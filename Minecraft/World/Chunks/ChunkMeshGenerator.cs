@@ -9,9 +9,6 @@ namespace Minecraft.World.Chunks
 {
     class ChunkMeshGenerator
     {
-        private bool renderBottomBlockVoid = false;
-        private bool renderSideBlockVoid = true;
-
         private float topLight = 0.9F;
         private float bottomLight = 2.4F;
         private float sideXLight = 1.15F;
@@ -22,15 +19,6 @@ namespace Minecraft.World.Chunks
         private List<int> indices;
         private List<float> lights;
         private int indCount;
-
-        public Vector3[] sides = {
-            new Vector3( 0, 0,-1), //Back
-            new Vector3( 1, 0, 0),  //Right
-            new Vector3( 0, 0, 1),  //Front
-            new Vector3(-1, 0, 0), //Left
-            new Vector3( 0, 1, 0),  //Top
-            new Vector3( 0,-1, 0)  //Bottom
-        };
 
         private BlockDatabase blockDatabase;
         private WorldMap world;
@@ -50,31 +38,19 @@ namespace Minecraft.World.Chunks
             lights = new List<float>();
             indCount = 0;
 
-           // activeNorthChunk = null;
-           // activeSouthChunk = null;
-           // activeEastChunk = null;
-           // activeWestChunk = null;
             activeCurrentChunk = null;
         }
 
         private Chunk activeCurrentChunk;
-        /*private Chunk activeNorthChunk;
-        private Chunk activeSouthChunk;
-        private Chunk activeEastChunk;
-        private Chunk activeWestChunk;*/
 
         public void PrepareChunkToRender(Chunk toPrepareChunk)
         {
-            //ResetData();
-           // SetActiveChunksForProcessing(toPrepareChunk.gridX, toPrepareChunk.gridZ);
             GenerateRenderMeshForChunk(toPrepareChunk);
 
             Chunk cXNeg = null;
             world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX - 1, toPrepareChunk.gridZ), out cXNeg);
             if (cXNeg != null)
             {
-                //ResetData();
-             //   SetActiveChunksForProcessing(cXNeg.gridX, cXNeg.gridZ);
                 GenerateRenderMeshForChunk(cXNeg);
             }
 
@@ -82,8 +58,6 @@ namespace Minecraft.World.Chunks
             world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX + 1, toPrepareChunk.gridZ), out cXPos);
             if (cXPos != null)
             {
-                //ResetData();
-           //     SetActiveChunksForProcessing(cXPos.gridX, cXPos.gridZ);
                 GenerateRenderMeshForChunk(cXPos);
             }
 
@@ -91,8 +65,6 @@ namespace Minecraft.World.Chunks
             world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX, toPrepareChunk.gridZ - 1), out cZNeg);
             if (cZNeg != null)
             {
-               // ResetData();
-             //   SetActiveChunksForProcessing(cZNeg.gridX, cZNeg.gridZ);
                 GenerateRenderMeshForChunk(cZNeg);
             }
 
@@ -100,20 +72,9 @@ namespace Minecraft.World.Chunks
             world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX, toPrepareChunk.gridZ + 1), out cZPos);
             if (cZPos != null)
             {
-                //ResetData();
-             //   SetActiveChunksForProcessing(cZPos.gridX, cZPos.gridZ);
                 GenerateRenderMeshForChunk(cZPos);
             }
         }
-
-       /* private void SetActiveChunksForProcessing(int sourceChunkGridX, int sourceChunkGridZ)
-        {
-            world.chunks.TryGetValue(new Vector2(sourceChunkGridX, sourceChunkGridZ), out activeCurrentChunk);
-            world.chunks.TryGetValue(new Vector2(sourceChunkGridX - 1, sourceChunkGridZ), out activeEastChunk);
-            world.chunks.TryGetValue(new Vector2(sourceChunkGridX + 1, sourceChunkGridZ), out activeWestChunk);
-            world.chunks.TryGetValue(new Vector2(sourceChunkGridX, sourceChunkGridZ - 1), out activeSouthChunk);
-            world.chunks.TryGetValue(new Vector2(sourceChunkGridX, sourceChunkGridZ + 1), out activeNorthChunk);
-        }*/
 
         private void GenerateRenderMeshForSection(Section toProcessSection)
         {
@@ -221,24 +182,6 @@ namespace Minecraft.World.Chunks
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
         {
-            /*if (x - 1 < 0)
-            {
-                if (activeWestChunk == null)
-                {
-                    return renderSideBlockVoid;
-                }
-
-                Section neighbourSection = activeWestChunk.sections[currentSection.height];
-                if ((neighbourSection != null && currentSection.blocks[Constants.CHUNK_SIZE - 1, (int)y, (int)z] == null) || neighbourSection == null)
-                {
-                    return true;
-                }
-            }
-            else if (currentSection.blocks[(int)x - 1, (int)y, (int)z] == null)
-            {
-                return true;
-            }           
-            return false;*/
             if(x - 1 < 0)
             {
                 Section westSection = null;
@@ -266,24 +209,6 @@ namespace Minecraft.World.Chunks
 
         private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
         {
-            /*if (x + 1 >= Constants.CHUNK_SIZE)
-            {
-                if (activeEastChunk == null)
-                {
-                    return renderSideBlockVoid;
-                }
-
-                Section neighbourSection = activeEastChunk.sections[currentSection.height];
-                if ((neighbourSection != null && currentSection.blocks[0, (int)y, (int)z] == null) || neighbourSection == null)
-                {
-                    return true;
-                }
-            }
-            else if (currentSection.blocks[(int)x + 1, (int)y, (int)z] == null)
-            {
-                return true;
-            }
-            return false;*/
             if (x + 1 >= Constants.CHUNK_SIZE)
             {
                 Section eastSection = null;
@@ -313,24 +238,6 @@ namespace Minecraft.World.Chunks
 
         private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
         {
-            /*if(z + 1 >= Constants.CHUNK_SIZE)
-            {
-                if(activeNorthChunk == null)
-                {
-                    return renderSideBlockVoid;
-                }
-
-                Section neighbourSection = activeNorthChunk.sections[currentSection.height];
-                if ((neighbourSection != null && currentSection.blocks[(int)x, (int)y, 0] == null) || neighbourSection == null)
-                {
-                    return true;
-                }
-            }
-            else if (currentSection.blocks[(int)x, (int)y, (int)z + 1] == null)
-            {
-                return true;
-            }
-            return false;*/
             if (z + 1 >= Constants.CHUNK_SIZE)
             {
                 Section northSection = null;
@@ -360,24 +267,6 @@ namespace Minecraft.World.Chunks
 
         private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
         {
-            /*if (z - 1 < 0)
-            {
-                if (activeSouthChunk == null)
-                {
-                    return renderSideBlockVoid;
-                }
-
-                Section neighbourSection = activeSouthChunk.sections[currentSection.height];
-                if ((neighbourSection != null && currentSection.blocks[(int)x, (int)y, Constants.CHUNK_SIZE - 1] == null) || neighbourSection == null)
-                {
-                    return true;
-                }
-            }
-            else if (currentSection.blocks[(int)x, (int)y, (int)z - 1] == null)
-            {   
-                return true;       
-            }
-            return false;*/
             if (z - 1 < 0)
             {
                 Section southSection = null;
@@ -433,7 +322,7 @@ namespace Minecraft.World.Chunks
             {
                 if (currentSection.height == 0)
                 {
-                    return renderBottomBlockVoid;
+                    return true;
                 }
 
                 Section sectionBelow = activeCurrentChunk.sections[currentSection.height - 1];
