@@ -38,7 +38,7 @@ namespace Minecraft.Entities
             hitbox = new AABB(position, new Vector3(x1, y1, z1));
         }
 
-        public void Update(GameWindow window, WorldMap map, float time)
+        public void Update(GameWindow window, WorldMap map, float time, Input input)
         {
             if (window.Focused) {
            
@@ -216,6 +216,32 @@ namespace Minecraft.Entities
                 velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
 
                 mouseRay.Update();
+                if (input.OnMousePress(MouseButton.Right))
+                {
+
+                    //float x = Maths.round((camera.position.X + itMouse.ray.currentRay.X * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    // float y = Maths.round((camera.position.Y + itMouse.ray.currentRay.Y * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    //float z = Maths.round((camera.position.Z + itMouse.ray.currentRay.Z * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    int offset = 2;
+                    int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
+                    int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
+                    int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+                    
+                    map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
+                }
+                if (input.OnMousePress(MouseButton.Left))
+                {
+
+                    //float x = Maths.round((camera.position.X + itMouse.ray.currentRay.X * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    // float y = Maths.round((camera.position.Y + itMouse.ray.currentRay.Y * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    //float z = Maths.round((camera.position.Z + itMouse.ray.currentRay.Z * 20) - Constants.HALF_CUBE_SIZE, 8);
+                    int offset = 2;
+                    int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
+                    int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
+                    int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+                    
+                    map.AddBlockToWorld(x, y, z, BlockType.Air);
+                }
 
                 camera.SetPosition(position);
                 camera.Rotate();

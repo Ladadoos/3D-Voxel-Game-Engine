@@ -22,7 +22,7 @@ namespace Minecraft.Textures
 
             texturesPerRow = atlasSize / textureSize;
             unitSize = 1.0F / texturesPerRow;
-            centerOffset = 1.0F / atlasSize;
+            centerOffset = 2.0F / atlasSize;
         }
 
         public float[] GetCubeTextureCoords(int backX, int backY, int rightX, int rightY, int frontX, int frontY, int leftX, int leftY,

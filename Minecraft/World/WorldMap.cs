@@ -6,6 +6,7 @@ using OpenTK;
 using LibNoise;
 using Minecraft.World.Blocks;
 using Minecraft.World.Chunks;
+using Minecraft.Tools;
 
 namespace Minecraft.World
 {
@@ -51,7 +52,7 @@ namespace Minecraft.World
             {
                 for (int y = 0; y < 7; y++)
                 {
-                    GenerateBlocksForChunk(x, y);
+                   // GenerateBlocksForChunk(x, y);
                 }
             }
             var now2 = DateTime.Now - start;
@@ -133,9 +134,41 @@ namespace Minecraft.World
 
         public Vector2 GetChunkPosition(float xPos, float yPos)
         {
-            int x = (int)(System.Math.Ceiling(xPos / Constants.CHUNK_SIZE)) - 1;
-            int z = (int)(System.Math.Ceiling(yPos / Constants.CHUNK_SIZE)) - 1;
-            return new Vector2(x, z);
+            //int x = (int)(System.Math.Ceiling(xPos / Constants.CHUNK_SIZE)) - 1;
+            //int z = (int)(System.Math.Ceiling(yPos / Constants.CHUNK_SIZE)) - 1;
+            return new Vector2((int)xPos >> 4, (int)yPos >> 4);
+        }
+
+        public bool AddBlockToWorld(int x, int y, int z, BlockType blockType)
+        {
+            if (IsOutsideBuildHeight(y))
+            {
+                return false;
+            }
+
+            Vector2 chunkPos = GetChunkPosition((float)x, (float)z);
+            Chunk chunk;
+            if(!chunks.TryGetValue(chunkPos, out chunk))
+            {
+                Console.WriteLine("tried to add block in junk that doesnt exist");
+                return false;
+            }
+
+            int i = x & 15;
+            int j = y;
+            int k = z & 15;
+
+            chunk.AddBlock(i, j, k, blockType);
+            chunkMeshGenerator.PrepareChunkToRender(chunk);
+            //Console.WriteLine("Local space" + x2 + "," + z2);
+            Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
+
+            return true;
+        }
+
+        public bool IsOutsideBuildHeight(int height)
+        {
+            return height < 0 || height >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
         }
     }
 }

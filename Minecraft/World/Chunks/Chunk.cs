@@ -34,7 +34,15 @@ namespace Minecraft.World
             }
 
             int localY = y - h * Constants.SECTION_HEIGHT;
-            sections[h].AddBlock(x, localY, z, block);
+            if(block == BlockType.Air)
+            {
+                sections[h].RemoveBlock(x, localY, z);
+            }
+            else
+            {
+                sections[h].AddBlock(x, localY, z, block);
+            }
+            
         }
     }
 }

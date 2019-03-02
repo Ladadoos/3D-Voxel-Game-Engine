@@ -15,6 +15,9 @@ using System.Drawing;
 
 namespace Minecraft.Main
 {
+
+    //player.position is not center of player!
+
     sealed class GameWindow : OpenTK.GameWindow
     {
         public MasterRenderer masterRenderer;
@@ -22,7 +25,7 @@ namespace Minecraft.Main
         public Player player;
         public WorldMap world;
         public BlockDatabase blockDatabase;
-
+        public Input input;
 
         public TextRenderer renderer;
         Font serif = new Font(FontFamily.GenericSerif, 24);
@@ -60,7 +63,7 @@ namespace Minecraft.Main
             world = new WorldMap(blockDatabase);
             world.GenerateTestMap();
             player = new Player(masterRenderer.projectionMatrix);
-
+            input = new Input();
             /*renderer = new TextRenderer(Width, Height);
             PointF position = PointF.Empty;
 
@@ -80,11 +83,13 @@ namespace Minecraft.Main
         {
             elapsedFrames++;
             elapsedTime += e.Time;
-            Title = "Vsync: " + VSync + " FPS: " + (int)(1f / e.Time) + " AVG FPS: " + (int)(elapsedFrames / elapsedTime) + " Position: " + player.position;
+            Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
+            Title = "Vsync: " + VSync + " FPS: " + (int)(1f / e.Time) + " AVG FPS: " + (int)(elapsedFrames / elapsedTime) + " Position: " + player.position + "Grid Pos: " + chunkPos;
             if(OpenTK.Input.Keyboard.GetState().IsKeyDown(Key.Escape)) {
                 Exit();
             }
-            player.Update(this, world, (float)e.Time);
+            input.Update();
+            player.Update(this, world, (float)e.Time, input);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
