@@ -12,8 +12,8 @@ namespace Minecraft.Textures
         public int textureSize;
 
         private int texturesPerRow;
-        private float unitSize;
-        private float centerOffset;
+        private float textureUVsize;
+        private float texelSize;
 
         public TextureAtlas(int textureId, int atlasSize, int textureSize) : base(textureId)
         {
@@ -21,8 +21,8 @@ namespace Minecraft.Textures
             this.textureSize = textureSize;
 
             texturesPerRow = atlasSize / textureSize;
-            unitSize = 1.0F / texturesPerRow;
-            centerOffset = 1.0F / (atlasSize * 2);
+            textureUVsize = 1.0F / texturesPerRow;
+            texelSize = 0.5F / atlasSize;
         }
 
         public float[] GetCubeTextureCoords(int backX, int backY, int rightX, int rightY, int frontX, int frontY, int leftX, int leftY,
@@ -42,11 +42,11 @@ namespace Minecraft.Textures
 
         public float[] GetTextureCoords(int x, int y)
         {
-            float xMin = x * unitSize + centerOffset;
-            float yMin = y * unitSize + centerOffset;
+            float xMin = x * textureUVsize + texelSize * 0.5F;
+            float yMin = y * textureUVsize + texelSize * 0.5F;
 
-            float xMax = x * unitSize  + unitSize - centerOffset;
-            float yMax = y * unitSize  + unitSize - centerOffset;
+            float xMax = x * textureUVsize + textureUVsize - texelSize * 0.5F;
+            float yMax = y * textureUVsize + textureUVsize - texelSize * 0.5F;
 
             float[] textureCoords = {
                 xMax, yMax,
