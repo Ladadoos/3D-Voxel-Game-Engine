@@ -46,13 +46,16 @@ namespace Minecraft.World
 
         public void GenerateTestMap()
         {
-            for (int x = 0; x < 15; x += 2)
+            var start = DateTime.Now;
+            for (int x = 0; x < 30; x++)
             {
-                for (int y = 0; y < 15; y += 2)
+                for (int y = 0; y < 30; y++)
                 {
                     GenerateBlocksForChunk(x, y);
                 }
             }
+            var now2 = DateTime.Now - start;
+            Console.WriteLine("Generating 30x30 chunks took: " + now2 + " ms");
             Console.WriteLine("Generation completed.");
         }
 
@@ -125,10 +128,9 @@ namespace Minecraft.World
             //chunks.Add(new Vector2(x, y), chunkC);
             //chunks[x, y] = chunkC;
             chunks.Add(new Vector2(x, y), chunkC);
-            var start = DateTime.Now;
+            //var start = DateTime.Now;
             chunkMeshGenerator.PrepareChunkToRender(chunkC);
-            var now2 = DateTime.Now - start;
-            Console.WriteLine("Chunk time: " + now2);
+
             //Logger.log("Block gen time[" + now + "]     Mesh updating time[" + now2 + "]     Chunk count[" + chunks.Count + "]", LogType.INFORMATION);
         }
 
