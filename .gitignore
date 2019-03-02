@@ -5,6 +5,11 @@
 /[Bb]uilds/
 /[Aa]uto[Bb]uild/
 
+*/**/bin/Debug
+*/**/bin/Release
+*/**/obj/Debug
+*/**/obj/Release
+
 .vscode/
 .vs/
 
