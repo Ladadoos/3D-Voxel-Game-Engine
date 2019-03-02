@@ -5,7 +5,7 @@ namespace Minecraft.World.Sections
     class Section
     {  
         public sbyte height;
-        public sbyte?[,,] blocks = new sbyte?[Constants.CHUNK_SIZE, Constants.CHUNK_SIZE, Constants.CHUNK_SIZE];
+        public sbyte?[,,] blocks = new sbyte?[Constants.CHUNK_SIZE, Constants.SECTION_HEIGHT, Constants.CHUNK_SIZE];
 
         public Section(sbyte height)
         {

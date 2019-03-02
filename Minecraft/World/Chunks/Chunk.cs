@@ -11,7 +11,7 @@ namespace Minecraft.World
     {
         public Model model;
 
-        public Section[] sections = new Section[Constants.CHUNK_SIZE];
+        public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX;
         public int gridZ;
 
@@ -27,13 +27,13 @@ namespace Minecraft.World
 
         public void AddBlock(int x, int y, int z, BlockType block)
         {
-            int h = y / Constants.CHUNK_SIZE;
+            int h = y / Constants.SECTION_HEIGHT;
             if(sections[h] == null)
             {
                 sections[h] = new Section((sbyte)h);
             }
 
-            int localY = y - h * Constants.CHUNK_SIZE;
+            int localY = y - h * Constants.SECTION_HEIGHT;
             sections[h].AddBlock(x, localY, z, block);
         }
     }

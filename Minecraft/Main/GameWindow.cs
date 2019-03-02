@@ -16,7 +16,6 @@ namespace Minecraft.Main
 {
     sealed class GameWindow : OpenTK.GameWindow
     {
-
         public MasterRenderer masterRenderer;
         public Loader loader;
         public Player player;
@@ -62,7 +61,7 @@ namespace Minecraft.Main
         {
             elapsedFrames++;
             elapsedTime += e.Time;
-            Title = "Minecraft    Vsync: " + VSync + "    FPS: " + (int)(1f / e.Time) + "AVG FPS: " + elapsedFrames / elapsedTime + "Position: " + player.position;
+            Title = "Vsync: " + VSync + " FPS: " + (int)(1f / e.Time) + " AVG FPS: " + (int)(elapsedFrames / elapsedTime) + " Position: " + player.position;
             if(OpenTK.Input.Keyboard.GetState().IsKeyDown(Key.Escape)) {
                 Exit();
             }

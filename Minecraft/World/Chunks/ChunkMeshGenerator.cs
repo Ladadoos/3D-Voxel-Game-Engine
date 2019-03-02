@@ -105,12 +105,12 @@ namespace Minecraft.World.Chunks
                     continue;
                 }
 
-                for (int x = 0; x < 16; x++)
+                for (int x = 0; x < Constants.CHUNK_SIZE; x++)
                 {
-                    for (int z = 0; z < 16; z++)
+                    for (int z = 0; z < Constants.CHUNK_SIZE; z++)
                     {
                         int y2 = 0;
-                        for(int y = 0; y < 16; y++)
+                        for(int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
                             sbyte? b = section.blocks[x, y, z];
                             if(b == null)
@@ -122,7 +122,7 @@ namespace Minecraft.World.Chunks
                             blockDatabase.blockTextures.TryGetValue(block, out tCoords);
                             if (tCoords != null)
                             {
-                                y2 = y + i * 16;
+                                y2 = y + i * Constants.SECTION_HEIGHT;
                                 if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z, tCoords))
                                 {
                                     AddFace(BlockSide.RIGHT, x, y2, z, tCoords, sideZLight);
@@ -296,9 +296,9 @@ namespace Minecraft.World.Chunks
 
         private bool ShouldAddTopFaceOfBlock(Section currentSection, float x, float y, float z, float[] textureCoordinates)
         {
-            if(y + 1 >= Constants.CHUNK_SIZE)
+            if(y + 1 >= Constants.SECTION_HEIGHT)
             {
-                if(currentSection.height == Constants.CHUNK_SIZE - 1)
+                if(currentSection.height == Constants.SECTION_HEIGHT - 1)
                 {
                     return true;
                 }
@@ -326,7 +326,7 @@ namespace Minecraft.World.Chunks
                 }
 
                 Section sectionBelow = activeCurrentChunk.sections[currentSection.height - 1];
-                if ((sectionBelow != null && sectionBelow.blocks[(int)x, Constants.CHUNK_SIZE - 1, (int)z] == null) || sectionBelow == null)
+                if ((sectionBelow != null && sectionBelow.blocks[(int)x, Constants.SECTION_HEIGHT - 1, (int)z] == null) || sectionBelow == null)
                 {
                     return true;
                 }

@@ -38,7 +38,7 @@ namespace Minecraft.World
 
         public void CleanUp()
         {
-            foreach(KeyValuePair<Vector2, Chunk> gridChunk in chunks)
+            foreach (KeyValuePair<Vector2, Chunk> gridChunk in chunks)
             {
                 gridChunk.Value.model.CleanUp();
             }
@@ -46,9 +46,9 @@ namespace Minecraft.World
 
         public void GenerateTestMap()
         {
-            for (int x = 0; x < 15; x+=2)
+            for (int x = 0; x < 15; x += 2)
             {
-                for (int y = 0; y < 15; y+=2)
+                for (int y = 0; y < 15; y += 2)
                 {
                     GenerateBlocksForChunk(x, y);
                 }
@@ -59,10 +59,10 @@ namespace Minecraft.World
 
         public void GenerateBlocksForChunk(int x, int y)
         {
-            var start = DateTime.Now;
+  
 
 
-            double xOff = 0;
+            /*double xOff = 0;
             double yOff = 0;
             Chunk chunkC;
 
@@ -106,27 +106,29 @@ namespace Minecraft.World
                     xOff += perlinNoise;
                 }
                 yOff += perlinNoise;
-            }
+            }*/
 
-            /*int yyy = random.Next(255);
+            Chunk chunkC = new Chunk(x, y);
+            int yyy = Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT - 1;
             Array val = Enum.GetValues(typeof(BlockType));
             for (int i = 0; i < Constants.CHUNK_SIZE; i++)
             {
                 for (int j = 0; j < Constants.CHUNK_SIZE; j++)
                 {
-                    for(int k = 0; k < random.Next(64) + 1; k++)
+                    for (int k = 0; k < yyy; k++)
                     {
-                       // sbyte r = (sbyte)(random.Next(10) + 1);
+                        // sbyte r = (sbyte)(random.Next(10) + 1);
                         chunkC.AddBlock(i, k, j, (BlockType)(val.GetValue(random.Next(10) + 1)));
                     }
                 }
-            }*/
+            }
             //chunks.Add(new Vector2(x, y), chunkC);
             //chunks[x, y] = chunkC;
             chunks.Add(new Vector2(x, y), chunkC);
-            var now = DateTime.Now - start;
+            var start = DateTime.Now;
             chunkMeshGenerator.PrepareChunkToRender(chunkC);
             var now2 = DateTime.Now - start;
+            Console.WriteLine("Chunk time: " + now2);
             //Logger.log("Block gen time[" + now + "]     Mesh updating time[" + now2 + "]     Chunk count[" + chunks.Count + "]", LogType.INFORMATION);
         }
 

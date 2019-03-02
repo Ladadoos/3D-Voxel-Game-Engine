@@ -7,9 +7,11 @@
          * General
          */
 
+        public const int SECTION_HEIGHT = 16;
         public const float CUBE_SIZE = 1.0F;
         public const float HALF_CUBE_SIZE = CUBE_SIZE / 2.0F;
         public const int CHUNK_SIZE = 16;
+        public const int SECTIONS_IN_CHUNKS = 16;
 
         /*
          * Physics
@@ -29,7 +31,7 @@
         public const float PLAYER_WIDTH = HALF_CUBE_SIZE; /** X direction */
         public const float PLAYER_LENGTH = HALF_CUBE_SIZE; /** Z direction */
 
-        public const float PLAYER_BASE_MOVE_SPEED = 1.13F;
+        public const float PLAYER_BASE_MOVE_SPEED = 0.13F;
         public const float PLAYER_SPRINT_MULTIPLIER = 1.7F;
         public const float PLAYER_CROUCH_MULTIPLIER = 0.4F;
         public const float PLAYER_JUMP_FORCE = 2.15F;

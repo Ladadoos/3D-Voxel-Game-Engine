@@ -62,25 +62,25 @@ namespace Minecraft.Entities
                     AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
                 }
 
-                /*Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
+                Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
                 if (!map.chunks.ContainsKey(chunkPos) && Keyboard.GetState().IsKeyDown(Key.Z)) {
                     map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-                }*/
+                }
 
-                Vector2 chunkPos = Vector2.Zero;
+                /*Vector2 chunkPos = Vector2.Zero;
                 for (int i = -1; i < 3; i++)
                 {
                   for(int j = -1; j < 3; j++)
                     {
-                        float x = position.X + i * 16;
-                        float z = position.Z + j * 16;
+                        float x = position.X + i * Constants.CHUNK_SIZE;
+                        float z = position.Z + j * Constants.CHUNK_SIZE;
                         chunkPos = map.GetChunkPosition(x, z);
                         if (!map.chunks.ContainsKey(chunkPos))
                         {
                             map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
                         }
                     }
-                }
+                }*/
 
                 sbyte h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
 
