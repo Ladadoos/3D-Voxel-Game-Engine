@@ -280,9 +280,9 @@ namespace Minecraft.Entities
 
         private void CalculateHitbox()
         {
-            float x1 = position.X + Constants.PLAYER_WIDTH;
+            float x1 = position.X + Constants.PLAYER_WIDTH / 2.0F;
             float y1 = position.Y + Constants.PLAYER_HEIGHT;
-            float z1 = position.Z + Constants.PLAYER_LENGTH;
+            float z1 = position.Z + Constants.PLAYER_LENGTH / 2.0F;
             hitbox.setHitbox(position, new Vector3(x1, y1, z1));
         }
 
