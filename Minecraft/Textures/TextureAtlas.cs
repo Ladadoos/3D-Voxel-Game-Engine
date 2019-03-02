@@ -4,11 +4,16 @@ namespace Minecraft.Textures
 {
     class TextureAtlas : Texture
     {
+        //center offset variable
+        //https://gamedev.stackexchange.com/questions/46963/how-to-avoid-texture-bleeding-in-a-texture-atlas
+
+
         public int atlasSize;
         public int textureSize;
 
         private int texturesPerRow;
         private float unitSize;
+        private float centerOffset;
 
         public TextureAtlas(int textureId, int atlasSize, int textureSize) : base(textureId)
         {
@@ -17,6 +22,7 @@ namespace Minecraft.Textures
 
             texturesPerRow = atlasSize / textureSize;
             unitSize = 1.0F / texturesPerRow;
+            centerOffset = 1.0F / atlasSize;
         }
 
         public float[] GetCubeTextureCoords(int backX, int backY, int rightX, int rightY, int frontX, int frontY, int leftX, int leftY,
@@ -36,11 +42,11 @@ namespace Minecraft.Textures
 
         public float[] GetTextureCoords(int x, int y)
         {
-            float xMin = x * unitSize;
-            float yMin = y * unitSize;
+            float xMin = x * unitSize + centerOffset;
+            float yMin = y * unitSize + centerOffset;
 
-            float xMax = xMin + unitSize;
-            float yMax = yMin + unitSize;
+            float xMax = x * unitSize  + unitSize - centerOffset;
+            float yMax = y * unitSize  + unitSize - centerOffset;
 
             float[] textureCoords = {
                 xMax, yMax,

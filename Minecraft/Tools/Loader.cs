@@ -24,8 +24,8 @@ namespace Minecraft.Tools
             GL.GenTextures(1, out texture);
             GL.BindTexture(TextureTarget.Texture2D, texture);
 
-           // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, 10497); //10497 = REPEAT
-            //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, 10497);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, 10497); //10497 = REPEAT
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, 10497);
            // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9728); //9729 = LINEAR
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9728); //9728 = NEAREST
 

@@ -12,7 +12,7 @@ namespace Minecraft.World.Blocks
 
         public BlockDatabase(Loader loader)
         {
-            textureAtlas = new TextureAtlas(loader.LoadTexture("../../Resources/texturePack2.png"), 256, 16);
+            textureAtlas = new TextureAtlas(loader.LoadTexture("../../Resources/texturePack.png"), 512, 32);
         }
 
         public void RegisterBlocks()

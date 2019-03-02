@@ -18,7 +18,7 @@ namespace Minecraft.World
         public Random random = new Random();
 
         public static Perlin perlin = new Perlin();
-        public double perlinNoise = 0.0025D; //0.0006f
+        public double perlinNoise = 0.004D; //0.0006f
 
         public TreeGenerator treeGenerator;
         public ChunkMeshGenerator chunkMeshGenerator;
@@ -47,25 +47,22 @@ namespace Minecraft.World
         public void GenerateTestMap()
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 30; x++)
+            for (int x = 0; x < 7; x++)
             {
-                for (int y = 0; y < 30; y++)
+                for (int y = 0; y < 7; y++)
                 {
                     GenerateBlocksForChunk(x, y);
                 }
             }
             var now2 = DateTime.Now - start;
-            Console.WriteLine("Generating 30x30 chunks took: " + now2 + " ms");
+            Console.WriteLine("Generating chunks took: " + now2 + " s");
             Console.WriteLine("Generation completed.");
         }
 
 
         public void GenerateBlocksForChunk(int x, int y)
         {
-  
-
-
-            /*double xOff = 0;
+            double xOff = 0;
             double yOff = 0;
             Chunk chunkC;
 
@@ -109,10 +106,10 @@ namespace Minecraft.World
                     xOff += perlinNoise;
                 }
                 yOff += perlinNoise;
-            }*/
+            }
 
-            Chunk chunkC = new Chunk(x, y);
-            int yyy = Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT - 1;
+            /*Chunk chunkC = new Chunk(x, y);
+            int yyy = random.Next(100);//Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT - 1;
             Array val = Enum.GetValues(typeof(BlockType));
             for (int i = 0; i < Constants.CHUNK_SIZE; i++)
             {
@@ -124,7 +121,7 @@ namespace Minecraft.World
                         chunkC.AddBlock(i, k, j, (BlockType)(val.GetValue(random.Next(10) + 1)));
                     }
                 }
-            }
+            }*/
             //chunks.Add(new Vector2(x, y), chunkC);
             //chunks[x, y] = chunkC;
             chunks.Add(new Vector2(x, y), chunkC);
