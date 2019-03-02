@@ -24,10 +24,10 @@ namespace Minecraft.Tools
             GL.GenTextures(1, out texture);
             GL.BindTexture(TextureTarget.Texture2D, texture);
 
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, 10497); //10497 = REPEAT
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, 10497);
-           // GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, 9728); //9729 = LINEAR
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, 9728); //9728 = NEAREST
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge); 
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
 
             Bitmap image = new Bitmap(filePath);
             BitmapData data = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
