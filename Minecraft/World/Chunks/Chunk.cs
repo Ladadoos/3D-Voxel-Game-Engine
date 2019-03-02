@@ -9,20 +9,14 @@ namespace Minecraft.World
 {
     class Chunk
     {
-        public Model model;
-
         public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX;
         public int gridZ;
-
-        public Matrix4 transformationMatrix;
 
         public Chunk(int gridX, int gridZ)
         {
             this.gridX = gridX;
             this.gridZ = gridZ;
-
-            transformationMatrix = Maths.CreateTransformationMatrix(new Vector3(gridX * Constants.CHUNK_SIZE, 0, gridZ * Constants.CHUNK_SIZE), 0, 0, 0, 1, 1, 1);
         }
 
         public void AddBlock(int x, int y, int z, BlockType block)

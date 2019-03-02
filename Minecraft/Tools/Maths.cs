@@ -6,7 +6,9 @@ namespace Minecraft.Tools
 {
     class Maths
     {
-        public static Matrix4 CreateTransformationMatrix(Vector3 translation, float rx, float ry, float rz, float scaleX, float scaleY, float scaleZ)
+        public static Matrix4 CreateTransformationMatrix(Vector3 translation, 
+                                                        float rx = 0, float ry = 0, float rz = 0,
+                                                        float scaleX = 1, float scaleY = 1, float scaleZ = 1)
         {
             Matrix4 scaleMatrix = new Matrix4(scaleX, 0, 0, 0, 0, scaleY, 0, 0, 0, 0, scaleZ, 0, 0, 0, 0, 1);
             Matrix4 transformationmatrix = scaleMatrix *

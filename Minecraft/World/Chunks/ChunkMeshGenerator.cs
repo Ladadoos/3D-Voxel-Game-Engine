@@ -83,8 +83,8 @@ namespace Minecraft.World.Chunks
 
         private void GenerateRenderMeshForChunk(Chunk chunk)
         {
-            ResetData();
             activeCurrentChunk = chunk;
+
             Chunk cXNeg = null;
             world.chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out cXNeg);
 
@@ -153,7 +153,19 @@ namespace Minecraft.World.Chunks
                     }
                 }
             }
-            chunk.model = new Model(positions.ToArray(), textureCoords.ToArray(), indices.ToArray(), lights.ToArray());
+
+            Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), indices.ToArray(), lights.ToArray());
+            RenderChunk newRenderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
+            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            if (world.renderChunks.ContainsKey(chunkPos))
+            {
+                world.renderChunks[chunkPos] = newRenderChunk;
+            }
+            else
+            {
+                world.renderChunks.Add(chunkPos, newRenderChunk);
+            }
+
             ResetData();
         }
 

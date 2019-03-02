@@ -24,6 +24,8 @@ namespace Minecraft.World
         public TreeGenerator treeGenerator;
         public ChunkMeshGenerator chunkMeshGenerator;
         public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
+        public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
+
 
         public BlockDatabase db;
 
@@ -39,9 +41,9 @@ namespace Minecraft.World
 
         public void CleanUp()
         {
-            foreach (KeyValuePair<Vector2, Chunk> gridChunk in chunks)
+            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in renderChunks)
             {
-                gridChunk.Value.model.CleanUp();
+                chunkToRender.Value.OnApplicationClosed();
             }
         }
 

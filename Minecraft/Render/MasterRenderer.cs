@@ -54,12 +54,12 @@ namespace Minecraft.Render
 
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, Maths.CreateViewMatrix(camera));
-            foreach (KeyValuePair<Vector2, Chunk> gridChunk in world.chunks)
+            foreach (KeyValuePair<Vector2, RenderChunk> renderChunk in world.renderChunks)
             {
-                gridChunk.Value.model.Bind();
-                basicShader.LoadMatrix(basicShader.location_TransformationMatrix, gridChunk.Value.transformationMatrix);
-                GL.DrawElements(PrimitiveType.Triangles, gridChunk.Value.model.indicesCount, DrawElementsType.UnsignedInt, 0);
-                gridChunk.Value.model.Unbind();
+                renderChunk.Value.HardBlocksModel.Bind();
+                basicShader.LoadMatrix(basicShader.location_TransformationMatrix, renderChunk.Value.TransformationMatrix);
+                GL.DrawElements(PrimitiveType.Triangles, renderChunk.Value.HardBlocksModel.indicesCount, DrawElementsType.UnsignedInt, 0);
+                renderChunk.Value.HardBlocksModel.Unbind();
             }
          
             basicShader.Stop();
