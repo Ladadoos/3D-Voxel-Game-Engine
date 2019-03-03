@@ -55,8 +55,8 @@ namespace Minecraft.Entities
                     AddForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
                 }
                 if (Keyboard.GetState().IsKeyDown(Key.Space)) {
-                    AddForce(0.0F, 1.0F * speedMultiplier, 0.0F);
-                    //Jump();
+                    //AddForce(0.0F, 1.0F * speedMultiplier, 0.0F);
+                    Jump();
                 }
                 if (Keyboard.GetState().IsKeyDown(Key.ShiftLeft)) {
                     AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
@@ -91,6 +91,26 @@ namespace Minecraft.Entities
                 Section section = null;
 
                 map.chunks.TryGetValue(chunkPos, out chunk);
+
+                List<Vector3> b = GetCollisionDetectionBlockPositions(map);
+                foreach (Vector3 collidablePos in b)
+                {
+                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                    if (hitbox.intersects(blockAABB))
+                    {
+                        if (velocity.X > 0.0F)
+                        {
+                            position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
+                            velocity.X = 0.0F;
+                        }
+                        if (velocity.X < 0.0F)
+                        {
+                            position.X = blockAABB.max.X;
+                            velocity.X = 0.0F;
+                        }
+                    }
+                }
+
                /* if (chunk != null)
                 {
                     if(h <= 15 || h >= 0)
@@ -132,11 +152,11 @@ namespace Minecraft.Entities
 
                 chunkPos = map.GetChunkPosition(position.X, position.Z);
 
-                /*if (verticalSpeed > Constants.GRAVITY_THRESHOLD) {
+                if (verticalSpeed > Constants.GRAVITY_THRESHOLD) {
                     verticalSpeed += Constants.GRAVITY * (float)time;
                 } else {
                     verticalSpeed = Constants.GRAVITY_THRESHOLD;
-                }*/
+                }
                 AddForce(0.0F, verticalSpeed, 0.0F);
 
                 bool collidedY = false;
@@ -146,6 +166,30 @@ namespace Minecraft.Entities
                 h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
                 // blockAABB.min = Vector3.Zero; blockAABB.max = Vector3.Zero;
                 map.chunks.TryGetValue(chunkPos, out chunk);
+
+                foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+                {
+                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                    if (hitbox.intersects(blockAABB))
+                    {
+                        if (velocity.Y > 0.0F)
+                        {
+                            position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
+                            velocity.Y = 0.0F;
+                            verticalSpeed = 0.0F;
+                        }
+                        if (velocity.Y < 0.0F)
+                        {
+                            position.Y = blockAABB.max.Y;
+                            velocity.Y = 0.0F;
+                            verticalSpeed = 0.0F;
+                            collidedY = true;
+                        }
+                    }
+                }
+
+
+
                 // if (chunk != null) {
                 //    section = null;
                 //    chunk.sections.TryGetValue(h, out section);
@@ -185,6 +229,26 @@ namespace Minecraft.Entities
                 h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
                 // blockAABB.min = Vector3.Zero; blockAABB.max = Vector3.Zero;
                 map.chunks.TryGetValue(chunkPos, out chunk);
+
+                foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+                {
+                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                    if (hitbox.intersects(blockAABB))
+                    {
+                        if (velocity.Z > 0)
+                        {
+                            position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
+                            velocity.Z = 0;
+                        }
+                        if (velocity.Z < 0)
+                        {
+                            position.Z = blockAABB.max.Z;
+                            velocity.Z = 0;
+                        }
+                    }
+                }
+
+
                 // if (chunk != null) {
                 //     section = null;
                 //     chunk.sections.TryGetValue(h, out section);
@@ -222,7 +286,7 @@ namespace Minecraft.Entities
                     int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
                     int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
                     int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
-                    
+
                     map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
                 }
                 if (input.OnMouseDown(MouseButton.Left))
@@ -272,109 +336,137 @@ namespace Minecraft.Entities
 
         private void CalculateHitbox()
         {
-            float x1 = position.X + Constants.PLAYER_WIDTH / 2.0F;
+            float x1 = position.X + Constants.PLAYER_WIDTH;
             float y1 = position.Y + Constants.PLAYER_HEIGHT;
-            float z1 = position.Z + Constants.PLAYER_LENGTH / 2.0F;
+            float z1 = position.Z + Constants.PLAYER_LENGTH;
             hitbox.setHitbox(position, new Vector3(x1, y1, z1));
         }
 
-        /*private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap map)
+        private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap world)
         {
-            List<Vector3> blockPositions = new List<Vector3>();
+            //Adapt to player height for collision blocks selection?
+            List<Vector3> collidablePositions = new List<Vector3>();
 
-            Vector2 playerPositionInChunk = map.GetChunkPosition(position.X, position.Z);
+            int intX = (int)position.X;
+            int intY = (int)position.Y;
+            int intZ = (int)position.Z;
 
-            List<Chunk> chunks = new List<Chunk>();
-            Chunk chunk = null;
-
-            Vector2 surrounding = playerPositionInChunk;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if(chunk != null)
+            for (int xx = intX - 2; xx <= intX + 2; xx++)
             {
-                chunks.Add(chunk);
-                chunk = null;
+                for (int zz = intZ - 2; zz <= intZ + 2; zz++)
+                {
+                    for (int yy = intY - 2; yy <= intY + 3; yy++)
+                    {
+                        //Console.WriteLine(xx + " - " + yy + " - " + zz);
+                        BlockType block = world.GetBlockAt(intX, intY, intZ);
+                        if(block != BlockType.Air)
+                        {
+                            collidablePositions.Add(new Vector3(xx, yy, zz));
+                        }
+                    }
+                }
             }
+     
+            return collidablePositions;
+        }
 
-            surrounding.X += 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+    /*private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap map)
+    {
+        List<Vector3> blockPositions = new List<Vector3>();
 
-            surrounding.X -= 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        Vector2 playerPositionInChunk = map.GetChunkPosition(position.X, position.Z);
 
-            surrounding.Y += 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        List<Chunk> chunks = new List<Chunk>();
+        Chunk chunk = null;
 
-            surrounding.Y -= 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        Vector2 surrounding = playerPositionInChunk;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if(chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
 
-            surrounding.Y -= 1;
-            surrounding.X -= 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        surrounding.X += 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
 
-            surrounding.Y -= 1;
-            surrounding.X += 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        surrounding.X -= 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
 
-            surrounding.Y += 1;
-            surrounding.X -= 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        surrounding.Y += 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
 
-            surrounding.Y += 1;
-            surrounding.X += 1;
-            map.chunks.TryGetValue(surrounding, out chunk);
-            if (chunk != null)
-            {
-                chunks.Add(chunk);
-                chunk = null;
-            }
-            surrounding = playerPositionInChunk;
+        surrounding.Y -= 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
 
-            return blockPositions;
-        }*/
+        surrounding.Y -= 1;
+        surrounding.X -= 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
 
-        private double GetLength(int x, int y)
+        surrounding.Y -= 1;
+        surrounding.X += 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
+
+        surrounding.Y += 1;
+        surrounding.X -= 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
+
+        surrounding.Y += 1;
+        surrounding.X += 1;
+        map.chunks.TryGetValue(surrounding, out chunk);
+        if (chunk != null)
+        {
+            chunks.Add(chunk);
+            chunk = null;
+        }
+        surrounding = playerPositionInChunk;
+
+        return blockPositions;
+    }*/
+
+            private double GetLength(int x, int y)
         {
             return Math.Sqrt(x * x + y * y);
         }
