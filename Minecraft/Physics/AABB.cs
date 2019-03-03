@@ -21,10 +21,9 @@ namespace Minecraft.Physics
 
         public bool intersects(AABB c)
         {
-            if ((c.max.X <= min.X) || (c.min.X >= max.X)) return false;
-            if ((c.max.Y <= min.Y) || (c.min.Y >= max.Y)) return false;
-            if ((c.max.Z <= min.Z) || (c.min.Z >= max.Z)) return false;
-            return true;
+            return min.X < c.max.X && max.X > c.min.X && 
+                   min.Y < c.max.Y && max.Y > c.min.Y &&
+                   min.Z < c.max.Z && max.Z > c.min.Z;
         }
     }
 }

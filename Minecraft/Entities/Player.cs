@@ -62,35 +62,10 @@ namespace Minecraft.Entities
                     AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
                 }
 
-                Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
-                if (!map.chunks.ContainsKey(chunkPos) && Keyboard.GetState().IsKeyDown(Key.Z)) {
-                    map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-                }
-
-                /*Vector2 chunkPos = Vector2.Zero;
-                for (int i = -1; i < 3; i++)
-                {
-                  for(int j = -1; j < 3; j++)
-                    {
-                        float x = position.X + i * Constants.CHUNK_SIZE;
-                        float z = position.Z + j * Constants.CHUNK_SIZE;
-                        chunkPos = map.GetChunkPosition(x, z);
-                        if (!map.chunks.ContainsKey(chunkPos))
-                        {
-                            map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-                        }
-                    }
-                }*/
-
-                sbyte h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
+                UpdateWorldGenerationBasedOnPlayerPosition(map);
 
                 position.X += velocity.X * time;
                 CalculateHitbox();
-
-                Chunk chunk = null;
-                Section section = null;
-
-                map.chunks.TryGetValue(chunkPos, out chunk);
 
                 List<Vector3> b = GetCollisionDetectionBlockPositions(map);
                 foreach (Vector3 collidablePos in b)
@@ -111,47 +86,6 @@ namespace Minecraft.Entities
                     }
                 }
 
-               /* if (chunk != null)
-                {
-                    if(h <= 15 || h >= 0)
-                    {
-                        section = chunk.sections[h];
-                        if (section != null)
-                        {
-                            //foreach (KeyValuePair<Vector3, sbyte> block in section.blocks.ToArray())
-                            //{
-                            for (int x = 0; x < 16; x++)
-                            {
-                                for (int z = 0; z < 16; z++)
-                                {
-                                    for (int y = 0; y < 16; y++)
-                                    {
-                                        Vector3 pos = new Vector3(chunkPos.X * 16 + x, h - section.height)
-                                        AABB blockAABB = Cube.GetAABB(pos.X + chunkPos.X * 16, pos.Y, pos.Z + chunkPos.Y * 16);
-                                        if (hitbox.intersects(blockAABB) && block.Value != 0)
-                                        {
-                                            if (velocity.X > 0.0F)
-                                            {
-                                                position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
-                                                velocity.X = 0.0F;
-                                            }
-                                            if (velocity.X < 0.0F)
-                                            {
-                                                position.X = blockAABB.max.X;
-                                                velocity.X = 0.0F;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            //}
-                        }
-                    }
-                }*/
-
-                chunkPos = map.GetChunkPosition(position.X, position.Z);
-
                 if (verticalSpeed > Constants.GRAVITY_THRESHOLD) {
                     verticalSpeed += Constants.GRAVITY * (float)time;
                 } else {
@@ -162,13 +96,10 @@ namespace Minecraft.Entities
                 bool collidedY = false;
                 position.Y += velocity.Y * time;
                 CalculateHitbox();
-                chunk = null;
-                h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
-                // blockAABB.min = Vector3.Zero; blockAABB.max = Vector3.Zero;
-                map.chunks.TryGetValue(chunkPos, out chunk);
-
+ 
                 foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
                 {
+                   // Console.WriteLine(collidablePos);
                     AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                     if (hitbox.intersects(blockAABB))
                     {
@@ -187,49 +118,11 @@ namespace Minecraft.Entities
                         }
                     }
                 }
-
-
-
-                // if (chunk != null) {
-                //    section = null;
-                //    chunk.sections.TryGetValue(h, out section);
-                //    if (section != null) {
-                //foreach (KeyValuePair<Vector3, sbyte> block in section.blocks.ToArray()) {
-                //   Vector3 pos = block.Key;
-                //  blockAABB.min.X = pos.X + chunkPos.X * 16;
-                // blockAABB.min.Y = pos.Y;
-                // blockAABB.min.Z = pos.Z + chunkPos.Y * 16;
-                // blockAABB.max.X += blockAABB.min.X + Constants.CUBE_SIZE;
-                // blockAABB.max.Y += blockAABB.min.Y + Constants.CUBE_SIZE;
-                // blockAABB.max.Z += blockAABB.min.Z + Constants.CUBE_SIZE;
-                /* AABB blockAABB = Cube.getAABB(pos.X + chunkPos.X * 16, pos.Y, pos.Z + chunkPos.Y * 16);
-                 if (hitbox.intersects(blockAABB) && block.Value != 0) {
-                     if (velocity.Y > 0.0F) {
-                         position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
-                         velocity.Y = 0.0F;
-                         verticalSpeed = 0.0F;
-                     }
-                     if (velocity.Y < 0.0F) {
-                         position.Y = blockAABB.max.Y;
-                         velocity.Y = 0.0F;
-                         verticalSpeed = 0.0F;
-                         collidedY = true;
-                     }
-                 }*/
-                // }
-                //  }
-                // }
                 isInAir = !collidedY;
-
-                chunkPos = map.GetChunkPosition(position.X, position.Z);
 
                 position.Z += velocity.Z * time;
                 CalculateHitbox();
-                chunk = null;
-                h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
-                // blockAABB.min = Vector3.Zero; blockAABB.max = Vector3.Zero;
-                map.chunks.TryGetValue(chunkPos, out chunk);
-
+   
                 foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
                 {
                     AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
@@ -237,7 +130,7 @@ namespace Minecraft.Entities
                     {
                         if (velocity.Z > 0)
                         {
-                            position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
+                            position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;                     
                             velocity.Z = 0;
                         }
                         if (velocity.Z < 0)
@@ -247,35 +140,6 @@ namespace Minecraft.Entities
                         }
                     }
                 }
-
-
-                // if (chunk != null) {
-                //     section = null;
-                //     chunk.sections.TryGetValue(h, out section);
-                //     if(section != null) {
-                //foreach (KeyValuePair<Vector3, sbyte> block in section.blocks.ToArray()) {
-                //    Vector3 pos = block.Key;
-                // blockAABB.min.X = pos.X + chunkPos.X * 16;
-                // blockAABB.min.Y = pos.Y;
-                /// blockAABB.min.Z = pos.Z + chunkPos.Y * 16;
-                // blockAABB.max.X += blockAABB.min.X + Constants.CUBE_SIZE;
-                // blockAABB.max.Y += blockAABB.min.Y + Constants.CUBE_SIZE;
-                // blockAABB.max.Z += blockAABB.min.Z + Constants.CUBE_SIZE;
-                /*AABB blockAABB = Cube.getAABB(pos.X + chunkPos.X * 16, pos.Y, pos.Z + chunkPos.Y * 16);
-                if (hitbox.intersects(blockAABB) && block.Value != 0) {
-                    if (velocity.Z > 0) {
-                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
-                        velocity.Z = 0;
-                    }
-                    if (velocity.Z < 0) {
-                        position.Z = blockAABB.max.Z;
-                        velocity.Z = 0;
-                    }
-                }*/
-                // }
-                //    }
-                //  }
-
 
                 velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
 
@@ -303,6 +167,29 @@ namespace Minecraft.Entities
                 camera.Rotate();
                 camera.ResetCursor(window.Bounds);
             }
+        }
+
+        private void UpdateWorldGenerationBasedOnPlayerPosition(WorldMap map)
+        {
+            Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
+            if (!map.chunks.ContainsKey(chunkPos) && Keyboard.GetState().IsKeyDown(Key.Z))
+            {
+                map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
+            }
+
+            /*for (int i = -1; i < 3; i++)
+            {
+                for(int j = -1; j < 3; j++)
+                {
+                    float x = position.X + i * Constants.CHUNK_SIZE;
+                    float z = position.Z + j * Constants.CHUNK_SIZE;
+                    Vector2 chunkPos = map.GetChunkPosition(x, z);
+                    if (!map.chunks.ContainsKey(chunkPos))
+                    {
+                        map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
+                    }
+                }
+            }*/
         }
 
         private void AddForce(float x, float y, float z)
@@ -347,17 +234,16 @@ namespace Minecraft.Entities
             //Adapt to player height for collision blocks selection?
             List<Vector3> collidablePositions = new List<Vector3>();
 
-            int intX = (int)position.X;
+            /*int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
-            for (int xx = intX - 2; xx <= intX + 2; xx++)
+            for (int xx = intX - 5; xx <= intX + 5; xx++)
             {
-                for (int zz = intZ - 2; zz <= intZ + 2; zz++)
+                for (int zz = intZ - 5; zz <= intZ + 5; zz++)
                 {
-                    for (int yy = intY - 2; yy <= intY + 3; yy++)
+                    for (int yy = intY - 5; yy <= intY + 5; yy++)
                     {
-                        //Console.WriteLine(xx + " - " + yy + " - " + zz);
                         BlockType block = world.GetBlockAt(intX, intY, intZ);
                         if(block != BlockType.Air)
                         {
@@ -365,9 +251,35 @@ namespace Minecraft.Entities
                         }
                     }
                 }
+            }*/
+            Vector2 chunkPos = world.GetChunkPosition(position.X, position.Z);
+            sbyte h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
+            Chunk chunk;
+            Section section;
+            world.chunks.TryGetValue(chunkPos, out chunk);
+            if (chunk != null)
+            {
+                section = chunk.sections[h];
+                if (section != null)
+                {
+                    for(int x = 0; x < 16; x++)
+                    {
+                        for (int y = 0; y < 16; y++)
+                        {
+                            for (int z = 0; z < 16; z++)
+                            {
+                                if(section.blocks[x, y, z] != null)
+                                {
+                                    Vector3 v = new Vector3(chunkPos.X * 16 + x, h * 16 + y, chunkPos.Y * 16 + z);
+                                    collidablePositions.Add(v);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-     
-            return collidablePositions;
+
+             return collidablePositions;
         }
 
     /*private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap map)
