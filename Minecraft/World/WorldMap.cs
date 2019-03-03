@@ -50,11 +50,11 @@ namespace Minecraft.World
         public void GenerateTestMap()
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 7; x++)
+            for (int x = 0; x < 10; x++)
             {
-                for (int y = 0; y < 7; y++)
+                for (int y = 0; y < 10; y++)
                 {
-                   // GenerateBlocksForChunk(x, y);
+                   GenerateBlocksForChunk(x, y);
                 }
             }
             var now2 = DateTime.Now - start;
@@ -148,7 +148,7 @@ namespace Minecraft.World
                 return false;
             }
 
-            Vector2 chunkPos = GetChunkPosition((float)x, (float)z);
+            Vector2 chunkPos = GetChunkPosition(x, z);
             Chunk chunk;
             if(!chunks.TryGetValue(chunkPos, out chunk))
             {
@@ -171,6 +171,38 @@ namespace Minecraft.World
         public bool IsOutsideBuildHeight(int height)
         {
             return height < 0 || height >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
+        }
+        
+        public BlockType GetBlockAt(int x, int y, int z)
+        {
+            if (IsOutsideBuildHeight(y))
+            {
+                return BlockType.Air;
+            }
+
+            Vector2 chunkPos = GetChunkPosition(x, z);
+            Chunk chunk;
+            if (!chunks.TryGetValue(chunkPos, out chunk))
+            {
+                return BlockType.Air;
+            }
+
+            int sectionHeight = y / Constants.SECTION_HEIGHT;
+            if(chunk.sections[sectionHeight] == null)
+            {
+                return BlockType.Air;
+            }
+
+            int localX = x & 15;    
+            int localY = y & 15;
+            int localZ = z & 15;
+
+            sbyte? blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
+            if (blockType == null)
+            {
+                return BlockType.Air;
+            }
+            return (BlockType)blockType;
         }
     }
 }
