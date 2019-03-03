@@ -6,7 +6,7 @@ using System.Drawing.Imaging;
 
 namespace Minecraft
 {
-    class Loader
+    class TextureLoader
     {
         private List<int> textures = new List<int>();
 
@@ -34,6 +34,8 @@ namespace Minecraft
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0, OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             image.UnlockBits(data);
+
+            textures.Add(texture);
             return texture;
         }
     }

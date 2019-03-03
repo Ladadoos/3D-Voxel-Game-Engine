@@ -17,13 +17,11 @@ namespace Minecraft
         private List<float> lights;
         private int indCount;
 
-        private BlockDatabase blockDatabase;
         private World world;
 
-        public ChunkMeshGenerator(BlockDatabase blockDatabase, World world)
+        public ChunkMeshGenerator(World world)
         {
             this.world = world;
-            this.blockDatabase = blockDatabase;
             ResetData();
         }
 
@@ -121,7 +119,7 @@ namespace Minecraft
                             }
                             BlockType block =(BlockType)b;
                             float[] tCoords = null;
-                            blockDatabase.blockTextures.TryGetValue(block, out tCoords);
+                            Game.blockDatabase.blockTextures.TryGetValue(block, out tCoords);
                             if (tCoords != null)
                             {
                                 y2 = y + i * Constants.SECTION_HEIGHT;

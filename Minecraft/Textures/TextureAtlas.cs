@@ -7,7 +7,6 @@ namespace Minecraft
         //center offset variable
         //https://gamedev.stackexchange.com/questions/46963/how-to-avoid-texture-bleeding-in-a-texture-atlas
 
-
         public int atlasSize;
         public int textureSize;
 

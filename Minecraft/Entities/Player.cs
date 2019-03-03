@@ -24,17 +24,17 @@ namespace Minecraft
 
         private MouseRay mouseRay;
 
-        public Player(Matrix4 proj)
+        public Player(Matrix4 projectionMatrix)
         {
             camera = new Camera();
             position = new Vector3(Constants.CHUNK_SIZE / 2, 148, Constants.CHUNK_SIZE / 2);
-            mouseRay = new MouseRay(camera, proj);
+            mouseRay = new MouseRay(camera, projectionMatrix);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
-        public void Update(GameWindow window, World map, float deltaTime, Input input)
+        public void Update(World map, float deltaTime)
         {
-            if (window.Focused)
+            if (GameWindow.instance.Focused)
             {
                 UpdateKeyboardInput();
             }
@@ -70,7 +70,7 @@ namespace Minecraft
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
 
             mouseRay.Update();
-            if (input.OnMousePress(MouseButton.Right))
+            if (Game.input.OnMousePress(MouseButton.Right))
             {
                 int offset = 2;
                 int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
@@ -79,7 +79,7 @@ namespace Minecraft
 
                 map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
             }
-            if (input.OnMousePress(MouseButton.Left))
+            if (Game.input.OnMousePress(MouseButton.Left))
             {
                 int offset = 2;
                 int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
@@ -90,10 +90,10 @@ namespace Minecraft
             }
 
             camera.SetPosition(position);
-            if (window.Focused)
+            if (GameWindow.instance.Focused)
             {
                 camera.Rotate();
-                camera.ResetCursor(window.Bounds);
+                camera.ResetCursor(GameWindow.instance.Bounds);
             }      
         }
 
@@ -102,7 +102,7 @@ namespace Minecraft
             speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
             if ((isInCreativeMode || (!isInCreativeMode && !isInAir)) && 
-                (Keyboard.GetState().IsKeyDown(Key.ControlLeft) || Keyboard.GetState().IsKeyDown(Key.ControlRight)))
+                (Game.input.OnKeyPress(Key.ControlLeft) || Game.input.OnKeyPress(Key.ControlRight)))
             {
                 isRunning = true;
             }
@@ -112,23 +112,23 @@ namespace Minecraft
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
             }
 
-            if (Keyboard.GetState().IsKeyDown(Key.W))
+            if (Game.input.OnKeyDown(Key.W))
             {
                 AddForce(0.0F, 0.0F, 1.0F * speedMultiplier);
             }
-            if (Keyboard.GetState().IsKeyDown(Key.S))
+            if (Game.input.OnKeyDown(Key.S))
             {
                 AddForce(0.0F, 0.0F, -1.0F * speedMultiplier);
             }
-            if (Keyboard.GetState().IsKeyDown(Key.D))
+            if (Game.input.OnKeyDown(Key.D))
             {
                 AddForce(1.0F * speedMultiplier, 0.0F, 0.0F);
             }
-            if (Keyboard.GetState().IsKeyDown(Key.A))
+            if (Game.input.OnKeyDown(Key.A))
             {
                 AddForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
             }
-            if (Keyboard.GetState().IsKeyDown(Key.Space))
+            if (Game.input.OnKeyDown(Key.Space))
             {
                 if (isInCreativeMode)
                 {
@@ -139,7 +139,7 @@ namespace Minecraft
                     AttemptToJump();
                 }
             }
-            if (Keyboard.GetState().IsKeyDown(Key.ShiftLeft))
+            if (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight))
             {
                 if (isInCreativeMode)
                 {
@@ -147,7 +147,7 @@ namespace Minecraft
                 }
             }
 
-            if (Keyboard.GetState().IsKeyDown(Key.R))
+            if (Game.input.OnKeyPress(Key.R))
             {
                 int localX = (int)position.X & 15;
                 int localY = (int)position.Y & 15;

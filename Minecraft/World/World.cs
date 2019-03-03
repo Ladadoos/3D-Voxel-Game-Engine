@@ -23,16 +23,12 @@ namespace Minecraft
         public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
         public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
 
-        public BlockDatabase db;
-
-        public World(BlockDatabase db)
+        public World()
         {
-            chunkMeshGenerator = new ChunkMeshGenerator(db, this);
+            chunkMeshGenerator = new ChunkMeshGenerator(this);
             treeGenerator = new TreeGenerator();
 
             seed = random.Next(10000);
-
-            this.db = db;
         }
 
         public void CleanUp()

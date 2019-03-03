@@ -7,9 +7,10 @@ namespace Minecraft
         public TextureAtlas textureAtlas;
         public Dictionary<BlockType, float[]> blockTextures = new Dictionary<BlockType, float[]>();
 
-        public BlockDatabase(Loader loader)
+        public BlockDatabase()
         {
-            textureAtlas = new TextureAtlas(loader.LoadTexture("../../Resources/texturePack.png"), 512, 32);
+            int textureId = Game.textureLoader.LoadTexture("../../Resources/texturePack.png");
+            textureAtlas = new TextureAtlas(textureId, 512, 32);
         }
 
         public void RegisterBlocks()
