@@ -39,7 +39,7 @@ namespace Minecraft
                 UpdateKeyboardInput();
             }
 
-            UpdateWorldGenerationBasedOnPlayerPosition(map);
+            //UpdateWorldGenerationBasedOnPlayerPosition(map);
 
             if (!isInCreativeMode)
             {

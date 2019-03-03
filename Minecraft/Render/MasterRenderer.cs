@@ -57,7 +57,6 @@ namespace Minecraft
                 GL.DrawElements(PrimitiveType.Triangles, renderChunk.Value.HardBlocksModel.indicesCount, DrawElementsType.UnsignedInt, 0);
                 renderChunk.Value.HardBlocksModel.Unbind();
             }
-         
             basicShader.Stop();
         }
 

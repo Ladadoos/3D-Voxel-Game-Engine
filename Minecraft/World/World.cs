@@ -46,16 +46,15 @@ namespace Minecraft
             {
                 for (int y = 0; y < 10; y++)
                 {
-                   GenerateBlocksForChunk(x, y);
+                   Chunk chunk = GenerateBlocksForChunk(x, y);
+                   chunkMeshGenerator.PrepareChunkToRender(chunk, true);
                 }
             }
             var now2 = DateTime.Now - start;
-            Console.WriteLine("Generating chunks took: " + now2 + " s");
-            Console.WriteLine("Generation completed.");
+            Console.WriteLine("Generating init chunks took: " + now2 + " s");
         }
 
-
-        public void GenerateBlocksForChunk(int x, int y)
+        public Chunk GenerateBlocksForChunk(int x, int y)
         {
             double xOff = 0;
             double yOff = 0;
@@ -121,8 +120,9 @@ namespace Minecraft
             //chunks[x, y] = chunkC;
             chunks.Add(new Vector2(x, y), chunkC);
             //var start = DateTime.Now;
-
-            chunkMeshGenerator.PrepareChunkToRender(chunkC, true);
+            Console.WriteLine("Generated chunk " + x + "," + y);
+            return chunkC;
+            //chunkMeshGenerator.PrepareChunkToRender(chunkC, true);
 
             //Logger.log("Block gen time[" + now + "]     Mesh updating time[" + now2 + "]     Chunk count[" + chunks.Count + "]", LogType.INFORMATION);
         }

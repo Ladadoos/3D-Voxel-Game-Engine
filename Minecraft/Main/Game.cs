@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Minecraft
@@ -30,6 +31,26 @@ namespace Minecraft
             world.GenerateTestMap();
             player = new Player(masterRenderer.projectionMatrix);
             input = new Input();
+
+            Thread t3 = new Thread(() => DoGenerateWorld());
+            t3.IsBackground = true;
+            t3.Start();
+        }
+
+        private Queue<Chunk> toProcessChunks = new Queue<Chunk>();
+
+        private void DoGenerateWorld()
+        {
+            while (true)
+            {
+                Thread.Sleep(100);
+                Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
+                if (!world.chunks.ContainsKey(chunkPos))
+                {
+                    Chunk chunk = world.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
+                    toProcessChunks.Enqueue(chunk);
+                }
+            }
         }
 
         public void OnCloseGame()
@@ -46,6 +67,15 @@ namespace Minecraft
 
             input.Update();
             player.Update(world, (float)elapsedTime);
+
+            if(toProcessChunks.Count > 0)
+            {
+                for(int i = 0; i < toProcessChunks.Count; i++)
+                {
+                    Chunk toProcessChunk = toProcessChunks.Dequeue();
+                    world.chunkMeshGenerator.PrepareChunkToRender(toProcessChunk, true);
+                }
+            }
         }
 
         public void OnRenderGame()
