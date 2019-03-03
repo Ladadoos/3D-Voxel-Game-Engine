@@ -6,7 +6,6 @@ using OpenTK;
 using LibNoise;
 using Minecraft.World.Blocks;
 using Minecraft.World.Chunks;
-using Minecraft.Tools;
 
 namespace Minecraft.World
 {
@@ -19,7 +18,7 @@ namespace Minecraft.World
         public Random random = new Random();
 
         public static Perlin perlin = new Perlin();
-        public double perlinNoise = 0.004D; //0.0006f
+        public double perlinNoise = 0.002D; //0.0006f
 
         public TreeGenerator treeGenerator;
         public ChunkMeshGenerator chunkMeshGenerator;

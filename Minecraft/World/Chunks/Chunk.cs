@@ -1,8 +1,5 @@
 ﻿
-using OpenTK;
-
 using Minecraft.World.Blocks;
-using Minecraft.Tools;
 using Minecraft.World.Sections;
 
 namespace Minecraft.World
