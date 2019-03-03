@@ -1,10 +1,9 @@
-﻿using Minecraft.World;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Input;
 using System;
 using System.Drawing;
 
-namespace Minecraft.Entities
+namespace Minecraft
 {
     class Camera
     {

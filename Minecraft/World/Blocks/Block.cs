@@ -1,4 +1,4 @@
-﻿namespace Minecraft.World.Blocks
+﻿namespace Minecraft
 {
     abstract class Block
     {

@@ -4,13 +4,7 @@ using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Input;
 
-using Minecraft.World;
-using Minecraft.Physics;
-using Minecraft.World.Sections;
-using Minecraft.Tools;
-using Minecraft.World.Blocks;
-
-namespace Minecraft.Entities
+namespace Minecraft
 {
     class Player
     {       
@@ -38,7 +32,7 @@ namespace Minecraft.Entities
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
-        public void Update(GameWindow window, WorldMap map, float deltaTime, Input input)
+        public void Update(GameWindow window, World map, float deltaTime, Input input)
         {
             if (window.Focused)
             {
@@ -79,18 +73,18 @@ namespace Minecraft.Entities
             if (input.OnMousePress(MouseButton.Right))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
-                int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
-                int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
+                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
+                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
                 map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
             }
             if (input.OnMousePress(MouseButton.Left))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
-                int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
-                int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
+                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
+                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
                 map.AddBlockToWorld(x, y, z, BlockType.Air);
             }
@@ -181,7 +175,7 @@ namespace Minecraft.Entities
             return verticalSpeed < Constants.GRAVITY_THRESHOLD;
         }
 
-        private void DoXAxisCollisionDetection(WorldMap map)
+        private void DoXAxisCollisionDetection( World map)
         {
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
             {
@@ -202,7 +196,7 @@ namespace Minecraft.Entities
             }
         }
 
-        private void DoYAxisCollisionDetection(WorldMap map)
+        private void DoYAxisCollisionDetection(World map)
         {
             bool collidedY = false;
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
@@ -227,7 +221,7 @@ namespace Minecraft.Entities
             isInAir = !collidedY;
         }
 
-        private void DoZAxisCollisionDetection(WorldMap map)
+        private void DoZAxisCollisionDetection( World map)
         {
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
             {
@@ -248,7 +242,7 @@ namespace Minecraft.Entities
             }
         }
 
-        private void UpdateWorldGenerationBasedOnPlayerPosition(WorldMap map)
+        private void UpdateWorldGenerationBasedOnPlayerPosition( World map)
         {
             Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
             if (!map.chunks.ContainsKey(chunkPos) && Keyboard.GetState().IsKeyDown(Key.Z))
@@ -306,7 +300,7 @@ namespace Minecraft.Entities
             hitbox.setHitbox(position, GetPlayerMaxAABB());
         }
 
-        private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap world)
+        private List<Vector3> GetCollisionDetectionBlockPositions( World world)
         {
             //Adapt to player height for collision blocks selection?
             List<Vector3> collidablePositions = new List<Vector3>();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minecraft.Tools
+namespace Minecraft
 {
     class Logger
     {

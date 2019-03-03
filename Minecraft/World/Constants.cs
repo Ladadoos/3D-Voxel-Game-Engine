@@ -1,4 +1,4 @@
-﻿namespace Minecraft.World
+﻿namespace Minecraft
 {
     class Constants
     {

@@ -1,7 +1,4 @@
-﻿using Minecraft.Tools;
-using Minecraft.World;
-using Minecraft.World.Blocks;
-using OpenTK;
+﻿using OpenTK;
 
 namespace Minecraft
 {

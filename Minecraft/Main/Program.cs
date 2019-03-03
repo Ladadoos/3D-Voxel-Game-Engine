@@ -1,6 +1,4 @@
-﻿using Minecraft.Main;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class Program
     {

@@ -1,9 +1,6 @@
-﻿
-using Minecraft.Physics;
-using OpenTK;
-using Minecraft.World.Chunks;
+﻿using OpenTK;
 
-namespace Minecraft.World.Blocks
+namespace Minecraft
 {
     class Cube
     {
@@ -130,27 +127,27 @@ namespace Minecraft.World.Blocks
 
         public static float[] GetCubeVerticesForSide(BlockSide side, float x, float y, float z)
         {
-            if (side == BlockSide.BACK)
+            if (side == BlockSide.Back)
             {
                 return GetCubeBackVertices(x, y, z);
             }
-            else if (side == BlockSide.RIGHT)
+            else if (side == BlockSide.Right)
             {
                 return GetCubeRightVertices(x, y, z);
             }
-            else if (side == BlockSide.FRONT)
+            else if (side == BlockSide.Front)
             {
                 return GetCubeFrontVertices(x, y, z);
             }
-            else if (side == BlockSide.LEFT)
+            else if (side == BlockSide.Left)
             {
                 return GetCubeLeftVertices(x, y, z);
             }
-            else if (side == BlockSide.TOP)
+            else if (side == BlockSide.Top)
             {
                 return GetCubeTopVertices(x, y, z);
             }
-            else if (side == BlockSide.BOTTOM)
+            else if (side == BlockSide.Bottom)
             {
                 return GetCubeBottomVertices(x, y, z);
             }

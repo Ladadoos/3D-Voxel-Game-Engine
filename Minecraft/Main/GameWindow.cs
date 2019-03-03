@@ -6,13 +6,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 
-using Minecraft.Tools;
-using Minecraft.Entities;
-using Minecraft.Render;
-using Minecraft.World;
-using Minecraft.World.Blocks;
-
-namespace Minecraft.Main
+namespace Minecraft
 {
 
     //player.position is not center of player!
@@ -22,7 +16,7 @@ namespace Minecraft.Main
         public MasterRenderer masterRenderer;
         public Loader loader;
         public Player player;
-        public WorldMap world;
+        public World world;
         public BlockDatabase blockDatabase;
         public Input input;
 
@@ -56,11 +50,10 @@ namespace Minecraft.Main
             masterRenderer = new MasterRenderer(Width, Height);
             blockDatabase = new BlockDatabase(loader);
             blockDatabase.RegisterBlocks();
-            world = new WorldMap(blockDatabase);
+            world = new World(blockDatabase);
             world.GenerateTestMap();
             player = new Player(masterRenderer.projectionMatrix);
             input = new Input();
-
         }
 
         private long elapsedFrames;

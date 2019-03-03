@@ -2,10 +2,7 @@
 
 using OpenTK;
 
-using Minecraft.World.Blocks;
-using Minecraft.World.Sections;
-
-namespace Minecraft.World.Chunks
+namespace Minecraft
 {
     class ChunkMeshGenerator
     {
@@ -21,9 +18,9 @@ namespace Minecraft.World.Chunks
         private int indCount;
 
         private BlockDatabase blockDatabase;
-        private WorldMap world;
+        private World world;
 
-        public ChunkMeshGenerator(BlockDatabase blockDatabase, WorldMap world)
+        public ChunkMeshGenerator(BlockDatabase blockDatabase, World world)
         {
             this.world = world;
             this.blockDatabase = blockDatabase;
@@ -130,27 +127,27 @@ namespace Minecraft.World.Chunks
                                 y2 = y + i * Constants.SECTION_HEIGHT;
                                 if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.RIGHT, x, y2, z, tCoords, sideZLight);
+                                    AddFace(BlockSide.Right, x, y2, z, tCoords, sideZLight);
                                 }
                                 if (ShouldAddWestFaceOfBlock(cXNeg, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.LEFT, x, y2, z, tCoords, sideXLight);
+                                    AddFace(BlockSide.Left, x, y2, z, tCoords, sideXLight);
                                 }
                                 if (ShouldAddSouthFaceOfBlock(cZNeg, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.BACK, x, y2, z, tCoords, sideXLight);
+                                    AddFace(BlockSide.Back, x, y2, z, tCoords, sideXLight);
                                 }
                                 if(ShouldAddNorthFaceOfBlock(cZPos, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.FRONT, x, y2, z, tCoords, sideZLight);
+                                    AddFace(BlockSide.Front, x, y2, z, tCoords, sideZLight);
                                 }
                                 if(ShouldAddTopFaceOfBlock(section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.TOP, x, y2, z, tCoords, topLight);
+                                    AddFace(BlockSide.Top, x, y2, z, tCoords, topLight);
                                 }
                                 if(ShouldAddBottomFaceOfBlock(section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.BOTTOM, x, y2, z, tCoords, bottomLight);
+                                    AddFace(BlockSide.Bottom, x, y2, z, tCoords, bottomLight);
                                 }
                             }
                             y2 = 0;
@@ -368,15 +365,4 @@ namespace Minecraft.World.Chunks
             textureCoords.Add(tCoords[b * 8 + 7]);
         }
     }
-
-    public enum BlockSide : sbyte
-    {
-        BACK = 0,
-        RIGHT = 1,
-        FRONT = 2,
-        LEFT = 3,
-        TOP = 4,
-        BOTTOM = 5
-    };
-
 }

@@ -1,4 +1,4 @@
-﻿namespace Minecraft.Textures
+﻿namespace Minecraft
 {
     abstract class Texture
     {

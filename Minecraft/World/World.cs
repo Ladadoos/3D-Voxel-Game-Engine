@@ -4,12 +4,10 @@ using System.Collections.Generic;
 using OpenTK;
 
 using LibNoise;
-using Minecraft.World.Blocks;
-using Minecraft.World.Chunks;
 
-namespace Minecraft.World
+namespace Minecraft
 {
-    class WorldMap
+    class World
     {
         public const int MaxRenderDistance = 32;
 
@@ -25,10 +23,9 @@ namespace Minecraft.World
         public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
         public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
 
-
         public BlockDatabase db;
 
-        public WorldMap(BlockDatabase db)
+        public World(BlockDatabase db)
         {
             chunkMeshGenerator = new ChunkMeshGenerator(db, this);
             treeGenerator = new TreeGenerator();

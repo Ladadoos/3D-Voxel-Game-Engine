@@ -1,8 +1,4 @@
-﻿
-using Minecraft.World.Blocks;
-using Minecraft.World.Sections;
-
-namespace Minecraft.World
+﻿namespace Minecraft
 {
     class Chunk
     {

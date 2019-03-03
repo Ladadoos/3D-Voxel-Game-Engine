@@ -1,8 +1,7 @@
-﻿using Minecraft.Tools;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Minecraft.Shaders
+namespace Minecraft
 {
     abstract class Shader
     {

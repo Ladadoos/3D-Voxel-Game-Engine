@@ -1,8 +1,7 @@
-﻿using Minecraft.Entities;
-using OpenTK;
+﻿using OpenTK;
 using System;
 
-namespace Minecraft.Tools
+namespace Minecraft
 {
     class Maths
     {

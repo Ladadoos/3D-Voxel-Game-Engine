@@ -1,4 +1,4 @@
-﻿namespace Minecraft.Shaders
+﻿namespace Minecraft
 {
     class ShaderBasic : Shader
     {

@@ -1,6 +1,4 @@
-﻿using Minecraft.World.Blocks;
-
-namespace Minecraft.World.Sections
+﻿namespace Minecraft
 {
     class Section
     {  

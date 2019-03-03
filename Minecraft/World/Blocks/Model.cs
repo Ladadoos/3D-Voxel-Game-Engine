@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
 
-namespace Minecraft.World.Blocks
+namespace Minecraft
 {
     class Model
     {
@@ -67,7 +67,7 @@ namespace Minecraft.World.Blocks
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * sizeof(float)), data, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(buffers.Count, coordinateSize, VertexAttribPointerType.Float, false, 0, 0);
-            // GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.EnableVertexAttribArray(buffers.Count);
             buffers.Add(vboID);
         }

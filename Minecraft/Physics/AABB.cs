@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace Minecraft.Physics
+namespace Minecraft
 {
     class AABB
     {

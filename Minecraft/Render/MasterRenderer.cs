@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
-using Minecraft.Shaders;
-using Minecraft.Tools;
-using Minecraft.Entities;
-using Minecraft.World;
 
-namespace Minecraft.Render
+namespace Minecraft
 {
     class MasterRenderer
     { 
@@ -46,7 +42,7 @@ namespace Minecraft.Render
             //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
         }
 
-        public void Render(Camera camera, WorldMap world)
+        public void Render(Camera camera,  World world)
         {
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit);

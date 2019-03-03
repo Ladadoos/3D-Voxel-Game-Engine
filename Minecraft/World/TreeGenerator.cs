@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Minecraft.World
+namespace Minecraft
 {
     class TreeGenerator
     {
@@ -14,7 +14,7 @@ namespace Minecraft.World
                 int r = 2 + random.Next(3);
                 for (int yy = 1; yy < r; yy++)
                 {
-                    chunk.AddBlock(x, y + yy, z, Blocks.BlockType.Log);
+                    chunk.AddBlock(x, y + yy, z, BlockType.Log);
                 }
                 y += r;
                 x -= 2;
@@ -25,26 +25,26 @@ namespace Minecraft.World
                     {
                         for (int k = 0; k < 2; k++)
                         {
-                            chunk.AddBlock(x + i, y + k, z + j, Blocks.BlockType.Leaves);
+                            chunk.AddBlock(x + i, y + k, z + j, BlockType.Leaves);
                         }
                     }
                 }
                 x += 2;
                 z++;
                 y += 2;
-                chunk.AddBlock(x, y++, z, Blocks.BlockType.Leaves);
-                chunk.AddBlock(x--, y--, z++, Blocks.BlockType.Leaves);
+                chunk.AddBlock(x, y++, z, BlockType.Leaves);
+                chunk.AddBlock(x--, y--, z++, BlockType.Leaves);
                 for (int i = 0; i < 3; i++)
                 {
                     for (int k = 0; k < 2; k++)
                     {
-                        chunk.AddBlock(x + i, y + k, z, Blocks.BlockType.Leaves);
+                        chunk.AddBlock(x + i, y + k, z, BlockType.Leaves);
                     }
                 }
                 x++;
                 z++;
-                chunk.AddBlock(x, y++, z, Blocks.BlockType.Leaves);
-                chunk.AddBlock(x, y, z, Blocks.BlockType.Leaves);
+                chunk.AddBlock(x, y++, z, BlockType.Leaves);
+                chunk.AddBlock(x, y, z, BlockType.Leaves);
             }
         }
 

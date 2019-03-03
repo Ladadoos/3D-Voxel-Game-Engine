@@ -1,12 +1,11 @@
-﻿using Minecraft.Entities;
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Input;
 
-namespace Minecraft.Tools
+namespace Minecraft
 {
     class MouseRay
     {
-        public Ray ray;
+        public Vector3 currentRay;
         private Matrix4 projectionMatrix;
         private Matrix4 viewMatrix;
         private Camera camera;
@@ -16,13 +15,12 @@ namespace Minecraft.Tools
             camera = cam;
             projectionMatrix = projection;
             viewMatrix = Maths.CreateViewMatrix(cam);
-            ray = new Ray();
         }
 
         public void Update()
         {
             viewMatrix = Maths.CreateViewMatrix(camera);
-            ray.currentRay = CalculateMouseRay();
+            currentRay = CalculateMouseRay();
         }
 
         private Vector3 CalculateMouseRay()

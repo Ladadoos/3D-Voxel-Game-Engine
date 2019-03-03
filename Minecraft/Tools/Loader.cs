@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace Minecraft.Tools
+namespace Minecraft
 {
     class Loader
     {
