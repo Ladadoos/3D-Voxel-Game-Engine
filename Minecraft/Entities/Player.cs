@@ -13,11 +13,14 @@ using Minecraft.World.Blocks;
 namespace Minecraft.Entities
 {
     class Player
-    {
+    {       
+        private bool isInCreativeMode = false;
+        private bool doCollisionDetection = true;
+
         public Camera camera;
         public Vector3 position;
         public Vector3 velocity;
-        public float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED * 35;
+        public float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
         public AABB hitbox;
 
@@ -31,141 +34,201 @@ namespace Minecraft.Entities
             camera = new Camera();
             position = new Vector3(Constants.CHUNK_SIZE / 2, 148, Constants.CHUNK_SIZE / 2);
             mouseRay = new MouseRay(camera, proj);
-
-            float x1 = position.X + Constants.PLAYER_WIDTH;
-            float y1 = position.Y + Constants.PLAYER_HEIGHT;
-            float z1 = position.Z + Constants.PLAYER_LENGTH;
-            hitbox = new AABB(position, new Vector3(x1, y1, z1));
+            hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
-        public void Update(GameWindow window, WorldMap map, float time, Input input)
+        public void Update(GameWindow window, WorldMap map, float deltaTime, Input input)
         {
-            if (window.Focused) {
-           
-                if (Keyboard.GetState().IsKeyDown(Key.W)) {
-                    AddForce(0.0F, 0.0F, 1.0F * speedMultiplier);
+            if (window.Focused)
+            {
+                UpdateKeyboardInput();
+            }
+
+            UpdateWorldGenerationBasedOnPlayerPosition(map);
+
+            if (!isInCreativeMode)
+            {
+                UpdateGravityAppliedOnPlayer(deltaTime);
+            }
+
+            position.X += velocity.X * deltaTime;
+            CalculateHitbox();
+            if (doCollisionDetection)
+            {
+                DoXAxisCollisionDetection(map);
+            }
+
+            position.Y += velocity.Y * deltaTime;
+            CalculateHitbox();
+            if (doCollisionDetection)
+            {
+                DoYAxisCollisionDetection(map);
+            }
+
+            position.Z += velocity.Z * deltaTime;
+            CalculateHitbox();
+            if (doCollisionDetection)
+            {
+                DoZAxisCollisionDetection(map);
+            }
+
+            velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
+
+            mouseRay.Update();
+            if (input.OnMousePress(MouseButton.Right))
+            {
+                int offset = 2;
+                int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
+                int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
+                int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+
+                map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
+            }
+            if (input.OnMouseDown(MouseButton.Left))
+            {
+                int offset = 2;
+                int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
+                int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
+                int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
+
+                map.AddBlockToWorld(x, y, z, BlockType.Air);
+            }
+
+            camera.SetPosition(position);
+            camera.Rotate();
+            camera.ResetCursor(window.Bounds);
+        }
+
+        private void UpdateKeyboardInput()
+        {
+            speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
+
+            if ((isInCreativeMode || (!isInCreativeMode && !isInAir)) && 
+                (Keyboard.GetState().IsKeyDown(Key.ControlLeft) || Keyboard.GetState().IsKeyDown(Key.ControlRight)))
+            {
+                speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.W))
+            {
+                AddForce(0.0F, 0.0F, 1.0F * speedMultiplier);
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.S))
+            {
+                AddForce(0.0F, 0.0F, -1.0F * speedMultiplier);
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.D))
+            {
+                AddForce(1.0F * speedMultiplier, 0.0F, 0.0F);
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.A))
+            {
+                AddForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.Space))
+            {
+                if (isInCreativeMode)
+                {
+                    AddForce(0.0F, 1.0F * speedMultiplier, 0.0F);
                 }
-                if (Keyboard.GetState().IsKeyDown(Key.S)) {
-                    AddForce(0.0F, 0.0F, -1.0F * speedMultiplier);
+                else
+                {
+                    AttemptToJump();
                 }
-                if (Keyboard.GetState().IsKeyDown(Key.D)) {
-                    AddForce(1.0F * speedMultiplier, 0.0F, 0.0F);
-                }
-                if (Keyboard.GetState().IsKeyDown(Key.A)) {
-                    AddForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
-                }
-                if (Keyboard.GetState().IsKeyDown(Key.Space)) {
-                    //AddForce(0.0F, 1.0F * speedMultiplier, 0.0F);
-                    Jump();
-                }
-                if (Keyboard.GetState().IsKeyDown(Key.ShiftLeft)) {
+            }
+            if (Keyboard.GetState().IsKeyDown(Key.ShiftLeft))
+            {
+                if (isInCreativeMode)
+                {
                     AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
                 }
+            }
+        }
 
-                UpdateWorldGenerationBasedOnPlayerPosition(map);
+        private void UpdateGravityAppliedOnPlayer(double deltaTime)
+        {
+            if (!HasPlayerSurpassedTerminalVelocity())
+            {
+                verticalSpeed += Constants.GRAVITY * (float)deltaTime;
+            }
+            else
+            {
+                verticalSpeed = Constants.GRAVITY_THRESHOLD;
+            }
 
-                position.X += velocity.X * time;
-                CalculateHitbox();
+            AddForce(0.0F, verticalSpeed, 0.0F);
+        }
 
-                List<Vector3> b = GetCollisionDetectionBlockPositions(map);
-                foreach (Vector3 collidablePos in b)
+        private bool HasPlayerSurpassedTerminalVelocity()
+        {
+            return verticalSpeed < Constants.GRAVITY_THRESHOLD;
+        }
+
+        private void DoXAxisCollisionDetection(WorldMap map)
+        {
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            {
+                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                if (hitbox.intersects(blockAABB))
                 {
-                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                    if (hitbox.intersects(blockAABB))
+                    if (velocity.X > 0.0F)
                     {
-                        if (velocity.X > 0.0F)
-                        {
-                            position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
-                            velocity.X = 0.0F;
-                        }
-                        if (velocity.X < 0.0F)
-                        {
-                            position.X = blockAABB.max.X;
-                            velocity.X = 0.0F;
-                        }
+                        position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
+                        velocity.X = 0.0F;
+                    }
+                    if (velocity.X < 0.0F)
+                    {
+                        position.X = blockAABB.max.X;
+                        velocity.X = 0.0F;
                     }
                 }
+            }
+        }
 
-                if (verticalSpeed > Constants.GRAVITY_THRESHOLD) {
-                    verticalSpeed += Constants.GRAVITY * (float)time;
-                } else {
-                    verticalSpeed = Constants.GRAVITY_THRESHOLD;
-                }
-                AddForce(0.0F, verticalSpeed, 0.0F);
-
-                bool collidedY = false;
-                position.Y += velocity.Y * time;
-                CalculateHitbox();
- 
-                foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+        private void DoYAxisCollisionDetection(WorldMap map)
+        {
+            bool collidedY = false;
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            {
+                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                if (hitbox.intersects(blockAABB))
                 {
-                   // Console.WriteLine(collidablePos);
-                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                    if (hitbox.intersects(blockAABB))
+                    if (velocity.Y > 0.0F)
                     {
-                        if (velocity.Y > 0.0F)
-                        {
-                            position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
-                            velocity.Y = 0.0F;
-                            verticalSpeed = 0.0F;
-                        }
-                        if (velocity.Y < 0.0F)
-                        {
-                            position.Y = blockAABB.max.Y;
-                            velocity.Y = 0.0F;
-                            verticalSpeed = 0.0F;
-                            collidedY = true;
-                        }
+                        position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
+                        velocity.Y = 0.0F;
+                        verticalSpeed = 0.0F;
+                    }
+                    if (velocity.Y < 0.0F)
+                    {
+                        position.Y = blockAABB.max.Y;
+                        velocity.Y = 0.0F;
+                        verticalSpeed = 0.0F;
+                        collidedY = true;
                     }
                 }
-                isInAir = !collidedY;
+            }
 
-                position.Z += velocity.Z * time;
-                CalculateHitbox();
-   
-                foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            isInAir = !collidedY;
+        }
+
+        private void DoZAxisCollisionDetection(WorldMap map)
+        {
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            {
+                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                if (hitbox.intersects(blockAABB))
                 {
-                    AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                    if (hitbox.intersects(blockAABB))
+                    if (velocity.Z > 0)
                     {
-                        if (velocity.Z > 0)
-                        {
-                            position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;                     
-                            velocity.Z = 0;
-                        }
-                        if (velocity.Z < 0)
-                        {
-                            position.Z = blockAABB.max.Z;
-                            velocity.Z = 0;
-                        }
+                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
+                        velocity.Z = 0;
+                    }
+                    if (velocity.Z < 0)
+                    {
+                        position.Z = blockAABB.max.Z;
+                        velocity.Z = 0;
                     }
                 }
-
-                velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
-
-                mouseRay.Update();
-                if (input.OnMousePress(MouseButton.Right))
-                {
-                    int offset = 2;
-                    int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
-                    int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
-                    int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
-
-                    map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
-                }
-                if (input.OnMouseDown(MouseButton.Left))
-                {
-                    int offset = 2;
-                    int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
-                    int y = (int)(camera.position.Y + mouseRay.ray.currentRay.Y * offset);
-                    int z = (int)(camera.position.Z + mouseRay.ray.currentRay.Z * offset);
-                    
-                    map.AddBlockToWorld(x, y, z, BlockType.Air);
-                }
-
-                camera.SetPosition(position);
-                camera.Rotate();
-                camera.ResetCursor(window.Bounds);
             }
         }
 
@@ -202,31 +265,29 @@ namespace Minecraft.Entities
             offset += z * forward;
             offset.Y += y;
 
-           // offset.X *= Constants.PLAYER_BASE_MOVE_SPEED;
-           // offset.Y *= Constants.PLAYER_BASE_MOVE_SPEED;
-            //offset.Z *= Constants.PLAYER_BASE_MOVE_SPEED;
-
-            offset.X *= 1.0F;
-            offset.Y *= 1.0F;
-            offset.Z *= 1.0F;
-
             velocity += offset;
         }
 
-        private void Jump()
+        private void AttemptToJump()
         {
-            if (!isInAir) {
+            if (!isInAir)
+            {
                 verticalSpeed = Constants.PLAYER_JUMP_FORCE;
                 isInAir = true;
             }
         }
 
+        /// <summary>
+        /// Returns the max component of the AABB from this player.
+        /// </summary>
+        private Vector3 GetPlayerMaxAABB()
+        {
+            return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
+        }
+
         private void CalculateHitbox()
         {
-            float x1 = position.X + Constants.PLAYER_WIDTH;
-            float y1 = position.Y + Constants.PLAYER_HEIGHT;
-            float z1 = position.Z + Constants.PLAYER_LENGTH;
-            hitbox.setHitbox(position, new Vector3(x1, y1, z1));
+            hitbox.setHitbox(position, GetPlayerMaxAABB());
         }
 
         private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap world)
@@ -281,107 +342,5 @@ namespace Minecraft.Entities
 
              return collidablePositions;
         }
-
-    /*private List<Vector3> GetCollisionDetectionBlockPositions(WorldMap map)
-    {
-        List<Vector3> blockPositions = new List<Vector3>();
-
-        Vector2 playerPositionInChunk = map.GetChunkPosition(position.X, position.Z);
-
-        List<Chunk> chunks = new List<Chunk>();
-        Chunk chunk = null;
-
-        Vector2 surrounding = playerPositionInChunk;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if(chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-
-        surrounding.X += 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.X -= 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y += 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y -= 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y -= 1;
-        surrounding.X -= 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y -= 1;
-        surrounding.X += 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y += 1;
-        surrounding.X -= 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        surrounding.Y += 1;
-        surrounding.X += 1;
-        map.chunks.TryGetValue(surrounding, out chunk);
-        if (chunk != null)
-        {
-            chunks.Add(chunk);
-            chunk = null;
-        }
-        surrounding = playerPositionInChunk;
-
-        return blockPositions;
-    }*/
-
-            private double GetLength(int x, int y)
-        {
-            return Math.Sqrt(x * x + y * y);
-        }
-
     }
 }
