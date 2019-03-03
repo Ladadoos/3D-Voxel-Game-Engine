@@ -26,6 +26,7 @@ namespace Minecraft.Entities
 
         private float verticalSpeed = 0;
         private bool isInAir = true;
+        private bool isRunning = false;
 
         private MouseRay mouseRay;
 
@@ -106,8 +107,14 @@ namespace Minecraft.Entities
             if ((isInCreativeMode || (!isInCreativeMode && !isInAir)) && 
                 (Keyboard.GetState().IsKeyDown(Key.ControlLeft) || Keyboard.GetState().IsKeyDown(Key.ControlRight)))
             {
+                isRunning = true;
+            }
+
+            if (isRunning)
+            {
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
             }
+
             if (Keyboard.GetState().IsKeyDown(Key.W))
             {
                 AddForce(0.0F, 0.0F, 1.0F * speedMultiplier);
@@ -173,13 +180,13 @@ namespace Minecraft.Entities
                     if (velocity.X > 0.0F)
                     {
                         position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
-                        velocity.X = 0.0F;
                     }
                     if (velocity.X < 0.0F)
                     {
-                        position.X = blockAABB.max.X;
-                        velocity.X = 0.0F;
+                        position.X = blockAABB.max.X;     
                     }
+                    velocity.X = 0.0F;
+                    isRunning = false;
                 }
             }
         }
@@ -195,16 +202,14 @@ namespace Minecraft.Entities
                     if (velocity.Y > 0.0F)
                     {
                         position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
-                        velocity.Y = 0.0F;
-                        verticalSpeed = 0.0F;
                     }
                     if (velocity.Y < 0.0F)
                     {
                         position.Y = blockAABB.max.Y;
-                        velocity.Y = 0.0F;
-                        verticalSpeed = 0.0F;
                         collidedY = true;
                     }
+                    velocity.Y = 0.0F;
+                    verticalSpeed = 0.0F;
                 }
             }
 
@@ -220,14 +225,14 @@ namespace Minecraft.Entities
                 {
                     if (velocity.Z > 0)
                     {
-                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
-                        velocity.Z = 0;
+                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH; 
                     }
                     if (velocity.Z < 0)
                     {
                         position.Z = blockAABB.max.Z;
-                        velocity.Z = 0;
                     }
+                    velocity.Z = 0;
+                    isRunning = false;
                 }
             }
         }
