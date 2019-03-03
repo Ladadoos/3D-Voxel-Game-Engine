@@ -14,8 +14,8 @@ namespace Minecraft.Entities
 {
     class Player
     {       
-        private bool isInCreativeMode = false;
-        private bool doCollisionDetection = true;
+        private bool isInCreativeMode = true;
+        private bool doCollisionDetection = false;
 
         public Camera camera;
         public Vector3 position;
@@ -85,7 +85,7 @@ namespace Minecraft.Entities
 
                 map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
             }
-            if (input.OnMouseDown(MouseButton.Left))
+            if (input.OnMousePress(MouseButton.Left))
             {
                 int offset = 2;
                 int x = (int)(camera.position.X + mouseRay.ray.currentRay.X * offset);
@@ -96,8 +96,11 @@ namespace Minecraft.Entities
             }
 
             camera.SetPosition(position);
-            camera.Rotate();
-            camera.ResetCursor(window.Bounds);
+            if (window.Focused)
+            {
+                camera.Rotate();
+                camera.ResetCursor(window.Bounds);
+            }      
         }
 
         private void UpdateKeyboardInput()
@@ -148,6 +151,14 @@ namespace Minecraft.Entities
                 {
                     AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
                 }
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Key.R))
+            {
+                int localX = (int)position.X & 15;
+                int localY = (int)position.Y & 15;
+                int localZ = (int)position.Z & 15;
+                Console.WriteLine(localX + "," + localY + "," + localZ);
             }
         }
 
@@ -306,10 +317,11 @@ namespace Minecraft.Entities
 
             for (int xx = intX - 5; xx <= intX + 5; xx++)
             {
-                for (int zz = intZ - 5; zz <= intZ + 5; zz++)
+                for (int yy = intY - 5; yy <= intY + 5; yy++)
                 {
-                    for (int yy = intY - 5; yy <= intY + 5; yy++)
+                    for (int zz = intZ - 5; zz <= intZ + 5; zz++)
                     {
+            
                         BlockType block = world.GetBlockAt(intX, intY, intZ);
                         if(block != BlockType.Air)
                         {

@@ -43,9 +43,14 @@ namespace Minecraft.World.Chunks
 
         private Chunk activeCurrentChunk;
 
-        public void PrepareChunkToRender(Chunk toPrepareChunk)
+        public void PrepareChunkToRender(Chunk toPrepareChunk, bool updateSurroundingChunks)
         {
             GenerateRenderMeshForChunk(toPrepareChunk);
+
+            if (!updateSurroundingChunks)
+            {
+                return;
+            }
 
             Chunk cXNeg = null;
             world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX - 1, toPrepareChunk.gridZ), out cXNeg);

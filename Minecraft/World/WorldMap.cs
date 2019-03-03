@@ -128,7 +128,8 @@ namespace Minecraft.World
             //chunks[x, y] = chunkC;
             chunks.Add(new Vector2(x, y), chunkC);
             //var start = DateTime.Now;
-            chunkMeshGenerator.PrepareChunkToRender(chunkC);
+
+            chunkMeshGenerator.PrepareChunkToRender(chunkC, true);
 
             //Logger.log("Block gen time[" + now + "]     Mesh updating time[" + now2 + "]     Chunk count[" + chunks.Count + "]", LogType.INFORMATION);
         }
@@ -160,10 +161,10 @@ namespace Minecraft.World
             int k = z & 15;
 
             chunk.AddBlock(i, j, k, blockType);
-            chunkMeshGenerator.PrepareChunkToRender(chunk);
-            //Console.WriteLine("Local space" + x2 + "," + z2);
-            Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
 
+            bool updateSurroundingChunks = i == 0 || i == 15 || k == 0 || k == 15;
+            chunkMeshGenerator.PrepareChunkToRender(chunk, updateSurroundingChunks);
+            Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
             return true;
         }
 
