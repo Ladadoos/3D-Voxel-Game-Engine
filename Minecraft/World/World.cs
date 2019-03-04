@@ -47,6 +47,7 @@ namespace Minecraft
                 for (int y = 0; y < 10; y++)
                 {
                    Chunk chunk = GenerateBlocksForChunk(x, y);
+                   chunks.Add(new Vector2(x, y), chunk);
                    chunkMeshGenerator.PrepareChunkToRender(chunk, true);
                 }
             }
@@ -118,7 +119,7 @@ namespace Minecraft
             }*/
             //chunks.Add(new Vector2(x, y), chunkC);
             //chunks[x, y] = chunkC;
-            chunks.Add(new Vector2(x, y), chunkC);
+            //chunks.Add(new Vector2(x, y), chunkC);
             //var start = DateTime.Now;
             Console.WriteLine("Generated chunk " + x + "," + y);
             return chunkC;

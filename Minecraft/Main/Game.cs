@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Minecraft
 {
@@ -37,18 +38,28 @@ namespace Minecraft
             t3.Start();
         }
 
-        private Queue<Chunk> toProcessChunks = new Queue<Chunk>();
+        private List<Chunk> toProcessChunks = new List<Chunk>();
 
         private void DoGenerateWorld()
         {
+            //Key already in dictionary and contains check while modifying dictionary!
             while (true)
             {
-                Thread.Sleep(100);
-                Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
-                if (!world.chunks.ContainsKey(chunkPos))
+                int r = Constants.PLAYER_RENDER_DISTANCE;
+                for (int x = -r; x <= r; x++)
                 {
-                    Chunk chunk = world.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-                    toProcessChunks.Enqueue(chunk);
+                    for (int z = -r; z <= r; z++)
+                    {
+                        Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
+                        Vector2 toAttemptChunk = new Vector2(chunkPos.X + x, chunkPos.Y + z);
+                        if (!world.chunks.ContainsKey(toAttemptChunk) 
+                            && !toProcessChunks.Any(c => c.gridX == toAttemptChunk.X && c.gridZ ==  toAttemptChunk.Y))
+                        {
+                            Chunk chunk = world.GenerateBlocksForChunk((int)chunkPos.X + x, (int)chunkPos.Y + z);
+                            toProcessChunks.Add(chunk);
+                            Thread.Sleep(15);
+                        }
+                    }
                 }
             }
         }
@@ -70,10 +81,12 @@ namespace Minecraft
 
             if(toProcessChunks.Count > 0)
             {
-                for(int i = 0; i < toProcessChunks.Count; i++)
+                for(int i = toProcessChunks.Count - 1; i > 0; i--)
                 {
-                    Chunk toProcessChunk = toProcessChunks.Dequeue();
-                    world.chunkMeshGenerator.PrepareChunkToRender(toProcessChunk, true);
+                    Chunk toProcessChunk = toProcessChunks[i];
+                    toProcessChunks.RemoveAt(i);
+                    world.chunks.Add(new Vector2(toProcessChunk.gridX, toProcessChunk.gridZ), toProcessChunk);
+                    world.chunkMeshGenerator.PrepareChunkToRender(toProcessChunk, false);
                 }
             }
         }
