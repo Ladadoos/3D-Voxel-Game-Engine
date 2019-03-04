@@ -129,14 +129,9 @@ namespace Minecraft
                 }
             }*/
             //chunks.Add(new Vector2(x, y), chunkC);
-            //chunks[x, y] = chunkC;
-            //chunks.Add(new Vector2(x, y), chunkC);
-            //var start = DateTime.Now;
+
             Console.WriteLine("Generated chunk " + x + "," + y);
             return chunkC;
-            //chunkMeshGenerator.PrepareChunkToRender(chunkC, true);
-
-            //Logger.log("Block gen time[" + now + "]     Mesh updating time[" + now2 + "]     Chunk count[" + chunks.Count + "]", LogType.INFORMATION);
         }
 
         public Vector2 GetChunkPosition(float xPos, float yPos)
