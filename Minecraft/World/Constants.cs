@@ -31,7 +31,7 @@
         public const float PLAYER_WIDTH = HALF_CUBE_SIZE; /** X direction */
         public const float PLAYER_LENGTH = HALF_CUBE_SIZE; /** Z direction */
 
-        public const float PLAYER_BASE_MOVE_SPEED = 15F;
+        public const float PLAYER_BASE_MOVE_SPEED = 1.5F;
         public const float PLAYER_SPRINT_MULTIPLIER = 1.7F;
         public const float PLAYER_CROUCH_MULTIPLIER = 0.4F;
         public const float PLAYER_JUMP_FORCE = 2.15F;

@@ -32,14 +32,32 @@ namespace Minecraft
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
-        public void Update(World map, float deltaTime)
+        public void Update(World world, float deltaTime)
         {
             if (GameWindow.instance.Focused)
             {
                 UpdateKeyboardInput();
             }
 
-            //UpdateWorldGenerationBasedOnPlayerPosition(map);
+
+            int intX = (int)position.X;
+            int intY = (int)position.Y;
+            int intZ = (int)position.Z;
+
+            for (int xx = intX - 2; xx <= intX + 2; xx++)
+            {
+                for (int yy = intY - 2; yy <= intY + 2; yy++)
+                {
+                    for (int zz = intZ - 2; zz <= intZ + 3; zz++)
+                    {
+                        BlockType block = world.GetBlockAt(xx, yy, zz);
+                        if(block != BlockType.Air)
+                        {
+                            world.AddBlockToWorld(xx, yy, zz, BlockType.Air);
+                        }
+                    }
+                }
+            }
 
             if (!isInCreativeMode)
             {
@@ -50,21 +68,21 @@ namespace Minecraft
             CalculateHitbox();
             if (doCollisionDetection)
             {
-                DoXAxisCollisionDetection(map);
+                DoXAxisCollisionDetection(world);
             }
 
             position.Y += velocity.Y * deltaTime;
             CalculateHitbox();
             if (doCollisionDetection)
             {
-                DoYAxisCollisionDetection(map);
+                DoYAxisCollisionDetection(world);
             }
 
             position.Z += velocity.Z * deltaTime;
             CalculateHitbox();
             if (doCollisionDetection)
             {
-                DoZAxisCollisionDetection(map);
+                DoZAxisCollisionDetection(world);
             }
 
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
@@ -77,7 +95,7 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                map.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
+                world.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
@@ -86,7 +104,7 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                map.AddBlockToWorld(x, y, z, BlockType.Air);
+                world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
 
             camera.SetPosition(position);
@@ -242,29 +260,6 @@ namespace Minecraft
             }
         }
 
-        private void UpdateWorldGenerationBasedOnPlayerPosition( World map)
-        {
-            Vector2 chunkPos = map.GetChunkPosition(position.X, position.Z);
-            if (!map.chunks.ContainsKey(chunkPos) && Keyboard.GetState().IsKeyDown(Key.Z))
-            {
-                map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-            }
-
-            /*for (int i = -1; i < 3; i++)
-            {
-                for(int j = -1; j < 3; j++)
-                {
-                    float x = position.X + i * Constants.CHUNK_SIZE;
-                    float z = position.Z + j * Constants.CHUNK_SIZE;
-                    Vector2 chunkPos = map.GetChunkPosition(x, z);
-                    if (!map.chunks.ContainsKey(chunkPos))
-                    {
-                        map.GenerateBlocksForChunk((int)chunkPos.X, (int)chunkPos.Y);
-                    }
-                }
-            }*/
-        }
-
         private void AddForce(float x, float y, float z)
         {
             Vector3 offset = new Vector3();
@@ -302,56 +297,28 @@ namespace Minecraft
 
         private List<Vector3> GetCollisionDetectionBlockPositions( World world)
         {
-            //Adapt to player height for collision blocks selection?
             List<Vector3> collidablePositions = new List<Vector3>();
 
-            /*int intX = (int)position.X;
+            int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
-            for (int xx = intX - 5; xx <= intX + 5; xx++)
+            for (int xx = intX - 2; xx <= intX + 2; xx++)
             {
-                for (int yy = intY - 5; yy <= intY + 5; yy++)
+                for (int yy = intY - 2; yy <= intY + 2; yy++)
                 {
-                    for (int zz = intZ - 5; zz <= intZ + 5; zz++)
-                    {
-            
-                        BlockType block = world.GetBlockAt(intX, intY, intZ);
+                    for (int zz = intZ - 1; zz <= intZ + Constants.PLAYER_HEIGHT; zz++)
+                    {            
+                        BlockType block = world.GetBlockAt(xx, yy, zz);
                         if(block != BlockType.Air)
                         {
                             collidablePositions.Add(new Vector3(xx, yy, zz));
                         }
                     }
                 }
-            }*/
-            Vector2 chunkPos = world.GetChunkPosition(position.X, position.Z);
-            sbyte h = (sbyte)(position.Y / Constants.CHUNK_SIZE);
-            Chunk chunk;
-            Section section;
-            world.chunks.TryGetValue(chunkPos, out chunk);
-            if (chunk != null)
-            {
-                section = chunk.sections[h];
-                if (section != null)
-                {
-                    for(int x = 0; x < 16; x++)
-                    {
-                        for (int y = 0; y < 16; y++)
-                        {
-                            for (int z = 0; z < 16; z++)
-                            {
-                                if(section.blocks[x, y, z] != null)
-                                {
-                                    Vector3 v = new Vector3(chunkPos.X * 16 + x, h * 16 + y, chunkPos.Y * 16 + z);
-                                    collidablePositions.Add(v);
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
-             return collidablePositions;
+            return collidablePositions;
         }
     }
 }
