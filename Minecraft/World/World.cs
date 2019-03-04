@@ -23,7 +23,7 @@ namespace Minecraft
         public ChunkMeshGenerator chunkMeshGenerator;
         public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
         public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
-        private Queue<ReprocessChunkInfo> toReprocessChunks = new Queue<ReprocessChunkInfo>();
+        private List<Chunk> toReprocessChunks = new List<Chunk>();
 
         public World()
         {
@@ -45,21 +45,21 @@ namespace Minecraft
         {
             for(int i = 0; i < toReprocessChunks.Count; i++)
             {
-                ReprocessChunkInfo chunkInfo = toReprocessChunks.Dequeue();
-                chunkMeshGenerator.PrepareChunkToRender(chunkInfo.toReprocessChunk, chunkInfo.reprocessSuroundings);
+                chunkMeshGenerator.GenerateRenderMeshForChunk(toReprocessChunks[i]);
             }
+            toReprocessChunks.Clear();
         }
 
         public void GenerateTestMap()
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 10; x++)
+            for (int x = 0; x <4; x++)
             {
-                for (int y = 0; y < 10; y++)
+                for (int y = 0; y < 4; y++)
                 {
                    Chunk chunk = GenerateBlocksForChunk(x, y);
                    chunks.Add(new Vector2(x, y), chunk);
-                   chunkMeshGenerator.PrepareChunkToRender(chunk, true);
+                   toReprocessChunks.Add(chunk);
                 }
             }
             var now2 = DateTime.Now - start;
@@ -161,23 +161,59 @@ namespace Minecraft
             int k = z & 15;
 
             chunk.AddBlock(i, j, k, blockType);
+     
+            TryAddChunkToReprocessQueue(chunk);
 
-            bool updateSurroundingChunks = i == 0 || i == 15 || k == 0 || k == 15;
-            ReprocessChunkInfo chunkInfo = toReprocessChunks.FirstOrDefault(c => c.toReprocessChunk == chunk);
-            if (chunkInfo == null)
+            if (i == 0)
             {
-                toReprocessChunks.Enqueue(new ReprocessChunkInfo(chunk, updateSurroundingChunks));
-            }
-            else
-            {
-                if (!chunkInfo.reprocessSuroundings)
+                Chunk cXNeg = null;
+                chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out cXNeg);
+                if (cXNeg != null)
                 {
-                    chunkInfo.reprocessSuroundings = updateSurroundingChunks;
+                    TryAddChunkToReprocessQueue(cXNeg);
+                }
+            }
+
+            if (i == 15)
+            {
+                Chunk cXPos = null;
+                chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out cXPos);
+                if (cXPos != null)
+                {
+                    TryAddChunkToReprocessQueue(cXPos);
+                }
+            }
+
+            if (k == 0)
+            {
+                Chunk cZNeg = null;
+                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out cZNeg);
+                if (cZNeg != null)
+                {
+                    TryAddChunkToReprocessQueue(cZNeg);
+                }
+            }
+
+            if (k == 15)
+            {
+                Chunk cZPos = null;
+                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out cZPos);
+                if (cZPos != null)
+                {
+                    TryAddChunkToReprocessQueue(cZPos);
                 }
             }
 
             Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
             return true;
+        }
+
+        private void TryAddChunkToReprocessQueue(Chunk toReprocessChunk)
+        {
+            if (!toReprocessChunks.Contains(toReprocessChunk))
+            {
+                toReprocessChunks.Add(toReprocessChunk);
+            }
         }
 
         public bool IsOutsideBuildHeight(int height)

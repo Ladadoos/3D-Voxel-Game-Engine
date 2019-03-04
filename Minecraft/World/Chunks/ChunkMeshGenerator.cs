@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-
+using System.Linq;
 using OpenTK;
 
 namespace Minecraft
@@ -38,50 +38,12 @@ namespace Minecraft
 
         private Chunk activeCurrentChunk;
 
-        public void PrepareChunkToRender(Chunk toPrepareChunk, bool updateSurroundingChunks)
-        {
-            GenerateRenderMeshForChunk(toPrepareChunk);
-
-            if (!updateSurroundingChunks)
-            {
-                return;
-            }
-
-            Chunk cXNeg = null;
-            world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX - 1, toPrepareChunk.gridZ), out cXNeg);
-            if (cXNeg != null)
-            {
-                GenerateRenderMeshForChunk(cXNeg);
-            }
-
-            Chunk cXPos = null;
-            world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX + 1, toPrepareChunk.gridZ), out cXPos);
-            if (cXPos != null)
-            {
-                GenerateRenderMeshForChunk(cXPos);
-            }
-
-            Chunk cZNeg = null;
-            world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX, toPrepareChunk.gridZ - 1), out cZNeg);
-            if (cZNeg != null)
-            {
-                GenerateRenderMeshForChunk(cZNeg);
-            }
-
-            Chunk cZPos = null;
-            world.chunks.TryGetValue(new Vector2(toPrepareChunk.gridX, toPrepareChunk.gridZ + 1), out cZPos);
-            if (cZPos != null)
-            {
-                GenerateRenderMeshForChunk(cZPos);
-            }
-        }
-
-        private void GenerateRenderMeshForSection(Section toProcessSection)
+        /*private void GenerateRenderMeshForSection(Section toProcessSection)
         {
 
-        }
+        }*/
 
-        private void GenerateRenderMeshForChunk(Chunk chunk)
+        public void GenerateRenderMeshForChunk(Chunk chunk)
         {
             activeCurrentChunk = chunk;
 

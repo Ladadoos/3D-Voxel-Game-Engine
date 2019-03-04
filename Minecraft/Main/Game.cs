@@ -53,7 +53,7 @@ namespace Minecraft
                         {
                             Chunk chunk = world.GenerateBlocksForChunk((int)chunkPos.X + x, (int)chunkPos.Y + z);
                             toProcessChunks.Add(chunk);
-                            Thread.Sleep(100);
+                            Thread.Sleep(50);
                         }
                     }
                 }
@@ -82,7 +82,7 @@ namespace Minecraft
                     Chunk toProcessChunk = toProcessChunks[i];
                     toProcessChunks.RemoveAt(i);
                     world.chunks.Add(new Vector2(toProcessChunk.gridX, toProcessChunk.gridZ), toProcessChunk);
-                    world.chunkMeshGenerator.PrepareChunkToRender(toProcessChunk, true);
+                    world.chunkMeshGenerator.GenerateRenderMeshForChunk(toProcessChunk);
                 }
             }
 
