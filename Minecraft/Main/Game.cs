@@ -1,11 +1,7 @@
 ﻿using OpenTK;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Minecraft
 {
@@ -89,6 +85,8 @@ namespace Minecraft
                     world.chunkMeshGenerator.PrepareChunkToRender(toProcessChunk, true);
                 }
             }
+
+            world.EndFrameUpdate();
         }
 
         public void OnRenderGame()

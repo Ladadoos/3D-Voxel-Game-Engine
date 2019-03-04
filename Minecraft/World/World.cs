@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using OpenTK;
 
 using LibNoise;
+using System.Linq;
 
 namespace Minecraft
 {
@@ -22,6 +23,7 @@ namespace Minecraft
         public ChunkMeshGenerator chunkMeshGenerator;
         public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
         public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
+        private Queue<ReprocessChunkInfo> toReprocessChunks = new Queue<ReprocessChunkInfo>();
 
         public World()
         {
@@ -36,6 +38,15 @@ namespace Minecraft
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in renderChunks)
             {
                 chunkToRender.Value.OnApplicationClosed();
+            }
+        }
+
+        public void EndFrameUpdate()
+        {
+            for(int i = 0; i < toReprocessChunks.Count; i++)
+            {
+                ReprocessChunkInfo chunkInfo = toReprocessChunks.Dequeue();
+                chunkMeshGenerator.PrepareChunkToRender(chunkInfo.toReprocessChunk, chunkInfo.reprocessSuroundings);
             }
         }
 
@@ -157,7 +168,19 @@ namespace Minecraft
             chunk.AddBlock(i, j, k, blockType);
 
             bool updateSurroundingChunks = i == 0 || i == 15 || k == 0 || k == 15;
-            chunkMeshGenerator.PrepareChunkToRender(chunk, updateSurroundingChunks);
+            ReprocessChunkInfo chunkInfo = toReprocessChunks.FirstOrDefault(c => c.toReprocessChunk == chunk);
+            if (chunkInfo == null)
+            {
+                toReprocessChunks.Enqueue(new ReprocessChunkInfo(chunk, updateSurroundingChunks));
+            }
+            else
+            {
+                if (!chunkInfo.reprocessSuroundings)
+                {
+                    chunkInfo.reprocessSuroundings = updateSurroundingChunks;
+                }
+            }
+
             Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
             return true;
         }
