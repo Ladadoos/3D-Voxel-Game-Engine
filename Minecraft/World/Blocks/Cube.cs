@@ -125,29 +125,29 @@ namespace Minecraft
             return new AABB(new Vector3(x, y, z), new Vector3(x + Constants.CUBE_SIZE, y + Constants.CUBE_SIZE, z + Constants.CUBE_SIZE));
         }
 
-        public static float[] GetCubeVerticesForSide(BlockSide side, float x, float y, float z)
+        public static float[] GetCubeVerticesForSide(Direction side, float x, float y, float z)
         {
-            if (side == BlockSide.Back)
+            if (side == Direction.Back)
             {
                 return GetCubeBackVertices(x, y, z);
             }
-            else if (side == BlockSide.Right)
+            else if (side == Direction.Right)
             {
                 return GetCubeRightVertices(x, y, z);
             }
-            else if (side == BlockSide.Front)
+            else if (side == Direction.Front)
             {
                 return GetCubeFrontVertices(x, y, z);
             }
-            else if (side == BlockSide.Left)
+            else if (side == Direction.Left)
             {
                 return GetCubeLeftVertices(x, y, z);
             }
-            else if (side == BlockSide.Top)
+            else if (side == Direction.Top)
             {
                 return GetCubeTopVertices(x, y, z);
             }
-            else if (side == BlockSide.Bottom)
+            else if (side == Direction.Bottom)
             {
                 return GetCubeBottomVertices(x, y, z);
             }

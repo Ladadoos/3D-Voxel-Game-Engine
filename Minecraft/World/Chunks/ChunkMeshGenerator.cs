@@ -125,27 +125,27 @@ namespace Minecraft
                                 y2 = y + i * Constants.SECTION_HEIGHT;
                                 if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Right, x, y2, z, tCoords, sideZLight);
+                                    AddFace(Direction.Right, x, y2, z, tCoords, sideZLight);
                                 }
                                 if (ShouldAddWestFaceOfBlock(cXNeg, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Left, x, y2, z, tCoords, sideXLight);
+                                    AddFace(Direction.Left, x, y2, z, tCoords, sideXLight);
                                 }
                                 if (ShouldAddSouthFaceOfBlock(cZNeg, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Back, x, y2, z, tCoords, sideXLight);
+                                    AddFace(Direction.Back, x, y2, z, tCoords, sideXLight);
                                 }
                                 if(ShouldAddNorthFaceOfBlock(cZPos, section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Front, x, y2, z, tCoords, sideZLight);
+                                    AddFace(Direction.Front, x, y2, z, tCoords, sideZLight);
                                 }
                                 if(ShouldAddTopFaceOfBlock(section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Top, x, y2, z, tCoords, topLight);
+                                    AddFace(Direction.Top, x, y2, z, tCoords, topLight);
                                 }
                                 if(ShouldAddBottomFaceOfBlock(section, x, y, z, tCoords))
                                 {
-                                    AddFace(BlockSide.Bottom, x, y2, z, tCoords, bottomLight);
+                                    AddFace(Direction.Bottom, x, y2, z, tCoords, bottomLight);
                                 }
                             }
                             y2 = 0;
@@ -169,7 +169,7 @@ namespace Minecraft
             ResetData();
         }
 
-        private void AddFace(BlockSide blockSide, float x, float y, float z, float[] textureCoordinates, float lightValue)
+        private void AddFace(Direction blockSide, float x, float y, float z, float[] textureCoordinates, float lightValue)
         {
             FillTextureCoordinates(blockSide, textureCoordinates);
 
@@ -350,7 +350,7 @@ namespace Minecraft
             return false;
         }
        
-        public void FillTextureCoordinates(BlockSide side, float[] tCoords)
+        public void FillTextureCoordinates(Direction side, float[] tCoords)
         {
             int b = (int)side;
             textureCoords.Add(tCoords[b * 8]);

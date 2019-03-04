@@ -1,6 +1,6 @@
 ﻿namespace Minecraft
 {
-    public enum BlockSide : sbyte
+    public enum Direction : sbyte
     {
         Back = 0, //Side facing negative Z
         Right = 1, //Side facing negative X
