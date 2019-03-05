@@ -45,13 +45,13 @@ namespace Minecraft
                 for (int x = -r; x <= r; x++)
                 {
                     for (int z = -r; z <= r; z++)
-                    {
+                    {              
                         Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
                         Vector2 toAttemptChunk = new Vector2(chunkPos.X + x, chunkPos.Y + z);
-                        if (!world.chunks.ContainsKey(toAttemptChunk) 
-                            && !toProcessChunks.Any(c => c.gridX == toAttemptChunk.X && c.gridZ ==  toAttemptChunk.Y))
+
+                        if (!world.chunks.ContainsKey(toAttemptChunk))
                         {
-                            Chunk chunk = world.GenerateBlocksForChunk((int)chunkPos.X + x, (int)chunkPos.Y + z);
+                            Chunk chunk = world.GenerateBlocksForChunk((int)toAttemptChunk.X, (int)toAttemptChunk.Y);
                             toProcessChunks.Add(chunk);
                             Thread.Sleep(50);
                         }

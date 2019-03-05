@@ -39,7 +39,6 @@ namespace Minecraft
                 UpdateKeyboardInput();
             }
 
-
             int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;

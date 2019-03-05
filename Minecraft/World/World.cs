@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using OpenTK;
 
 using LibNoise;
-using System.Linq;
 
 namespace Minecraft
 {
