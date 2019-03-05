@@ -1,6 +1,6 @@
 ﻿using OpenTK;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace Minecraft
@@ -10,6 +10,7 @@ namespace Minecraft
         public static TextureLoader textureLoader;
         public static Input input;
         public static BlockDatabase blockDatabase;
+        public static Random randomizer;
 
         public MasterRenderer masterRenderer;
         public Player player;
@@ -23,15 +24,17 @@ namespace Minecraft
             textureLoader = new TextureLoader();
             masterRenderer = new MasterRenderer(window.Width, window.Height);
             blockDatabase = new BlockDatabase();
+            randomizer = new Random();
+
             blockDatabase.RegisterBlocks();
             world = new World();
             world.GenerateTestMap();
             player = new Player(masterRenderer.projectionMatrix);
             input = new Input();
 
-            Thread t3 = new Thread(() => DoGenerateWorld());
-            t3.IsBackground = true;
-            t3.Start();
+            //Thread t3 = new Thread(() => DoGenerateWorld());
+            //t3.IsBackground = true;
+            //t3.Start();
         }
 
         private List<Chunk> toProcessChunks = new List<Chunk>();
@@ -51,7 +54,7 @@ namespace Minecraft
 
                         if (!world.chunks.ContainsKey(toAttemptChunk))
                         {
-                            Chunk chunk = world.GenerateBlocksForChunk((int)toAttemptChunk.X, (int)toAttemptChunk.Y);
+                            Chunk chunk = world.worldGenerator.GenerateBlocksForChunkAt((int)toAttemptChunk.X, (int)toAttemptChunk.Y);
                             toProcessChunks.Add(chunk);
                             Thread.Sleep(50);
                         }

@@ -12,6 +12,7 @@
         public const float HALF_CUBE_SIZE = CUBE_SIZE / 2.0F;
         public const int CHUNK_SIZE = 16;
         public const int SECTIONS_IN_CHUNKS = 16;
+        public const int MAX_BUILD_HEIGHT = SECTIONS_IN_CHUNKS * SECTION_HEIGHT;
 
         /*
          * Physics

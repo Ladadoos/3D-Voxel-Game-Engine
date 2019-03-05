@@ -12,6 +12,7 @@
         Dirt = 7,
         Stone = 8,
         Sand = 9,
-        Leaves = 10
+        Leaves = 10,
+        Snow = 11,
     };
 }

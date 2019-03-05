@@ -14,6 +14,14 @@
 
         public void AddBlock(int x, int y, int z, BlockType block)
         {
+            if (y < 0)
+            {
+                y = 0;
+            } else if (y > Constants.MAX_BUILD_HEIGHT - 1)
+            {
+                y = Constants.MAX_BUILD_HEIGHT - 1;
+            }
+
             int h = y / Constants.SECTION_HEIGHT;
             if(sections[h] == null)
             {
