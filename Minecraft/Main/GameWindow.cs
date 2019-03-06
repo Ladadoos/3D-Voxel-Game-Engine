@@ -39,7 +39,7 @@ namespace Minecraft
         protected override void OnLoad(EventArgs e)
         {
             CursorVisible = true;
-            VSync = VSyncMode.Off;
+            VSync = VSyncMode.On;
 
             game.OnStartGame(this);
         }
@@ -51,11 +51,12 @@ namespace Minecraft
             }
 
             Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
-            Title = "Vsync: " + VSync + 
-                    " FPS: " + (int)(1f / e.Time) + 
-                    " AVG FPS: " + game.GetAverageFps() + 
-                    " Position: " + game.player.position + 
-                    " Grid Pos: " + chunkPos;
+            Title = "Vsync: " + VSync +
+                    " FPS: " + (int)(1f / e.Time) +
+                    " AVG FPS: " + game.GetAverageFps() +
+                    " Position: " + game.player.position +
+                    " Grid Pos: " + chunkPos +
+                    " Velocity: " + game.player.velocity;
 
             game.OnUpdateGame(e.Time);
         }

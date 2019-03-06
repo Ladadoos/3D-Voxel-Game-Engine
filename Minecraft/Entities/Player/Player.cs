@@ -10,6 +10,11 @@ namespace Minecraft
     {       
         private bool isInCreativeMode = false;
         private bool doCollisionDetection = true;
+        private bool isInAir = true;
+        private bool isCrouching = false;
+        private bool isRunning = false;
+
+        private Game game;
 
         public Camera camera;
         public Vector3 position;
@@ -19,29 +24,28 @@ namespace Minecraft
         public AABB hitbox;
 
         private float verticalSpeed = 0;
-        private bool isInAir = true;
-        private bool isRunning = false;
 
         private MouseRay mouseRay;
 
         private BlockType selectedBlock = BlockType.Dirt;
 
-        public Player(Matrix4 projectionMatrix)
+        public Player(Game game, Matrix4 projectionMatrix)
         {
+            this.game = game;
             camera = new Camera();
             position = new Vector3(Constants.CHUNK_SIZE / 2, 148, Constants.CHUNK_SIZE / 2);
             mouseRay = new MouseRay(camera, projectionMatrix);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
-        public void Update(World world, float deltaTime)
+        public void Update(float deltaTime)
         {
             if (GameWindow.instance.Focused)
             {
-                UpdateKeyboardInput(world);
+                UpdateKeyboardInput();
             }
 
-           /* int intX = (int)position.X;
+            /*int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
@@ -50,11 +54,10 @@ namespace Minecraft
                 for (int yy = intY - 2; yy <= intY + 2; yy++)
                 {
                     for (int zz = intZ - 2; zz <= intZ + 3; zz++)
-                    {
-                        BlockType block = world.GetBlockAt(xx, yy, zz);
-                        if(block != BlockType.Air)
+                    { 
+                        if(game.world.GetBlockAt(xx, yy, zz) != BlockType.Air)
                         {
-                            world.AddBlockToWorld(xx, yy, zz, BlockType.Air);
+                            game.world.AddBlockToWorld(xx, yy, zz, BlockType.Air);
                         }
                     }
                 }
@@ -66,28 +69,28 @@ namespace Minecraft
             }
 
             position.X += velocity.X * deltaTime;
-            CalculateHitbox();
+            CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoXAxisCollisionDetection(world);
+                DoXAxisCollisionDetection();
             }
 
             position.Y += velocity.Y * deltaTime;
-            CalculateHitbox();
+            CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoYAxisCollisionDetection(world);
+                DoYAxisCollisionDetection();
             }
 
             position.Z += velocity.Z * deltaTime;
-            CalculateHitbox();
+            CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoZAxisCollisionDetection(world);
+                DoZAxisCollisionDetection();
             }
 
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
-
+           
             camera.SetPosition(position);
             mouseRay.Update();
             if (Game.input.OnMousePress(MouseButton.Right))
@@ -97,7 +100,7 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                world.AddBlockToWorld(x, y, z, selectedBlock);
+                game.world.AddBlockToWorld(x, y, z, selectedBlock);
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
@@ -106,7 +109,7 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                selectedBlock = world.GetBlockAt(x, y, z);
+                selectedBlock = game.world.GetBlockAt(x, y, z);
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
@@ -115,7 +118,7 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                world.AddBlockToWorld(x, y, z, BlockType.Air);
+                game.world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
 
             if (GameWindow.instance.Focused)
@@ -125,59 +128,98 @@ namespace Minecraft
             }      
         }
 
-        private void UpdateKeyboardInput(World world)
+        private void TryStartRunning()
+        {
+            if(!isRunning && (isInCreativeMode || (!isInCreativeMode && !isInAir)))
+            {
+                isRunning = true;
+                game.masterRenderer.SetFieldOfView(1.65F);
+            }
+        }
+
+        private void TryStopRunning()
+        {
+            if (isRunning)
+            {
+                isRunning = false;
+                game.masterRenderer.ResetToDefaultFieldOfView();
+            }
+        }
+
+        private void TryStopCrouching()
+        {
+            if (isCrouching)
+            {
+                isCrouching = false;
+                game.masterRenderer.ResetToDefaultFieldOfView();
+            }
+        }
+
+        private void TryStartCrouching()
+        {
+            if (isRunning)
+            {
+                TryStopRunning();
+            }
+
+            game.masterRenderer.SetFieldOfView(1.45F);
+            isCrouching = true;
+        }
+
+        private void UpdateKeyboardInput()
         {
             speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
-            if ((isInCreativeMode || (!isInCreativeMode && !isInAir)) && 
-                (Game.input.OnKeyPress(Key.ControlLeft) || Game.input.OnKeyPress(Key.ControlRight)))
+            bool inputToRun = Game.input.OnKeyPress(Key.ControlLeft) || Game.input.OnKeyPress(Key.ControlRight);
+            bool inputToCrouch = Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight);
+            bool inputToMoveLeft = Game.input.OnKeyDown(Key.A);
+            bool inputToMoveBack = Game.input.OnKeyDown(Key.S);
+            bool inputToMoveRight = Game.input.OnKeyDown(Key.D);
+            bool inputToMoveForward = Game.input.OnKeyDown(Key.W);
+            bool inputToJump = Game.input.OnKeyDown(Key.Space);
+
+            //Prioritize crouching over running
+            if (inputToRun && !inputToCrouch)
             {
-                isRunning = true;
+                TryStartRunning();
+            }
+            else if (inputToCrouch)
+            {
+                TryStartCrouching();
+            }else if (!inputToCrouch)
+            {
+                TryStopCrouching();
             }
 
-            if (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight))
+            if(!inputToMoveForward || inputToMoveBack)
+            {
+                TryStopRunning();
+            }
+
+            if (isRunning)
+            {
+                speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
+            }else if (isCrouching)
             {
                 if (isInCreativeMode)
                 {
-                    AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
+                    ApplyForce(0.0F, -1.0F * speedMultiplier, 0.0F);
                 }
                 else
                 {
                     speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
                 }
             }
-
-            if (isRunning)
-            {
-                speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
-            }
-
-            if(isInAir && !isInCreativeMode)
+            /*if (isInAir && !isInCreativeMode)
             {
                 speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
-            }
+            }*/
 
-            if (Game.input.OnKeyDown(Key.W))
-            {
-                AddForce(0.0F, 0.0F, 1.0F * speedMultiplier);
-            }
-            if (Game.input.OnKeyDown(Key.S))
-            {
-                AddForce(0.0F, 0.0F, -1.0F * speedMultiplier);
-            }
-            if (Game.input.OnKeyDown(Key.D))
-            {
-                AddForce(1.0F * speedMultiplier, 0.0F, 0.0F);
-            }
-            if (Game.input.OnKeyDown(Key.A))
-            {
-                AddForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
-            }
-            if (Game.input.OnKeyDown(Key.Space))
+            if (inputToJump)
             {
                 if (isInCreativeMode)
                 {
-                    AddForce(0.0F, 1.0F * speedMultiplier, 0.0F);
+                    ApplyForce(0.0F, 1.0F * speedMultiplier, 0.0F);
                 }
                 else
                 {
@@ -185,28 +227,40 @@ namespace Minecraft
                 }
             }
 
-
-            if (Game.input.OnKeyPress(Key.R))
+            if (inputToMoveForward)
             {
-                int localX = (int)position.X & 15;
-                int localY = (int)position.Y & 15;
-                int localZ = (int)position.Z & 15;
-                Console.WriteLine(localX + "," + localY + "," + localZ);
+                ApplyForce(0.0F, 0.0F, 1.0F * speedMultiplier);
+            }
+            if (inputToMoveBack)
+            {
+                ApplyForce(0.0F, 0.0F, -1.0F * speedMultiplier);
+            }
+            if (inputToMoveRight)
+            {
+                ApplyForce(1.0F * speedMultiplier, 0.0F, 0.0F);
+            }
+            if (inputToMoveLeft)
+            {
+                ApplyForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
             }
         }
 
         private void UpdateGravityAppliedOnPlayer(double deltaTime)
         {
+            if (!isInAir)
+            {
+                return;
+            }
+
             if (!HasPlayerSurpassedTerminalVelocity())
             {
-                verticalSpeed += Constants.GRAVITY * (float)deltaTime;
+                verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
+                ApplyForce(0.0F, verticalSpeed, 0.0F);
             }
             else
             {
                 verticalSpeed = Constants.GRAVITY_THRESHOLD;
-            }
-
-            AddForce(0.0F, verticalSpeed, 0.0F);
+            }           
         }
 
         private bool HasPlayerSurpassedTerminalVelocity()
@@ -214,9 +268,9 @@ namespace Minecraft
             return verticalSpeed < Constants.GRAVITY_THRESHOLD;
         }
 
-        private void DoXAxisCollisionDetection( World map)
+        private void DoXAxisCollisionDetection()
         {
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.intersects(blockAABB))
@@ -230,15 +284,15 @@ namespace Minecraft
                         position.X = blockAABB.max.X;     
                     }
                     velocity.X = 0.0F;
-                    isRunning = false;
+                    TryStopRunning();
                 }
             }
         }
 
-        private void DoYAxisCollisionDetection(World map)
+        private void DoYAxisCollisionDetection()
         {
             bool collidedY = false;
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.intersects(blockAABB))
@@ -260,9 +314,9 @@ namespace Minecraft
             isInAir = !collidedY;
         }
 
-        private void DoZAxisCollisionDetection( World map)
+        private void DoZAxisCollisionDetection()
         {
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(map))
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.intersects(blockAABB))
@@ -276,12 +330,12 @@ namespace Minecraft
                         position.Z = blockAABB.max.Z;
                     }
                     velocity.Z = 0;
-                    isRunning = false;
+                    TryStopRunning();
                 }
             }
         }
 
-        private void AddForce(float x, float y, float z)
+        private void ApplyForce(float x, float y, float z)
         {
             Vector3 offset = new Vector3();
             Vector3 forward = new Vector3((float)Math.Sin(camera.orientation.X), 0, (float)Math.Cos(camera.orientation.X));
@@ -311,12 +365,12 @@ namespace Minecraft
             return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
         }
 
-        private void CalculateHitbox()
+        private void CalculateAABBHitbox()
         {
             hitbox.setHitbox(position, GetPlayerMaxAABB());
         }
 
-        private List<Vector3> GetCollisionDetectionBlockPositions( World world)
+        private List<Vector3> GetCollisionDetectionBlockPositions(World world)
         {
             List<Vector3> collidablePositions = new List<Vector3>();
 

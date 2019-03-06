@@ -29,7 +29,7 @@ namespace Minecraft
             blockDatabase.RegisterBlocks();
             world = new World();
             world.GenerateTestMap();
-            player = new Player(masterRenderer.projectionMatrix);
+            player = new Player(this, masterRenderer.currentProjectionMatrix);
             input = new Input();
 
             Thread t3 = new Thread(() => DoGenerateWorld());
@@ -76,7 +76,7 @@ namespace Minecraft
             totalElapsedTime += elapsedTime;
 
             input.Update();
-            player.Update(world, (float)elapsedTime);
+            player.Update((float)elapsedTime);
 
             if(toProcessChunks.Count > 0)
             {
@@ -99,9 +99,7 @@ namespace Minecraft
 
         public void OnWindowResize(int newWidth, int newHeight)
         {
-            masterRenderer.width = newWidth;
-            masterRenderer.height = newHeight;
-            masterRenderer.CreateProjectionMatrix();
+            masterRenderer.OnWindowResize(newWidth, newHeight);
         }
 
         public int GetAverageFps()

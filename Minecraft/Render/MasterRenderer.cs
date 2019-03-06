@@ -6,40 +6,33 @@ using OpenTK.Graphics.OpenGL;
 namespace Minecraft
 {
     class MasterRenderer
-    { 
-
-        public float nearPlane = 0.1F;
-        public float farPlane = 10000.0F;
-        public float FOV = 1.5F;
-        public int width;
-        public int height;
+    {
+        private ProjectionMatrixInfo standardProjectionMatrixInfo;
+        private ProjectionMatrixInfo currentProjectionMatrixInfo;
 
         private float colorClearR = 0.57F;
         private float colorClearG = 0.73F;
         private float colorClearB = 1.0F;
 
-        public Matrix4 projectionMatrix;
-
+        public Matrix4 currentProjectionMatrix;
         public ShaderBasic basicShader;
 
         public MasterRenderer(int width, int height)
         {
-            GL.Enable(EnableCap.DepthTest);
+            EnableDepthTest();
             EnableCulling();
 
-            this.width = width;
-            this.height = height;
-            CreateProjectionMatrix();
             basicShader = new ShaderBasic();
-
             basicShader.Start();
             basicShader.LoadInt(basicShader.location_Texture1, 0);
             Matrix4 transformationMatrix = Maths.CreateTransformationMatrix(new Vector3(1, 1, 1), 0, 0, 0, 1, 1, 1);
             basicShader.LoadMatrix(basicShader.location_TransformationMatrix, transformationMatrix);
-            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, projectionMatrix);
+            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, currentProjectionMatrix);
             basicShader.Stop();
 
-            //GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            standardProjectionMatrixInfo = new ProjectionMatrixInfo(0.1F, 10000.0F, 1.5F, width, height);
+            currentProjectionMatrixInfo = standardProjectionMatrixInfo;
+            UpdateCurrentProjectionMatrix();
         }
 
         public void Render(Camera camera,  World world)
@@ -60,25 +53,73 @@ namespace Minecraft
             basicShader.Stop();
         }
 
+        public void OnWindowResize(int newWidth, int newHeight)
+        {
+            standardProjectionMatrixInfo.windowWidth = newWidth;
+            standardProjectionMatrixInfo.windowHeight = newHeight;
+
+            currentProjectionMatrixInfo.windowWidth = newWidth;
+            currentProjectionMatrixInfo.windowHeight = newHeight;
+
+            UpdateCurrentProjectionMatrix();
+        }
+
+        public void SetFieldOfView(float fieldOfView)
+        {
+            if (currentProjectionMatrixInfo.fieldOfView != fieldOfView)
+            {
+                currentProjectionMatrixInfo.fieldOfView = fieldOfView;
+                UpdateCurrentProjectionMatrix();
+            }
+        }
+
+        public void ResetToDefaultFieldOfView()
+        {
+            SetFieldOfView(standardProjectionMatrixInfo.fieldOfView);
+        }
+
         public void CleanUp()
         {
             basicShader.CleanUp();
         }
 
-        public static void EnableCulling()
+        private void EnableCulling()
         {
            GL.Enable(EnableCap.CullFace);
            GL.CullFace(CullFaceMode.Back);
         }
 
-        public static void DisableCulling()
+        private void DisableCulling()
         {
             GL.Disable(EnableCap.CullFace);
         }
 
-        public void CreateProjectionMatrix()
+        private void EnableLineModeRendering()
         {
-            projectionMatrix = Maths.CreateProjectionMatrix(FOV, width, height, nearPlane, farPlane);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+        }
+
+        /// <summary>
+        /// Enabling depth test insures that object A behind object B isn't rendered over object B
+        /// </summary>
+        private void EnableDepthTest()
+        {
+            GL.Enable(EnableCap.DepthTest);
+        }
+
+        private void UpdateCurrentProjectionMatrix()
+        {
+            currentProjectionMatrix = Maths.CreateProjectionMatrix(
+                currentProjectionMatrixInfo.fieldOfView,
+                currentProjectionMatrixInfo.windowWidth,
+                currentProjectionMatrixInfo.windowHeight,
+                currentProjectionMatrixInfo.distanceNearPlane,
+                currentProjectionMatrixInfo.distanceFarPlane
+            );
+
+            basicShader.Start();
+            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, currentProjectionMatrix);
+            basicShader.Stop();
         }
     }
 }

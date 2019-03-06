@@ -18,7 +18,7 @@
          * Physics
          */
 
-        public const float GRAVITY = -8.25F;
+        public const float GRAVITY = -7.25F;
         public const float GRAVITY_THRESHOLD = -12.5F;
 
         /*
@@ -32,10 +32,10 @@
         public const float PLAYER_WIDTH = HALF_CUBE_SIZE; /** X direction */
         public const float PLAYER_LENGTH = HALF_CUBE_SIZE; /** Z direction */
 
-        public const float PLAYER_BASE_MOVE_SPEED = 1.5F;
-        public const float PLAYER_SPRINT_MULTIPLIER = 1.7F;
-        public const float PLAYER_CROUCH_MULTIPLIER = 0.4F;
-        public const float PLAYER_JUMP_FORCE = 2.55F;
+        public const float PLAYER_BASE_MOVE_SPEED = 0.70F;
+        public const float PLAYER_SPRINT_MULTIPLIER = 1.75F;
+        public const float PLAYER_CROUCH_MULTIPLIER = 0.35F;
+        public const float PLAYER_JUMP_FORCE = 2.15F;
         public const float PLAYER_STOP_FORCE_MULTIPLIER = 0.80F;
         public const float PLAYER_MOUSE_SENSIVITY = 0.0015F;
         public const float PLAYER_IN_AIR_SLOWDOWN = 0.75F;
