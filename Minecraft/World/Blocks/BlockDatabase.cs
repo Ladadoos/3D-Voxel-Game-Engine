@@ -27,6 +27,7 @@ namespace Minecraft
             Register(BlockType.Sand, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1);
             Register(BlockType.Leaves, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3, 5, 3);
             Register(BlockType.Snow, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4, 2, 4);
+            Register(BlockType.Gravel, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1);
         }
 
         private void Register(BlockType type, int baX, int baY, int rX, int rY, int fX, int fY, int lX, int lY, int tX, int tY, int boX, int boY)

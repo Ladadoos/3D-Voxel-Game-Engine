@@ -14,5 +14,6 @@
         Sand = 9,
         Leaves = 10,
         Snow = 11,
+        Gravel = 12
     };
 }

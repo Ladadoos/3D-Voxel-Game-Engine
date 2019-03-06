@@ -8,8 +8,8 @@ namespace Minecraft
 {
     class Player
     {       
-        private bool isInCreativeMode = true;
-        private bool doCollisionDetection = false;
+        private bool isInCreativeMode = false;
+        private bool doCollisionDetection = true;
 
         public Camera camera;
         public Vector3 position;
@@ -24,6 +24,8 @@ namespace Minecraft
 
         private MouseRay mouseRay;
 
+        private BlockType selectedBlock = BlockType.Dirt;
+
         public Player(Matrix4 projectionMatrix)
         {
             camera = new Camera();
@@ -36,10 +38,10 @@ namespace Minecraft
         {
             if (GameWindow.instance.Focused)
             {
-                UpdateKeyboardInput();
+                UpdateKeyboardInput(world);
             }
 
-            int intX = (int)position.X;
+           /* int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
@@ -56,7 +58,7 @@ namespace Minecraft
                         }
                     }
                 }
-            }
+            }*/
 
             if (!isInCreativeMode)
             {
@@ -86,6 +88,7 @@ namespace Minecraft
 
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
 
+            camera.SetPosition(position);
             mouseRay.Update();
             if (Game.input.OnMousePress(MouseButton.Right))
             {
@@ -94,7 +97,16 @@ namespace Minecraft
                 int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
                 int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
 
-                world.AddBlockToWorld(x, y, z, BlockType.Cobblestone);
+                world.AddBlockToWorld(x, y, z, selectedBlock);
+            }
+            if (Game.input.OnMousePress(MouseButton.Middle))
+            {
+                int offset = 2;
+                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
+                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
+                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
+
+                selectedBlock = world.GetBlockAt(x, y, z);
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
@@ -106,7 +118,6 @@ namespace Minecraft
                 world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
 
-            camera.SetPosition(position);
             if (GameWindow.instance.Focused)
             {
                 camera.Rotate();
@@ -114,7 +125,7 @@ namespace Minecraft
             }      
         }
 
-        private void UpdateKeyboardInput()
+        private void UpdateKeyboardInput(World world)
         {
             speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
@@ -124,9 +135,26 @@ namespace Minecraft
                 isRunning = true;
             }
 
+            if (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight))
+            {
+                if (isInCreativeMode)
+                {
+                    AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
+                }
+                else
+                {
+                    speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
+                }
+            }
+
             if (isRunning)
             {
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
+            }
+
+            if(isInAir && !isInCreativeMode)
+            {
+                speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
             }
 
             if (Game.input.OnKeyDown(Key.W))
@@ -156,13 +184,7 @@ namespace Minecraft
                     AttemptToJump();
                 }
             }
-            if (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight))
-            {
-                if (isInCreativeMode)
-                {
-                    AddForce(0.0F, -1.0F * speedMultiplier, 0.0F);
-                }
-            }
+
 
             if (Game.input.OnKeyPress(Key.R))
             {
@@ -308,8 +330,7 @@ namespace Minecraft
                 {
                     for (int zz = intZ - 1; zz <= intZ + Constants.PLAYER_HEIGHT; zz++)
                     {            
-                        BlockType block = world.GetBlockAt(xx, yy, zz);
-                        if(block != BlockType.Air)
+                        if(world.GetBlockAt(xx, yy, zz) != BlockType.Air)
                         {
                             collidablePositions.Add(new Vector3(xx, yy, zz));
                         }

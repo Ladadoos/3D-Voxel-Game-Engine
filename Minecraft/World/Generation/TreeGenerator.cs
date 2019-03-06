@@ -8,7 +8,12 @@ namespace Minecraft
 
         public void GenerateTree(Chunk chunk, int x, int y, int z)
         {
-            if (x > 3 && x < 12 && z > 3 && z < 12)
+            if (random.Next(15) != 1)
+            {
+                return;
+            }
+
+            if (x > 2 && x < 13 && z > 2 && z < 13)
             {
                 //Logger.log("    Tree generated", LogType.INFORMATION);
                 int r = 2 + random.Next(3);

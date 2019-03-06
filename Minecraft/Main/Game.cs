@@ -32,9 +32,9 @@ namespace Minecraft
             player = new Player(masterRenderer.projectionMatrix);
             input = new Input();
 
-            //Thread t3 = new Thread(() => DoGenerateWorld());
-            //t3.IsBackground = true;
-            //t3.Start();
+            Thread t3 = new Thread(() => DoGenerateWorld());
+            t3.IsBackground = true;
+            t3.Start();
         }
 
         private List<Chunk> toProcessChunks = new List<Chunk>();

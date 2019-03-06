@@ -6,15 +6,18 @@ using System.Threading.Tasks;
 
 namespace Minecraft
 {
-    class RockyBiome : Biome
+    class ForestBiome : Biome
     {
-        public RockyBiome()
+        private TreeGenerator treeGenerator;
+
+        public ForestBiome()
         {
+            treeGenerator = new TreeGenerator();
         }
 
         public override void Decorate(Chunk chunk, int x, int y, int z)
         {
-            throw new NotImplementedException();
+            treeGenerator.GenerateTree(chunk, x, y, z);
         }
     }
 }

@@ -12,7 +12,9 @@ namespace Minecraft
         private double biomePerlinDetail = 0.0045D; //Smaller means larger biomes
         private int biomePerlinSeed;
 
-        private RockyBiome rockBiome = new RockyBiome(); 
+        private RockyBiome rockBiome = new RockyBiome();
+        private ForestBiome forestBiome = new ForestBiome();
+        private SandBiome sandBiome = new SandBiome();
 
         public WorldGenerator()
         {
@@ -55,16 +57,25 @@ namespace Minecraft
                     double biomeDeterminer = GetBiomePerlinValueAt(biomeXoffset, biomeYOffset);
                     if (biomeDeterminer > 0.75D)
                     {
-                        generatedChunk.AddBlock(i, height, j, BlockType.Stone);
+                        if(Game.randomizer.Next(25) != 1)
+                        {
+                            generatedChunk.AddBlock(i, height, j, BlockType.Stone);
+                        }
+                        else
+                        {
+                            generatedChunk.AddBlock(i, height, j, BlockType.Gravel);
+                        }      
                     }
                     else if (biomeDeterminer < -0.75D)
                     {
                         generatedChunk.AddBlock(i, height, j, BlockType.Snow);
                     }else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
                     {
+                        forestBiome.Decorate(generatedChunk, i, height, j);
                         generatedChunk.AddBlock(i, height, j, BlockType.Grass);
                     }else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
                     {
+                        sandBiome.Decorate(generatedChunk, i, height, j);
                         generatedChunk.AddBlock(i, height, j, BlockType.Sand);
                     }
 
