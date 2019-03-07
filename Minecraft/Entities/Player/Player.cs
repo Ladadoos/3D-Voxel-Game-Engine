@@ -25,8 +25,6 @@ namespace Minecraft
 
         private float verticalSpeed = 0;
 
-        private MouseRay mouseRay;
-
         private BlockType selectedBlock = BlockType.Dirt;
 
         public Player(Game game, Matrix4 projectionMatrix)
@@ -34,7 +32,6 @@ namespace Minecraft
             this.game = game;
             camera = new Camera();
             position = new Vector3(Constants.CHUNK_SIZE / 2, 148, Constants.CHUNK_SIZE / 2);
-            mouseRay = new MouseRay(camera, projectionMatrix);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
@@ -92,31 +89,31 @@ namespace Minecraft
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
            
             camera.SetPosition(position);
-            mouseRay.Update();
+
             if (Game.input.OnMousePress(MouseButton.Right))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
-                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
-                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
+                int x = (int)Math.Floor(camera.position.X + camera.rayOut.X * offset);
+                int y = (int)Math.Floor(camera.position.Y + camera.rayOut.Y * offset);
+                int z = (int)Math.Floor(camera.position.Z + camera.rayOut.Z * offset);
 
                 game.world.AddBlockToWorld(x, y, z, selectedBlock);
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
-                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
-                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
+                int x = (int)(camera.position.X + camera.rayOut.X * offset);
+                int y = (int)(camera.position.Y + camera.rayOut.Y * offset);
+                int z = (int)(camera.position.Z + camera.rayOut.Z * offset);
 
                 selectedBlock = game.world.GetBlockAt(x, y, z);
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + mouseRay.currentRay.X * offset);
-                int y = (int)(camera.position.Y + mouseRay.currentRay.Y * offset);
-                int z = (int)(camera.position.Z + mouseRay.currentRay.Z * offset);
+                int x = (int)(camera.position.X + camera.rayOut.X * offset);
+                int y = (int)(camera.position.Y + camera.rayOut.Y * offset);
+                int z = (int)(camera.position.Z + camera.rayOut.Z * offset);
 
                 game.world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
@@ -170,7 +167,7 @@ namespace Minecraft
         {
             speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
-            bool inputToRun = Game.input.OnKeyPress(Key.ControlLeft) || Game.input.OnKeyPress(Key.ControlRight);
+            bool inputToRun = Game.input.OnKeyDown(Key.ControlLeft) || Game.input.OnKeyDown(Key.ControlRight);
             bool inputToCrouch = Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight);
             bool inputToMoveLeft = Game.input.OnKeyDown(Key.A);
             bool inputToMoveBack = Game.input.OnKeyDown(Key.S);
@@ -210,10 +207,10 @@ namespace Minecraft
                     speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
                 }
             }
-            /*if (isInAir && !isInCreativeMode)
+            if (isInAir && !isInCreativeMode)
             {
                 speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
-            }*/
+            }
 
             if (inputToJump)
             {
@@ -338,7 +335,7 @@ namespace Minecraft
         private void ApplyForce(float x, float y, float z)
         {
             Vector3 offset = new Vector3();
-            Vector3 forward = new Vector3((float)Math.Sin(camera.orientation.X), 0, (float)Math.Cos(camera.orientation.X));
+            Vector3 forward = new Vector3((float)Math.Sin(camera.radialOrientation.X), 0, (float)Math.Cos(camera.radialOrientation.X));
             Vector3 right = new Vector3(-forward.Z, 0, forward.X);
 
             offset += x * right;

@@ -8,14 +8,17 @@ namespace Minecraft
     class Camera
     {
         public Vector3 position;
-        public Vector3 orientation;
-        public Vector2 lastMousePos;
+        public Vector3 rayOut;
+        public Vector3 radialOrientation;
+
+        private Vector2 lastMousePos;
 
         public Camera()
         {
             position = new Vector3();
-            orientation = new Vector3();
+            radialOrientation = new Vector3();
             lastMousePos = new Vector2();
+            rayOut = new Vector3();
         }
 
         public void SetPosition(Vector3 playerPos)
@@ -32,8 +35,18 @@ namespace Minecraft
             delta.X = delta.X * Constants.PLAYER_MOUSE_SENSIVITY;
             delta.Y = delta.Y * Constants.PLAYER_MOUSE_SENSIVITY;
 
-            orientation.X = (orientation.X + delta.X) % ((float)Math.PI * 2.0F);
-            orientation.Y = Math.Max(Math.Min(orientation.Y + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
+            radialOrientation.X = (radialOrientation.X + delta.X) % ((float)Math.PI * 2.0F);
+            radialOrientation.Y = Math.Max(Math.Min(radialOrientation.Y + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
+
+            CalculateRayOut();
+        }
+
+        private void CalculateRayOut()
+        {
+            double cosY = Math.Cos(radialOrientation.Y);
+            rayOut = new Vector3((float)(cosY * Math.Sin(radialOrientation.X)),
+                                 (float)Math.Sin(radialOrientation.Y),
+                                 (float)(cosY * Math.Cos(radialOrientation.X)));
         }
 
         public void ResetCursor(Rectangle bounds)

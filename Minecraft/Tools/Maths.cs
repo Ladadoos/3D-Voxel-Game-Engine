@@ -32,15 +32,20 @@ namespace Minecraft
         public static Vector3 CreateLookAtVector(Camera camera)
         {
             Vector3 lookAt = new Vector3();
-            lookAt.X = (float)(Math.Sin(camera.orientation.X) * Math.Cos(camera.orientation.Y));
-            lookAt.Y = (float)Math.Sin(camera.orientation.Y);
-            lookAt.Z = (float)(Math.Cos(camera.orientation.X) * Math.Cos(camera.orientation.Y));
+            lookAt.X = (float)(Math.Sin(camera.radialOrientation.X) * Math.Cos(camera.radialOrientation.Y));
+            lookAt.Y = (float)Math.Sin(camera.radialOrientation.Y);
+            lookAt.Z = (float)(Math.Cos(camera.radialOrientation.X) * Math.Cos(camera.radialOrientation.Y));
             return lookAt;
         }
 
         public static float ToRadians(double angle)
         {
             return (float)(Math.PI * angle / 180.0);
+        }
+
+        public static float RadianToDegree(double angle)
+        {
+            return (float)(angle * (180.0 / Math.PI));
         }
     }
 }
