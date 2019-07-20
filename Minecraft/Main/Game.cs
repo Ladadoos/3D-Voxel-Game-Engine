@@ -27,7 +27,7 @@ namespace Minecraft
             randomizer = new Random();
 
             blockDatabase.RegisterBlocks();
-            world = new World();
+            world = new World(this);
             world.GenerateTestMap();
             player = new Player(this, masterRenderer.currentProjectionMatrix);
             input = new Input();

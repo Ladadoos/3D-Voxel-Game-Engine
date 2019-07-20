@@ -7,6 +7,8 @@ namespace Minecraft
 {
     class World
     {
+        private Game game;
+
         public static int SeaLevel = 95;
 
         public WorldGenerator worldGenerator;
@@ -16,8 +18,9 @@ namespace Minecraft
         public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
         private List<Chunk> toReprocessChunks = new List<Chunk>();
 
-        public World()
+        public World(Game game)
         {
+            this.game = game;
             chunkMeshGenerator = new ChunkMeshGenerator(this);
             worldGenerator = new WorldGenerator();
         }
@@ -42,9 +45,9 @@ namespace Minecraft
         public void GenerateTestMap()
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 16; x++)
+            for (int x = 0; x < 10; x++)
             {
-                for (int y = 0; y < 16; y++)
+                for (int y = 0; y < 10; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
                    chunks.Add(new Vector2(x, y), chunk);
@@ -71,7 +74,20 @@ namespace Minecraft
             Chunk chunk;
             if(!chunks.TryGetValue(chunkPos, out chunk))
             {
-                Console.WriteLine("tried to add block in junk that doesnt exist");
+                Console.WriteLine("Tried to add block in junk that doesnt exist");
+                return false;
+            }
+
+            if(x == Math.Floor(game.player.position.X) && 
+                z == Math.Floor(game.player.position.Z) && 
+                y == Math.Floor(game.player.position.Y))
+            {
+                Console.WriteLine("in player");
+                return false;
+            }
+
+            if(blockType != BlockType.Air && GetBlockAt(x, y, z) != BlockType.Air)
+            {
                 return false;
             }
 

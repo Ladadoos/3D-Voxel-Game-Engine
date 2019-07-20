@@ -8,7 +8,7 @@ namespace Minecraft
 {
     class Player
     {       
-        private bool isInCreativeMode = false;
+        private bool isInCreativeMode = true;
         private bool doCollisionDetection = true;
         private bool isInAir = true;
         private bool isCrouching = false;
@@ -31,7 +31,7 @@ namespace Minecraft
         {
             this.game = game;
             camera = new Camera();
-            position = new Vector3(Constants.CHUNK_SIZE / 2, 148, Constants.CHUNK_SIZE / 2);
+            position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 

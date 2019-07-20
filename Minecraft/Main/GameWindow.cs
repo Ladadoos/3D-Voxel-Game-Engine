@@ -39,7 +39,7 @@ namespace Minecraft
         protected override void OnLoad(EventArgs e)
         {
             CursorVisible = true;
-            VSync = VSyncMode.On;
+            VSync = VSyncMode.Off;
 
             game.OnStartGame(this);
         }
