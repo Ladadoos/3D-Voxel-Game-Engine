@@ -42,6 +42,7 @@ namespace Minecraft
         private void DoGenerateWorld()
         {
             //Key already in dictionary and contains check while modifying dictionary!
+            //Temporary unsafe multi-threading of world generation
             while (true)
             {
                 int r = Constants.PLAYER_RENDER_DISTANCE;

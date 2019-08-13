@@ -25,7 +25,7 @@ namespace Minecraft
 
         private float verticalSpeed = 0;
 
-        private BlockType selectedBlock = BlockType.Dirt;
+        private BlockType selectedBlock = BlockType.Cobblestone;
 
         public Player(Game game, Matrix4 projectionMatrix)
         {
