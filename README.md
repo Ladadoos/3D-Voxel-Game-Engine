@@ -1,1 +1,7 @@
-A minecraft clone using OpenGL and C#. Includes collision detection and response, breakable/placable blocks, endless world generation, biomes and more.
+## Minecraft clone
+
+A minecraft clone using OpenGL, C# and GLSL. Includes collision detection and response, breakable and placeable blocks, endless world generation, biomes, texturepacks and more.
+
+![](Images/image1.png)
+![](Images/image2.png)
+![](Images/image3.png)
