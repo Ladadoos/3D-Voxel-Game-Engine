@@ -9,7 +9,7 @@ namespace Minecraft
 
         public BlockDatabase()
         {
-            int textureId = Game.textureLoader.LoadTexture("../../Resources/texturePack.png");
+            int textureId = Game.textureLoader.LoadTexture("../../Resources/texturePack2.png");
             textureAtlas = new TextureAtlas(textureId, 256, 16);
         }
 
