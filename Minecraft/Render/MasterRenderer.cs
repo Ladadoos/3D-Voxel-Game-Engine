@@ -7,8 +7,9 @@ namespace Minecraft
 {
     class MasterRenderer
     {
+        // The projection matrix used when the player isn't doing or affected by anything special like running, shifting etc...
         private ProjectionMatrixInfo standardProjectionMatrixInfo;
-        private ProjectionMatrixInfo currentProjectionMatrixInfo;
+        public ProjectionMatrixInfo currentProjectionMatrixInfo;
 
         private float colorClearR = 0.57F;
         private float colorClearG = 0.73F;
@@ -38,13 +39,18 @@ namespace Minecraft
         public void Render(Camera camera,  World world)
         {
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            GL.Clear(ClearBufferMask.DepthBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, Maths.CreateViewMatrix(camera));
             foreach (KeyValuePair<Vector2, RenderChunk> renderChunk in world.renderChunks)
             {
+                Vector3 min = new Vector3(renderChunk.Key.X * 16, 0, renderChunk.Key.Y * 16);
+                Vector3 max = min + new Vector3(16, 256, 16);
+                if (!camera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
+                {
+                    continue;
+                }
                 renderChunk.Value.HardBlocksModel.Bind();
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, renderChunk.Value.TransformationMatrix);
                 GL.DrawElements(PrimitiveType.Triangles, renderChunk.Value.HardBlocksModel.indicesCount, DrawElementsType.UnsignedInt, 0);
@@ -94,14 +100,13 @@ namespace Minecraft
             GL.Disable(EnableCap.CullFace);
         }
 
+        /// <summary> Renders only the lines formed by connecting the vertices together.
         private void EnableLineModeRendering()
         {
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
         }
 
-        /// <summary>
-        /// Enabling depth test insures that object A behind object B isn't rendered over object B
-        /// </summary>
+        /// <summary> Enabling depth test insures that object A behind object B isn't rendered over object B </summary>
         private void EnableDepthTest()
         {
             GL.Enable(EnableCap.DepthTest);

@@ -11,9 +11,9 @@ namespace Minecraft
         {
             Matrix4 scaleMatrix = new Matrix4(scaleX, 0, 0, 0, 0, scaleY, 0, 0, 0, 0, scaleZ, 0, 0, 0, 0, 1);
             Matrix4 transformationmatrix = scaleMatrix *
-                Matrix4.CreateRotationX(ToRadians(rx)) *
-                Matrix4.CreateRotationY(ToRadians(ry)) *
-                Matrix4.CreateRotationZ(ToRadians(rz)) *
+                Matrix4.CreateRotationX(DegreeToRadian(rx)) *
+                Matrix4.CreateRotationY(DegreeToRadian(ry)) *
+                Matrix4.CreateRotationZ(DegreeToRadian(rz)) *
                 Matrix4.CreateTranslation(translation);
             return transformationmatrix;
         }
@@ -32,13 +32,14 @@ namespace Minecraft
         public static Vector3 CreateLookAtVector(Camera camera)
         {
             Vector3 lookAt = new Vector3();
-            lookAt.X = (float)(Math.Sin(camera.radialOrientation.X) * Math.Cos(camera.radialOrientation.Y));
+            double cosY = Math.Cos(camera.radialOrientation.Y);
+            lookAt.X = (float)(Math.Sin(camera.radialOrientation.X) * cosY);
             lookAt.Y = (float)Math.Sin(camera.radialOrientation.Y);
-            lookAt.Z = (float)(Math.Cos(camera.radialOrientation.X) * Math.Cos(camera.radialOrientation.Y));
+            lookAt.Z = (float)(Math.Cos(camera.radialOrientation.X) * cosY);
             return lookAt;
         }
 
-        public static float ToRadians(double angle)
+        public static float DegreeToRadian(double angle)
         {
             return (float)(Math.PI * angle / 180.0);
         }

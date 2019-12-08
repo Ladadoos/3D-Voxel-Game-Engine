@@ -30,7 +30,7 @@ namespace Minecraft
         public Player(Game game, Matrix4 projectionMatrix)
         {
             this.game = game;
-            camera = new Camera();
+            camera = new Camera(game);
             position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
@@ -93,27 +93,27 @@ namespace Minecraft
             if (Game.input.OnMousePress(MouseButton.Right))
             {
                 int offset = 2;
-                int x = (int)Math.Floor(camera.position.X + camera.rayOut.X * offset);
-                int y = (int)Math.Floor(camera.position.Y + camera.rayOut.Y * offset);
-                int z = (int)Math.Floor(camera.position.Z + camera.rayOut.Z * offset);
+                int x = (int)Math.Floor(camera.position.X + camera.forward.X * offset);
+                int y = (int)Math.Floor(camera.position.Y + camera.forward.Y * offset);
+                int z = (int)Math.Floor(camera.position.Z + camera.forward.Z * offset);
 
                 game.world.AddBlockToWorld(x, y, z, selectedBlock);
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + camera.rayOut.X * offset);
-                int y = (int)(camera.position.Y + camera.rayOut.Y * offset);
-                int z = (int)(camera.position.Z + camera.rayOut.Z * offset);
+                int x = (int)(camera.position.X + camera.forward.X * offset);
+                int y = (int)(camera.position.Y + camera.forward.Y * offset);
+                int z = (int)(camera.position.Z + camera.forward.Z * offset);
 
                 selectedBlock = game.world.GetBlockAt(x, y, z);
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
                 int offset = 2;
-                int x = (int)(camera.position.X + camera.rayOut.X * offset);
-                int y = (int)(camera.position.Y + camera.rayOut.Y * offset);
-                int z = (int)(camera.position.Z + camera.rayOut.Z * offset);
+                int x = (int)(camera.position.X + camera.forward.X * offset);
+                int y = (int)(camera.position.Y + camera.forward.Y * offset);
+                int z = (int)(camera.position.Z + camera.forward.Z * offset);
 
                 game.world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
