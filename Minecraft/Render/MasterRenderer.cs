@@ -65,7 +65,7 @@ namespace Minecraft
         private void UploadTextureAtlas()
         {
             basicShader.Start();
-            basicShader.LoadInt(basicShader.location_Texture1, 0);
+            basicShader.LoadInt(basicShader.location_TextureAtlas, 0);
             basicShader.Stop();
         }
 

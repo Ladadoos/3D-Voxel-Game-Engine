@@ -2,10 +2,10 @@
 {
     class ShaderBasic : Shader
     {
-        private static readonly string vertexFile = "../../Shaders/GLSL/vertexShader.txt";
-        private static readonly string fragmentFile = "../../Shaders/GLSL/fragmentShader.txt";
+        private static readonly string vertexFile = "../../Shaders/BasicShader/vertexShader.glsl";
+        private static readonly string fragmentFile = "../../Shaders/BasicShader/fragmentShader.glsl";
 
-        public int location_Texture1;
+        public int location_TextureAtlas;
         public int location_TransformationMatrix;
         public int location_ViewMatrix;
         public int location_ProjectionMatrix;
@@ -17,7 +17,7 @@
 
         protected override void GetAllUniformLocations()
         {
-            location_Texture1 = GetUniformLocation("texture1");
+            location_TextureAtlas = GetUniformLocation("textureAtlas");
             location_TransformationMatrix = GetUniformLocation("transformationMatrix");
             location_ViewMatrix = GetUniformLocation("viewMatrix");
             location_ProjectionMatrix = GetUniformLocation("projectionMatrix");
