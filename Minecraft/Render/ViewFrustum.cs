@@ -8,7 +8,6 @@ namespace Minecraft
         //Implementation: https://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
         struct FrustumPlane
         {
-            //public Vector3 point;
             public Vector3 normal;
             public float distanceToOrigin;
 
@@ -18,37 +17,24 @@ namespace Minecraft
             }
         }
 
-        private float fov;
-        private float aspectRatio;
-        private float nearDistance;
-        private float farDistance;
         private float nearWidth, nearHeight, farWidth, farHeight;
-
         private FrustumPlane[] frustumPlanes = new FrustumPlane[6];
 
-        public ViewFrustum(float fov, float aspectRatio, float nearDistance, float farDistance)
+        public ViewFrustum(ProjectionMatrixInfo projectionInfo)
         {
-            this.fov = fov;
-            this.aspectRatio = aspectRatio;
-            this.nearDistance = nearDistance;
-            this.farDistance = farDistance;
-            CalculateNearFarWidthHeight();
+            CalculateNearFarWidthHeight(projectionInfo);
         }
 
-        private void CalculateNearFarWidthHeight()
+        private void CalculateNearFarWidthHeight(ProjectionMatrixInfo pInfo)
         {
+            float aspectRatio = pInfo.windowWidth / pInfo.windowHeight;
             float extension = 2;
-            float tan = (float)Math.Tan(fov * 0.5) * extension;
-            nearHeight = tan * nearDistance;
+            float tan = (float)Math.Tan(pInfo.fieldOfView * 0.5) * extension;
+            nearHeight = tan * pInfo.distanceNearPlane;
             nearWidth = nearHeight * aspectRatio;
-            farHeight = tan * farDistance;
+            farHeight = tan * pInfo.distanceFarPlane;
             farWidth = farHeight * aspectRatio;
         }
-
-        /*public Matrix4 CreateProjectionMatrix()
-        {
-            return Matrix4.CreatePerspectiveFieldOfView(fov, aspectRatio, nearDistance, farDistance);
-        }*/
 
         public void UpdateFrustumPoints(Camera camera)
         {
@@ -56,8 +42,8 @@ namespace Minecraft
             Vector3 xAxis = camera.right;
             Vector3 yAxis = Vector3.Cross(zAxis, xAxis);
 
-            Vector3 nearCenter = camera.position - zAxis * nearDistance;
-            Vector3 farCenter = camera.position - zAxis * farDistance;
+            Vector3 nearCenter = camera.position - zAxis * camera.currentProjection.distanceNearPlane;
+            Vector3 farCenter = camera.position - zAxis * camera.currentProjection.distanceFarPlane;
 
             frustumPlanes[0].normal = -zAxis; //near plane
             frustumPlanes[0].distanceToOrigin = Vector3.Dot(frustumPlanes[0].normal, nearCenter);

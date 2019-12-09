@@ -41,11 +41,11 @@ namespace Minecraft
 
         public float[] GetTextureCoords(int x, int y)
         {
-            float xMin = x * textureUVsize + texelSize;// * 0.5F;
-            float yMin = y * textureUVsize + texelSize;// * 0.5F;
+            float xMin = x * textureUVsize + texelSize * 0.5F;
+            float yMin = y * textureUVsize + texelSize * 0.5F;
 
-            float xMax = x * textureUVsize + textureUVsize - texelSize;// * 0.5F;
-            float yMax = y * textureUVsize + textureUVsize - texelSize; // * 0.5F;
+            float xMax = x * textureUVsize + textureUVsize - texelSize * 0.5F;
+            float yMax = y * textureUVsize + textureUVsize - texelSize * 0.5F;
 
             float[] textureCoords = {
                 xMax, yMax,

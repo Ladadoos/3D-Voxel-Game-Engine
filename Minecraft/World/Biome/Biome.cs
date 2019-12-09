@@ -1,6 +1,4 @@
-﻿using LibNoise;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     abstract class Biome
     {

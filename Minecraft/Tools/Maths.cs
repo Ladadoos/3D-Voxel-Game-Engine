@@ -18,24 +18,13 @@ namespace Minecraft
             return transformationmatrix;
         }
 
-        public static Matrix4 CreateProjectionMatrix(float fov, float width, float height, float near, float far)
-        {
-            return Matrix4.CreatePerspectiveFieldOfView(fov, width / height, near, far);
-        }
-
-        public static Matrix4 CreateViewMatrix(Camera camera)
-        {
-            Vector3 lookAt = CreateLookAtVector(camera);
-            return Matrix4.LookAt(camera.position, camera.position + lookAt, Vector3.UnitY);
-        }
-
-        public static Vector3 CreateLookAtVector(Camera camera)
+        public static Vector3 CreateLookAtVector(float yaw, float pitch)
         {
             Vector3 lookAt = new Vector3();
-            double cosY = Math.Cos(camera.radialOrientation.Y);
-            lookAt.X = (float)(Math.Sin(camera.radialOrientation.X) * cosY);
-            lookAt.Y = (float)Math.Sin(camera.radialOrientation.Y);
-            lookAt.Z = (float)(Math.Cos(camera.radialOrientation.X) * cosY);
+            double cosY = Math.Cos(yaw);
+            lookAt.X = (float)(Math.Sin(pitch) * cosY);
+            lookAt.Y = (float)Math.Sin(yaw);
+            lookAt.Z = (float)(Math.Cos(pitch) * cosY);
             return lookAt;
         }
 

@@ -10,15 +10,12 @@ namespace Minecraft
 {
     sealed class GameWindow : OpenTK.GameWindow
     {
-        public static GameWindow instance;
-
         private Game game;
 
         public GameWindow() : base(1920, 1080, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
         {
             Logger.Log("OpenGL version: " + GL.GetString(StringName.Version), LogType.INFORMATION);
             game = new Game();
-            instance = this;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -53,7 +50,7 @@ namespace Minecraft
             Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
             Title = "Vsync: " + VSync +
                     " FPS: " + (int)(1f / e.Time) +
-                    " AVG FPS: " + game.GetAverageFps() +
+                    " AVG FPS: " + game.fpsCounter.GetAverageFPS() +
                     " Position: " + game.player.position +
                     " Grid Pos: " + chunkPos +
                     " Velocity: " + game.player.velocity;

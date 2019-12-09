@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
-    struct ProjectionMatrixInfo
+    class ProjectionMatrixInfo
     {
         public float distanceNearPlane;
         public float distanceFarPlane;
@@ -21,6 +15,11 @@ namespace Minecraft
             this.fieldOfView = fieldOfView;
             this.windowWidth = windowWidth;
             this.windowHeight = windowHeight;
+        }
+
+        public ProjectionMatrixInfo ShallowCopy()
+        {
+            return (ProjectionMatrixInfo)MemberwiseClone();
         }
     }
 }

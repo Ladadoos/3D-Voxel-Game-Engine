@@ -7,7 +7,7 @@ using OpenTK.Input;
 namespace Minecraft
 {
     class Player
-    {       
+    {
         private bool isInCreativeMode = true;
         private bool doCollisionDetection = true;
         private bool isInAir = true;
@@ -27,17 +27,17 @@ namespace Minecraft
 
         private BlockType selectedBlock = BlockType.Cobblestone;
 
-        public Player(Game game, Matrix4 projectionMatrix)
+        public Player(Game game)
         {
             this.game = game;
-            camera = new Camera(game);
+            camera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
             position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
             hitbox = new AABB(position, GetPlayerMaxAABB());
         }
 
         public void Update(float deltaTime)
         {
-            if (GameWindow.instance.Focused)
+            if (game.window.Focused)
             {
                 UpdateKeyboardInput();
             }
@@ -87,8 +87,12 @@ namespace Minecraft
             }
 
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
-           
-            camera.SetPosition(position);
+
+            Vector3 cameraPosition = position;
+            cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
+            cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
+            cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
+            camera.SetPosition(cameraPosition);
 
             if (Game.input.OnMousePress(MouseButton.Right))
             {
@@ -118,19 +122,19 @@ namespace Minecraft
                 game.world.AddBlockToWorld(x, y, z, BlockType.Air);
             }
 
-            if (GameWindow.instance.Focused)
+            if (game.window.Focused)
             {
-                camera.Rotate();
-                camera.ResetCursor(GameWindow.instance.Bounds);
-            }      
+                camera.UpdatePitchAndYaw();
+                camera.ResetCursor(game.window.Bounds);
+            }
         }
 
         private void TryStartRunning()
         {
-            if(!isRunning && (isInCreativeMode || (!isInCreativeMode && !isInAir)))
+            if (!isRunning && (isInCreativeMode || (!isInCreativeMode && !isInAir)))
             {
                 isRunning = true;
-                game.masterRenderer.SetFieldOfView(1.65F);
+                camera.SetFieldOfView(1.65F);
             }
         }
 
@@ -139,7 +143,7 @@ namespace Minecraft
             if (isRunning)
             {
                 isRunning = false;
-                game.masterRenderer.ResetToDefaultFieldOfView();
+                camera.SetFieldOfViewToDefault();
             }
         }
 
@@ -148,7 +152,7 @@ namespace Minecraft
             if (isCrouching)
             {
                 isCrouching = false;
-                game.masterRenderer.ResetToDefaultFieldOfView();
+                camera.SetFieldOfViewToDefault();
             }
         }
 
@@ -159,7 +163,7 @@ namespace Minecraft
                 TryStopRunning();
             }
 
-            game.masterRenderer.SetFieldOfView(1.45F);
+            camera.SetFieldOfView(1.45F);
             isCrouching = true;
         }
 
@@ -179,16 +183,15 @@ namespace Minecraft
             if (inputToRun && !inputToCrouch)
             {
                 TryStartRunning();
-            }
-            else if (inputToCrouch)
+            } else if (inputToCrouch)
             {
                 TryStartCrouching();
-            }else if (!inputToCrouch)
+            } else if (!inputToCrouch)
             {
                 TryStopCrouching();
             }
 
-            if(!inputToMoveForward || inputToMoveBack)
+            if (!inputToMoveForward || inputToMoveBack)
             {
                 TryStopRunning();
             }
@@ -196,13 +199,12 @@ namespace Minecraft
             if (isRunning)
             {
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
-            }else if (isCrouching)
+            } else if (isCrouching)
             {
                 if (isInCreativeMode)
                 {
-                    ApplyForce(0.0F, -1.0F * speedMultiplier, 0.0F);
-                }
-                else
+                    MovePlayerVertically(-speedMultiplier);
+                } else
                 {
                     speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
                 }
@@ -216,9 +218,8 @@ namespace Minecraft
             {
                 if (isInCreativeMode)
                 {
-                    ApplyForce(0.0F, 1.0F * speedMultiplier, 0.0F);
-                }
-                else
+                    MovePlayerVertically(speedMultiplier);
+                } else
                 {
                     AttemptToJump();
                 }
@@ -226,19 +227,19 @@ namespace Minecraft
 
             if (inputToMoveForward)
             {
-                ApplyForce(0.0F, 0.0F, 1.0F * speedMultiplier);
+                MovePlayerHorizontally(0, speedMultiplier);
             }
             if (inputToMoveBack)
             {
-                ApplyForce(0.0F, 0.0F, -1.0F * speedMultiplier);
+                MovePlayerHorizontally(0, -speedMultiplier);
             }
             if (inputToMoveRight)
             {
-                ApplyForce(1.0F * speedMultiplier, 0.0F, 0.0F);
+                MovePlayerHorizontally(speedMultiplier, 0);
             }
             if (inputToMoveLeft)
             {
-                ApplyForce(-1.0F * speedMultiplier, 0.0F, 0.0F);
+                MovePlayerHorizontally(-speedMultiplier, 0);
             }
         }
 
@@ -252,12 +253,11 @@ namespace Minecraft
             if (!HasPlayerSurpassedTerminalVelocity())
             {
                 verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
-                ApplyForce(0.0F, verticalSpeed, 0.0F);
-            }
-            else
+                MovePlayerVertically(verticalSpeed);
+            } else
             {
                 verticalSpeed = Constants.GRAVITY_THRESHOLD;
-            }           
+            }
         }
 
         private bool HasPlayerSurpassedTerminalVelocity()
@@ -270,7 +270,7 @@ namespace Minecraft
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.intersects(blockAABB))
+                if (hitbox.Intersects(blockAABB))
                 {
                     if (velocity.X > 0.0F)
                     {
@@ -278,7 +278,7 @@ namespace Minecraft
                     }
                     if (velocity.X < 0.0F)
                     {
-                        position.X = blockAABB.max.X;     
+                        position.X = blockAABB.max.X;
                     }
                     velocity.X = 0.0F;
                     TryStopRunning();
@@ -292,7 +292,7 @@ namespace Minecraft
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.intersects(blockAABB))
+                if (hitbox.Intersects(blockAABB))
                 {
                     if (velocity.Y > 0.0F)
                     {
@@ -316,11 +316,11 @@ namespace Minecraft
             foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.intersects(blockAABB))
+                if (hitbox.Intersects(blockAABB))
                 {
                     if (velocity.Z > 0)
                     {
-                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH; 
+                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
                     }
                     if (velocity.Z < 0)
                     {
@@ -332,17 +332,21 @@ namespace Minecraft
             }
         }
 
-        private void ApplyForce(float x, float y, float z)
+        ///<summary> Moves horizontal relative to the camera. x is right, z is forward. </summary>
+        private void MovePlayerHorizontally(float x, float z)
         {
             Vector3 offset = new Vector3();
-            Vector3 forward = new Vector3((float)Math.Sin(camera.radialOrientation.X), 0, (float)Math.Cos(camera.radialOrientation.X));
+            Vector3 forward = new Vector3((float)Math.Sin(camera.pitch), 0, (float)Math.Cos(camera.pitch));
             Vector3 right = new Vector3(-forward.Z, 0, forward.X);
-
             offset += x * right;
             offset += z * forward;
-            offset.Y += y;
-
             velocity += offset;
+        }
+
+        ///<summary> Moves vertical relative to world up vector. </summary>
+        private void MovePlayerVertically(float y)
+        {
+            velocity.Y += y;
         }
 
         private void AttemptToJump()
@@ -354,9 +358,7 @@ namespace Minecraft
             }
         }
 
-        /// <summary>
-        /// Returns the max component of the AABB from this player.
-        /// </summary>
+        /// <summary> Returns the max component of the AABB from this player. </summary>
         private Vector3 GetPlayerMaxAABB()
         {
             return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
@@ -364,7 +366,7 @@ namespace Minecraft
 
         private void CalculateAABBHitbox()
         {
-            hitbox.setHitbox(position, GetPlayerMaxAABB());
+            hitbox.SetHitbox(position, GetPlayerMaxAABB());
         }
 
         private List<Vector3> GetCollisionDetectionBlockPositions(World world)
@@ -380,8 +382,8 @@ namespace Minecraft
                 for (int yy = intY - 2; yy <= intY + 2; yy++)
                 {
                     for (int zz = intZ - 1; zz <= intZ + Constants.PLAYER_HEIGHT; zz++)
-                    {            
-                        if(world.GetBlockAt(xx, yy, zz) != BlockType.Air)
+                    {
+                        if (world.GetBlockAt(xx, yy, zz) != BlockType.Air)
                         {
                             collidablePositions.Add(new Vector3(xx, yy, zz));
                         }

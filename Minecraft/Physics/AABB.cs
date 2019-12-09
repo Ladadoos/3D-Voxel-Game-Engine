@@ -13,13 +13,13 @@ namespace Minecraft
             this.max = max;
         }
 
-        public void setHitbox(Vector3 min, Vector3 max)
+        public void SetHitbox(Vector3 min, Vector3 max)
         {
             this.min = min;
             this.max = max;
         }
 
-        public bool intersects(AABB c)
+        public bool Intersects(AABB c)
         {
             return min.X < c.max.X && max.X > c.min.X &&
                    min.Y < c.max.Y && max.Y > c.min.Y &&

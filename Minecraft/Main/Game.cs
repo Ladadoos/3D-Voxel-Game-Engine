@@ -1,67 +1,37 @@
-﻿using OpenTK;
-using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System;
 
 namespace Minecraft
 {
     class Game
     {
-        public static TextureLoader textureLoader;
-        public static Input input;
-        public static BlockDatabase blockDatabase;
-        public static Random randomizer;
+        public GameWindow window { get; private set; }
 
-        public MasterRenderer masterRenderer;
-        public Player player;
-        public World world;
+        public static TextureLoader textureLoader { get; private set; }
+        public static Input input { get; private set; }
+        public static BlockDatabase blockDatabase { get; private set; }
+        public static Random randomizer { get; private set; }
 
-        private long totalElapsedFrames;
-        private double totalElapsedTime;
+        public MasterRenderer masterRenderer { get; private set; }
+        public Player player { get; private set; }
+        public World world { get; private set; }
+        public FPSCounter fpsCounter { get; private set; }
 
         public void OnStartGame(GameWindow window)
         {
+            this.window = window;
+
+            player = new Player(this);
+
+            fpsCounter = new FPSCounter();
             textureLoader = new TextureLoader();
-            masterRenderer = new MasterRenderer(window.Width, window.Height);
+            masterRenderer = new MasterRenderer(player.camera);
             blockDatabase = new BlockDatabase();
             randomizer = new Random();
 
             blockDatabase.RegisterBlocks();
             world = new World(this);
             world.GenerateTestMap();
-            player = new Player(this, masterRenderer.currentProjectionMatrix);
             input = new Input();
-
-            Thread t3 = new Thread(() => DoGenerateWorld());
-            t3.IsBackground = true;
-            t3.Start();
-        }
-
-        private List<Chunk> toProcessChunks = new List<Chunk>();
-
-        private void DoGenerateWorld()
-        {
-            //Key already in dictionary and contains check while modifying dictionary!
-            //Temporary unsafe multi-threading of world generation
-            while (true)
-            {
-                int r = Constants.PLAYER_RENDER_DISTANCE;
-                for (int x = -r; x <= r; x++)
-                {
-                    for (int z = -r; z <= r; z++)
-                    {              
-                        Vector2 chunkPos = world.GetChunkPosition(player.position.X, player.position.Z);
-                        Vector2 toAttemptChunk = new Vector2(chunkPos.X + x, chunkPos.Y + z);
-
-                        if (!world.chunks.ContainsKey(toAttemptChunk))
-                        {
-                            Chunk chunk = world.worldGenerator.GenerateBlocksForChunkAt((int)toAttemptChunk.X, (int)toAttemptChunk.Y);
-                            toProcessChunks.Add(chunk);
-                            Thread.Sleep(50);
-                        }
-                    }
-                }
-            }
         }
 
         public void OnCloseGame()
@@ -73,39 +43,23 @@ namespace Minecraft
 
         public void OnUpdateGame(double elapsedTime)
         {
-            totalElapsedFrames++;
-            totalElapsedTime += elapsedTime;
+            fpsCounter.IncrementFrameCounter();
+            fpsCounter.AddElapsedTime(elapsedTime);
 
             input.Update();
             player.Update((float)elapsedTime);
-
-            if(toProcessChunks.Count > 0)
-            {
-                for(int i = toProcessChunks.Count - 1; i > 0; i--)
-                {
-                    Chunk toProcessChunk = toProcessChunks[i];
-                    toProcessChunks.RemoveAt(i);
-                    world.chunks.Add(new Vector2(toProcessChunk.gridX, toProcessChunk.gridZ), toProcessChunk);
-                    world.chunkMeshGenerator.GenerateRenderMeshForChunk(toProcessChunk);
-                }
-            }
 
             world.EndFrameUpdate();
         }
 
         public void OnRenderGame()
         {
-            masterRenderer.Render(player.camera, world);
+            masterRenderer.Render(world);
         }
 
         public void OnWindowResize(int newWidth, int newHeight)
         {
-            masterRenderer.OnWindowResize(newWidth, newHeight);
-        }
-
-        public int GetAverageFps()
-        {
-            return (int)(totalElapsedFrames / totalElapsedTime);
+            player.camera.SetWindowSize(newWidth, newHeight);
         }
     }
 }

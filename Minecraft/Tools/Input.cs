@@ -19,9 +19,6 @@ namespace Minecraft
             currentKeyboardState = Keyboard.GetState();
         }
 
-        /*
-         * Mouse
-         */
         public bool OnMouseDown(MouseButton mButton)
         {
             return currentMouseState.IsButtonDown(mButton);
@@ -37,9 +34,6 @@ namespace Minecraft
             return currentMouseState.IsButtonDown(mButton) && previousMouseState.IsButtonUp(mButton);
         }
 
-        /*
-         * Keyboard
-         */
         public bool OnKeyDown(Key key)
         {
             return currentKeyboardState.IsKeyDown(key);
