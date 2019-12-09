@@ -1,6 +1,6 @@
 ﻿namespace Minecraft
 {
-    abstract class Block
+    /*abstract class Block
     {
         public float[] textureCoordinates;
 
@@ -8,5 +8,5 @@
         {
             this.textureCoordinates = textureCoordinates;
         }
-    }
+    }*/
 }

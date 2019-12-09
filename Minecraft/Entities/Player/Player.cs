@@ -8,7 +8,7 @@ namespace Minecraft
 {
     class Player
     {
-        private bool isInCreativeMode = true;
+        private bool isInCreativeMode = false;
         private bool doCollisionDetection = true;
         private bool isInAir = true;
         private bool isCrouching = false;
@@ -65,25 +65,26 @@ namespace Minecraft
                 UpdateGravityAppliedOnPlayer(deltaTime);
             }
 
+            List<Vector3> blocks = GetCollisionDetectionBlockPositions(game.world);
             position.X += velocity.X * deltaTime;
             CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoXAxisCollisionDetection();
+                DoXAxisCollisionDetection(blocks);
             }
 
             position.Y += velocity.Y * deltaTime;
             CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoYAxisCollisionDetection();
+                DoYAxisCollisionDetection(blocks);
             }
 
             position.Z += velocity.Z * deltaTime;
             CalculateAABBHitbox();
             if (doCollisionDetection)
             {
-                DoZAxisCollisionDetection();
+                DoZAxisCollisionDetection(blocks);
             }
 
             velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
@@ -96,30 +97,39 @@ namespace Minecraft
 
             if (Game.input.OnMousePress(MouseButton.Right))
             {
-                int offset = 2;
-                int x = (int)Math.Floor(camera.position.X + camera.forward.X * offset);
-                int y = (int)Math.Floor(camera.position.Y + camera.forward.Y * offset);
-                int z = (int)Math.Floor(camera.position.Z + camera.forward.Z * offset);
-
-                game.world.AddBlockToWorld(x, y, z, selectedBlock);
+                RayResult rayResult = GetLookatBlock();
+                if (rayResult.intersected)
+                {
+                    Vector3 target = rayResult.intersectedGridPoint + rayResult.normalAtIntersection;
+                    int x = (int)target.X;
+                    int y = (int)target.Y;
+                    int z = (int)target.Z;
+                    game.world.AddBlockToWorld(x, y, z, selectedBlock);
+                }
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
-                int offset = 2;
-                int x = (int)(camera.position.X + camera.forward.X * offset);
-                int y = (int)(camera.position.Y + camera.forward.Y * offset);
-                int z = (int)(camera.position.Z + camera.forward.Z * offset);
-
-                selectedBlock = game.world.GetBlockAt(x, y, z);
+                RayResult rayResult = GetLookatBlock();
+                if (rayResult.intersected)
+                {
+                    Vector3 target = rayResult.intersectedGridPoint;
+                    int x = (int)target.X;
+                    int y = (int)target.Y;
+                    int z = (int)target.Z;
+                    selectedBlock = game.world.GetBlockAt(x, y, z);
+                }
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
-                int offset = 2;
-                int x = (int)(camera.position.X + camera.forward.X * offset);
-                int y = (int)(camera.position.Y + camera.forward.Y * offset);
-                int z = (int)(camera.position.Z + camera.forward.Z * offset);
-
-                game.world.AddBlockToWorld(x, y, z, BlockType.Air);
+                RayResult rayResult = GetLookatBlock();
+                if (rayResult.intersected)
+                {
+                    Vector3 target = rayResult.intersectedGridPoint;
+                    int x = (int)target.X;
+                    int y = (int)target.Y;
+                    int z = (int)target.Z;
+                    game.world.AddBlockToWorld(x, y, z, BlockType.Air);
+                }
             }
 
             if (game.window.Focused)
@@ -265,9 +275,9 @@ namespace Minecraft
             return verticalSpeed < Constants.GRAVITY_THRESHOLD;
         }
 
-        private void DoXAxisCollisionDetection()
+        private void DoXAxisCollisionDetection(List<Vector3> blocks)
         {
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
+            foreach (Vector3 collidablePos in blocks)
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.Intersects(blockAABB))
@@ -286,10 +296,10 @@ namespace Minecraft
             }
         }
 
-        private void DoYAxisCollisionDetection()
+        private void DoYAxisCollisionDetection(List<Vector3> blocks)
         {
             bool collidedY = false;
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
+            foreach (Vector3 collidablePos in blocks)
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.Intersects(blockAABB))
@@ -311,9 +321,9 @@ namespace Minecraft
             isInAir = !collidedY;
         }
 
-        private void DoZAxisCollisionDetection()
+        private void DoZAxisCollisionDetection(List<Vector3> blocks)
         {
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositions(game.world))
+            foreach (Vector3 collidablePos in blocks)
             {
                 AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
                 if (hitbox.Intersects(blockAABB))
@@ -393,5 +403,71 @@ namespace Minecraft
 
             return collidablePositions;
         }
+
+        private List<Vector3> GetCollisionDetectionBlockPositionsTemporary(World world)
+        {
+            List<Vector3> collidablePositions = new List<Vector3>();
+
+            int intX = (int)position.X;
+            int intY = (int)position.Y;
+            int intZ = (int)position.Z;
+
+            for (int xx = intX - 5; xx <= intX + 5; xx++)
+            {
+                for (int yy = intY - 5; yy <= intY + 5; yy++)
+                {
+                    for (int zz = intZ - 5; zz <= intZ + 5; zz++)
+                    {
+                        if (world.GetBlockAt(xx, yy, zz) != BlockType.Air)
+                        {
+                            collidablePositions.Add(new Vector3(xx, yy, zz));
+                        }
+                    }
+                }
+            }
+
+            return collidablePositions;
+        }
+
+        private RayResult GetLookatBlock()
+        {
+            AABB aabb = null;
+            Vector3 pos = Vector3.Zero;
+            Ray r = new Ray(camera.position, camera.forward);
+            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositionsTemporary(game.world))
+            {
+                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
+                float dist = blockAABB.Intersects(r);
+                if (dist < r.distanceToIntersection)
+                {
+                    r.distanceToIntersection = dist;
+                    pos = collidablePos;
+                    aabb = blockAABB;
+                }
+            }
+
+            RayResult rayResult = new RayResult{ intersected = false };
+
+            if (pos != Vector3.Zero)
+            {
+                float bias = 1.00005f;
+                Vector3 interPoint = r.origin + r.direction * r.distanceToIntersection;
+
+                Vector3 c = (aabb.min + aabb.max) * 0.5f;
+                Vector3 p = interPoint - c;
+                Vector3 d = (aabb.min - aabb.max) * 0.5f;
+                Vector3 normal = new Vector3(
+                    (int)(p.X / Math.Abs(d.X) * bias),
+                    (int)(p.Y / Math.Abs(d.Y) * bias),
+                    (int)(p.Z / Math.Abs(d.Z) * bias)).Normalized();               
+                rayResult.intersected = true;
+                rayResult.intersectedAABB = aabb;
+                rayResult.normalAtIntersection = normal;
+                rayResult.intersectedPoint = interPoint;
+                rayResult.intersectedGridPoint = pos;
+            }
+
+            return rayResult;
+        } 
     }
 }

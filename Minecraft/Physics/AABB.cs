@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 
 namespace Minecraft
 {
@@ -43,6 +44,37 @@ namespace Minecraft
             allCorners[7] = max - deltaX - deltaZ;
 
             return allCorners;
+        }
+     
+        public float Intersects(Ray ray)
+        {
+            float t1 = (min.X - ray.origin.X) * ray.directionFrac.X;
+            float t2 = (max.X - ray.origin.X) * ray.directionFrac.X;
+            float t3 = (min.Y - ray.origin.Y) * ray.directionFrac.Y;
+            float t4 = (max.Y - ray.origin.Y) * ray.directionFrac.Y;
+            float t5 = (min.Z - ray.origin.Z) * ray.directionFrac.Z;
+            float t6 = (max.Z - ray.origin.Z) * ray.directionFrac.Z;
+
+            float tmin = Math.Max(Math.Max(Math.Min(t1, t2), Math.Min(t3, t4)), Math.Min(t5, t6));
+            float tmax = Math.Min(Math.Min(Math.Max(t1, t2), Math.Max(t3, t4)), Math.Max(t5, t6));
+
+            // if tmax < 0, ray (line) is intersecting AABB, but the whole AABB is behind us
+            if (tmax < 0)
+            {
+                return float.MaxValue;
+            }
+
+            // if tmin > tmax, ray doesn't intersect AABB
+            if (tmin > tmax)
+            {
+                return float.MaxValue;
+            }
+
+            if(ray.distanceToIntersection > tmin)
+            {
+                return tmin;
+            }
+            return float.MaxValue;
         }
     }
 }
