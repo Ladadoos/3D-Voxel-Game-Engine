@@ -78,9 +78,8 @@ namespace Minecraft
                 return false;
             }
 
-            if(x == Math.Floor(game.player.position.X) && 
-                z == Math.Floor(game.player.position.Z) && 
-                y == Math.Floor(game.player.position.Y))
+
+            if(game.player.hitbox.Intersects(Cube.GetAABB(x, y, z)))
             {
                 Console.WriteLine("in player");
                 return false;
