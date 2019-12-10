@@ -78,8 +78,8 @@ namespace Minecraft
                 return false;
             }
 
-
-            if(game.player.hitbox.Intersects(Cube.GetAABB(x, y, z)))
+            //Small bug when: flying agaisnt a wall and breaking the block infront. It detects collision.
+            if (game.player.hitbox.Intersects(Cube.GetAABB(x, y, z)))
             {
                 Console.WriteLine("in player");
                 return false;

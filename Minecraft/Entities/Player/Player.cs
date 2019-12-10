@@ -17,7 +17,7 @@ namespace Minecraft
         private Game game;
 
         public Camera camera;
-        public Vector3 position;
+        public Vector3 position; //The bottom-left component of the players AABB. 
         public Vector3 velocity;
         public float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
@@ -25,6 +25,7 @@ namespace Minecraft
 
         private float verticalSpeed = 0;
 
+        public RayTraceResult mouseOverObject { get; private set; }
         private BlockType selectedBlock = BlockType.Cobblestone;
 
         public Player(Game game)
@@ -41,6 +42,8 @@ namespace Minecraft
             {
                 UpdateKeyboardInput();
             }
+
+            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
 
             /*int intX = (int)position.X;
             int intY = (int)position.Y;
@@ -97,10 +100,9 @@ namespace Minecraft
 
             if (Game.input.OnMousePress(MouseButton.Right))
             {
-                RayResult rayResult = GetLookatBlock();
-                if (rayResult.intersected)
+                if (mouseOverObject != null)
                 {
-                    Vector3 target = rayResult.intersectedGridPoint + rayResult.normalAtIntersection;
+                    Vector3 target = mouseOverObject.intersectedGridPoint + mouseOverObject.normalAtIntersection;
                     int x = (int)target.X;
                     int y = (int)target.Y;
                     int z = (int)target.Z;
@@ -109,10 +111,9 @@ namespace Minecraft
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
-                RayResult rayResult = GetLookatBlock();
-                if (rayResult.intersected)
+                if (mouseOverObject != null)
                 {
-                    Vector3 target = rayResult.intersectedGridPoint;
+                    Vector3 target = mouseOverObject.intersectedGridPoint;
                     int x = (int)target.X;
                     int y = (int)target.Y;
                     int z = (int)target.Z;
@@ -121,10 +122,9 @@ namespace Minecraft
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
-                RayResult rayResult = GetLookatBlock();
-                if (rayResult.intersected)
+                if (mouseOverObject != null)
                 {
-                    Vector3 target = rayResult.intersectedGridPoint;
+                    Vector3 target = mouseOverObject.intersectedGridPoint;
                     int x = (int)target.X;
                     int y = (int)target.Y;
                     int z = (int)target.Z;
@@ -387,11 +387,11 @@ namespace Minecraft
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
-            for (int xx = intX - 2; xx <= intX + 2; xx++)
+            for (int xx = intX - 1; xx <= intX + 1; xx++)
             {
-                for (int yy = intY - 2; yy <= intY + 2; yy++)
+                for (int yy = intY - 1; yy <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); yy++)
                 {
-                    for (int zz = intZ - 1; zz <= intZ + Constants.PLAYER_HEIGHT; zz++)
+                    for (int zz = intZ - 1; zz <= intZ + 1; zz++)
                     {
                         if (world.GetBlockAt(xx, yy, zz) != BlockType.Air)
                         {
@@ -403,71 +403,5 @@ namespace Minecraft
 
             return collidablePositions;
         }
-
-        private List<Vector3> GetCollisionDetectionBlockPositionsTemporary(World world)
-        {
-            List<Vector3> collidablePositions = new List<Vector3>();
-
-            int intX = (int)position.X;
-            int intY = (int)position.Y;
-            int intZ = (int)position.Z;
-
-            for (int xx = intX - 5; xx <= intX + 5; xx++)
-            {
-                for (int yy = intY - 5; yy <= intY + 5; yy++)
-                {
-                    for (int zz = intZ - 5; zz <= intZ + 5; zz++)
-                    {
-                        if (world.GetBlockAt(xx, yy, zz) != BlockType.Air)
-                        {
-                            collidablePositions.Add(new Vector3(xx, yy, zz));
-                        }
-                    }
-                }
-            }
-
-            return collidablePositions;
-        }
-
-        private RayResult GetLookatBlock()
-        {
-            AABB aabb = null;
-            Vector3 pos = Vector3.Zero;
-            Ray r = new Ray(camera.position, camera.forward);
-            foreach (Vector3 collidablePos in GetCollisionDetectionBlockPositionsTemporary(game.world))
-            {
-                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                float dist = blockAABB.Intersects(r);
-                if (dist < r.distanceToIntersection)
-                {
-                    r.distanceToIntersection = dist;
-                    pos = collidablePos;
-                    aabb = blockAABB;
-                }
-            }
-
-            RayResult rayResult = new RayResult{ intersected = false };
-
-            if (pos != Vector3.Zero)
-            {
-                float bias = 1.00005f;
-                Vector3 interPoint = r.origin + r.direction * r.distanceToIntersection;
-
-                Vector3 c = (aabb.min + aabb.max) * 0.5f;
-                Vector3 p = interPoint - c;
-                Vector3 d = (aabb.min - aabb.max) * 0.5f;
-                Vector3 normal = new Vector3(
-                    (int)(p.X / Math.Abs(d.X) * bias),
-                    (int)(p.Y / Math.Abs(d.Y) * bias),
-                    (int)(p.Z / Math.Abs(d.Z) * bias)).Normalized();               
-                rayResult.intersected = true;
-                rayResult.intersectedAABB = aabb;
-                rayResult.normalAtIntersection = normal;
-                rayResult.intersectedPoint = interPoint;
-                rayResult.intersectedGridPoint = pos;
-            }
-
-            return rayResult;
-        } 
     }
 }

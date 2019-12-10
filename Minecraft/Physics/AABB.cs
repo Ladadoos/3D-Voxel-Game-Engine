@@ -76,5 +76,17 @@ namespace Minecraft
             }
             return float.MaxValue;
         }
+
+        public Vector3 GetNormalAtIntersectionPoint(Vector3 point)
+        {
+            float bias = 1.00005f;
+            Vector3 c = (min + max) * 0.5f;
+            Vector3 p = point - c;
+            Vector3 d = (min - max) * 0.5f;
+            return (new Vector3(
+                (int)(p.X / Math.Abs(d.X) * bias),
+                (int)(p.Y / Math.Abs(d.Y) * bias),
+                (int)(p.Z / Math.Abs(d.Z) * bias))).Normalized();
+        }
     }
 }
