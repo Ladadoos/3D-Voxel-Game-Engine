@@ -26,11 +26,26 @@ namespace Minecraft
         private void CreateData(float[] positions, float[] textureCoordinates, int[] indices, float[] lights)
         {
             indicesCount = indices.Length;
+
             CreateVAO();
+            Bind();
 
             AddVBO(3, positions);
             AddVBO(2, textureCoordinates);
             AddVBO(1, lights);
+            AddEBO(indices);
+
+            Unbind();
+        }
+
+        public Model(float[] positions, int[] indices)
+        {
+            indicesCount = indices.Length;
+
+            CreateVAO();
+            Bind();
+
+            AddVBO(3, positions);
             AddEBO(indices);
 
             Unbind();
@@ -75,7 +90,6 @@ namespace Minecraft
         private void CreateVAO()
         {
             vaoId = GL.GenVertexArray();
-            Bind();
         }
 
         public void Bind()

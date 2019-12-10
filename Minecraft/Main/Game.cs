@@ -24,7 +24,7 @@ namespace Minecraft
 
             fpsCounter = new FPSCounter();
             textureLoader = new TextureLoader();
-            masterRenderer = new MasterRenderer(player.camera);
+            masterRenderer = new MasterRenderer(this);
             blockDatabase = new BlockDatabase();
             randomizer = new Random();
 
