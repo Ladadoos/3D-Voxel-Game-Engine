@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using OpenTK;
 using OpenTK.Input;
 
@@ -8,7 +8,8 @@ namespace Minecraft
 {
     class Player
     {
-        private bool isInCreativeMode = false;
+        private bool isFlying = true;
+        private bool isInCreativeMode = true;
         private bool doCollisionDetection = true;
         private bool isInAir = true;
         private bool isCrouching = false;
@@ -28,12 +29,16 @@ namespace Minecraft
         public RayTraceResult mouseOverObject { get; private set; }
         private BlockType selectedBlock = BlockType.Cobblestone;
 
+        private Stopwatch jumpStopWatch = new Stopwatch();
+
         public Player(Game game)
         {
             this.game = game;
             camera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
             position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
             hitbox = new AABB(position, GetPlayerMaxAABB());
+
+            jumpStopWatch.Start();
         }
 
         public void Update(float deltaTime)
@@ -45,25 +50,7 @@ namespace Minecraft
 
             mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
 
-            /*int intX = (int)position.X;
-            int intY = (int)position.Y;
-            int intZ = (int)position.Z;
-
-            for (int xx = intX - 2; xx <= intX + 2; xx++)
-            {
-                for (int yy = intY - 2; yy <= intY + 2; yy++)
-                {
-                    for (int zz = intZ - 2; zz <= intZ + 3; zz++)
-                    { 
-                        if(game.world.GetBlockAt(xx, yy, zz) != BlockType.Air)
-                        {
-                            game.world.AddBlockToWorld(xx, yy, zz, BlockType.Air);
-                        }
-                    }
-                }
-            }*/
-
-            if (!isInCreativeMode)
+            if (!isFlying)
             {
                 UpdateGravityAppliedOnPlayer(deltaTime);
             }
@@ -148,6 +135,17 @@ namespace Minecraft
             }
         }
 
+        private void TryToggleFlying()
+        {
+            jumpStopWatch.Stop();
+            float elapsedTime = jumpStopWatch.ElapsedMilliseconds;
+            if(elapsedTime < 300 && isInCreativeMode)
+            {
+                isFlying = !isFlying;
+            }
+            jumpStopWatch.Restart();
+        }
+
         private void TryStopRunning()
         {
             if (isRunning)
@@ -188,6 +186,7 @@ namespace Minecraft
             bool inputToMoveRight = Game.input.OnKeyDown(Key.D);
             bool inputToMoveForward = Game.input.OnKeyDown(Key.W);
             bool inputToJump = Game.input.OnKeyDown(Key.Space);
+            bool inputToFly = Game.input.OnKeyPress(Key.Space);
 
             //Prioritize crouching over running
             if (inputToRun && !inputToCrouch)
@@ -206,12 +205,21 @@ namespace Minecraft
                 TryStopRunning();
             }
 
+            if (isInAir && !isFlying)
+            {
+                speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
+            }
+            if (isFlying)
+            {
+                speedMultiplier *= Constants.PLAYER_FLYING_MULTIPLIER;
+            }
+
             if (isRunning)
             {
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
             } else if (isCrouching)
             {
-                if (isInCreativeMode)
+                if (isFlying)
                 {
                     MovePlayerVertically(-speedMultiplier);
                 } else
@@ -219,20 +227,21 @@ namespace Minecraft
                     speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
                 }
             }
-            if (isInAir && !isInCreativeMode)
-            {
-                speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
-            }
 
             if (inputToJump)
             {
-                if (isInCreativeMode)
+                if (isFlying)
                 {
                     MovePlayerVertically(speedMultiplier);
                 } else
                 {
                     AttemptToJump();
                 }
+            }
+
+            if (inputToFly)
+            {
+                TryToggleFlying();
             }
 
             if (inputToMoveForward)
