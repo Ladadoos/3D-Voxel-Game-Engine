@@ -34,7 +34,7 @@ namespace Minecraft
         public Player(Game game)
         {
             this.game = game;
-            camera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
+            camera = new Camera(game.window, new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
             position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
             hitbox = new AABB(position, GetPlayerMaxAABB());
 
@@ -121,8 +121,7 @@ namespace Minecraft
 
             if (game.window.Focused)
             {
-                camera.UpdatePitchAndYaw();
-                camera.ResetCursor(game.window.Bounds);
+                camera.Update();
             }
         }
 

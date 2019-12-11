@@ -12,19 +12,23 @@ namespace Minecraft
         public Vector3 right;// { get; private set; }
         public float pitch, yaw;
 
-        public ViewFrustum viewFrustum;
-
         private Vector2 lastMousePos;
+        private GameWindow window;
+
+        public ViewFrustum viewFrustum { get; private set; }
 
         private ProjectionMatrixInfo defaultProjection;
         public ProjectionMatrixInfo currentProjection { get; private set; }
         public Matrix4 currentProjectionMatrix { get; private set; }
+        public Matrix4 currentViewMatrix { get; private set; }
 
         public delegate void OnProjectionChanged(ProjectionMatrixInfo info);
         public event OnProjectionChanged OnProjectionChangedHandler;
 
-        public Camera(ProjectionMatrixInfo projectionInfo)
+        public Camera(GameWindow window, ProjectionMatrixInfo projectionInfo)
         {
+            this.window = window;
+
             defaultProjection = projectionInfo.ShallowCopy();
             currentProjection = projectionInfo;
             currentProjectionMatrix = CreateProjectionMatrix();
@@ -58,7 +62,7 @@ namespace Minecraft
             OnProjectionChangedHandler?.Invoke(currentProjection);
         }
 
-        public Matrix4 CreateProjectionMatrix()
+        private Matrix4 CreateProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(
                 currentProjection.fieldOfView,
@@ -67,7 +71,7 @@ namespace Minecraft
                 currentProjection.distanceFarPlane);
         }
 
-        public Matrix4 CreateViewMatrix()
+        private Matrix4 CreateViewMatrix()
         {
             Vector3 lookAt = Maths.CreateLookAtVector(yaw, pitch);
             return Matrix4.LookAt(position, position + lookAt, Vector3.UnitY);
@@ -78,7 +82,15 @@ namespace Minecraft
             this.position = position;
         }
 
-        public void UpdatePitchAndYaw()
+        public void Update()
+        {
+            UpdatePitchAndYaw();
+            viewFrustum.UpdateFrustumPoints(this);
+            ResetCursorToWindowCenter();
+            currentViewMatrix = CreateViewMatrix();
+        }
+
+        private void UpdatePitchAndYaw()
         {
             Vector2 delta = lastMousePos - new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
 
@@ -90,12 +102,11 @@ namespace Minecraft
 
             forward = Maths.CreateLookAtVector(yaw, pitch);
             right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, forward));
-
-            viewFrustum.UpdateFrustumPoints(this);
         }
 
-        public void ResetCursor(Rectangle bounds)
+        private void ResetCursorToWindowCenter()
         {
+            Rectangle bounds = window.Bounds;
             Mouse.SetPosition(bounds.Left + bounds.Width / 2.0D, bounds.Top + bounds.Height / 2.0D);
             lastMousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
         }

@@ -1,15 +1,15 @@
 ﻿namespace Minecraft
 {
-    class SelectedBlockShader : Shader
+    class WireframeShader : Shader
     {
-        private static readonly string vertexFile = "../../Shaders/SelectedBlockShader/vs_selectedBlock.glsl";
-        private static readonly string fragmentFile = "../../Shaders/SelectedBlockShader/fs_selectedBlock.glsl";
+        private static readonly string vertexFile = "../../Shaders/WireframeShader/vs_wireframe.glsl";
+        private static readonly string fragmentFile = "../../Shaders/WireframeShader/fs_wireframe.glsl";
 
         public int location_TransformationMatrix;
         public int location_ViewMatrix;
         public int location_ProjectionMatrix;
 
-        public SelectedBlockShader() : base(vertexFile, fragmentFile)
+        public WireframeShader() : base(vertexFile, fragmentFile)
         {
 
         }

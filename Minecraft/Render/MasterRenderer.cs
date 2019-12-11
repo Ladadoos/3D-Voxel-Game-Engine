@@ -13,12 +13,14 @@ namespace Minecraft
 
         private ShaderBasic basicShader;
         private Camera playerCamera;
+        private WireframeRenderer wireframeRenderer;
         private PlayerHoverBlockRenderer playerBlockRenderer;
 
         public MasterRenderer(Game game)
         {
             playerCamera = game.player.camera;
-            playerBlockRenderer = new PlayerHoverBlockRenderer(game.player);
+            wireframeRenderer = new WireframeRenderer(game.player.camera);
+            playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
             basicShader = new ShaderBasic();
             UploadTextureAtlas();
@@ -34,10 +36,8 @@ namespace Minecraft
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            Matrix4 cameraViewMatrix = playerCamera.CreateViewMatrix();
-
             basicShader.Start();
-            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraViewMatrix);
+            basicShader.LoadMatrix(basicShader.location_ViewMatrix, playerCamera.currentViewMatrix);
             foreach (KeyValuePair<Vector2, RenderChunk> renderChunk in world.renderChunks)
             {
                 Vector3 min = new Vector3(renderChunk.Key.X * 16, 0, renderChunk.Key.Y * 16);
@@ -53,7 +53,7 @@ namespace Minecraft
             }
             basicShader.Stop();
 
-            playerBlockRenderer.RenderSelection(cameraViewMatrix);
+            playerBlockRenderer.RenderSelection();
         }
 
         public void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)
