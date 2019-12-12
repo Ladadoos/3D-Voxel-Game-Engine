@@ -1,4 +1,6 @@
-﻿namespace Minecraft
+﻿using OpenTK;
+
+namespace Minecraft
 {
     class Chunk
     {
@@ -12,32 +14,32 @@
             this.gridZ = gridZ;
         }
 
-        public void AddBlock(int x, int y, int z, BlockType block)
+        public void AddBlock(int localX, int worldY, int localZ, BlockState blockstate)
         {
-            if (y < 0)
+            if (worldY < 0)
             {
-                y = 0;
-            } else if (y > Constants.MAX_BUILD_HEIGHT - 1)
+                worldY = 0;
+            } else if (worldY > Constants.MAX_BUILD_HEIGHT - 1)
             {
-                y = Constants.MAX_BUILD_HEIGHT - 1;
+                worldY = Constants.MAX_BUILD_HEIGHT - 1;
             }
 
-            int h = y / Constants.SECTION_HEIGHT;
-            if(sections[h] == null)
+            int sectionHeight = worldY / Constants.SECTION_HEIGHT;
+            if(sections[sectionHeight] == null)
             {
-                sections[h] = new Section((sbyte)h);
+                sections[sectionHeight] = new Section((sbyte)sectionHeight);
             }
 
-            int localY = y - h * Constants.SECTION_HEIGHT;
-            if(block == BlockType.Air)
+            int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;
+            if(blockstate.block == Block.Air)
             {
-                sections[h].RemoveBlock(x, localY, z);
+                sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
             }
             else
             {
-                sections[h].AddBlock(x, localY, z, block);
-            }
-            
+                blockstate.position = new Vector3(localX + gridX * 16, worldY, localZ + gridZ * 16);
+                sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
+            }         
         }
     }
 }

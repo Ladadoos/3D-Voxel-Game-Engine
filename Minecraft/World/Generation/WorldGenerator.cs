@@ -1,4 +1,5 @@
 ﻿using LibNoise;
+using OpenTK;
 
 namespace Minecraft
 {
@@ -59,24 +60,24 @@ namespace Minecraft
                     {
                         if(Game.randomizer.Next(25) != 1)
                         {
-                            generatedChunk.AddBlock(i, height, j, BlockType.Stone);
+                            generatedChunk.AddBlock(i, height, j, Block.Dirt.GetNewDefaultState());
                         }
                         else
                         {
-                            generatedChunk.AddBlock(i, height, j, BlockType.Gravel);
+                            generatedChunk.AddBlock(i, height, j, Block.Dirt.GetNewDefaultState());
                         }      
                     }
                     else if (biomeDeterminer < -0.75D)
                     {
-                        generatedChunk.AddBlock(i, height, j, BlockType.Snow);
+                        generatedChunk.AddBlock(i, height, j, Block.Dirt.GetNewDefaultState());
                     }else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
                     {
                         forestBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, BlockType.Grass);
+                        generatedChunk.AddBlock(i, height, j, Block.Dirt.GetNewDefaultState());
                     }else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
                     {
                         sandBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, BlockType.Sand);
+                        generatedChunk.AddBlock(i, height, j, Block.Dirt.GetNewDefaultState());
                     }
 
                     int k = height - 1;
@@ -85,11 +86,11 @@ namespace Minecraft
                         int r = Game.randomizer.Next(1000);
                         if (r < 10)
                         {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, BlockType.Redstone_Ore);
+                            //generatedChunk.AddBlock(i * 1, k, j * 1, BlockType.Redstone_Ore);
                         }
                         else
                         {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, BlockType.Stone);
+                            generatedChunk.AddBlock(i * 1, k, j * 1, Block.Dirt.GetNewDefaultState());
                         }
 
                         k--;

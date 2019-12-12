@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using OpenTK;
 
 namespace Minecraft
@@ -58,87 +58,89 @@ namespace Minecraft
             Console.WriteLine("Generating init chunks took: " + now2 + " s");
         }
 
-        public Vector2 GetChunkPosition(float xPos, float yPos)
+        public Vector2 GetChunkPosition(float worldX, float worldZ)
         {
-            return new Vector2((int)xPos >> 4, (int)yPos >> 4);
+            return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
         }
 
-        public bool AddBlockToWorld(int x, int y, int z, BlockType blockType)
+        public bool AddBlockToWorld(Vector3 intPosition, BlockState blockstate)
         {
-            if (IsOutsideBuildHeight(y))
+            return AddBlockToWorld((int)intPosition.X, (int)intPosition.Y, (int)intPosition.Z, blockstate);
+        }
+
+        public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState blockstate)
+        {
+            blockstate.position = new Vector3(worldX, worldY, worldZ);
+
+            if (IsOutsideBuildHeight(worldY))
             {
                 return false;
             }
 
-            Vector2 chunkPos = GetChunkPosition(x, z);
-            Chunk chunk;
-            if(!chunks.TryGetValue(chunkPos, out chunk))
+            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            if(!chunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 Console.WriteLine("Tried to add block in junk that doesnt exist");
                 return false;
             }
 
             //Small bug when: flying agaisnt a wall and breaking the block infront. It detects collision.
-            if (game.player.hitbox.Intersects(Cube.GetAABB(x, y, z)))
+            if(blockstate.block.GetCollisionBox(blockstate).Any(aabb => game.player.hitbox.Intersects(aabb)))
             {
-                Console.WriteLine("in player");
+                Console.WriteLine("Block tried to placed was in player");
                 return false;
             }
 
-            if(blockType != BlockType.Air && GetBlockAt(x, y, z) != BlockType.Air)
+            if(blockstate.block != Block.Air && GetBlockAt(worldX, worldY, worldZ).block != Block.Air)
             {
                 return false;
             }
 
-            int i = x & 15;
-            int j = y;
-            int k = z & 15;
+            int localX = worldX & 15;
+            int localZ = worldZ & 15;
 
-            chunk.AddBlock(i, j, k, blockType);
+            chunk.AddBlock(localX, worldY, localZ, blockstate);
+            blockstate.block.OnAdded(blockstate, game);
      
             TryAddChunkToReprocessQueue(chunk);
 
-            if (i == 0)
+            if (localX == 0)
             {
-                Chunk cXNeg = null;
-                chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out cXNeg);
+                chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
                 if (cXNeg != null)
                 {
                     TryAddChunkToReprocessQueue(cXNeg);
                 }
             }
 
-            if (i == 15)
+            if (localX == 15)
             {
-                Chunk cXPos = null;
-                chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out cXPos);
+                chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
                 if (cXPos != null)
                 {
                     TryAddChunkToReprocessQueue(cXPos);
                 }
             }
 
-            if (k == 0)
+            if (localZ == 0)
             {
-                Chunk cZNeg = null;
-                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out cZNeg);
+                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
                 if (cZNeg != null)
                 {
                     TryAddChunkToReprocessQueue(cZNeg);
                 }
             }
 
-            if (k == 15)
+            if (localZ == 15)
             {
-                Chunk cZPos = null;
-                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out cZPos);
+                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
                 if (cZPos != null)
                 {
                     TryAddChunkToReprocessQueue(cZPos);
                 }
             }
 
-            Console.WriteLine("Tried to add block in chunk" + i + "," + j + "," + k);
+            Console.WriteLine("Added block at " + worldX + "," + worldY + "," + worldZ);
             return true;
         }
 
@@ -150,41 +152,45 @@ namespace Minecraft
             }
         }
 
-        public bool IsOutsideBuildHeight(int height)
+        public bool IsOutsideBuildHeight(int worldY)
         {
-            return height < 0 || height >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
+            return worldY < 0 || worldY >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
         }
         
-        public BlockType GetBlockAt(int x, int y, int z)
+        public BlockState GetBlockAt(Vector3 worldIntPosition)
         {
-            if (IsOutsideBuildHeight(y))
+            return GetBlockAt((int)worldIntPosition.X, (int)worldIntPosition.Y, (int)worldIntPosition.Z);
+        }
+
+        public BlockState GetBlockAt(int worldX, int worldY, int worldZ)
+        {
+            if (IsOutsideBuildHeight(worldY))
             {
-                return BlockType.Air;
+                return Block.Air.GetNewDefaultState(); 
             }
 
-            Vector2 chunkPos = GetChunkPosition(x, z);
-            Chunk chunk;
-            if (!chunks.TryGetValue(chunkPos, out chunk))
+            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            if (!chunks.TryGetValue(chunkPos, out Chunk chunk))
             {
-                return BlockType.Air;
+                return Block.Air.GetNewDefaultState();
             }
 
-            int sectionHeight = y / Constants.SECTION_HEIGHT;
+            int sectionHeight = worldY / Constants.SECTION_HEIGHT;
             if(chunk.sections[sectionHeight] == null)
             {
-                return BlockType.Air;
+                return Block.Air.GetNewDefaultState(); 
             }
 
-            int localX = x & 15;    
-            int localY = y & 15;
-            int localZ = z & 15;
+            int localX = worldX & 15;    
+            int localY = worldY & 15;
+            int localZ = worldZ & 15;
 
-            sbyte? blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
+            BlockState blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
             if (blockType == null)
             {
-                return BlockType.Air;
+                return Block.Air.GetNewDefaultState(); 
             }
-            return (BlockType)blockType;
+            return blockType;
         }
     }
 }

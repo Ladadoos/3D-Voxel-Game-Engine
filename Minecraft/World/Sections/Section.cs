@@ -3,21 +3,22 @@
     class Section
     {  
         public sbyte height;
-        public sbyte?[,,] blocks = new sbyte?[Constants.CHUNK_SIZE, Constants.SECTION_HEIGHT, Constants.CHUNK_SIZE];
+        //THIS SHOULD IDEALLY NOT BE NULL....
+        public BlockState[,,] blocks = new BlockState[Constants.CHUNK_SIZE, Constants.SECTION_HEIGHT, Constants.CHUNK_SIZE];
 
         public Section(sbyte height)
         {
             this.height = height;
         }
 
-        public void AddBlock(int x, int y, int z, BlockType block)
+        public void AddBlock(int localX, int localY, int localZ, BlockState blockstate)
         {
-            blocks[x, y, z] = (sbyte)block;
+            blocks[localX, localY, localZ] = blockstate;
         }
 
-        public void RemoveBlock(int x, int y, int z)
+        public void RemoveBlock(int localX, int localY, int localZ)
         {
-            blocks[x, y, z] = null;
+            blocks[localX, localY, localZ] = null;
         }
     }
 }

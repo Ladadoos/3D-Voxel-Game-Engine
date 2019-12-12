@@ -27,7 +27,7 @@ namespace Minecraft
         private float verticalSpeed = 0;
 
         public RayTraceResult mouseOverObject { get; private set; }
-        private BlockType selectedBlock = BlockType.Cobblestone;
+        private BlockState selectedBlock = Block.Dirt.GetNewDefaultState();
 
         private Stopwatch jumpStopWatch = new Stopwatch();
 
@@ -55,7 +55,7 @@ namespace Minecraft
                 UpdateGravityAppliedOnPlayer(deltaTime);
             }
 
-            List<Vector3> blocks = GetCollisionDetectionBlockPositions(game.world);
+            List<BlockState> blocks = GetCollisionDetectionBlockPositions();
             position.X += velocity.X * deltaTime;
             CalculateAABBHitbox();
             if (doCollisionDetection)
@@ -85,37 +85,34 @@ namespace Minecraft
             cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
             camera.SetPosition(cameraPosition);
 
-            if (Game.input.OnMousePress(MouseButton.Right))
+            if (Game.input.OnMousePress(MouseButton.Right) && mouseOverObject != null)
             {
-                if (mouseOverObject != null)
+                if (isCrouching)
                 {
                     Vector3 target = mouseOverObject.intersectedGridPoint + mouseOverObject.normalAtIntersection;
-                    int x = (int)target.X;
-                    int y = (int)target.Y;
-                    int z = (int)target.Z;
-                    game.world.AddBlockToWorld(x, y, z, selectedBlock);
+                    game.world.AddBlockToWorld(target, selectedBlock.Clone());
+                } else
+                {
+                    BlockState state = game.world.GetBlockAt(mouseOverObject.intersectedGridPoint);
+                    if(!state.block.OnInteract(state, game))
+                    {
+                        Vector3 target = mouseOverObject.intersectedGridPoint + mouseOverObject.normalAtIntersection;
+                        game.world.AddBlockToWorld(target, selectedBlock.Clone());
+                    }
                 }
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
                 if (mouseOverObject != null)
                 {
-                    Vector3 target = mouseOverObject.intersectedGridPoint;
-                    int x = (int)target.X;
-                    int y = (int)target.Y;
-                    int z = (int)target.Z;
-                    selectedBlock = game.world.GetBlockAt(x, y, z);
+                    selectedBlock = game.world.GetBlockAt(mouseOverObject.intersectedGridPoint);
                 }
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
                 if (mouseOverObject != null)
                 {
-                    Vector3 target = mouseOverObject.intersectedGridPoint;
-                    int x = (int)target.X;
-                    int y = (int)target.Y;
-                    int z = (int)target.Z;
-                    game.world.AddBlockToWorld(x, y, z, BlockType.Air);
+                    game.world.AddBlockToWorld(mouseOverObject.intersectedGridPoint, Block.Air.GetNewDefaultState());
                 }
             }
 
@@ -283,20 +280,24 @@ namespace Minecraft
             return verticalSpeed < Constants.GRAVITY_THRESHOLD;
         }
 
-        private void DoXAxisCollisionDetection(List<Vector3> blocks)
+        private void DoXAxisCollisionDetection(List<BlockState> blocks)
         {
-            foreach (Vector3 collidablePos in blocks)
+            foreach (BlockState collidable in blocks)
             {
-                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.Intersects(blockAABB))
+                foreach (AABB aabb in collidable.block.GetCollisionBox(collidable))
                 {
+                    if (!hitbox.Intersects(aabb))
+                    {
+                        continue;
+                    }
+
                     if (velocity.X > 0.0F)
                     {
-                        position.X = blockAABB.min.X - Constants.PLAYER_WIDTH;
+                        position.X = aabb.min.X - Constants.PLAYER_WIDTH;
                     }
                     if (velocity.X < 0.0F)
                     {
-                        position.X = blockAABB.max.X;
+                        position.X = aabb.max.X;
                     }
                     velocity.X = 0.0F;
                     TryStopRunning();
@@ -304,21 +305,25 @@ namespace Minecraft
             }
         }
 
-        private void DoYAxisCollisionDetection(List<Vector3> blocks)
+        private void DoYAxisCollisionDetection(List<BlockState> blocks)
         {
             bool collidedY = false;
-            foreach (Vector3 collidablePos in blocks)
+            foreach (BlockState collidable in blocks)
             {
-                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.Intersects(blockAABB))
+                foreach (AABB aabb in collidable.block.GetCollisionBox(collidable))
                 {
+                    if (!hitbox.Intersects(aabb))
+                    {
+                        continue;
+                    }
+
                     if (velocity.Y > 0.0F)
                     {
-                        position.Y = blockAABB.min.Y - Constants.PLAYER_HEIGHT;
+                        position.Y = aabb.min.Y - Constants.PLAYER_HEIGHT;
                     }
                     if (velocity.Y < 0.0F)
                     {
-                        position.Y = blockAABB.max.Y;
+                        position.Y = aabb.max.Y;
                         collidedY = true;
                     }
                     velocity.Y = 0.0F;
@@ -329,20 +334,24 @@ namespace Minecraft
             isInAir = !collidedY;
         }
 
-        private void DoZAxisCollisionDetection(List<Vector3> blocks)
+        private void DoZAxisCollisionDetection(List<BlockState> blocks)
         {
-            foreach (Vector3 collidablePos in blocks)
+            foreach (BlockState collidable in blocks)
             {
-                AABB blockAABB = Cube.GetAABB(collidablePos.X, collidablePos.Y, collidablePos.Z);
-                if (hitbox.Intersects(blockAABB))
+                foreach(AABB aabb in collidable.block.GetCollisionBox(collidable))
                 {
+                    if (!hitbox.Intersects(aabb))
+                    {
+                        continue;
+                    }
+
                     if (velocity.Z > 0)
                     {
-                        position.Z = blockAABB.min.Z - Constants.PLAYER_LENGTH;
+                        position.Z = aabb.min.Z - Constants.PLAYER_LENGTH;
                     }
                     if (velocity.Z < 0)
                     {
-                        position.Z = blockAABB.max.Z;
+                        position.Z = aabb.max.Z;
                     }
                     velocity.Z = 0;
                     TryStopRunning();
@@ -387,9 +396,9 @@ namespace Minecraft
             hitbox.SetHitbox(position, GetPlayerMaxAABB());
         }
 
-        private List<Vector3> GetCollisionDetectionBlockPositions(World world)
+        private List<BlockState> GetCollisionDetectionBlockPositions()
         {
-            List<Vector3> collidablePositions = new List<Vector3>();
+            List<BlockState> collidables = new List<BlockState>();
 
             int intX = (int)position.X;
             int intY = (int)position.Y;
@@ -401,15 +410,16 @@ namespace Minecraft
                 {
                     for (int zz = intZ - 1; zz <= intZ + 1; zz++)
                     {
-                        if (world.GetBlockAt(xx, yy, zz) != BlockType.Air)
+                        BlockState blockstate = game.world.GetBlockAt(xx, yy, zz);
+                        if (blockstate.block != Block.Air)
                         {
-                            collidablePositions.Add(new Vector3(xx, yy, zz));
+                            collidables.Add(blockstate);
                         }
                     }
                 }
             }
 
-            return collidablePositions;
+            return collidables;
         }
     }
 }

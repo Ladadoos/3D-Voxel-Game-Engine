@@ -22,28 +22,23 @@ namespace Minecraft
         {
             Vector3 position = origin;
             Vector3 offset = direction / 25;
-            Vector3 targetPos = Vector3.Zero;
-            bool foundTarget = false;
+            BlockState targetBlock = null;
             for (int i = 0; i < 80; i++)
             {
                 position += offset;
-                int intX = (int)position.X;
-                int intY = (int)position.Y;
-                int intZ = (int)position.Z;
-                if (world.GetBlockAt(intX, intY, intZ) != BlockType.Air)
+                targetBlock = world.GetBlockAt(position);
+                if (targetBlock.block != Block.Air)
                 {
-                    targetPos = new Vector3(intX, intY, intZ);
-                    foundTarget = true;
                     break;
                 }
             }
 
-            if (!foundTarget)
+            if (targetBlock == null)
             {
                 return null;
             }
 
-            AABB targetAABB = Cube.GetAABB(targetPos.X, targetPos.Y, targetPos.Z);
+            AABB targetAABB = Block.GetFullBlockCollision(targetBlock);
             float dist = targetAABB.Intersects(this);
             if (dist == float.MaxValue)
             {
@@ -51,7 +46,7 @@ namespace Minecraft
             }
             this.distanceToIntersection = dist;
             Vector3 interPoint = origin + direction * distanceToIntersection;
-            return new RayTraceResult(targetAABB, targetAABB.GetNormalAtIntersectionPoint(interPoint), interPoint, targetPos);
+            return new RayTraceResult(targetAABB, targetAABB.GetNormalAtIntersectionPoint(interPoint), interPoint, targetBlock.position);
         }
     }
 }

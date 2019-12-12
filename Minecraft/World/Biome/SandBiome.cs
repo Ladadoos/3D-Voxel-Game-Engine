@@ -15,7 +15,7 @@
                     int r = 2 + Game.randomizer.Next(3);
                     for (int yy = 1; yy < r; yy++)
                     {
-                        chunk.AddBlock(x, y + yy, z, BlockType.Log);
+                        //chunk.AddBlock(x, y + yy, z, BlockType.Log);
                     }
                 }
             }

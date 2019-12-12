@@ -8,7 +8,7 @@ namespace Minecraft
 
         public void GenerateTree(Chunk chunk, int x, int y, int z)
         {
-            if (random.Next(15) != 1)
+            /*if (random.Next(15) != 1)
             {
                 return;
             }
@@ -50,7 +50,7 @@ namespace Minecraft
                 z++;
                 chunk.AddBlock(x, y++, z, BlockType.Leaves);
                 chunk.AddBlock(x, y, z, BlockType.Leaves);
-            }
+            }*/
         }
 
     }

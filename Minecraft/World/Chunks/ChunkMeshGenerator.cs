@@ -37,26 +37,14 @@ namespace Minecraft
 
         private Chunk activeCurrentChunk;
 
-        /*private void GenerateRenderMeshForSection(Section toProcessSection)
-        {
-
-        }*/
-
         public void GenerateRenderMeshForChunk(Chunk chunk)
         {
             activeCurrentChunk = chunk;
 
-            Chunk cXNeg = null;
-            world.chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out cXNeg);
-
-            Chunk cXPos = null;
-            world.chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out cXPos);
-
-            Chunk cZNeg = null;
-            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out cZNeg);
-
-            Chunk cZPos = null;
-            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out cZPos);
+            world.chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
+            world.chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
+            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
+            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
 
             for (int i = 0; i < chunk.sections.Length; i++)
             { 
@@ -73,14 +61,13 @@ namespace Minecraft
                         int y2 = 0;
                         for(int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
-                            sbyte? b = section.blocks[x, y, z];
+                            BlockState b = section.blocks[x, y, z];
                             if(b == null)
                             {
                                 continue;
                             }
-                            BlockType block =(BlockType)b;
                             float[] tCoords = null;
-                            Game.blockDatabase.blockTextures.TryGetValue(block, out tCoords);
+                            Game.blockDatabase.staticBlockTextures.TryGetValue(b.block, out tCoords);
                             if (tCoords != null)
                             {
                                 y2 = y + i * Constants.SECTION_HEIGHT;
