@@ -138,6 +138,7 @@ namespace Minecraft
             if(elapsedTime < 300 && isInCreativeMode)
             {
                 isFlying = !isFlying;
+                verticalSpeed = 0;
             }
             jumpStopWatch.Restart();
         }
