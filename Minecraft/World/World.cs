@@ -84,7 +84,6 @@ namespace Minecraft
                 return false;
             }
 
-            //Small bug when: flying agaisnt a wall and breaking the block infront. It detects collision.
             if(blockstate.block.GetCollisionBox(blockstate).Any(aabb => game.player.hitbox.Intersects(aabb)))
             {
                 Console.WriteLine("Block tried to placed was in player");

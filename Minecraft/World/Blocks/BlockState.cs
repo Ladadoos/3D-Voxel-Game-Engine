@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using System;
 
 namespace Minecraft
 {
@@ -10,14 +9,14 @@ namespace Minecraft
         //Position is automatically set by the world once the block is placed.
         public Vector3 position;
 
-        public BlockState()
-        {
-
-        }
-
         public BlockState Clone()
         {
             return (BlockState)MemberwiseClone();
+        }
+
+        public Vector3 ChunkLocalPosition()
+        {
+            return new Vector3((int)position.X & 15, position.Y, (int)position.Z & 15);
         }
     }
 
@@ -34,6 +33,22 @@ namespace Minecraft
         public BlockStateAir() : base()
         {
             block = Block.Air;
+        }
+    }
+
+    class BlockStateStone : BlockState
+    {
+        public BlockStateStone() : base()
+        {
+            block = Block.Stone;
+        }
+    }
+
+    class BlockStateFlower : BlockState
+    {
+        public BlockStateFlower() : base()
+        {
+            block = Block.Flower;
         }
     }
 }

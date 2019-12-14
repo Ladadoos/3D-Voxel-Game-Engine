@@ -16,6 +16,7 @@
             blocks[localX, localY, localZ] = blockstate;
         }
 
+        //Consider optimalization where you completely ignore a section if its fully opaque and surrounding section walls are full opaque
         public void RemoveBlock(int localX, int localY, int localZ)
         {
             blocks[localX, localY, localZ] = null;

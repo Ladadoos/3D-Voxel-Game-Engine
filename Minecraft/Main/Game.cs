@@ -8,8 +8,9 @@ namespace Minecraft
 
         public static TextureLoader textureLoader { get; private set; }
         public static Input input { get; private set; }
-        public static BlockDatabase blockDatabase { get; private set; }
+        public static TextureAtlas textureAtlas { get; private set; }
         public static Random randomizer { get; private set; }
+        public static BlockModelRegistry modelManager { get; private set; }
 
         public MasterRenderer masterRenderer { get; private set; }
         public Player player { get; private set; }
@@ -25,10 +26,13 @@ namespace Minecraft
             fpsCounter = new FPSCounter();
             textureLoader = new TextureLoader();
             masterRenderer = new MasterRenderer(this);
-            blockDatabase = new BlockDatabase();
+
+            int textureId = Game.textureLoader.LoadTexture("../../Resources/texturePack2.png");
+            textureAtlas = new TextureAtlas(textureId, 256, 16);
+
+            modelManager = new BlockModelRegistry();
             randomizer = new Random();
 
-            blockDatabase.RegisterBlocks();
             world = new World(this);
             world.GenerateTestMap();
             input = new Input();

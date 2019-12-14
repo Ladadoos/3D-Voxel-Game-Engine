@@ -6,8 +6,8 @@ namespace Minecraft
     {
         public static readonly Block Air = new BlockAir();
         public static readonly Block Dirt = new BlockDirt();
-
-        public BlockType blockType { get; protected set; }
+        public static readonly Block Stone = new BlockStone();
+        public static readonly Block Flower = new BlockFlower();
 
         public abstract BlockState GetNewDefaultState();
 
@@ -32,11 +32,6 @@ namespace Minecraft
 
     class BlockAir : Block
     {
-        public BlockAir()
-        {
-            blockType = BlockType.Air;
-        }
-
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateAir();
@@ -50,21 +45,32 @@ namespace Minecraft
 
     class BlockDirt : Block
     {
-        public BlockDirt()
-        {
-            blockType = BlockType.Dirt;
-        }
-
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateDirt();
         }
+    }
+
+    class BlockStone : Block
+    {
+        public override BlockState GetNewDefaultState()
+        {
+            return new BlockStateStone();
+        }
 
         public override bool OnInteract(BlockState blockstate, Game game)
         {
-            BlockStateDirt state = (BlockStateDirt)blockstate;
-            System.Console.WriteLine("Interacted with dirt at " + state.position);
+            BlockStateStone state = (BlockStateStone)blockstate;
+            System.Console.WriteLine("Interacted with stone at " + state.position);
             return true;
+        }
+    }
+
+    class BlockFlower : Block
+    {
+        public override BlockState GetNewDefaultState()
+        {
+            return new BlockStateFlower();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using LibNoise;
-using OpenTK;
 
 namespace Minecraft
 {
@@ -86,11 +85,11 @@ namespace Minecraft
                         int r = Game.randomizer.Next(1000);
                         if (r < 10)
                         {
-                            //generatedChunk.AddBlock(i * 1, k, j * 1, BlockType.Redstone_Ore);
+                            generatedChunk.AddBlock(i * 1, k, j * 1, Block.Flower.GetNewDefaultState());
                         }
                         else
                         {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, Block.Dirt.GetNewDefaultState());
+                            generatedChunk.AddBlock(i * 1, k, j * 1, Block.Stone.GetNewDefaultState());
                         }
 
                         k--;

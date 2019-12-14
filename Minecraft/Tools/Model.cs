@@ -12,28 +12,22 @@ namespace Minecraft
 
         public List<int> buffers = new List<int>();
 
-        public Model(float[] positions, float[] textureCoordinates, int[] indices, float[] lights)
+        public Model(float[] positions, float[] textureCoordinates, float[] lights, int indicesCount)
         {
-            CreateData(positions, textureCoordinates, indices, lights);
+            CreateData(positions, textureCoordinates, lights, indicesCount);
         }
 
-        public void AddData(float[] positions, float[] textureCoordinates, int[] indices, float[] lights)
+        private void CreateData(float[] positions, float[] textureCoordinates, float[] lights, int indicesCount)
         {
-            DeleteData();
-            CreateData(positions, textureCoordinates, indices, lights);
-        }
-
-        private void CreateData(float[] positions, float[] textureCoordinates, int[] indices, float[] lights)
-        {
-            indicesCount = indices.Length;
+            this.indicesCount = indicesCount;
 
             CreateVAO();
             Bind();
 
-            AddVBO(3, positions);
-            AddVBO(2, textureCoordinates);
-            AddVBO(1, lights);
-            AddEBO(indices);
+            CreateVBO(3, positions);
+            CreateVBO(2, textureCoordinates);
+            CreateVBO(1, lights);
+            //CreateIBO(indices);
 
             Unbind();
         }
@@ -45,8 +39,8 @@ namespace Minecraft
             CreateVAO();
             Bind();
 
-            AddVBO(3, positions);
-            AddEBO(indices);
+            CreateVBO(3, positions);
+            CreateIBO(indices);
 
             Unbind();
         }
@@ -60,15 +54,8 @@ namespace Minecraft
             GL.DeleteVertexArray(vaoId);
         }
 
-        private void DeleteData()
-        {
-            CleanUp();
-            vaoId = 0;
-            indicesCount = 0;
-            buffers = new List<int>();
-        }
-
-        private void AddEBO(int[] indices)
+        /// <summary> Creates an index buffer object and buffers the given indices. </summary>
+        private void CreateIBO(int[] indices)
         {
             int vboID = GL.GenBuffer();
             buffers.Add(vboID);
@@ -76,17 +63,22 @@ namespace Minecraft
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(indices.Length * sizeof(int)), indices, BufferUsageHint.StaticDraw);
         }
 
-        private void AddVBO(int coordinateSize, float[] data)
+        /// <summary>
+        /// Creates a vertex bufffer object and buffers the given float values. The integer specifies the number of elements in the datastructure.
+        /// A Vector3 would for example have this integer set to 3 (X, Y, Z)
+        /// </summary>
+        private void CreateVBO(int nrOfElementsInStructure, float[] data)
         {
             int vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * sizeof(float)), data, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(buffers.Count, coordinateSize, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(buffers.Count, nrOfElementsInStructure, VertexAttribPointerType.Float, false, 0, 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.EnableVertexAttribArray(buffers.Count);
             buffers.Add(vboID);
         }
 
+        /// <summary> Creates a vertex array object </summary>
         private void CreateVAO()
         {
             vaoId = GL.GenVertexArray();

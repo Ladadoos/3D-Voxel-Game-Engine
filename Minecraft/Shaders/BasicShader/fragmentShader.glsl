@@ -8,5 +8,9 @@ uniform sampler2D textureAtlas;
 
 void main()
 {
-   FragColor = texture(textureAtlas, TexCoord) / Light;
+   vec4 albedo = texture(textureAtlas, TexCoord);
+   if(albedo.a < 1){
+     discard;
+   }
+   FragColor = albedo / Light;
 }

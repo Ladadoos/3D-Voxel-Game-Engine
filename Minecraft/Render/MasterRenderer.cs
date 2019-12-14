@@ -35,7 +35,7 @@ namespace Minecraft
         {
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
+   
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, playerCamera.currentViewMatrix);
             foreach (KeyValuePair<Vector2, RenderChunk> renderChunk in world.renderChunks)
@@ -48,7 +48,7 @@ namespace Minecraft
                 }
                 renderChunk.Value.HardBlocksModel.Bind();
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, renderChunk.Value.TransformationMatrix);
-                GL.DrawElements(PrimitiveType.Triangles, renderChunk.Value.HardBlocksModel.indicesCount, DrawElementsType.UnsignedInt, 0);
+                GL.DrawArrays(PrimitiveType.Quads, 0, renderChunk.Value.HardBlocksModel.indicesCount);
                 renderChunk.Value.HardBlocksModel.Unbind();
             }
             basicShader.Stop();

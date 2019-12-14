@@ -41,9 +41,7 @@ namespace Minecraft
             aabbCube = new Model(positions, indices);
         }
 
-        /// <summary>
-        /// Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. 
-        /// </summary>
+        /// <summary> Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. </summary>
         public void RenderWireframeAt(int lineWidth, Vector3 translation, Vector3 scale)
         {
             GL.LineWidth(lineWidth);

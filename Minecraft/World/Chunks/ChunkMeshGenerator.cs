@@ -12,7 +12,6 @@ namespace Minecraft
 
         private List<float> positions;
         private List<float> textureCoords;
-        private List<int> indices;
         private List<float> lights;
         private int indCount;
 
@@ -28,7 +27,6 @@ namespace Minecraft
         {
             positions = new List<float>();
             textureCoords = new List<float>();
-            indices = new List<int>();
             lights = new List<float>();
             indCount = 0;
 
@@ -47,9 +45,9 @@ namespace Minecraft
             world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
 
             for (int i = 0; i < chunk.sections.Length; i++)
-            { 
+            {
                 Section section = chunk.sections[i];
-                if(section == null)
+                if (section == null)
                 {
                     continue;
                 }
@@ -58,58 +56,59 @@ namespace Minecraft
                 {
                     for (int z = 0; z < Constants.CHUNK_SIZE; z++)
                     {
-                        int y2 = 0;
-                        for(int y = 0; y < Constants.SECTION_HEIGHT; y++)
+                        for (int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
-                            BlockState b = section.blocks[x, y, z];
-                            if(b == null)
+                            BlockState state = section.blocks[x, y, z];
+                            if (state == null || state.block == Block.Air)
                             {
                                 continue;
                             }
-                            float[] tCoords = null;
-                            Game.blockDatabase.staticBlockTextures.TryGetValue(b.block, out tCoords);
-                            if (tCoords != null)
+                            Game.modelManager.modelRegistry.TryGetValue(state.block, out BlockModel blockModel);
+
+                            if (blockModel == null)
                             {
-                                y2 = y + i * Constants.SECTION_HEIGHT;
-                                if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Right, x, y2, z, tCoords, sideZLight);
-                                }
-                                if (ShouldAddWestFaceOfBlock(cXNeg, section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Left, x, y2, z, tCoords, sideXLight);
-                                }
-                                if (ShouldAddSouthFaceOfBlock(cZNeg, section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Back, x, y2, z, tCoords, sideXLight);
-                                }
-                                if(ShouldAddNorthFaceOfBlock(cZPos, section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Front, x, y2, z, tCoords, sideZLight);
-                                }
-                                if(ShouldAddTopFaceOfBlock(section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Top, x, y2, z, tCoords, topLight);
-                                }
-                                if(ShouldAddBottomFaceOfBlock(section, x, y, z, tCoords))
-                                {
-                                    AddFace(Direction.Bottom, x, y2, z, tCoords, bottomLight);
-                                }
+                                throw new System.Exception("Could not find model for: " + state.block.GetType());
                             }
-                            y2 = 0;
+
+                           // BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
+                           // AddBlockFacesToMesh(faces, state, 1);
+
+                            if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Right, state, blockModel, sideZLight);
+                            }
+                            if (ShouldAddWestFaceOfBlock(cXNeg, section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Left, state, blockModel, sideXLight);
+                            }
+                            if (ShouldAddSouthFaceOfBlock(cZNeg, section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Back, state, blockModel, sideXLight);
+                            }
+                            if (ShouldAddNorthFaceOfBlock(cZPos, section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Front, state, blockModel, sideZLight);
+                            }
+                            if (ShouldAddTopFaceOfBlock(section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Top, state, blockModel, topLight);
+                            }
+                            if (ShouldAddBottomFaceOfBlock(section, x, y, z))
+                            {
+                                BuildMeshForSide(Direction.Bottom, state, blockModel, bottomLight);
+                            }
                         }
                     }
                 }
             }
 
-            Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), indices.ToArray(), lights.ToArray());
+            Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), lights.ToArray(), indCount);
             RenderChunk newRenderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
             Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
             if (world.renderChunks.ContainsKey(chunkPos))
             {
                 world.renderChunks[chunkPos] = newRenderChunk;
-            }
-            else
+            } else
             {
                 world.renderChunks.Add(chunkPos, newRenderChunk);
             }
@@ -117,57 +116,68 @@ namespace Minecraft
             ResetData();
         }
 
-        private void AddFace(Direction blockSide, float x, float y, float z, float[] textureCoordinates, float lightValue)
+        private void BuildMeshForSide(Direction blockSide, BlockState state, BlockModel model, float lightValue)
         {
-            FillTextureCoordinates(blockSide, textureCoordinates);
-
-            float[] pos = Cube.GetCubeVerticesForSide(blockSide, x, y, z);
-            foreach (float f in pos)
-            {
-                positions.Add(f);
-            }
-            indices.Add(indCount);
-            indices.Add(indCount + 1);
-            indices.Add(indCount + 2);
-            indices.Add(indCount + 2);
-            indices.Add(indCount + 3);
-            indices.Add(indCount);
-            indCount += 4;
-
-            lights.Add(lightValue);
-            lights.Add(lightValue);
-            lights.Add(lightValue);
-            lights.Add(lightValue);
+            BlockFace[] faces = model.GetPartialVisibleFaces(blockSide, state);
+            AddBlockFacesToMesh(faces, state, lightValue);
         }
 
-        private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private void AddBlockFacesToMesh(BlockFace[] faces, BlockState state, float lightValue)
         {
-            if(x - 1 < 0)
+            if (faces.Length > 0)
+            {
+                foreach (BlockFace face in faces)
+                {
+                    foreach (float uv in face.textureCoords)
+                    {
+                        textureCoords.Add(uv);
+                    }
+
+                    foreach (Vector3 position in face.positions)
+                    {
+                        Vector3 world = position + new Vector3(state.ChunkLocalPosition());
+                        positions.Add(world.X);
+                        positions.Add(world.Y);
+                        positions.Add(world.Z);
+                    }
+
+                    indCount += 4;
+                    lights.Add(lightValue);
+                    lights.Add(lightValue);
+                    lights.Add(lightValue);
+                    lights.Add(lightValue);
+                }
+            }
+        }
+
+        private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, float x, float y, float z)
+        {
+            if (x - 1 < 0)
             {
                 Section westSection = null;
-                if(westChunk != null)
+                if (westChunk != null)
                 {
                     westSection = westChunk.sections[currentSection.height];
                 }
 
-                if(westSection != null)
+                if (westSection != null)
                 {
-                    if(westSection.blocks[Constants.CHUNK_SIZE - 1, (int)y, (int)z] == null)
+                    if (westSection.blocks[Constants.CHUNK_SIZE - 1, (int)y, (int)z] == null)
                     {
                         return true;
                     }
-                }else
+                } else
                 {
                     return true;
                 }
-            }else if(currentSection.blocks[(int)x - 1, (int)y, (int)z] == null)
+            } else if (currentSection.blocks[(int)x - 1, (int)y, (int)z] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, float x, float y, float z)
         {
             if (x + 1 >= Constants.CHUNK_SIZE)
             {
@@ -183,20 +193,18 @@ namespace Minecraft
                     {
                         return true;
                     }
-                }
-                else
+                } else
                 {
                     return true;
                 }
-            }
-            else if (currentSection.blocks[(int)x + 1, (int)y, (int)z] == null)
+            } else if (currentSection.blocks[(int)x + 1, (int)y, (int)z] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, float x, float y, float z)
         {
             if (z + 1 >= Constants.CHUNK_SIZE)
             {
@@ -212,20 +220,18 @@ namespace Minecraft
                     {
                         return true;
                     }
-                }
-                else
+                } else
                 {
                     return true;
                 }
-            }
-            else if (currentSection.blocks[(int)x, (int)y, (int)z + 1] == null)
+            } else if (currentSection.blocks[(int)x, (int)y, (int)z + 1] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, float x, float y, float z)
         {
             if (z - 1 < 0)
             {
@@ -241,24 +247,22 @@ namespace Minecraft
                     {
                         return true;
                     }
-                }
-                else
+                } else
                 {
                     return true;
                 }
-            }
-            else if (currentSection.blocks[(int)x, (int)y, (int)z - 1] == null)
+            } else if (currentSection.blocks[(int)x, (int)y, (int)z - 1] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddTopFaceOfBlock(Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private bool ShouldAddTopFaceOfBlock(Section currentSection, float x, float y, float z)
         {
-            if(y + 1 >= Constants.SECTION_HEIGHT)
+            if (y + 1 >= Constants.SECTION_HEIGHT)
             {
-                if(currentSection.height == Constants.SECTION_HEIGHT - 1)
+                if (currentSection.height == Constants.SECTION_HEIGHT - 1)
                 {
                     return true;
                 }
@@ -268,15 +272,14 @@ namespace Minecraft
                 {
                     return true;
                 }
-            }
-            else if (currentSection.blocks[(int)x, (int)y + 1, (int)z] == null)
+            } else if (currentSection.blocks[(int)x, (int)y + 1, (int)z] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddBottomFaceOfBlock(Section currentSection, float x, float y, float z, float[] textureCoordinates)
+        private bool ShouldAddBottomFaceOfBlock(Section currentSection, float x, float y, float z)
         {
             if (y - 1 < 0)
             {
@@ -290,25 +293,11 @@ namespace Minecraft
                 {
                     return true;
                 }
-            }
-            else if (currentSection.blocks[(int)x, (int)y - 1, (int)z] == null)
+            } else if (currentSection.blocks[(int)x, (int)y - 1, (int)z] == null)
             {
-                return true;       
+                return true;
             }
             return false;
-        }
-       
-        public void FillTextureCoordinates(Direction side, float[] tCoords)
-        {
-            int b = (int)side;
-            textureCoords.Add(tCoords[b * 8]);
-            textureCoords.Add(tCoords[b * 8 + 1]);
-            textureCoords.Add(tCoords[b * 8 + 2]);
-            textureCoords.Add(tCoords[b * 8 + 3]);
-            textureCoords.Add(tCoords[b * 8 + 4]);
-            textureCoords.Add(tCoords[b * 8 + 5]);
-            textureCoords.Add(tCoords[b * 8 + 6]);
-            textureCoords.Add(tCoords[b * 8 + 7]);
         }
     }
 }
