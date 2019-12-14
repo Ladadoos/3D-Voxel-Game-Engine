@@ -67,8 +67,8 @@ namespace Minecraft
                                 throw new System.Exception("Could not find model for: " + state.block.GetType());
                             }
 
-                           // BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
-                           // AddBlockFacesToMesh(faces, state, 1);
+                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
+                            AddBlockFacesToMesh(faces, state, 1);
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z))
                             {
@@ -140,9 +140,9 @@ namespace Minecraft
             }
         }
 
-        private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, float x, float y, float z)
+        private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)
         {
-            if (x - 1 < 0)
+            if (localX - 1 < 0)
             {
                 Section westSection = null;
                 if (westChunk != null)
@@ -152,7 +152,7 @@ namespace Minecraft
 
                 if (westSection != null)
                 {
-                    if (westSection.blocks[Constants.CHUNK_SIZE - 1, (int)y, (int)z] == null)
+                    if (westSection.blocks[Constants.CHUNK_SIZE - 1, localY, localZ] == null)
                     {
                         return true;
                     }
@@ -160,16 +160,16 @@ namespace Minecraft
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x - 1, (int)y, (int)z] == null)
+            } else if (currentSection.blocks[localX - 1, localY, localZ] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, float x, float y, float z)
+        private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, int localX, int localY, int localZ)
         {
-            if (x + 1 >= Constants.CHUNK_SIZE)
+            if (localX + 1 >= Constants.CHUNK_SIZE)
             {
                 Section eastSection = null;
                 if (eastChunk != null)
@@ -179,7 +179,7 @@ namespace Minecraft
 
                 if (eastSection != null)
                 {
-                    if (eastSection.blocks[0, (int)y, (int)z] == null)
+                    if (eastSection.blocks[0, localY, localZ] == null)
                     {
                         return true;
                     }
@@ -187,16 +187,16 @@ namespace Minecraft
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x + 1, (int)y, (int)z] == null)
+            } else if (currentSection.blocks[localX + 1, localY, localZ] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, float x, float y, float z)
+        private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, int localX, int localY, int localZ)
         {
-            if (z + 1 >= Constants.CHUNK_SIZE)
+            if (localZ + 1 >= Constants.CHUNK_SIZE)
             {
                 Section northSection = null;
                 if (northChunk != null)
@@ -206,7 +206,7 @@ namespace Minecraft
 
                 if (northSection != null)
                 {
-                    if (northSection.blocks[(int)x, (int)y, 0] == null)
+                    if (northSection.blocks[localX, localY, 0] == null)
                     {
                         return true;
                     }
@@ -214,16 +214,16 @@ namespace Minecraft
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x, (int)y, (int)z + 1] == null)
+            } else if (currentSection.blocks[localX, localY, localZ + 1] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, float x, float y, float z)
+        private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, int localX, int localY, int localZ)
         {
-            if (z - 1 < 0)
+            if (localZ - 1 < 0)
             {
                 Section southSection = null;
                 if (southChunk != null)
@@ -233,7 +233,7 @@ namespace Minecraft
 
                 if (southSection != null)
                 {
-                    if (southSection.blocks[(int)x, (int)y, Constants.CHUNK_SIZE - 1] == null)
+                    if (southSection.blocks[localX, localY, Constants.CHUNK_SIZE - 1] == null)
                     {
                         return true;
                     }
@@ -241,16 +241,16 @@ namespace Minecraft
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x, (int)y, (int)z - 1] == null)
+            } else if (currentSection.blocks[localX, localY, localZ - 1] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddTopFaceOfBlock(Section currentSection, float x, float y, float z)
+        private bool ShouldAddTopFaceOfBlock(Section currentSection, int localX, int localY, int localZ)
         {
-            if (y + 1 >= Constants.SECTION_HEIGHT)
+            if (localY + 1 >= Constants.SECTION_HEIGHT)
             {
                 if (currentSection.height == Constants.SECTION_HEIGHT - 1)
                 {
@@ -258,20 +258,20 @@ namespace Minecraft
                 }
 
                 Section sectionAbove = activeCurrentChunk.sections[currentSection.height + 1];
-                if ((sectionAbove != null && sectionAbove.blocks[(int)x, 0, (int)z] == null) || sectionAbove == null)
+                if ((sectionAbove != null && sectionAbove.blocks[localX, 0, localZ] == null) || sectionAbove == null)
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x, (int)y + 1, (int)z] == null)
+            } else if (currentSection.blocks[localX, localY + 1, localZ] == null)
             {
                 return true;
             }
             return false;
         }
 
-        private bool ShouldAddBottomFaceOfBlock(Section currentSection, float x, float y, float z)
+        private bool ShouldAddBottomFaceOfBlock(Section currentSection, int localX, int localY, int localZ)
         {
-            if (y - 1 < 0)
+            if (localY - 1 < 0)
             {
                 if (currentSection.height == 0)
                 {
@@ -279,11 +279,11 @@ namespace Minecraft
                 }
 
                 Section sectionBelow = activeCurrentChunk.sections[currentSection.height - 1];
-                if ((sectionBelow != null && sectionBelow.blocks[(int)x, Constants.SECTION_HEIGHT - 1, (int)z] == null) || sectionBelow == null)
+                if ((sectionBelow != null && sectionBelow.blocks[localX, Constants.SECTION_HEIGHT - 1, localZ] == null) || sectionBelow == null)
                 {
                     return true;
                 }
-            } else if (currentSection.blocks[(int)x, (int)y - 1, (int)z] == null)
+            } else if (currentSection.blocks[localX, localY - 1, localZ] == null)
             {
                 return true;
             }

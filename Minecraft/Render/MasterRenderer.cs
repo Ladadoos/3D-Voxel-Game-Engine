@@ -28,7 +28,7 @@ namespace Minecraft
             playerCamera = game.player.camera;
 
             textureLoader = new TextureLoader();
-            int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack2.png");
+            int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
             staticBlocksMeshGenerator = new ChunkMeshGenerator();
