@@ -18,6 +18,13 @@ namespace Minecraft
 
     abstract class BlockModel
     {
+        protected TextureAtlas textureAtlas;
+
+        public BlockModel(TextureAtlas textureAtlas)
+        {
+            this.textureAtlas = textureAtlas;
+        }
+
         public abstract BlockFace[] GetAlwaysVisibleFaces(BlockState state);
         public abstract BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state);
     }
@@ -34,7 +41,7 @@ namespace Minecraft
 
         protected float[] uvBack, uvRight, uvFront, uvLeft, uvTop, uvBottom;
 
-        public FullBlockModel()
+        public FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
         }
@@ -64,27 +71,31 @@ namespace Minecraft
 
     class BlockModelDirt : FullBlockModel
     {
+        public BlockModelDirt(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
         protected override void SetStandardUVs()
         {
-            uvBack = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            uvRight = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            uvFront = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            uvLeft = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            uvTop = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            uvBottom = Game.textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 0));
         }
     }
 
     class BlockModelStone : FullBlockModel
     {
+        public BlockModelStone(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
         protected override void SetStandardUVs()
         {
-            uvBack = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
-            uvRight = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
-            uvFront = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
-            uvLeft = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
-            uvTop = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
-            uvBottom = Game.textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(1, 0));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(1, 0));
         }
     }
 
@@ -95,7 +106,7 @@ namespace Minecraft
 
         protected float[] uvBladeOne, uvBladeTwo;
 
-        public ScissorModel()
+        public ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
         }
@@ -119,10 +130,12 @@ namespace Minecraft
 
     class BlockModelFlower : ScissorModel
     {
+        public BlockModelFlower(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
         protected override void SetStandardUVs()
         {
-            uvBladeOne = Game.textureAtlas.GetTextureCoords(new Vector2(12, 0));
-            uvBladeTwo = Game.textureAtlas.GetTextureCoords(new Vector2(12, 0));
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(12, 0));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(12, 0));
         }
     }
 }

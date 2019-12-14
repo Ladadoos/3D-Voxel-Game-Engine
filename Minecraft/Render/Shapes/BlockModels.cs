@@ -2,8 +2,15 @@
 {
     class BlockModels
     {
-        public readonly BlockModel Dirt = new BlockModelDirt();
-        public readonly BlockModel Stone = new BlockModelStone();
-        public readonly BlockModel Flower = new BlockModelFlower();
+        public readonly BlockModel Dirt;
+        public readonly BlockModel Stone;
+        public readonly BlockModel Flower;
+
+        public BlockModels(TextureAtlas textureAtlas)
+        {
+            Dirt = new BlockModelDirt(textureAtlas);
+            Stone = new BlockModelStone(textureAtlas);
+            Flower = new BlockModelFlower(textureAtlas);
+        }
     }
 }

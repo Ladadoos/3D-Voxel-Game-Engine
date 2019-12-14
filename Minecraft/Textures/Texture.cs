@@ -7,6 +7,6 @@
         public Texture(int textureId)
         {
             this.textureId = textureId;
-        }
+        }      
     }
 }

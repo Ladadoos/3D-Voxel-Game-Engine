@@ -4,18 +4,20 @@ namespace Minecraft
 {
     class RenderChunk
     {
-        public Model HardBlocksModel {get; private set; }
-        public Matrix4 TransformationMatrix { get; private set; }
+        public Model hardBlocksModel { get; private set; }
+        public Matrix4 transformationMatrix { get; private set; }
+        public Vector2 gridPosition { get; private set; }
 
-        public RenderChunk(Model hardBlocksModel, int gridPositionX, int gridPositionY)
+        public RenderChunk(Model hardBlocksModel, int gridPositionX, int gridPositionZ)
         {
-            TransformationMatrix = Maths.CreateTransformationMatrix(new Vector3(gridPositionX * Constants.CHUNK_SIZE, 0, gridPositionY * Constants.CHUNK_SIZE));
-            HardBlocksModel = hardBlocksModel;
+            transformationMatrix = Maths.CreateTransformationMatrix(new Vector3(gridPositionX * Constants.CHUNK_SIZE, 0, gridPositionZ * Constants.CHUNK_SIZE));
+            this.hardBlocksModel = hardBlocksModel;
+            gridPosition = new Vector2(gridPositionX, gridPositionZ);
         }
 
-        public void OnApplicationClosed()
+        public void OnCloseGame()
         {
-            HardBlocksModel.CleanUp();
+            hardBlocksModel.OnCloseGame();
         }
     }
 }

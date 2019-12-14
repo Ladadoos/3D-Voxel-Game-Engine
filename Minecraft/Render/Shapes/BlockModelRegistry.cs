@@ -4,11 +4,12 @@ namespace Minecraft
 {
     class BlockModelRegistry
     {
-        public ReadOnlyDictionary<Block, BlockModel> modelRegistry;
-        private BlockModels blockModels = new BlockModels();
+        public ReadOnlyDictionary<Block, BlockModel> models;
+        private BlockModels blockModels;
 
-        public BlockModelRegistry()
+        public BlockModelRegistry(TextureAtlas textureAtlas)
         {
+            blockModels = new BlockModels(textureAtlas);
             RegisterBlockModels();
         }
 
@@ -20,7 +21,7 @@ namespace Minecraft
                 { Block.Stone, blockModels.Stone },
                 { Block.Flower, blockModels.Flower }
             };
-            modelRegistry = new ReadOnlyDictionary<Block, BlockModel>(registry);
+            models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }
     }
 }

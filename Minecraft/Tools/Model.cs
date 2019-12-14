@@ -45,11 +45,11 @@ namespace Minecraft
             Unbind();
         }
 
-        public void CleanUp()
+        public void OnCloseGame()
         {
             foreach (int buffer in buffers)
             {
-                GL.DeleteTexture(buffer);
+                GL.DeleteBuffer(buffer);
             }
             GL.DeleteVertexArray(vaoId);
         }

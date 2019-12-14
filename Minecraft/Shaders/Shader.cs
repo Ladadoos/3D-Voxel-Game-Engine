@@ -39,7 +39,7 @@ namespace Minecraft
             GL.UseProgram(0);
         }
 
-        public void CleanUp()
+        public void OnCloseGame()
         {
             Stop();
             GL.DetachShader(programID, vertexShaderID);

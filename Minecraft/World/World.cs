@@ -7,42 +7,28 @@ namespace Minecraft
 {
     class World
     {
-        private Game game;
-
         public static int SeaLevel = 95;
 
-        public WorldGenerator worldGenerator;
+        private WorldGenerator worldGenerator;
+        public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
+        private Game game;
 
-        public ChunkMeshGenerator chunkMeshGenerator;
-        public Dictionary<Vector2, Chunk> chunks = new Dictionary<Vector2, Chunk>();
-        public Dictionary<Vector2, RenderChunk> renderChunks = new Dictionary<Vector2, RenderChunk>();
-        private List<Chunk> toReprocessChunks = new List<Chunk>();
+        private delegate void OnBlockPlaced(World world, Chunk chunk, BlockState blockState);
+        private event OnBlockPlaced OnBlockPlacedHandler;
+
+        private delegate void OnChunkLoaded(Chunk chunk);
+        private event OnChunkLoaded OnChunkLoadedHandler;
 
         public World(Game game)
         {
             this.game = game;
-            chunkMeshGenerator = new ChunkMeshGenerator(this);
             worldGenerator = new WorldGenerator();
+
+            OnBlockPlacedHandler += game.masterRenderer.OnBlockPlaced;
+            OnChunkLoadedHandler += game.masterRenderer.OnChunkLoaded;
         }
 
-        public void CleanUp()
-        {
-            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in renderChunks)
-            {
-                chunkToRender.Value.OnApplicationClosed();
-            }
-        }
-
-        public void EndFrameUpdate()
-        {
-            for(int i = 0; i < toReprocessChunks.Count; i++)
-            {
-                chunkMeshGenerator.GenerateRenderMeshForChunk(toReprocessChunks[i]);
-            }
-            toReprocessChunks.Clear();
-        }
-
-        public void GenerateTestMap()
+        public void GenerateTestMap(MasterRenderer renderer)
         {
             var start = DateTime.Now;
             for (int x = 0; x < 10; x++)
@@ -50,8 +36,8 @@ namespace Minecraft
                 for (int y = 0; y < 10; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
-                   chunks.Add(new Vector2(x, y), chunk);
-                   toReprocessChunks.Add(chunk);
+                   loadedChunks.Add(new Vector2(x, y), chunk);
+                   OnChunkLoadedHandler?.Invoke(chunk);
                 }
             }
             var now2 = DateTime.Now - start;
@@ -78,7 +64,7 @@ namespace Minecraft
             }
 
             Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
-            if(!chunks.TryGetValue(chunkPos, out Chunk chunk))
+            if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 Console.WriteLine("Tried to add block in junk that doesnt exist");
                 return false;
@@ -100,55 +86,10 @@ namespace Minecraft
 
             chunk.AddBlock(localX, worldY, localZ, blockstate);
             blockstate.block.OnAdded(blockstate, game);
-     
-            TryAddChunkToReprocessQueue(chunk);
-
-            if (localX == 0)
-            {
-                chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
-                if (cXNeg != null)
-                {
-                    TryAddChunkToReprocessQueue(cXNeg);
-                }
-            }
-
-            if (localX == 15)
-            {
-                chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
-                if (cXPos != null)
-                {
-                    TryAddChunkToReprocessQueue(cXPos);
-                }
-            }
-
-            if (localZ == 0)
-            {
-                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
-                if (cZNeg != null)
-                {
-                    TryAddChunkToReprocessQueue(cZNeg);
-                }
-            }
-
-            if (localZ == 15)
-            {
-                chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
-                if (cZPos != null)
-                {
-                    TryAddChunkToReprocessQueue(cZPos);
-                }
-            }
+            OnBlockPlacedHandler?.Invoke(this, chunk, blockstate);
 
             Console.WriteLine("Added block at " + worldX + "," + worldY + "," + worldZ);
             return true;
-        }
-
-        private void TryAddChunkToReprocessQueue(Chunk toReprocessChunk)
-        {
-            if (!toReprocessChunks.Contains(toReprocessChunk))
-            {
-                toReprocessChunks.Add(toReprocessChunk);
-            }
         }
 
         public bool IsOutsideBuildHeight(int worldY)
@@ -169,7 +110,7 @@ namespace Minecraft
             }
 
             Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
-            if (!chunks.TryGetValue(chunkPos, out Chunk chunk))
+            if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 return Block.Air.GetNewDefaultState();
             }

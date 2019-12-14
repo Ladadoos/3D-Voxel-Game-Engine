@@ -60,5 +60,10 @@ namespace Minecraft
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
         }
+
+        public void OnCloseGame()
+        {
+            aabbCube.OnCloseGame();
+        }
     }
 }

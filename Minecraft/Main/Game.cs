@@ -6,11 +6,8 @@ namespace Minecraft
     {
         public GameWindow window { get; private set; }
 
-        public static TextureLoader textureLoader { get; private set; }
         public static Input input { get; private set; }
-        public static TextureAtlas textureAtlas { get; private set; }
         public static Random randomizer { get; private set; }
-        public static BlockModelRegistry modelManager { get; private set; }
 
         public MasterRenderer masterRenderer { get; private set; }
         public Player player { get; private set; }
@@ -21,28 +18,18 @@ namespace Minecraft
         {
             this.window = window;
 
-            player = new Player(this);
-
-            fpsCounter = new FPSCounter();
-            textureLoader = new TextureLoader();
-            masterRenderer = new MasterRenderer(this);
-
-            int textureId = Game.textureLoader.LoadTexture("../../Resources/texturePack2.png");
-            textureAtlas = new TextureAtlas(textureId, 256, 16);
-
-            modelManager = new BlockModelRegistry();
             randomizer = new Random();
-
-            world = new World(this);
-            world.GenerateTestMap();
             input = new Input();
+            player = new Player(this);
+            fpsCounter = new FPSCounter();
+            masterRenderer = new MasterRenderer(this);          
+            world = new World(this);
+            world.GenerateTestMap(masterRenderer);
         }
 
         public void OnCloseGame()
         {
-            masterRenderer.CleanUp();
-            textureLoader.CleanUp();
-            world.CleanUp();
+            masterRenderer.OnCloseGame();
         }
 
         public void OnUpdateGame(double elapsedTime)
@@ -53,7 +40,7 @@ namespace Minecraft
             input.Update();
             player.Update((float)elapsedTime);
 
-            world.EndFrameUpdate();
+            masterRenderer.EndFrameUpdate(world);
         }
 
         public void OnRenderGame()

@@ -43,7 +43,8 @@ namespace Minecraft
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if(Game.input.OnKeyPress(Key.Escape)) {
+            if(Game.input.OnKeyPress(Key.Escape))
+            {
                 Exit();
             }
 

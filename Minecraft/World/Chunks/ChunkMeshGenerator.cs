@@ -15,11 +15,8 @@ namespace Minecraft
         private List<float> lights;
         private int indCount;
 
-        private World world;
-
-        public ChunkMeshGenerator(World world)
+        public ChunkMeshGenerator()
         {
-            this.world = world;
             ResetData();
         }
 
@@ -35,14 +32,14 @@ namespace Minecraft
 
         private Chunk activeCurrentChunk;
 
-        public void GenerateRenderMeshForChunk(Chunk chunk)
+        public void GenerateRenderMeshForChunk(World world, MasterRenderer masterRenderer, Chunk chunk)
         {
             activeCurrentChunk = chunk;
 
-            world.chunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
-            world.chunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
-            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
-            world.chunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
+            world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
+            world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
+            world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
+            world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
 
             for (int i = 0; i < chunk.sections.Length; i++)
             {
@@ -63,7 +60,7 @@ namespace Minecraft
                             {
                                 continue;
                             }
-                            Game.modelManager.modelRegistry.TryGetValue(state.block, out BlockModel blockModel);
+                            masterRenderer.blockModelRegistry.models.TryGetValue(state.block, out BlockModel blockModel);
 
                             if (blockModel == null)
                             {
@@ -103,15 +100,8 @@ namespace Minecraft
             }
 
             Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), lights.ToArray(), indCount);
-            RenderChunk newRenderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
-            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
-            if (world.renderChunks.ContainsKey(chunkPos))
-            {
-                world.renderChunks[chunkPos] = newRenderChunk;
-            } else
-            {
-                world.renderChunks.Add(chunkPos, newRenderChunk);
-            }
+            RenderChunk renderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
+            masterRenderer.AddChunkToRender(renderChunk);
 
             ResetData();
         }
