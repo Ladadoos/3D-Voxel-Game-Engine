@@ -23,7 +23,7 @@ namespace Minecraft
             Vector3 position = origin;
             Vector3 offset = direction / 25;
             BlockState targetBlock = null;
-            for (int i = 0; i < 80; i++)
+            for (int i = 0; i < 100; i++)
             {
                 position += offset;
                 targetBlock = world.GetBlockAt(position);

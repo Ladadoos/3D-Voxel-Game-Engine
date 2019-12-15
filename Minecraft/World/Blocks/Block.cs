@@ -83,5 +83,10 @@ namespace Minecraft
         {
             return new BlockStateFlower();
         }
+
+        public override AABB[] GetCollisionBox(BlockState state)
+        {
+            return emptyAABB;
+        }
     }
 }

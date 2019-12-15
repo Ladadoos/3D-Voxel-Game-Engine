@@ -13,7 +13,7 @@ namespace Minecraft
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
         private Game game;
 
-        private delegate void OnBlockPlaced(World world, Chunk chunk, BlockState blockState);
+        private delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
         private event OnBlockPlaced OnBlockPlacedHandler;
 
         private delegate void OnChunkLoaded(Chunk chunk);
@@ -54,9 +54,9 @@ namespace Minecraft
             return AddBlockToWorld((int)intPosition.X, (int)intPosition.Y, (int)intPosition.Z, blockstate);
         }
 
-        public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState blockstate)
+        public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState newBlockState)
         {
-            blockstate.position = new Vector3(worldX, worldY, worldZ);
+            newBlockState.position = new Vector3(worldX, worldY, worldZ);
 
             if (IsOutsideBuildHeight(worldY))
             {
@@ -70,13 +70,14 @@ namespace Minecraft
                 return false;
             }
 
-            if(blockstate.block.GetCollisionBox(blockstate).Any(aabb => game.player.hitbox.Intersects(aabb)))
+            if(newBlockState.block.GetCollisionBox(newBlockState).Any(aabb => game.player.hitbox.Intersects(aabb)))
             {
                 Console.WriteLine("Block tried to placed was in player");
                 return false;
             }
 
-            if(blockstate.block != Blocks.Air && GetBlockAt(worldX, worldY, worldZ).block != Blocks.Air)
+            BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
+            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air)
             {
                 return false;
             }
@@ -84,11 +85,11 @@ namespace Minecraft
             int localX = worldX & 15;
             int localZ = worldZ & 15;
 
-            chunk.AddBlock(localX, worldY, localZ, blockstate);
-            blockstate.block.OnAdded(blockstate, game);
-            OnBlockPlacedHandler?.Invoke(this, chunk, blockstate);
+            chunk.AddBlock(localX, worldY, localZ, newBlockState);
+            newBlockState.block.OnAdded(newBlockState, game);
+            OnBlockPlacedHandler?.Invoke(this, chunk, oldState, newBlockState);
 
-            Console.WriteLine("Added block at " + worldX + "," + worldY + "," + worldZ);
+            Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());
             return true;
         }
 

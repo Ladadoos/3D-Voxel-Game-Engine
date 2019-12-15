@@ -3,42 +3,20 @@ using OpenTK;
 
 namespace Minecraft
 {
-    class ChunkMeshGenerator
+    class OpaqueMeshGenerator : MeshGenerator
     {
         private float topLight = 0.9F;
         private float bottomLight = 2.4F;
         private float sideXLight = 1.15F;
         private float sideZLight = 1.4F;
 
-        private List<float> positions;
-        private List<float> textureCoords;
-        private List<float> lights;
-        private int indCount;
-
-        private BlockModelRegistry blockModelRegistry;
-
-        public ChunkMeshGenerator(BlockModelRegistry blockModelRegistry)
+        public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {
-            this.blockModelRegistry = blockModelRegistry;
-            ResetData();
+            materialToProcess = BlockMaterial.Opaque;
         }
 
-        public void ResetData()
+        protected override Model GenerateMesh(World world, Chunk chunk)
         {
-            positions = new List<float>();
-            textureCoords = new List<float>();
-            lights = new List<float>();
-            indCount = 0;
-
-            activeCurrentChunk = null;
-        }
-
-        private Chunk activeCurrentChunk;
-
-        public RenderChunk GenerateRenderMeshForChunk(World world, Chunk chunk)
-        {
-            activeCurrentChunk = chunk;
-
             world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
             world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
             world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
@@ -59,12 +37,7 @@ namespace Minecraft
                         for (int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
                             BlockState state = section.blocks[x, y, z];
-                            if (state == null)
-                            {
-                                continue;
-                            }
-
-                            if(state.block.material != BlockMaterial.Opaque)
+                            if (state == null || !ShouldProcessLayer(state.block.material))
                             {
                                 continue;
                             }
@@ -75,7 +48,7 @@ namespace Minecraft
                             }
 
                             BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
-                            AddBlockFacesToMesh(faces, state, 1);
+                            AddFacesToMesh(faces, state, 1);
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z))
                             {
@@ -93,11 +66,11 @@ namespace Minecraft
                             {
                                 BuildMeshForSide(Direction.Front, state, blockModel, sideZLight);
                             }
-                            if (ShouldAddTopFaceOfBlock(section, x, y, z))
+                            if (ShouldAddTopFaceOfBlock(chunk, section, x, y, z))
                             {
                                 BuildMeshForSide(Direction.Top, state, blockModel, topLight);
                             }
-                            if (ShouldAddBottomFaceOfBlock(section, x, y, z))
+                            if (ShouldAddBottomFaceOfBlock(chunk, section, x, y, z))
                             {
                                 BuildMeshForSide(Direction.Bottom, state, blockModel, bottomLight);
                             }
@@ -106,44 +79,13 @@ namespace Minecraft
                 }
             }
 
-            Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), lights.ToArray(), indCount);
-            RenderChunk renderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
-            ResetData();
-            return renderChunk;
+            return new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), indicesCount);        
         }
 
         private void BuildMeshForSide(Direction blockSide, BlockState state, BlockModel model, float lightValue)
         {
             BlockFace[] faces = model.GetPartialVisibleFaces(blockSide, state);
-            AddBlockFacesToMesh(faces, state, lightValue);
-        }
-
-        private void AddBlockFacesToMesh(BlockFace[] faces, BlockState state, float lightValue)
-        {
-            if (faces.Length > 0)
-            {
-                foreach (BlockFace face in faces)
-                {
-                    foreach (float uv in face.textureCoords)
-                    {
-                        textureCoords.Add(uv);
-                    }
-
-                    foreach (Vector3 position in face.positions)
-                    {
-                        Vector3 world = position + new Vector3(state.ChunkLocalPosition());
-                        positions.Add(world.X);
-                        positions.Add(world.Y);
-                        positions.Add(world.Z);
-                    }
-
-                    indCount += 4;
-                    lights.Add(lightValue);
-                    lights.Add(lightValue);
-                    lights.Add(lightValue);
-                    lights.Add(lightValue);
-                }
-            }
+            AddFacesToMesh(faces, state, lightValue);
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)
@@ -262,14 +204,14 @@ namespace Minecraft
             return false;
         }
 
-        private bool ShouldAddTopFaceOfBlock(Section currentSection, int localX, int localY, int localZ)
+        private bool ShouldAddTopFaceOfBlock(Chunk currentChunk, Section currentSection, int localX, int localY, int localZ)
         {
             if (localY + 1 >= Constants.SECTION_HEIGHT)
             {
                 if (currentSection.height == Constants.SECTION_HEIGHT - 1)
                     return true;
 
-                Section sectionAbove = activeCurrentChunk.sections[currentSection.height + 1];
+                Section sectionAbove = currentChunk.sections[currentSection.height + 1];
                 if (sectionAbove == null)
                     return true;
 
@@ -291,14 +233,14 @@ namespace Minecraft
             return false;
         }
 
-        private bool ShouldAddBottomFaceOfBlock(Section currentSection, int localX, int localY, int localZ)
+        private bool ShouldAddBottomFaceOfBlock(Chunk currentChunk, Section currentSection, int localX, int localY, int localZ)
         {
             if (localY - 1 < 0)
             {
                 if (currentSection.height == 0)
                     return true;
 
-                Section sectionBelow = activeCurrentChunk.sections[currentSection.height - 1];
+                Section sectionBelow = currentChunk.sections[currentSection.height - 1];
                 if (sectionBelow == null)
                     return true;
 
