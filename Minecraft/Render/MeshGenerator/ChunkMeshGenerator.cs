@@ -59,7 +59,12 @@ namespace Minecraft
                         for (int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
                             BlockState state = section.blocks[x, y, z];
-                            if (state == null || state.block == Block.Air)
+                            if (state == null)
+                            {
+                                continue;
+                            }
+
+                            if(state.block.material != BlockMaterial.Opaque)
                             {
                                 continue;
                             }

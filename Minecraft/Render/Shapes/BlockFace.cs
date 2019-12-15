@@ -19,8 +19,7 @@ namespace Minecraft
     abstract class BlockModel
     {
         protected TextureAtlas textureAtlas;
-        protected BlockFace[] emptyArray = new BlockFace[0];
-
+        protected readonly BlockFace[] emptyArray = new BlockFace[0];
         protected byte opaqueFlags = 0;
 
         public BlockModel(TextureAtlas textureAtlas)

@@ -27,7 +27,7 @@ namespace Minecraft
         private float verticalSpeed = 0;
 
         public RayTraceResult mouseOverObject { get; private set; }
-        private BlockState selectedBlock = Block.Dirt.GetNewDefaultState();
+        private BlockState selectedBlock = Blocks.Dirt.GetNewDefaultState();
 
         private Stopwatch jumpStopWatch = new Stopwatch();
 
@@ -112,7 +112,7 @@ namespace Minecraft
             {
                 if (mouseOverObject != null)
                 {
-                    game.world.AddBlockToWorld(mouseOverObject.intersectedGridPoint, Block.Air.GetNewDefaultState());
+                    game.world.AddBlockToWorld(mouseOverObject.intersectedGridPoint, Blocks.Air.GetNewDefaultState());
                 }
             }
 
@@ -412,7 +412,7 @@ namespace Minecraft
                     for (int zz = intZ - 1; zz <= intZ + 1; zz++)
                     {
                         BlockState blockstate = game.world.GetBlockAt(xx, yy, zz);
-                        if (blockstate.block != Block.Air)
+                        if (blockstate.block != Blocks.Air)
                         {
                             collidables.Add(blockstate);
                         }

@@ -31,7 +31,7 @@ namespace Minecraft
             }
 
             int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;
-            if(blockstate.block == Block.Air)
+            if(blockstate.block == Blocks.Air)
             {
                 sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
             }

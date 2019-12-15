@@ -17,9 +17,9 @@ namespace Minecraft
         {
             Dictionary<Block, BlockModel> registry = new Dictionary<Block, BlockModel>
             {
-                { Block.Dirt, blockModels.Dirt },
-                { Block.Stone, blockModels.Stone },
-                { Block.Flower, blockModels.Flower }
+                { Blocks.Dirt, blockModels.Dirt },
+                { Blocks.Stone, blockModels.Stone },
+                { Blocks.Flower, blockModels.Flower }
             };
             models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }

@@ -76,7 +76,7 @@ namespace Minecraft
                 return false;
             }
 
-            if(blockstate.block != Block.Air && GetBlockAt(worldX, worldY, worldZ).block != Block.Air)
+            if(blockstate.block != Blocks.Air && GetBlockAt(worldX, worldY, worldZ).block != Blocks.Air)
             {
                 return false;
             }
@@ -106,19 +106,19 @@ namespace Minecraft
         {
             if (IsOutsideBuildHeight(worldY))
             {
-                return Block.Air.GetNewDefaultState(); 
+                return Blocks.Air.GetNewDefaultState(); 
             }
 
             Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
             if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
-                return Block.Air.GetNewDefaultState();
+                return Blocks.Air.GetNewDefaultState();
             }
 
             int sectionHeight = worldY / Constants.SECTION_HEIGHT;
             if(chunk.sections[sectionHeight] == null)
             {
-                return Block.Air.GetNewDefaultState(); 
+                return Blocks.Air.GetNewDefaultState(); 
             }
 
             int localX = worldX & 15;    
@@ -128,7 +128,7 @@ namespace Minecraft
             BlockState blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
             if (blockType == null)
             {
-                return Block.Air.GetNewDefaultState(); 
+                return Blocks.Air.GetNewDefaultState(); 
             }
             return blockType;
         }

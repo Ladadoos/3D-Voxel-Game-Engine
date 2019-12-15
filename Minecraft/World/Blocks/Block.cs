@@ -4,10 +4,13 @@ namespace Minecraft
 {
     abstract class Block
     {
-        public static readonly Block Air = new BlockAir();
-        public static readonly Block Dirt = new BlockDirt();
-        public static readonly Block Stone = new BlockStone();
-        public static readonly Block Flower = new BlockFlower();
+        public BlockMaterial material { get; protected set; }
+        protected readonly AABB[] emptyAABB = new AABB[0];
+
+        public Block(BlockMaterial material)
+        {
+            this.material = material;
+        }
 
         public abstract BlockState GetNewDefaultState();
 
@@ -32,6 +35,8 @@ namespace Minecraft
 
     class BlockAir : Block
     {
+        public BlockAir() : base(BlockMaterial.Air) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateAir();
@@ -39,12 +44,14 @@ namespace Minecraft
 
         public override AABB[] GetCollisionBox(BlockState state)
         {
-            return new AABB[0];
+            return emptyAABB;
         }
     }
 
     class BlockDirt : Block
     {
+        public BlockDirt() : base(BlockMaterial.Opaque) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateDirt();
@@ -53,6 +60,8 @@ namespace Minecraft
 
     class BlockStone : Block
     {
+        public BlockStone() : base(BlockMaterial.Opaque) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateStone();
@@ -68,6 +77,8 @@ namespace Minecraft
 
     class BlockFlower : Block
     {
+        public BlockFlower() : base(BlockMaterial.Fauna) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateFlower();

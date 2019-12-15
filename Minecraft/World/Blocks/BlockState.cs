@@ -24,7 +24,7 @@ namespace Minecraft
     {
         public BlockStateDirt() : base()
         {
-            block = Block.Dirt;
+            block = Blocks.Dirt;
         }
     }
 
@@ -32,7 +32,7 @@ namespace Minecraft
     {
         public BlockStateAir() : base()
         {
-            block = Block.Air;
+            block = Blocks.Air;
         }
     }
 
@@ -40,7 +40,7 @@ namespace Minecraft
     {
         public BlockStateStone() : base()
         {
-            block = Block.Stone;
+            block = Blocks.Stone;
         }
     }
 
@@ -48,7 +48,7 @@ namespace Minecraft
     {
         public BlockStateFlower() : base()
         {
-            block = Block.Flower;
+            block = Blocks.Flower;
         }
     }
 }

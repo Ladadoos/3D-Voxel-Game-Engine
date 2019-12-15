@@ -101,40 +101,21 @@ namespace Minecraft
             int localZ = (int)blockstate.position.Z & 15;
             MeshChunk(chunk);
 
-            if (localX == 0)
+            if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
             {
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
-                if (cXNeg != null)
-                {
-                    MeshChunk(cXNeg);
-                }
+                MeshChunk(cXNeg);
             }
-
-            if (localX == 15)
+            if (localX == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
             {
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
-                if (cXPos != null)
-                {
-                    MeshChunk(cXPos);
-                }
+                MeshChunk(cXPos);
             }
-
-            if (localZ == 0)
+            if (localZ == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
             {
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg);
-                if (cZNeg != null)
-                {
-                    MeshChunk(cZNeg);
-                }
+                MeshChunk(cZNeg);
             }
-
-            if (localZ == 15)
+            if (localZ == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
             {
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos);
-                if (cZPos != null)
-                {
-                    MeshChunk(cZPos);
-                }
+                MeshChunk(cZPos);
             }
         }
 
