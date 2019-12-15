@@ -20,16 +20,25 @@ namespace Minecraft
     {
         protected TextureAtlas textureAtlas;
         protected readonly BlockFace[] emptyArray = new BlockFace[0];
-        protected byte opaqueFlags = 0;
+        protected bool back, right, front, left, top, bottom;
 
         public BlockModel(TextureAtlas textureAtlas)
         {
             this.textureAtlas = textureAtlas;
         }
 
-        public bool IsOpaqueOnSide(Direction direction)
+        public virtual bool IsOpaqueOnSide(Direction direction)
         {
-            return DirectionUtil.IsEncodedInByte(opaqueFlags, direction);
+            switch (direction)
+            {
+                case Direction.Back: return back;
+                case Direction.Right: return right;
+                case Direction.Front: return front;
+                case Direction.Left: return left;
+                case Direction.Top: return top;
+                case Direction.Bottom: return bottom;
+                default: throw new System.Exception("Uncatched face.");
+            }
         }
 
         public abstract BlockFace[] GetAlwaysVisibleFaces(BlockState state);
@@ -52,12 +61,7 @@ namespace Minecraft
         {
             SetStandardUVs();
 
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Back);
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Bottom);
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Front);
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Left);
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Right);
-            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Top);
+            back = true; right = true; front = true; left = true; top = true; bottom = true;
         }
 
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)

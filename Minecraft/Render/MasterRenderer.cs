@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
+using System;
 
 namespace Minecraft
 {
@@ -97,9 +98,14 @@ namespace Minecraft
             playerBlockRenderer.RenderSelection();
         }
 
+
+        private bool firstPass = false;
+
         public void EndFrameUpdate(World world)
         {
-            foreach(ChunkLayer chunkLayer in toRemeshChunks)
+            var start = DateTime.Now;
+
+            foreach (ChunkLayer chunkLayer in toRemeshChunks)
             {
                 Vector2 gridPosition = new Vector2(chunkLayer.chunk.gridX, chunkLayer.chunk.gridZ);
 
@@ -119,7 +125,15 @@ namespace Minecraft
                     renderChunk.hardBlocksModel = staticBlocksMeshGenerator.GenerateMeshFor(world, chunkLayer.chunk);
                 }
             }
+
+            var now2 = DateTime.Now - start;
+            if (!firstPass)
+            {
+                Console.WriteLine("Generating init meshes took: " + now2 + " s");
+            }
+
             toRemeshChunks.Clear();
+            firstPass = true;
         }
 
         public void OnChunkLoaded(Chunk chunk)
