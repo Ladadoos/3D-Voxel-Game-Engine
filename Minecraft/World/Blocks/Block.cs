@@ -19,6 +19,11 @@ namespace Minecraft
             return false;
         }
 
+        public virtual bool CanAddBlockAt(World world, Vector3 intPosition)
+        {
+            return true;
+        }
+
         public virtual void OnAdded(BlockState blockstate, Game game) { }
 
         public virtual AABB[] GetCollisionBox(BlockState state)
@@ -87,6 +92,11 @@ namespace Minecraft
         public override AABB[] GetCollisionBox(BlockState state)
         {
             return emptyAABB;
+        }
+
+        public override bool CanAddBlockAt(World world, Vector3 intPosition)
+        {
+            return world.GetBlockAt(intPosition + new Vector3(0, -1, 0)).block == Blocks.Dirt;
         }
     }
 }

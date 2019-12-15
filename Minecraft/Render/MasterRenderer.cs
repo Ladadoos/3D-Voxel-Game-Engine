@@ -57,36 +57,38 @@ namespace Minecraft
         {
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-   
+
+            bool[] renderFlags = new bool[toRenderChunks.Count];
+            int i = 0;
+
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, playerCamera.currentViewMatrix);
+
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                 Vector3 max = min + new Vector3(16, 256, 16);
-                if (!playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
+                renderFlags[i++] = playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max));
+                if (!renderFlags[i - 1])
                 {
                     continue;
                 }
                 chunkToRender.Value.hardBlocksModel.Bind();
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
-                chunkToRender.Value.hardBlocksModel.Unbind();
             }
 
+            i = 0;
             DisableCulling();
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
-                Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                Vector3 max = min + new Vector3(16, 256, 16);
-                if (!playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
+                if (!renderFlags[i++])
                 {
                     continue;
                 }
                 chunkToRender.Value.faunaBlocksModel.Bind();
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.faunaBlocksModel.indicesCount);
-                chunkToRender.Value.faunaBlocksModel.Unbind();
             }
             EnableCulling();
 
@@ -109,11 +111,11 @@ namespace Minecraft
 
                 if (faunaMeshGenerator.ShouldProcessLayer(chunkLayer.layer))
                 {
-                    System.Console.WriteLine("Reconstructing fauna for chunk " + gridPosition);
+                    //System.Console.WriteLine("Reconstructing fauna for chunk " + gridPosition);
                     renderChunk.faunaBlocksModel = faunaMeshGenerator.GenerateMeshFor(world, chunkLayer.chunk);
                 } else if (staticBlocksMeshGenerator.ShouldProcessLayer(chunkLayer.layer))
                 {
-                    System.Console.WriteLine("Reconstructing static blocks for chunk " + gridPosition);
+                    //System.Console.WriteLine("Reconstructing static blocks for chunk " + gridPosition);
                     renderChunk.hardBlocksModel = staticBlocksMeshGenerator.GenerateMeshFor(world, chunkLayer.chunk);
                 }
             }

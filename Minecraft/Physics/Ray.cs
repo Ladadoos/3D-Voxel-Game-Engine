@@ -46,7 +46,7 @@ namespace Minecraft
             }
             this.distanceToIntersection = dist;
             Vector3 interPoint = origin + direction * distanceToIntersection;
-            return new RayTraceResult(targetAABB, targetAABB.GetNormalAtIntersectionPoint(interPoint), interPoint, targetBlock.position);
+            return new RayTraceResult(targetAABB, targetAABB.GetNormalAtIntersectionPoint(interPoint), interPoint, targetBlock);
         }
     }
 }

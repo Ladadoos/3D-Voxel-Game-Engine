@@ -89,15 +89,19 @@ namespace Minecraft
             {
                 if (isCrouching)
                 {
-                    Vector3 target = mouseOverObject.intersectedGridPoint + mouseOverObject.normalAtIntersection;
-                    game.world.AddBlockToWorld(target, selectedBlock.Clone());
+                    if(selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    {
+                        game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.Clone());
+                    }
                 } else
                 {
-                    BlockState state = game.world.GetBlockAt(mouseOverObject.intersectedGridPoint);
+                    BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
                     if(!state.block.OnInteract(state, game))
                     {
-                        Vector3 target = mouseOverObject.intersectedGridPoint + mouseOverObject.normalAtIntersection;
-                        game.world.AddBlockToWorld(target, selectedBlock.Clone());
+                        if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                        {
+                            game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.Clone());
+                        }
                     }
                 }
             }
@@ -105,14 +109,14 @@ namespace Minecraft
             {
                 if (mouseOverObject != null)
                 {
-                    selectedBlock = game.world.GetBlockAt(mouseOverObject.intersectedGridPoint);
+                    selectedBlock = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
                 }
             }
             if (Game.input.OnMousePress(MouseButton.Left))
             {
                 if (mouseOverObject != null)
                 {
-                    game.world.AddBlockToWorld(mouseOverObject.intersectedGridPoint, Blocks.Air.GetNewDefaultState());
+                    game.world.AddBlockToWorld(mouseOverObject.blockstateHit.position, Blocks.Air.GetNewDefaultState());
                 }
             }
 
