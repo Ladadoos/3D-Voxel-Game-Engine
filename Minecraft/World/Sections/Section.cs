@@ -2,11 +2,10 @@
 {
     class Section
     {  
-        public sbyte height;
-        //THIS SHOULD IDEALLY NOT BE NULL....
+        public byte height;
         public BlockState[,,] blocks = new BlockState[Constants.CHUNK_SIZE, Constants.SECTION_HEIGHT, Constants.CHUNK_SIZE];
 
-        public Section(sbyte height)
+        public Section(byte height)
         {
             this.height = height;
         }

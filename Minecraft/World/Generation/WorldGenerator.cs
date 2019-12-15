@@ -83,7 +83,7 @@ namespace Minecraft
                     while (k >= 0)
                     {
                         int r = Game.randomizer.Next(1000);
-                        if (r < 10)
+                        if (r == 1)
                         {
                             generatedChunk.AddBlock(i * 1, k, j * 1, Block.Flower.GetNewDefaultState());
                         }

@@ -15,8 +15,11 @@ namespace Minecraft
         private List<float> lights;
         private int indCount;
 
-        public ChunkMeshGenerator()
+        private BlockModelRegistry blockModelRegistry;
+
+        public ChunkMeshGenerator(BlockModelRegistry blockModelRegistry)
         {
+            this.blockModelRegistry = blockModelRegistry;
             ResetData();
         }
 
@@ -32,7 +35,7 @@ namespace Minecraft
 
         private Chunk activeCurrentChunk;
 
-        public void GenerateRenderMeshForChunk(World world, MasterRenderer masterRenderer, Chunk chunk)
+        public RenderChunk GenerateRenderMeshForChunk(World world, Chunk chunk)
         {
             activeCurrentChunk = chunk;
 
@@ -60,9 +63,8 @@ namespace Minecraft
                             {
                                 continue;
                             }
-                            masterRenderer.blockModelRegistry.models.TryGetValue(state.block, out BlockModel blockModel);
 
-                            if (blockModel == null)
+                            if (!blockModelRegistry.models.TryGetValue(state.block, out BlockModel blockModel))
                             {
                                 throw new System.Exception("Could not find model for: " + state.block.GetType());
                             }
@@ -101,9 +103,8 @@ namespace Minecraft
 
             Model hardBlocksChunkModel = new Model(positions.ToArray(), textureCoords.ToArray(), lights.ToArray(), indCount);
             RenderChunk renderChunk = new RenderChunk(hardBlocksChunkModel, chunk.gridX, chunk.gridZ);
-            masterRenderer.AddChunkToRender(renderChunk);
-
             ResetData();
+            return renderChunk;
         }
 
         private void BuildMeshForSide(Direction blockSide, BlockState state, BlockModel model, float lightValue)
@@ -144,25 +145,27 @@ namespace Minecraft
         {
             if (localX - 1 < 0)
             {
-                Section westSection = null;
-                if (westChunk != null)
-                {
-                    westSection = westChunk.sections[currentSection.height];
-                }
-
-                if (westSection != null)
-                {
-                    if (westSection.blocks[Constants.CHUNK_SIZE - 1, localY, localZ] == null)
-                    {
-                        return true;
-                    }
-                } else
-                {
+                if (westChunk == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX - 1, localY, localZ] == null)
+
+                Section westSection = westSection = westChunk.sections[currentSection.height];
+                if (westSection == null)
+                    return true;
+
+                BlockState blockWest = westSection.blocks[Constants.CHUNK_SIZE - 1, localY, localZ];
+                if (blockWest == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockWest.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Right);
+            } else
             {
-                return true;
+                BlockState blockWest = currentSection.blocks[localX - 1, localY, localZ];
+                if (blockWest == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockWest.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Right);
             }
             return false;
         }
@@ -171,25 +174,27 @@ namespace Minecraft
         {
             if (localX + 1 >= Constants.CHUNK_SIZE)
             {
-                Section eastSection = null;
-                if (eastChunk != null)
-                {
-                    eastSection = eastChunk.sections[currentSection.height];
-                }
-
-                if (eastSection != null)
-                {
-                    if (eastSection.blocks[0, localY, localZ] == null)
-                    {
-                        return true;
-                    }
-                } else
-                {
+                if (eastChunk == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX + 1, localY, localZ] == null)
+
+                Section eastSection = eastSection = eastChunk.sections[currentSection.height];
+                if (eastSection == null)
+                    return true;
+
+                BlockState blockEast = eastSection.blocks[0, localY, localZ];
+                if (blockEast == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockEast.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Left);
+            } else
             {
-                return true;
+                BlockState blockEast = currentSection.blocks[localX + 1, localY, localZ];
+                if (blockEast == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockEast.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Left);
             }
             return false;
         }
@@ -198,25 +203,27 @@ namespace Minecraft
         {
             if (localZ + 1 >= Constants.CHUNK_SIZE)
             {
-                Section northSection = null;
-                if (northChunk != null)
-                {
-                    northSection = northChunk.sections[currentSection.height];
-                }
-
-                if (northSection != null)
-                {
-                    if (northSection.blocks[localX, localY, 0] == null)
-                    {
-                        return true;
-                    }
-                } else
-                {
+                if (northChunk == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX, localY, localZ + 1] == null)
+
+                Section northSection = northSection = northChunk.sections[currentSection.height];
+                if (northSection == null)
+                    return true;
+
+                BlockState blockNorth = northSection.blocks[localX, localY, 0];
+                if (blockNorth == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockNorth.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Back);
+            } else
             {
-                return true;
+                BlockState blockNorth = currentSection.blocks[localX, localY, localZ + 1];
+                if (blockNorth == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockNorth.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Back);
             }
             return false;
         }
@@ -225,25 +232,27 @@ namespace Minecraft
         {
             if (localZ - 1 < 0)
             {
-                Section southSection = null;
-                if (southChunk != null)
-                {
-                    southSection = southChunk.sections[currentSection.height];
-                }
-
-                if (southSection != null)
-                {
-                    if (southSection.blocks[localX, localY, Constants.CHUNK_SIZE - 1] == null)
-                    {
-                        return true;
-                    }
-                } else
-                {
+                if (southChunk == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX, localY, localZ - 1] == null)
+
+                Section southSection = southSection = southChunk.sections[currentSection.height];
+                if (southSection == null)
+                    return true;
+
+                BlockState blockSouth = southSection.blocks[localX, localY, Constants.CHUNK_SIZE - 1];
+                if (blockSouth == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockSouth.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Front);
+            } else
             {
-                return true;
+                BlockState blockSouth = currentSection.blocks[localX, localY, localZ - 1];
+                if (blockSouth == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockSouth.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Front);
             }
             return false;
         }
@@ -253,18 +262,26 @@ namespace Minecraft
             if (localY + 1 >= Constants.SECTION_HEIGHT)
             {
                 if (currentSection.height == Constants.SECTION_HEIGHT - 1)
-                {
                     return true;
-                }
 
                 Section sectionAbove = activeCurrentChunk.sections[currentSection.height + 1];
-                if ((sectionAbove != null && sectionAbove.blocks[localX, 0, localZ] == null) || sectionAbove == null)
-                {
+                if (sectionAbove == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX, localY + 1, localZ] == null)
+
+                BlockState blockAbove = sectionAbove.blocks[localX, 0, localZ];
+                if (blockAbove == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockAbove.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Bottom);
+            } else
             {
-                return true;
+                BlockState blockAbove = currentSection.blocks[localX, localY + 1, localZ];
+                if (blockAbove == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockAbove.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Bottom);
             }
             return false;
         }
@@ -274,18 +291,26 @@ namespace Minecraft
             if (localY - 1 < 0)
             {
                 if (currentSection.height == 0)
-                {
                     return true;
-                }
 
                 Section sectionBelow = activeCurrentChunk.sections[currentSection.height - 1];
-                if ((sectionBelow != null && sectionBelow.blocks[localX, Constants.SECTION_HEIGHT - 1, localZ] == null) || sectionBelow == null)
-                {
+                if (sectionBelow == null)
                     return true;
-                }
-            } else if (currentSection.blocks[localX, localY - 1, localZ] == null)
+
+                BlockState blockBottom = sectionBelow.blocks[localX, Constants.SECTION_HEIGHT - 1, localZ];
+                if (blockBottom == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockBottom.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Top);
+            } else
             {
-                return true;
+                BlockState blockBottom = currentSection.blocks[localX, localY - 1, localZ];
+                if (blockBottom == null)
+                    return true;
+
+                if (blockModelRegistry.models.TryGetValue(blockBottom.block, out BlockModel blockModel))
+                    return !blockModel.IsOpaqueOnSide(Direction.Top);
             }
             return false;
         }

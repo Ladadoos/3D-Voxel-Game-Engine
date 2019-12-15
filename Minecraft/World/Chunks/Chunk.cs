@@ -27,7 +27,7 @@ namespace Minecraft
             int sectionHeight = worldY / Constants.SECTION_HEIGHT;
             if(sections[sectionHeight] == null)
             {
-                sections[sectionHeight] = new Section((sbyte)sectionHeight);
+                sections[sectionHeight] = new Section((byte)sectionHeight);
             }
 
             int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;

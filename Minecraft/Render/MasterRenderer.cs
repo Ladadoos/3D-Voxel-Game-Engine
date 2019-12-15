@@ -16,7 +16,7 @@ namespace Minecraft
         private WireframeRenderer wireframeRenderer;
         private PlayerHoverBlockRenderer playerBlockRenderer;
         private TextureAtlas textureAtlas;
-        public BlockModelRegistry blockModelRegistry { get; private set; }
+        private BlockModelRegistry blockModelRegistry;
         private TextureLoader textureLoader;
 
         private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
@@ -31,7 +31,7 @@ namespace Minecraft
             int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
-            staticBlocksMeshGenerator = new ChunkMeshGenerator();
+            staticBlocksMeshGenerator = new ChunkMeshGenerator(blockModelRegistry);
 
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
@@ -74,7 +74,7 @@ namespace Minecraft
         {
             foreach(Chunk chunk in toRemeshChunks)
             {
-                staticBlocksMeshGenerator.GenerateRenderMeshForChunk(world, this, chunk);
+                AddChunkToRender(staticBlocksMeshGenerator.GenerateRenderMeshForChunk(world, chunk));
             }
             toRemeshChunks.Clear();
         }

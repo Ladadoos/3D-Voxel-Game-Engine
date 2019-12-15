@@ -19,10 +19,18 @@ namespace Minecraft
     abstract class BlockModel
     {
         protected TextureAtlas textureAtlas;
+        protected BlockFace[] emptyArray = new BlockFace[0];
+
+        protected byte opaqueFlags = 0;
 
         public BlockModel(TextureAtlas textureAtlas)
         {
             this.textureAtlas = textureAtlas;
+        }
+
+        public bool IsOpaqueOnSide(Direction direction)
+        {
+            return DirectionUtil.IsEncodedInByte(opaqueFlags, direction);
         }
 
         public abstract BlockFace[] GetAlwaysVisibleFaces(BlockState state);
@@ -44,11 +52,18 @@ namespace Minecraft
         public FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
+
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Back);
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Bottom);
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Front);
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Left);
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Right);
+            DirectionUtil.EncodeInByte(ref opaqueFlags, Direction.Top);
         }
 
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
         {
-            return new BlockFace[0];
+            return emptyArray;
         }
 
         public override BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state)
@@ -122,7 +137,7 @@ namespace Minecraft
 
         public override BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state)
         {
-            return new BlockFace[0];
+            return emptyArray;
         }
 
         protected abstract void SetStandardUVs();
