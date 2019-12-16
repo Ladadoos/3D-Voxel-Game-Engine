@@ -77,7 +77,7 @@ namespace Minecraft
             }
 
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
-            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air)
+            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air || oldState.block == newBlockState.block)
             {
                 return false;
             }

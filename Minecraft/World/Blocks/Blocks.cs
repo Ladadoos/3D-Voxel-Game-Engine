@@ -6,5 +6,6 @@
         public static readonly Block Dirt = new BlockDirt();
         public static readonly Block Stone = new BlockStone();
         public static readonly Block Flower = new BlockFlower();
+        public static readonly Block Tnt = new BlockTNT();
     }
 }

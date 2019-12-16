@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -97,6 +98,52 @@ namespace Minecraft
         public override bool CanAddBlockAt(World world, Vector3 intPosition)
         {
             return world.GetBlockAt(intPosition + new Vector3(0, -1, 0)).block == Blocks.Dirt;
+        }
+    }
+
+    class BlockTNT : Block
+    {
+        public BlockTNT() : base(BlockMaterial.Opaque) { }
+
+        public override BlockState GetNewDefaultState()
+        {
+            return new BlockStateTNT();
+        }
+
+        public override bool OnInteract(BlockState blockstate, Game game)
+        {
+            List<BlockState> explosives = new List<BlockState>();
+
+            for(int x = -4; x <= 4; x++)
+            {
+                for (int y = -4; y <= 4; y++)
+                {
+                    for (int z = -4; z <= 4; z++)
+                    {
+                        if(x * x + y * y + z * z > 14)
+                        {
+                            continue;
+                        }
+
+                        Vector3 target = blockstate.position + new Vector3(x, y, z);
+                        BlockState state = game.world.GetBlockAt(target);
+                        if(state is BlockStateTNT && blockstate.position != target)
+                        {
+                            explosives.Add(state);
+                        } else
+                        {
+                            game.world.AddBlockToWorld(blockstate.position + new Vector3(x, y, z), Blocks.Air.GetNewDefaultState());
+                        }
+                    }
+                }
+            }
+
+            foreach(BlockState state in explosives)
+            {
+                state.block.OnInteract(state, game);
+            }
+
+            return true;
         }
     }
 }

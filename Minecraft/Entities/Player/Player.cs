@@ -10,7 +10,7 @@ namespace Minecraft
     {
         private bool isFlying = true;
         private bool isInCreativeMode = true;
-        private bool doCollisionDetection = false;
+        private bool doCollisionDetection = true;
         private bool isInAir = true;
         private bool isCrouching = false;
         private bool isRunning = false;
@@ -27,7 +27,7 @@ namespace Minecraft
         private float verticalSpeed = 0;
 
         public RayTraceResult mouseOverObject { get; private set; }
-        private BlockState selectedBlock = Blocks.Dirt.GetNewDefaultState();
+        private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
 
         private Stopwatch jumpStopWatch = new Stopwatch();
 

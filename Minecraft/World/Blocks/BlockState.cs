@@ -51,4 +51,12 @@ namespace Minecraft
             block = Blocks.Flower;
         }
     }
+
+    class BlockStateTNT : BlockState
+    {
+        public BlockStateTNT() : base()
+        {
+            block = Blocks.Tnt;
+        }
+    }
 }
