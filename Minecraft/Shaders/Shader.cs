@@ -86,6 +86,13 @@ namespace Minecraft
             GL.UniformMatrix4(location, false, ref matrix);
         }
 
+        public void LoadTexture(int uniformLocation, int textureUnitLayout, int textureId, TextureTarget target = TextureTarget.Texture2D)
+        {
+            GL.Uniform1(uniformLocation, textureUnitLayout);
+            GL.ActiveTexture(TextureUnit.Texture0 + textureUnitLayout);
+            GL.BindTexture(target, textureId);
+        }
+
         public static int LoadShader(string file, ShaderType type)
         {
             string source = System.IO.File.ReadAllText(file);

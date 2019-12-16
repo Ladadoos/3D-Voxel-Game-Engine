@@ -25,9 +25,7 @@
 
         protected override void BindAttributes()
         {
-            BindAttribute(0, "aPos");
-            BindAttribute(1, "aTexCoord");
+            
         }
-
     }
 }

@@ -1,16 +1,20 @@
 #version 400 core
-out vec4 FragColor;
+layout (location = 0) out vec4 fragmentColor;
+layout (location = 1) out vec4 normalDepthColor;
 
-in vec2 TexCoord;
-in float Light;
+in vec2 uv;
+in float illumination;
+in vec3 position;
 
 uniform sampler2D textureAtlas;
 
 void main()
 {
-   vec4 albedo = texture(textureAtlas, TexCoord);
-   if(albedo.rgb == vec3(1,1,1)){
-     discard;
+   vec4 albedo = texture(textureAtlas, uv);
+   if(albedo.rgb == vec3(1, 1, 1))
+   {
+		discard;
    }
-   FragColor = albedo / Light;
+   fragmentColor = albedo / illumination;  
+   normalDepthColor = vec4(1, 0, 0, 1);
 }

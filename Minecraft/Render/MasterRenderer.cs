@@ -19,6 +19,7 @@ namespace Minecraft
         private TextureAtlas textureAtlas;
         private BlockModelRegistry blockModelRegistry;
         private TextureLoader textureLoader;
+        private ScreenQuad screenQuad;
 
         private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
         private HashSet<ChunkLayer> toRemeshChunks = new HashSet<ChunkLayer>();
@@ -41,12 +42,11 @@ namespace Minecraft
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
             staticBlocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
             faunaMeshGenerator = new FaunaMeshGenerator(blockModelRegistry);
-
+            screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
             basicShader = new ShaderBasic();
-            UploadTextureAtlas();
             UploadProjectionMatrix();
             playerCamera.OnProjectionChangedHandler += OnPlayerCameraProjectionChanged;
 
@@ -56,6 +56,8 @@ namespace Minecraft
 
         public void Render(World world)
         {
+            EnableDepthTest();
+            screenQuad.fbo.BindFBO();
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -63,8 +65,8 @@ namespace Minecraft
             int i = 0;
 
             basicShader.Start();
+            basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, playerCamera.currentViewMatrix);
-
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
@@ -93,9 +95,10 @@ namespace Minecraft
             }
             EnableCulling();
 
-            basicShader.Stop();
-
             playerBlockRenderer.RenderSelection();
+            screenQuad.fbo.UnbindFBO();
+            GL.Disable(EnableCap.DepthTest);
+            screenQuad.RenderToScreen();
         }
 
 
@@ -190,13 +193,6 @@ namespace Minecraft
         {
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, playerCamera.currentProjectionMatrix);
-            basicShader.Stop();
-        }
-
-        private void UploadTextureAtlas()
-        {
-            basicShader.Start();
-            basicShader.LoadInt(basicShader.location_TextureAtlas, 0);
             basicShader.Stop();
         }
 

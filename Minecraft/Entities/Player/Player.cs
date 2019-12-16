@@ -10,7 +10,7 @@ namespace Minecraft
     {
         private bool isFlying = true;
         private bool isInCreativeMode = true;
-        private bool doCollisionDetection = true;
+        private bool doCollisionDetection = false;
         private bool isInAir = true;
         private bool isCrouching = false;
         private bool isRunning = false;

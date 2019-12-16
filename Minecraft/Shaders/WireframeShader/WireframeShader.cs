@@ -23,8 +23,6 @@
 
         protected override void BindAttributes()
         {
-            BindAttribute(0, "aPos");
         }
-
     }
 }

@@ -2,7 +2,7 @@
 {
     abstract class Texture
     {
-        public int textureId;
+        public int textureId { get; protected set; }
 
         public Texture(int textureId)
         {

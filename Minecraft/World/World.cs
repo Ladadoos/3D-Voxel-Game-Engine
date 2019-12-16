@@ -31,9 +31,9 @@ namespace Minecraft
         public void GenerateTestMap(MasterRenderer renderer)
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 10; x++)
+            for (int x = 0; x < 8; x++)
             {
-                for (int y = 0; y < 10; y++)
+                for (int y = 0; y < 8; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
                    loadedChunks.Add(new Vector2(x, y), chunk);
@@ -89,7 +89,7 @@ namespace Minecraft
             newBlockState.block.OnAdded(newBlockState, game);
             OnBlockPlacedHandler?.Invoke(this, chunk, oldState, newBlockState);
 
-            Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());
+            //Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());
             return true;
         }
 
