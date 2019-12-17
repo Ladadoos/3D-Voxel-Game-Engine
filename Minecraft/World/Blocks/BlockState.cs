@@ -9,11 +9,6 @@ namespace Minecraft
         //Position is automatically set by the world once the block is placed.
         public Vector3 position;
 
-        public BlockState Clone()
-        {
-            return (BlockState)MemberwiseClone();
-        }
-
         public Vector3 ChunkLocalPosition()
         {
             return new Vector3((int)position.X & 15, position.Y, (int)position.Z & 15);
@@ -54,6 +49,10 @@ namespace Minecraft
 
     class BlockStateTNT : BlockState
     {
+        public float elapsedSecondsSinceTrigger;
+        public bool triggeredByTnt;
+        public bool triggered;
+
         public BlockStateTNT() : base()
         {
             block = Blocks.Tnt;

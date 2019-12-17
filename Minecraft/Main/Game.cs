@@ -32,13 +32,15 @@ namespace Minecraft
             masterRenderer.OnCloseGame();
         }
 
-        public void OnUpdateGame(double elapsedTime)
+        public void OnUpdateGame(double elapsedSeconds)
         {
             fpsCounter.IncrementFrameCounter();
-            fpsCounter.AddElapsedTime(elapsedTime);
+            fpsCounter.AddElapsedTime(elapsedSeconds);
 
             input.Update();
-            player.Update((float)elapsedTime);
+            player.Update((float)elapsedSeconds);
+
+            world.Tick((float)elapsedSeconds);
 
             masterRenderer.EndFrameUpdate(world);
         }

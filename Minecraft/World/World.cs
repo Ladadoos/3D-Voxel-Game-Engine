@@ -13,6 +13,10 @@ namespace Minecraft
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
         private Game game;
 
+        private float secondsPerTick = 0.02F;
+        private float elapsedMillisecondsSinceLastTick;
+        private List<BlockState> toRemoveBlocks = new List<BlockState>();
+
         private delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
         private event OnBlockPlaced OnBlockPlacedHandler;
 
@@ -44,9 +48,33 @@ namespace Minecraft
             Console.WriteLine("Generating init chunks took: " + now2 + " s");
         }
 
+        public void Tick(float deltaTime)
+        {
+            elapsedMillisecondsSinceLastTick += deltaTime;
+            if(elapsedMillisecondsSinceLastTick > secondsPerTick)
+            {
+                foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
+                {
+                    loadedChunk.Value.Tick(this, elapsedMillisecondsSinceLastTick);
+                }
+                elapsedMillisecondsSinceLastTick = 0;
+            }
+
+            foreach(BlockState toRemoveBlock in toRemoveBlocks)
+            {
+                AddBlockToWorld(toRemoveBlock.position, Blocks.Air.GetNewDefaultState());
+            }
+            toRemoveBlocks.Clear();
+        }
+
         public Vector2 GetChunkPosition(float worldX, float worldZ)
         {
             return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
+        }
+
+        public void DeleteBlockAt(Vector3 intPosition)
+        {
+            toRemoveBlocks.Add(GetBlockAt(intPosition));
         }
 
         public bool AddBlockToWorld(Vector3 intPosition, BlockState blockstate)
@@ -77,7 +105,7 @@ namespace Minecraft
             }
 
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
-            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air || oldState.block == newBlockState.block)
+            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air)
             {
                 return false;
             }
@@ -86,7 +114,7 @@ namespace Minecraft
             int localZ = worldZ & 15;
 
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
-            newBlockState.block.OnAdded(newBlockState, game);
+            newBlockState.block.OnAdded(newBlockState, this);
             OnBlockPlacedHandler?.Invoke(this, chunk, oldState, newBlockState);
 
             //Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());

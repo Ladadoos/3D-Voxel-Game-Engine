@@ -1,9 +1,11 @@
 ﻿using OpenTK;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
     class Chunk
     {
+        private Dictionary<Vector3, BlockState> tickableBlocks = new Dictionary<Vector3, BlockState>();
         public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX;
         public int gridZ;
@@ -12,6 +14,14 @@ namespace Minecraft
         {
             this.gridX = gridX;
             this.gridZ = gridZ;
+        }
+
+        public void Tick(World world, float deltaTime)
+        {
+            foreach(BlockState state in tickableBlocks.Values)
+            {
+                state.block.OnTick(state, world, deltaTime);
+            }
         }
 
         public void AddBlock(int localX, int worldY, int localZ, BlockState blockstate)
@@ -34,11 +44,20 @@ namespace Minecraft
             if(blockstate.block == Blocks.Air)
             {
                 sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
+                if(tickableBlocks.TryGetValue(blockstate.position, out BlockState tickable))
+                {
+                    tickableBlocks.Remove(blockstate.position);
+                }
             }
             else
             {
                 blockstate.position = new Vector3(localX + gridX * 16, worldY, localZ + gridZ * 16);
                 sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
+
+                if (blockstate.block.isTickable)
+                {
+                    tickableBlocks.Add(blockstate.position, blockstate);
+                }               
             }         
         }
     }

@@ -91,16 +91,16 @@ namespace Minecraft
                 {
                     if(selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                     {
-                        game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.Clone());
+                        game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
                     }
                 } else
                 {
                     BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
-                    if(!state.block.OnInteract(state, game))
+                    if(!state.block.OnInteract(state, game.world))
                     {
                         if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                         {
-                            game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.Clone());
+                            game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
                         }
                     }
                 }
@@ -116,7 +116,7 @@ namespace Minecraft
             {
                 if (mouseOverObject != null)
                 {
-                    game.world.AddBlockToWorld(mouseOverObject.blockstateHit.position, Blocks.Air.GetNewDefaultState());
+                    game.world.DeleteBlockAt(mouseOverObject.blockstateHit.position);
                 }
             }
 
