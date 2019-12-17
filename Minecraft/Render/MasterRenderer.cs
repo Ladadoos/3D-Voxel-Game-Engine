@@ -22,15 +22,8 @@ namespace Minecraft
         private ScreenQuad screenQuad;
 
         private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
-        private HashSet<ChunkLayer> toRemeshChunks = new HashSet<ChunkLayer>();
-        private OpaqueMeshGenerator staticBlocksMeshGenerator;
-        private FaunaMeshGenerator faunaMeshGenerator;
-
-        struct ChunkLayer
-        {
-            public Chunk chunk;
-            public BlockMaterial layer;
-        }
+        private HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
+        private OpaqueMeshGenerator blocksMeshGenerator;
 
         public MasterRenderer(Game game)
         {
@@ -40,8 +33,7 @@ namespace Minecraft
             int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
-            staticBlocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
-            faunaMeshGenerator = new FaunaMeshGenerator(blockModelRegistry);
+            blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
@@ -56,13 +48,10 @@ namespace Minecraft
 
         public void Render(World world)
         {
-            EnableDepthTest();
+            GL.Enable(EnableCap.DepthTest);
             screenQuad.fbo.BindFBO();
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            bool[] renderFlags = new bool[toRenderChunks.Count];
-            int i = 0;
 
             basicShader.Start();
             basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
@@ -71,8 +60,7 @@ namespace Minecraft
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                 Vector3 max = min + new Vector3(16, 256, 16);
-                renderFlags[i++] = playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max));
-                if (!renderFlags[i - 1])
+                if (!playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
                 {
                     continue;
                 }
@@ -80,20 +68,6 @@ namespace Minecraft
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
             }
-
-            i = 0;
-            DisableCulling();
-            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
-            {
-                if (!renderFlags[i++])
-                {
-                    continue;
-                }
-                chunkToRender.Value.faunaBlocksModel.Bind();
-                basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
-                GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.faunaBlocksModel.indicesCount);
-            }
-            EnableCulling();
 
             playerBlockRenderer.RenderSelection();
             screenQuad.fbo.UnbindFBO();
@@ -108,25 +82,17 @@ namespace Minecraft
         {
             var start = DateTime.Now;
 
-            foreach (ChunkLayer chunkLayer in toRemeshChunks)
+            foreach (Chunk chunk in toRemeshChunks)
             {
-                Vector2 gridPosition = new Vector2(chunkLayer.chunk.gridX, chunkLayer.chunk.gridZ);
+                Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
 
                 if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
                 {
-                    renderChunk = new RenderChunk(chunkLayer.chunk.gridX, chunkLayer.chunk.gridZ);
+                    renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
                     toRenderChunks.Add(gridPosition, renderChunk);
                 }
 
-                if (faunaMeshGenerator.ShouldProcessLayer(chunkLayer.layer))
-                {
-                    //System.Console.WriteLine("Reconstructing fauna for chunk " + gridPosition);
-                    renderChunk.faunaBlocksModel = faunaMeshGenerator.GenerateMeshFor(world, chunkLayer.chunk);
-                } else if (staticBlocksMeshGenerator.ShouldProcessLayer(chunkLayer.layer))
-                {
-                    //System.Console.WriteLine("Reconstructing static blocks for chunk " + gridPosition);
-                    renderChunk.hardBlocksModel = staticBlocksMeshGenerator.GenerateMeshFor(world, chunkLayer.chunk);
-                }
+                renderChunk.hardBlocksModel = blocksMeshGenerator.GenerateMeshFor(world, chunk);
             }
 
             var now2 = DateTime.Now - start;
@@ -141,46 +107,38 @@ namespace Minecraft
 
         public void OnChunkLoaded(Chunk chunk)
         {
-            MeshChunk(new ChunkLayer { chunk = chunk, layer = BlockMaterial.Opaque });
-            MeshChunk(new ChunkLayer { chunk = chunk, layer = BlockMaterial.Fauna });
+            MeshChunk(chunk);
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState)
         {
-            if ((oldState.block.material == BlockMaterial.Fauna && newState.block.material == BlockMaterial.Air)
-                || (newState.block.material == BlockMaterial.Fauna))
-            {
-                MeshChunk(new ChunkLayer { chunk = chunk, layer = BlockMaterial.Fauna });
-            } else
-            {
-                int localX = (int)newState.position.X & 15;
-                int localZ = (int)newState.position.Z & 15;
-                MeshChunk(new ChunkLayer { chunk = chunk, layer = BlockMaterial.Opaque });
+            int localX = (int)newState.position.X & 15;
+            int localZ = (int)newState.position.Z & 15;
+            MeshChunk(chunk);
 
-                if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
-                {
-                    MeshChunk(new ChunkLayer { chunk = cXNeg, layer = BlockMaterial.Opaque });
-                }
-                if (localX == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
-                {
-                    MeshChunk(new ChunkLayer { chunk = cXPos, layer = BlockMaterial.Opaque });
-                }
-                if (localZ == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
-                {
-                    MeshChunk(new ChunkLayer { chunk = cZNeg, layer = BlockMaterial.Opaque });
-                }
-                if (localZ == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
-                {
-                    MeshChunk(new ChunkLayer { chunk = cZPos, layer = BlockMaterial.Opaque });
-                }
+            if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
+            {
+                MeshChunk(cXNeg);
+            }
+            if (localX == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
+            {
+                MeshChunk(cXPos);
+            }
+            if (localZ == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
+            {
+                MeshChunk(cZNeg);
+            }
+            if (localZ == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
+            {
+                MeshChunk(cZPos);
             }
         }
 
-        private void MeshChunk(ChunkLayer chunkLayer)
+        private void MeshChunk(Chunk chunk)
         {
-            if (!toRemeshChunks.Contains(chunkLayer))
+            if (!toRemeshChunks.Contains(chunk))
             {
-                toRemeshChunks.Add(chunkLayer);
+                toRemeshChunks.Add(chunk);
             }
         }
 

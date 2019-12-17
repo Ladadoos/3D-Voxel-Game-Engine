@@ -15,7 +15,6 @@ namespace Minecraft
         protected int indicesCount;
 
         protected BlockModelRegistry blockModelRegistry;
-        protected BlockMaterial materialToProcess;
 
         public MeshGenerator(BlockModelRegistry blockModelRegistry)
         {
@@ -37,20 +36,10 @@ namespace Minecraft
             return chunkModel;
         }
 
-        public bool ShouldProcessLayer(BlockMaterial material)
-        {
-            return material == materialToProcess;
-        }
-
         protected abstract Model GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMesh(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
         {
-            if(toAddFaces.Length <= 0)
-            {
-                return;
-            }
-
             foreach (BlockFace face in toAddFaces)
             {
                 foreach (float uv in face.textureCoords)
@@ -72,6 +61,45 @@ namespace Minecraft
                 illumations.Add(illumination);
                 illumations.Add(illumination);
             }
+        }
+
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        {
+            foreach (BlockFace face in toAddFaces)
+            {
+                for (int i = 0; i < face.textureCoords.Length; i += 4)
+                {
+                    textureUVs.Add(face.textureCoords[i + 2]);
+                    textureUVs.Add(face.textureCoords[i + 3]);
+                    textureUVs.Add(face.textureCoords[i]);
+                    textureUVs.Add(face.textureCoords[i + 1]);
+                }
+
+                for (int i = 0; i < face.positions.Length; i += 2)
+                {
+                    Vector3 world = face.positions[i + 1] + new Vector3(sourceState.ChunkLocalPosition());
+                    vertexPositions.Add(world.X);
+                    vertexPositions.Add(world.Y);
+                    vertexPositions.Add(world.Z);
+
+                    world = face.positions[i] + new Vector3(sourceState.ChunkLocalPosition());
+                    vertexPositions.Add(world.X);
+                    vertexPositions.Add(world.Y);
+                    vertexPositions.Add(world.Z);
+                }
+
+                indicesCount += 4;
+                illumations.Add(illumination);
+                illumations.Add(illumination);
+                illumations.Add(illumination);
+                illumations.Add(illumination);
+            }
+        }
+
+        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        {
+            AddFacesToMeshFromFront(toAddFaces, sourceState, illumination);
+            AddFacesToMeshFromBack(toAddFaces, sourceState, illumination);
         }
     }
 }

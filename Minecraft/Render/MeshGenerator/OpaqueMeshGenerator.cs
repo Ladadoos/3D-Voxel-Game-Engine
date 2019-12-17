@@ -12,7 +12,7 @@ namespace Minecraft
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {
-            materialToProcess = BlockMaterial.Opaque;
+            
         }
 
         protected override Model GenerateMesh(World world, Chunk chunk)
@@ -37,7 +37,7 @@ namespace Minecraft
                         for (int y = 0; y < Constants.SECTION_HEIGHT; y++)
                         {
                             BlockState state = section.blocks[x, y, z];
-                            if (state == null || !ShouldProcessLayer(state.block.material))
+                            if (state == null)
                             {
                                 continue;
                             }
@@ -47,8 +47,15 @@ namespace Minecraft
                                 throw new System.Exception("Could not find model for: " + state.block.GetType());
                             }
 
+                            if(blockModel is ScissorModel)
+                            {
+                                BlockFace[] cullFaces = blockModel.GetAlwaysVisibleFaces(state);
+                                AddFacesToMeshDualSided(cullFaces, state, 1);
+                                continue;
+                            }
+
                             BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
-                            AddFacesToMesh(faces, state, 1);
+                            AddFacesToMeshFromFront(faces, state, 1);
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, x, y, z))
                             {
@@ -85,7 +92,7 @@ namespace Minecraft
         private void BuildMeshForSide(Direction blockSide, BlockState state, BlockModel model, float lightValue)
         {
             BlockFace[] faces = model.GetPartialVisibleFaces(blockSide, state);
-            AddFacesToMesh(faces, state, lightValue);
+            AddFacesToMeshFromFront(faces, state, lightValue);
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)

@@ -4,8 +4,7 @@ namespace Minecraft
 {
     class RenderChunk
     {
-        public Model hardBlocksModel;// { get; private set; }
-        public Model faunaBlocksModel;// { get; private set; }
+        public Model hardBlocksModel;
         public Matrix4 transformationMatrix { get; private set; }
         public Vector2 gridPosition { get; private set; }
 
@@ -20,11 +19,6 @@ namespace Minecraft
             if(hardBlocksModel != null)
             {
                 hardBlocksModel.OnCloseGame();
-            }
-
-            if(faunaBlocksModel != null)
-            {
-                faunaBlocksModel.OnCloseGame();
             }
         }
     }
