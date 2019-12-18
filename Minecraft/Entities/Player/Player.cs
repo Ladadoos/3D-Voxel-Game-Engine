@@ -10,7 +10,7 @@ namespace Minecraft
     {
         private bool isFlying = true;
         private bool isInCreativeMode = true;
-        private bool doCollisionDetection = false;
+        private bool doCollisionDetection = true;
         private bool isInAir = true;
         private bool isCrouching = false;
         private bool isRunning = false;
@@ -270,19 +270,8 @@ namespace Minecraft
                 return;
             }
 
-            if (!HasPlayerSurpassedTerminalVelocity())
-            {
-                verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
-                MovePlayerVertically(verticalSpeed);
-            } else
-            {
-                verticalSpeed = Constants.GRAVITY_THRESHOLD;
-            }
-        }
-
-        private bool HasPlayerSurpassedTerminalVelocity()
-        {
-            return verticalSpeed < Constants.GRAVITY_THRESHOLD;
+            verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
+            MovePlayerVertically(verticalSpeed);
         }
 
         private void DoXAxisCollisionDetection(List<BlockState> blocks)

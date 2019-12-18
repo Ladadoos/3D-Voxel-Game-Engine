@@ -19,7 +19,6 @@
          */
 
         public const float GRAVITY = -7.25F;
-        public const float GRAVITY_THRESHOLD = -12.5F;
 
         /*
          * Player
