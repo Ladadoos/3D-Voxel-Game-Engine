@@ -27,7 +27,7 @@ namespace Minecraft
                 tcpClient = new TcpClient(host, port);
             }catch(Exception e)
             {
-                Console.WriteLine(e);
+                Logger.Error(e.ToString());
                 return false;
             }
 
@@ -36,7 +36,7 @@ namespace Minecraft
             writer = new BinaryWriter(netStream);
             bufferedStream = new NetBufferedStream(new BufferedStream(netStream));
             isConnected = true;
-            Console.WriteLine("Connected to server");
+            Logger.Info("Connected to server IP: " + host + " Port: " + port);
             return true;
         }
 
@@ -56,7 +56,7 @@ namespace Minecraft
             while (netStream.DataAvailable)
             {
                 Packet packet = packetFactory.ReadPacket(reader);
-                Console.WriteLine("Received packet [" + packet.ToString() + "]");
+                Logger.Info("Client received packet "+  packet.ToString());
                 packet.Execute(game);
             }
         }

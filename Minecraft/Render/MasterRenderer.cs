@@ -98,7 +98,7 @@ namespace Minecraft
             var now2 = DateTime.Now - start;
             if (!firstPass)
             {
-                Console.WriteLine("Generating init meshes took: " + now2 + " s");
+                Logger.Info("Generating initial meshes took: " + now2);
             }
 
             toRemeshChunks.Clear();

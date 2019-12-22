@@ -30,6 +30,7 @@ namespace Minecraft
 
         public void GenerateTestMap()
         {
+            Logger.Info("Starting initial chunk generation.");
             var start = DateTime.Now;
             for (int x = 0; x < 2; x++)
             {
@@ -40,7 +41,7 @@ namespace Minecraft
                 }
             }
             var now2 = DateTime.Now - start;
-            Console.WriteLine("Generating init chunks took: " + now2 + " s");
+            Logger.Info("Finished generation initial chunks. Took " + now2);
         }
 
         public void LoadChunk(Chunk chunk)
@@ -51,9 +52,8 @@ namespace Minecraft
                 OnChunkLoadedHandler?.Invoke(chunk);
             } else
             {
-                Console.WriteLine("already had chunk " + new Vector2(chunk.gridX, chunk.gridZ));
+                throw new Exception("Already had chunk data for " + new Vector2(chunk.gridX, chunk.gridZ));
             }
-
         }
 
         public void Tick(float deltaTime)
@@ -97,14 +97,14 @@ namespace Minecraft
 
             if (IsOutsideBuildHeight(worldY))
             {
-                Console.WriteLine("Block outside of building height");
+                Logger.Warn("Tried to place block outside of building height.");
                 return false;
             }
 
             Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
             if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
-                Console.WriteLine("Tried to add block in junk that doesnt exist");
+                Logger.Warn("Tried to place block in chunk that is not loaded.");
                 return false;
             }
 
@@ -117,7 +117,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
             if (oldState.GetBlock() != Blocks.Air)
             {
-                Console.WriteLine("Tried to add block where there was already one.");
+                Logger.Warn("Tried to place block where there was already one.");
                 return false;
             }
 

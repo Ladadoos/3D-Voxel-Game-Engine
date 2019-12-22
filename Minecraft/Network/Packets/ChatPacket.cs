@@ -18,7 +18,7 @@ namespace Minecraft
 
         public override void Execute(Game game)
         {
-            Console.WriteLine(message);
+            Logger.Info("Received message: " + message);
         }
     }
 }

@@ -12,7 +12,7 @@
         public override bool OnInteract(BlockState blockstate, World world)
         {
             BlockStateStone state = (BlockStateStone)blockstate;
-            System.Console.WriteLine("Interacted with stone at " + state.position);
+            Logger.Info("Interacted with stone at " + state.position);
             return true;
         }
     }

@@ -100,12 +100,11 @@ namespace Minecraft
             GL.ShaderSource(shaderID, source);
             GL.CompileShader(shaderID);
 
-            int success;
-            GL.GetShader(shaderID, ShaderParameter.CompileStatus, out success);
+            GL.GetShader(shaderID, ShaderParameter.CompileStatus, out int success);
             if (success == 0)
             {
-                Logger.Log("Could not compile shader: " + file, LogType.WARNING);
-                Logger.Log(GL.GetShaderInfoLog(shaderID), LogType.WARNING);
+                Logger.Error("Could not compile shader: " + file);
+                Logger.Error(GL.GetShaderInfoLog(shaderID));
             }
 
             return shaderID;

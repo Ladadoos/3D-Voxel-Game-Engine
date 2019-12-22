@@ -51,12 +51,12 @@ namespace Minecraft
         {
             tcpServer = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             tcpServer.Start();
-            Console.WriteLine("Started listening for connections.");
+            Logger.Info("Started listening for connections on " + GetType());
             run = true;
             while (run)
             {
                 TcpClient client = tcpServer.AcceptTcpClient();
-                Console.WriteLine("Server accepted client.");
+                Logger.Info("Server accepted new client.");
                 NetworkStream stream = client.GetStream();
                 Connection connection = new Connection
                 {
@@ -73,7 +73,7 @@ namespace Minecraft
                 Broadcast(null, new ChatPacket("New player joined!"));
                 if(!(this is IntegratedServer))
                 {
-                    Console.WriteLine("Sending chunk data.");
+                    Logger.Info("Writing chunk data to stream.");
                     foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
                     {
                         new ChunkDataPacket(kv.Value).WriteToStream(connection.bufferedStream);
@@ -82,7 +82,7 @@ namespace Minecraft
                 }
             }
 
-            Console.WriteLine("Closing server.");
+            Logger.Warn("Server is closing down. Closing connections to all clients.");
             lock (clientsLock)
             {
                 foreach (Connection conn in clients)
@@ -92,7 +92,7 @@ namespace Minecraft
                 }
             }
             tcpServer.Stop();
-            Console.WriteLine("Server closed.");
+            Logger.Info("Server closed.");
         }
 
         public void Update(Game game)
@@ -101,7 +101,7 @@ namespace Minecraft
             if (Console.KeyAvailable)
             {
                 string input = Console.ReadLine();
-                Console.WriteLine(input);
+                Broadcast(null, new ChatPacket(input));
             }
 
             lock (clientsLock)
@@ -114,7 +114,7 @@ namespace Minecraft
                     }
 
                     Packet packet = packetFactory.ReadPacket(conn.reader);
-                    Console.WriteLine("Received packet [" + packet.ToString() + "]");
+                    Logger.Info("Server received packet " + packet.ToString());
                     packet.Execute(game);
                 }
             }
@@ -124,7 +124,7 @@ namespace Minecraft
         {
             lock (clientsLock)
             {
-                Console.WriteLine("Broadcasting packet [" + packet.GetType() + "]");
+                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
                 foreach (Connection client in clients)
                 {
                     packet.WriteToStream(client.bufferedStream);

@@ -4,25 +4,45 @@ namespace Minecraft
 {
     class Logger
     {
-        public static void Log(string message, LogType type)
+        private static LogLevel logLevel = LogLevel.Info;
+
+        public static void SetLogLevel(LogLevel logLevel)
         {
-            switch (type)
+            Logger.logLevel = logLevel;
+        }
+
+        private static void Print(string message, LogLevel level)
+        {
+            Console.WriteLine(string.Format("[{0:HH:mm:ss}][" + level.ToString() + "] " + message, DateTime.Now));
+        }
+
+        public static void Info(string message)
+        {
+            if(logLevel >= LogLevel.Info)
             {
-                case LogType.INFORMATION:
-                    Console.WriteLine("[INFO] " + message);
-                    break;
-                case LogType.WARNING:
-                    Console.WriteLine("[WARN] " + message);
-                    break;
-                default:
-                    Console.WriteLine(message);
-                    break;
+                Print(message, LogLevel.Info);
+            }
+        }
+
+        public static void Warn(string message)
+        {
+            if (logLevel >= LogLevel.Warn)
+            {
+                Print(message, LogLevel.Warn);
+            }
+        }
+
+        public static void Error(string message)
+        {
+            if (logLevel >= LogLevel.Error)
+            {
+                Print(message, LogLevel.Error);
             }
         }
     }
 
-    public enum LogType
+    public enum LogLevel
     {
-        INFORMATION, WARNING
+        Info, Warn, Error
     };
 }

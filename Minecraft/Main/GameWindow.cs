@@ -14,7 +14,7 @@ namespace Minecraft
 
         public GameWindow(RunMode mode) : base(720, 480, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
         {
-            Logger.Log("OpenGL version: " + GL.GetString(StringName.Version), LogType.INFORMATION);
+            Logger.Info("OpenGL version: " + GL.GetString(StringName.Version));
             game = new Game(mode);
 
             if(mode == RunMode.Server)

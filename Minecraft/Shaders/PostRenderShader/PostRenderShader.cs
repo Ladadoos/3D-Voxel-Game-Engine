@@ -15,8 +15,7 @@
         protected override void GetAllUniformLocations()
         {
             location_colorTexture = GetUniformLocation("colorTexture");
-            location_normalDepthTexture = GetUniformLocation("depthNormalTexture");
-            System.Console.WriteLine(location_normalDepthTexture + " / " + location_colorTexture);
+            location_normalDepthTexture = GetUniformLocation("depthNormalTexture");   
         }
 
         protected override void BindAttributes()
