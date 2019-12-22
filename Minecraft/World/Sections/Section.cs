@@ -1,4 +1,6 @@
-﻿namespace Minecraft
+﻿using System.Collections.Generic;
+
+namespace Minecraft
 {
     class Section
     {  
@@ -19,6 +21,31 @@
         public void RemoveBlock(int localX, int localY, int localZ)
         {
             blocks[localX, localY, localZ] = null;
+        }
+
+        public void ToStream(NetBufferedStream bufferedStream)
+        {
+            List<BlockState> states = new List<BlockState>();
+            for(int x = 0; x < 16; x++)
+            {
+                for (int y = 0; y < 16; y++)
+                {
+                    for (int z = 0; z < 16; z++)
+                    {
+                        //NULL = AIR check
+                        if(blocks[x, y, z] != null)
+                        {
+                            states.Add(blocks[x, y, z]);
+                        }
+                    }
+                }
+            }
+
+            bufferedStream.WriteInt32(states.Count);
+            foreach(BlockState state in states)
+            {
+                state.ToStream(bufferedStream);
+            }
         }
     }
 }

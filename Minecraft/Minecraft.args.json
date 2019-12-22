@@ -1,0 +1,18 @@
+{
+  "FileVersion": 2,
+  "Id": "4c081d35-2b24-4a62-84dc-d0f6a871ef9a",
+  "Items": [
+    {
+      "Id": "15abc285-84cd-4187-beb8-89a25edde98d",
+      "Command": "clientserver"
+    },
+    {
+      "Id": "9253c811-d782-4b4c-b8d0-87457c65f3b9",
+      "Command": "server"
+    },
+    {
+      "Id": "eec7f234-8144-48e3-abc4-dde1ab085c4c",
+      "Command": "client"
+    }
+  ]
+}

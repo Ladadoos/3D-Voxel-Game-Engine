@@ -1,4 +1,5 @@
 ﻿using System;
+using OpenTK.Graphics.OpenGL;
 
 namespace Minecraft
 {
@@ -11,25 +12,67 @@ namespace Minecraft
 
         public MasterRenderer masterRenderer { get; private set; }
         public Player player { get; private set; }
-        public World world { get; private set; }
         public FPSCounter fpsCounter { get; private set; }
+        public Client client { get; private set; }
+        public World world { get; private set; }
+        public Server localServer { get; private set; }
+        public RunMode mode { get; private set; }
+
+        public Game(RunMode mode)
+        {
+            this.mode = mode;
+        }
 
         public void OnStartGame(GameWindow window)
         {
             this.window = window;
+            mode = mode;
 
+            Blocks.RegisterBlocks();
             randomizer = new Random();
             input = new Input();
-            player = new Player(this);
             fpsCounter = new FPSCounter();
-            masterRenderer = new MasterRenderer(this);          
-            world = new World(this);
-            world.GenerateTestMap(masterRenderer);
+
+            if (mode == RunMode.ClientServer)
+            {
+                player = new Player(this);
+                masterRenderer = new MasterRenderer(this);
+
+                localServer = new IntegratedServer();
+                localServer.Start(this, "127.0.0.1", 50000);
+
+                client = new Client();
+                client.ConnectWith("127.0.0.1", 50000);
+
+                world = localServer.GetLocalWorld();
+            } else if(mode == RunMode.Server)
+            {
+                localServer = new Server();
+                localServer.Start(this, "127.0.0.1", 50000);
+
+                world = localServer.GetLocalWorld();
+
+                window.VSync = OpenTK.VSyncMode.On;
+            } else{
+                player = new Player(this);
+                masterRenderer = new MasterRenderer(this);
+
+                world = new ClientWorld(this);
+
+                client = new Client();
+                client.ConnectWith("127.0.0.1", 50000);
+            }
         }
 
         public void OnCloseGame()
         {
-            masterRenderer.OnCloseGame();
+            if (mode == RunMode.ClientServer)
+            {
+                masterRenderer.OnCloseGame();
+            } else
+            {
+
+            }
         }
 
         public void OnUpdateGame(double elapsedSeconds)
@@ -37,22 +80,53 @@ namespace Minecraft
             fpsCounter.IncrementFrameCounter();
             fpsCounter.AddElapsedTime(elapsedSeconds);
 
-            input.Update();
-            player.Update((float)elapsedSeconds);
+            if (mode == RunMode.ClientServer)
+            {
+                localServer?.Update(this);
+                client?.Update(this);
 
-            world.Tick((float)elapsedSeconds);
+                input.Update();
+                player.Update((float)elapsedSeconds);
 
-            masterRenderer.EndFrameUpdate(world);
+                world.Tick((float)elapsedSeconds);
+
+                masterRenderer.EndFrameUpdate(world);
+            } else if(mode == RunMode.Client)
+            {
+                client?.Update(this);
+
+                input.Update();
+                player.Update((float)elapsedSeconds);
+
+                world.Tick((float)elapsedSeconds);
+
+                masterRenderer.EndFrameUpdate(world);
+            } else
+            {
+                localServer.Update(this);
+            }
         }
 
         public void OnRenderGame()
         {
-            masterRenderer.Render(world);
+            if (mode != RunMode.Server)
+            {
+                masterRenderer.Render(world);
+            } else
+            {
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            }
         }
 
         public void OnWindowResize(int newWidth, int newHeight)
         {
-            player.camera.SetWindowSize(newWidth, newHeight);
+            if (mode != RunMode.Server)
+            {
+                player.camera.SetWindowSize(newWidth, newHeight);
+            } else
+            {
+
+            }
         }
     }
 }

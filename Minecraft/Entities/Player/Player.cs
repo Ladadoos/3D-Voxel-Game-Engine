@@ -35,7 +35,8 @@ namespace Minecraft
         {
             this.game = game;
             camera = new Camera(game.window, new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
-            position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
+            //position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
+            position = new Vector3(0, 120, 0);
             hitbox = new AABB(position, GetPlayerMaxAABB());
 
             jumpStopWatch.Start();
@@ -85,25 +86,32 @@ namespace Minecraft
             cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
             camera.SetPosition(cameraPosition);
 
-            if (Game.input.OnMousePress(MouseButton.Right) && mouseOverObject != null)
+            if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused/* && mouseOverObject != null*/)
             {
-                if (isCrouching)
-                {
-                    if(selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
-                    {
-                        game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
-                    }
-                } else
+                //if (isCrouching)
+                //{
+                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                    newBlock.position = position + new Vector3(0, 10, 0);
+                    game.client.SendPacket(new PlaceBlockPacket(newBlock));
+
+                    //if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    //{
+                        /*BlockState newBlock = selectedBlock.block.GetNewDefaultState();
+                        newBlock.position = mouseOverObject.blockPlacePosition;
+                        game.client.SendPacket(new PlaceBlockPacket(newBlock));*/
+                        //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
+                    //}
+                /*} else
                 {
                     BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
                     if(!state.block.OnInteract(state, game.world))
                     {
                         if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                         {
-                            game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
+                            //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
                         }
                     }
-                }
+                }*/
             }
             if (Game.input.OnMousePress(MouseButton.Middle))
             {
@@ -116,7 +124,7 @@ namespace Minecraft
             {
                 if (mouseOverObject != null)
                 {
-                    game.world.DeleteBlockAt(mouseOverObject.blockstateHit.position);
+                    //game.world.DeleteBlockAt(mouseOverObject.blockstateHit.position);
                 }
             }
 
@@ -278,7 +286,7 @@ namespace Minecraft
         {
             foreach (BlockState collidable in blocks)
             {
-                foreach (AABB aabb in collidable.block.GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -304,7 +312,7 @@ namespace Minecraft
             bool collidedY = false;
             foreach (BlockState collidable in blocks)
             {
-                foreach (AABB aabb in collidable.block.GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -332,7 +340,7 @@ namespace Minecraft
         {
             foreach (BlockState collidable in blocks)
             {
-                foreach(AABB aabb in collidable.block.GetCollisionBox(collidable))
+                foreach(AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -405,7 +413,7 @@ namespace Minecraft
                     for (int zz = intZ - 1; zz <= intZ + 1; zz++)
                     {
                         BlockState blockstate = game.world.GetBlockAt(xx, yy, zz);
-                        if (blockstate.block != Blocks.Air)
+                        if (blockstate.GetBlock() != Blocks.Air)
                         {
                             collidables.Add(blockstate);
                         }

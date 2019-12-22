@@ -12,10 +12,16 @@ namespace Minecraft
     {
         private Game game;
 
-        public GameWindow() : base(1920, 1080, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
+        public GameWindow(RunMode mode) : base(720, 480, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
         {
             Logger.Log("OpenGL version: " + GL.GetString(StringName.Version), LogType.INFORMATION);
-            game = new Game();
+            game = new Game(mode);
+
+            if(mode == RunMode.Server)
+            {
+                Width = 10;
+                Height = 10;
+            }
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -36,7 +42,7 @@ namespace Minecraft
         protected override void OnLoad(EventArgs e)
         {
             CursorVisible = true;
-            VSync = VSyncMode.Off;
+            VSync = VSyncMode.On;
 
             game.OnStartGame(this);
         }
@@ -48,13 +54,18 @@ namespace Minecraft
                 Exit();
             }
 
-            Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
-            Title = "Vsync: " + VSync +
-                    " FPS: " + (int)(1f / e.Time) +
-                    " AVG FPS: " + game.fpsCounter.GetAverageFPS() +
-                    " Position: " + game.player.position +
-                    " Grid Pos: " + chunkPos +
-                    " Velocity: " + game.player.velocity;
+            if(game.mode != RunMode.Server)
+            {
+                Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
+                Title = "Focused:" + Focused + 
+                        "Vsync: " + VSync +
+                        " FPS: " + (int)(1f / e.Time) +
+                        " AVG FPS: " + game.fpsCounter.GetAverageFPS() +
+                        " Position: " + game.player.position +
+                        " Grid Pos: " + chunkPos +
+                        " Velocity: " + game.player.velocity;
+            }
+
 
             game.OnUpdateGame(e.Time);
         }

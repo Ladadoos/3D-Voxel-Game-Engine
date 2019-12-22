@@ -1,51 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenTK;
 
 namespace Minecraft
 {
-    class World
+    abstract class World
     {
         public static int SeaLevel = 95;
 
-        private WorldGenerator worldGenerator;
+        protected WorldGenerator worldGenerator;
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
-        private Game game;
+        protected Game game;
 
-        private float secondsPerTick = 0.02F;
-        private float elapsedMillisecondsSinceLastTick;
-        private List<BlockState> toRemoveBlocks = new List<BlockState>();
+        protected float secondsPerTick = 0.02F;
+        protected float elapsedMillisecondsSinceLastTick;
+        protected List<BlockState> toRemoveBlocks = new List<BlockState>();
 
-        private delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
-        private event OnBlockPlaced OnBlockPlacedHandler;
+        public delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
+        public event OnBlockPlaced OnBlockPlacedHandler;
 
-        private delegate void OnChunkLoaded(Chunk chunk);
-        private event OnChunkLoaded OnChunkLoadedHandler;
+        public delegate void OnChunkLoaded(Chunk chunk);
+        public event OnChunkLoaded OnChunkLoadedHandler;
 
         public World(Game game)
         {
             this.game = game;
             worldGenerator = new WorldGenerator();
-
-            OnBlockPlacedHandler += game.masterRenderer.OnBlockPlaced;
-            OnChunkLoadedHandler += game.masterRenderer.OnChunkLoaded;
         }
 
-        public void GenerateTestMap(MasterRenderer renderer)
+        public void GenerateTestMap()
         {
             var start = DateTime.Now;
-            for (int x = 0; x < 8; x++)
+            for (int x = 0; x < 2; x++)
             {
-                for (int y = 0; y < 8; y++)
+                for (int y = 0; y < 2; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
-                   loadedChunks.Add(new Vector2(x, y), chunk);
-                   OnChunkLoadedHandler?.Invoke(chunk);
+                   LoadChunk(chunk);
                 }
             }
             var now2 = DateTime.Now - start;
             Console.WriteLine("Generating init chunks took: " + now2 + " s");
+        }
+
+        public void LoadChunk(Chunk chunk)
+        {
+            if(!loadedChunks.ContainsKey(new Vector2(chunk.gridX, chunk.gridZ)))
+            {
+                loadedChunks.Add(new Vector2(chunk.gridX, chunk.gridZ), chunk);
+                OnChunkLoadedHandler?.Invoke(chunk);
+            } else
+            {
+                Console.WriteLine("already had chunk " + new Vector2(chunk.gridX, chunk.gridZ));
+            }
+
         }
 
         public void Tick(float deltaTime)
@@ -84,10 +92,12 @@ namespace Minecraft
 
         public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState newBlockState)
         {
+            //Dont like this whole setting position part like this....
             newBlockState.position = new Vector3(worldX, worldY, worldZ);
 
             if (IsOutsideBuildHeight(worldY))
             {
+                Console.WriteLine("Block outside of building height");
                 return false;
             }
 
@@ -98,15 +108,16 @@ namespace Minecraft
                 return false;
             }
 
-            if(newBlockState.block.GetCollisionBox(newBlockState).Any(aabb => game.player.hitbox.Intersects(aabb)))
+            /*if(newBlockState.block.GetCollisionBox(newBlockState).Any(aabb => game.player.hitbox.Intersects(aabb)))
             {
                 Console.WriteLine("Block tried to placed was in player");
                 return false;
-            }
+            }*/
 
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
-            if (newBlockState.block != Blocks.Air && oldState.block != Blocks.Air)
+            if (oldState.GetBlock() != Blocks.Air)
             {
+                Console.WriteLine("Tried to add block where there was already one.");
                 return false;
             }
 
@@ -114,7 +125,7 @@ namespace Minecraft
             int localZ = worldZ & 15;
 
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
-            newBlockState.block.OnAdded(newBlockState, this);
+            newBlockState.GetBlock().OnAdded(newBlockState, this);
             OnBlockPlacedHandler?.Invoke(this, chunk, oldState, newBlockState);
 
             //Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());

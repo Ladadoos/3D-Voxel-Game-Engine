@@ -27,7 +27,7 @@ namespace Minecraft
             {
                 position += offset;
                 targetBlock = world.GetBlockAt(position);
-                if (targetBlock.block != Blocks.Air)
+                if (targetBlock.GetBlock() != Blocks.Air)
                 {
                     break;
                 }

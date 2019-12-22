@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using OpenTK;
+﻿using OpenTK;
 
 namespace Minecraft
 {
@@ -42,9 +41,9 @@ namespace Minecraft
                                 continue;
                             }
 
-                            if (!blockModelRegistry.models.TryGetValue(state.block, out BlockModel blockModel))
+                            if (!blockModelRegistry.models.TryGetValue(state.GetBlock(), out BlockModel blockModel))
                             {
-                                throw new System.Exception("Could not find model for: " + state.block.GetType());
+                                throw new System.Exception("Could not find model for: " + state.GetBlock().GetType());
                             }
 
                             if(blockModel is ScissorModel)
@@ -110,7 +109,7 @@ namespace Minecraft
                 if (blockWest == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockWest.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockWest.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Right);
             } else
             {
@@ -118,7 +117,7 @@ namespace Minecraft
                 if (blockWest == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockWest.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockWest.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Right);
             }
             return false;
@@ -139,7 +138,7 @@ namespace Minecraft
                 if (blockEast == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockEast.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockEast.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Left);
             } else
             {
@@ -147,7 +146,7 @@ namespace Minecraft
                 if (blockEast == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockEast.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockEast.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Left);
             }
             return false;
@@ -168,7 +167,7 @@ namespace Minecraft
                 if (blockNorth == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockNorth.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockNorth.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Back);
             } else
             {
@@ -176,7 +175,7 @@ namespace Minecraft
                 if (blockNorth == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockNorth.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockNorth.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Back);
             }
             return false;
@@ -197,7 +196,7 @@ namespace Minecraft
                 if (blockSouth == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockSouth.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockSouth.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Front);
             } else
             {
@@ -205,7 +204,7 @@ namespace Minecraft
                 if (blockSouth == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockSouth.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockSouth.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Front);
             }
             return false;
@@ -226,7 +225,7 @@ namespace Minecraft
                 if (blockAbove == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockAbove.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockAbove.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Bottom);
             } else
             {
@@ -234,7 +233,7 @@ namespace Minecraft
                 if (blockAbove == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockAbove.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockAbove.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Bottom);
             }
             return false;
@@ -255,7 +254,7 @@ namespace Minecraft
                 if (blockBottom == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockBottom.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockBottom.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Top);
             } else
             {
@@ -263,7 +262,7 @@ namespace Minecraft
                 if (blockBottom == null)
                     return true;
 
-                if (blockModelRegistry.models.TryGetValue(blockBottom.block, out BlockModel blockModel))
+                if (blockModelRegistry.models.TryGetValue(blockBottom.GetBlock(), out BlockModel blockModel))
                     return !blockModel.IsOpaqueOnSide(Direction.Top);
             }
             return false;

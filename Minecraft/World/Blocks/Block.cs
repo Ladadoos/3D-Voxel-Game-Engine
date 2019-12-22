@@ -5,8 +5,14 @@ namespace Minecraft
 {
     abstract class Block
     {
+        public int id { get; private set; }
         protected readonly AABB[] emptyAABB = new AABB[0];
         public bool isTickable { get; protected set; }
+
+        public Block(int id)
+        {
+            this.id = id;
+        }
 
         public abstract BlockState GetNewDefaultState();
 
@@ -38,6 +44,8 @@ namespace Minecraft
 
     class BlockAir : Block
     {
+        public BlockAir(int id) : base(id) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateAir();
@@ -51,6 +59,8 @@ namespace Minecraft
 
     class BlockDirt : Block
     {
+        public BlockDirt(int id) : base(id) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateDirt();
@@ -59,6 +69,8 @@ namespace Minecraft
 
     class BlockStone : Block
     {
+        public BlockStone(int id) : base(id) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateStone();
@@ -74,6 +86,8 @@ namespace Minecraft
 
     class BlockFlower : Block
     {
+        public BlockFlower(int id) : base(id) { }
+
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateFlower();
@@ -86,13 +100,13 @@ namespace Minecraft
 
         public override bool CanAddBlockAt(World world, Vector3 intPosition)
         {
-            return world.GetBlockAt(intPosition + new Vector3(0, -1, 0)).block == Blocks.Dirt;
+            return world.GetBlockAt(intPosition + new Vector3(0, -1, 0)).GetBlock() == Blocks.Dirt;
         }
     }
 
     class BlockTNT : Block
     {
-        public BlockTNT()
+        public BlockTNT(int id) : base(id)
         {
             isTickable = true;
         }
@@ -155,7 +169,7 @@ namespace Minecraft
             foreach (BlockState state in explosives)
             {
                 ((BlockStateTNT)state).triggeredByTnt = true;
-                state.block.OnInteract(state, world);
+                state.GetBlock().OnInteract(state, world);
             }
         }
     }

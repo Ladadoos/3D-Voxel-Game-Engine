@@ -4,8 +4,6 @@ namespace Minecraft
 {
     abstract class BlockState
     {
-        public Block block { get; protected set; }
-
         //Position is automatically set by the world once the block is placed.
         public Vector3 position;
 
@@ -13,37 +11,47 @@ namespace Minecraft
         {
             return new Vector3((int)position.X & 15, position.Y, (int)position.Z & 15);
         }
+
+        public virtual void ToStream(NetBufferedStream bufferedStream)
+        {
+            bufferedStream.WriteInt32(GetBlock().id);
+            bufferedStream.WriteFloat(position.X);
+            bufferedStream.WriteFloat(position.Y);
+            bufferedStream.WriteFloat(position.Z);
+        }
+
+        public abstract Block GetBlock();
     }
 
     class BlockStateDirt : BlockState
     {
-        public BlockStateDirt() : base()
+        public override Block GetBlock()
         {
-            block = Blocks.Dirt;
+            return Blocks.Dirt;
         }
     }
 
     class BlockStateAir : BlockState
     {
-        public BlockStateAir() : base()
+        public override Block GetBlock()
         {
-            block = Blocks.Air;
+            return Blocks.Air;
         }
     }
 
     class BlockStateStone : BlockState
     {
-        public BlockStateStone() : base()
+        public override Block GetBlock()
         {
-            block = Blocks.Stone;
+            return Blocks.Stone;
         }
     }
 
     class BlockStateFlower : BlockState
     {
-        public BlockStateFlower() : base()
+        public override Block GetBlock()
         {
-            block = Blocks.Flower;
+            return Blocks.Flower;
         }
     }
 
@@ -53,9 +61,9 @@ namespace Minecraft
         public bool triggeredByTnt;
         public bool triggered;
 
-        public BlockStateTNT() : base()
+        public override Block GetBlock()
         {
-            block = Blocks.Tnt;
+            return Blocks.Tnt;
         }
     }
 }

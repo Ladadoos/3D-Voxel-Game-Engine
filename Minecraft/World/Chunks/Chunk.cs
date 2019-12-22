@@ -16,11 +16,32 @@ namespace Minecraft
             this.gridZ = gridZ;
         }
 
+        public void ToStream(NetBufferedStream bufferedStream)
+        {
+            bufferedStream.WriteInt32(gridX);
+            bufferedStream.WriteInt32(gridZ);
+
+            List<Section> validSections = new List<Section>();
+            foreach (Section section in sections)
+            {
+                if (section != null)
+                {
+                    validSections.Add(section);
+                }
+            }
+
+            bufferedStream.WriteInt32(validSections.Count);
+            foreach (Section section in validSections)
+            {
+                section.ToStream(bufferedStream);
+            }
+        }
+
         public void Tick(World world, float deltaTime)
         {
             foreach(BlockState state in tickableBlocks.Values)
             {
-                state.block.OnTick(state, world, deltaTime);
+                state.GetBlock().OnTick(state, world, deltaTime);
             }
         }
 
@@ -41,7 +62,7 @@ namespace Minecraft
             }
 
             int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;
-            if(blockstate.block == Blocks.Air)
+            if(blockstate.GetBlock() == Blocks.Air)
             {
                 sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
                 if(tickableBlocks.TryGetValue(blockstate.position, out BlockState tickable))
@@ -54,7 +75,7 @@ namespace Minecraft
                 blockstate.position = new Vector3(localX + gridX * 16, worldY, localZ + gridZ * 16);
                 sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
 
-                if (blockstate.block.isTickable)
+                if (blockstate.GetBlock().isTickable)
                 {
                     tickableBlocks.Add(blockstate.position, blockstate);
                 }               

@@ -34,7 +34,22 @@ namespace Minecraft
 
         public Chunk GenerateBlocksForChunkAt(int x, int y)
         {
-            Chunk generatedChunk = new Chunk(x, y);
+            Chunk chunk = new Chunk(x, y);
+
+            for (int i = 0; i < Constants.CHUNK_SIZE; i++)
+            {
+                for (int j = 0; j < Constants.CHUNK_SIZE; j++)
+                {
+                    for (int k = 0; k < 100; k++)
+                    {
+                        chunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
+                    }
+                }
+            }
+
+            return chunk;
+
+            /*Chunk generatedChunk = new Chunk(x, y);
 
             double baseXoffset = 0;
             double baseYOffset = 0;
@@ -100,9 +115,7 @@ namespace Minecraft
                 }
                 baseYOffset += basePerlinDetail;
                 biomeYOffset += biomePerlinDetail;
-            }
-
-            return generatedChunk;
+            return generatedChunk;*/
         }
     }
 }
