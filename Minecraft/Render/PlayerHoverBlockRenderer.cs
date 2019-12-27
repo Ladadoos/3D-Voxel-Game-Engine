@@ -5,9 +5,9 @@ namespace Minecraft
     class PlayerHoverBlockRenderer
     {
         private WireframeRenderer wireframeRenderer;
-        private Player player;
+        private ClientPlayer player;
 
-        public PlayerHoverBlockRenderer(WireframeRenderer wireframeRenderer, Player player)
+        public PlayerHoverBlockRenderer(WireframeRenderer wireframeRenderer, ClientPlayer player)
         {
             this.wireframeRenderer = wireframeRenderer;
             this.player = player;

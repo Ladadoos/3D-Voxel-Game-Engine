@@ -5,6 +5,7 @@ namespace Minecraft
 {
     class AABB
     {
+        //change to private
         public Vector3 max;
         public Vector3 min;
 

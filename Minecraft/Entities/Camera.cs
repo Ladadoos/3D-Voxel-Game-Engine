@@ -7,13 +7,11 @@ namespace Minecraft
 {
     class Camera
     {
-        public Vector3 position;// { get; private set; }
-        public Vector3 forward;// { get; private set; }
-        public Vector3 right;// { get; private set; }
-        public float pitch, yaw;
-
-        private Vector2 lastMousePos;
-        private GameWindow window;
+        public Vector3 position { get; private set; }
+        public Vector3 forward { get; private set; }
+        public Vector3 right { get; private set; }
+        public float pitch { get; private set; }
+        public float yaw { get; private set; }
 
         public ViewFrustum viewFrustum { get; private set; }
 
@@ -25,17 +23,14 @@ namespace Minecraft
         public delegate void OnProjectionChanged(ProjectionMatrixInfo info);
         public event OnProjectionChanged OnProjectionChangedHandler;
 
-        public Camera(GameWindow window, ProjectionMatrixInfo projectionInfo)
+        public Camera(ProjectionMatrixInfo projectionInfo)
         {
-            this.window = window;
-
             defaultProjection = projectionInfo.ShallowCopy();
             currentProjection = projectionInfo;
             currentProjectionMatrix = CreateProjectionMatrix();
 
             position = new Vector3();
             forward = new Vector3();
-            lastMousePos = new Vector2();
             viewFrustum = new ViewFrustum(projectionInfo);
         }
 
@@ -82,33 +77,19 @@ namespace Minecraft
             this.position = position;
         }
 
-        public void Update()
+        public void SetYawAndPitch(float pitch, float yaw)
         {
-            UpdatePitchAndYaw();
-            viewFrustum.UpdateFrustumPoints(this);
-            ResetCursorToWindowCenter();
-            currentViewMatrix = CreateViewMatrix();
-        }
-
-        private void UpdatePitchAndYaw()
-        {
-            Vector2 delta = lastMousePos - new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
-
-            delta.X = delta.X * Constants.PLAYER_MOUSE_SENSIVITY;
-            delta.Y = delta.Y * Constants.PLAYER_MOUSE_SENSIVITY;
-
-            pitch = (pitch + delta.X) % ((float)Math.PI * 2.0F);
-            yaw = Math.Max(Math.Min(yaw + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
+            this.pitch = pitch;
+            this.yaw = yaw;
 
             forward = Maths.CreateLookAtVector(yaw, pitch);
             right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, forward));
         }
 
-        private void ResetCursorToWindowCenter()
+        public void Update()
         {
-            Rectangle bounds = window.Bounds;
-            Mouse.SetPosition(bounds.Left + bounds.Width / 2.0D, bounds.Top + bounds.Height / 2.0D);
-            lastMousePos = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+            viewFrustum.UpdateFrustumPoints(this);
+            currentViewMatrix = CreateViewMatrix();
         }
     }
 }

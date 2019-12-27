@@ -1,277 +1,81 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using OpenTK;
-using OpenTK.Input;
 
 namespace Minecraft
 {
-    class Player
+    abstract class Player
     {
-        private bool isFlying = true;
-        private bool isInCreativeMode = true;
-        private bool doCollisionDetection = true;
-        private bool isInAir = true;
-        private bool isCrouching = false;
-        private bool isRunning = false;
+        protected bool isFlying = true;
+        protected bool isInCreativeMode = true;
+        protected bool doCollisionDetection = true;
+        protected bool isInAir = true;
+        protected bool isCrouching = false;
+        protected bool isRunning = false;
+        protected Stopwatch jumpStopWatch = new Stopwatch();
 
-        private Game game;
+        protected Vector3 realForward; //Vector facing towards where the player is looking
+        protected Vector3 moveForward; //Vector facing where the player is looking, ignoring y
+        protected Vector3 right;       //Vector facing to the right of where the player is looking
+        protected Vector3 position;    //Bottom-left of player AABB
+        protected Vector3 velocity;
+        protected float verticalSpeed;
+        protected AABB hitbox;
 
-        public Camera camera;
-        public Vector3 position; //The bottom-left component of the players AABB. 
-        public Vector3 velocity;
-        public float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
+        protected delegate void OnToggleRunning(bool isRunning);
+        protected event OnToggleRunning OnToggleRunningHandler;
 
-        public AABB hitbox;
+        protected delegate void OnToggleCrouching(bool isCrouching);
+        protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        private float verticalSpeed = 0;
-
-        public RayTraceResult mouseOverObject { get; private set; }
-        private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
-
-        private Stopwatch jumpStopWatch = new Stopwatch();
-
-        public Player(Game game)
+        public Player(Vector3 startPosition)
         {
-            this.game = game;
-            camera = new Camera(game.window, new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
-            //position = new Vector3(Constants.CHUNK_SIZE * 8, 148, Constants.CHUNK_SIZE * 8);
-            position = new Vector3(0, 120, 0);
+            position = startPosition;
+            velocity = Vector3.Zero;
             hitbox = new AABB(position, GetPlayerMaxAABB());
-
             jumpStopWatch.Start();
         }
 
-        public void Update(float deltaTime)
+        public Vector3 GetPosition()
         {
-            if (game.window.Focused)
-            {
-                UpdateKeyboardInput();
-            }
-
-            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
-
-            if (!isFlying)
-            {
-                UpdateGravityAppliedOnPlayer(deltaTime);
-            }
-
-            List<BlockState> blocks = GetCollisionDetectionBlockPositions();
-            position.X += velocity.X * deltaTime;
-            CalculateAABBHitbox();
-            if (doCollisionDetection)
-            {
-                DoXAxisCollisionDetection(blocks);
-            }
-
-            position.Y += velocity.Y * deltaTime;
-            CalculateAABBHitbox();
-            if (doCollisionDetection)
-            {
-                DoYAxisCollisionDetection(blocks);
-            }
-
-            position.Z += velocity.Z * deltaTime;
-            CalculateAABBHitbox();
-            if (doCollisionDetection)
-            {
-                DoZAxisCollisionDetection(blocks);
-            }
-
-            velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
-
-            Vector3 cameraPosition = position;
-            cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
-            cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
-            cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
-            camera.SetPosition(cameraPosition);
-
-            if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused/* && mouseOverObject != null*/)
-            {
-                //if (isCrouching)
-                //{
-                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                    newBlock.position = position + new Vector3(0, 10, 0);
-                    game.client.SendPacket(new PlaceBlockPacket(newBlock));
-
-                    //if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
-                    //{
-                        /*BlockState newBlock = selectedBlock.block.GetNewDefaultState();
-                        newBlock.position = mouseOverObject.blockPlacePosition;
-                        game.client.SendPacket(new PlaceBlockPacket(newBlock));*/
-                        //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
-                    //}
-                /*} else
-                {
-                    BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
-                    if(!state.block.OnInteract(state, game.world))
-                    {
-                        if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
-                        {
-                            //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
-                        }
-                    }
-                }*/
-            }
-            if (Game.input.OnMousePress(MouseButton.Middle))
-            {
-                if (mouseOverObject != null)
-                {
-                    selectedBlock = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
-                }
-            }
-            if (Game.input.OnMousePress(MouseButton.Left))
-            {
-                if (mouseOverObject != null)
-                {
-                    //game.world.DeleteBlockAt(mouseOverObject.blockstateHit.position);
-                }
-            }
-
-            if (game.window.Focused)
-            {
-                camera.Update();
-            }
+            return position;
         }
 
-        private void TryStartRunning()
+        public Vector3 GetVelocity()
         {
-            if (!isRunning && (isInCreativeMode || (!isInCreativeMode && !isInAir)))
-            {
-                isRunning = true;
-                camera.SetFieldOfView(1.65F);
-            }
+            return velocity;
         }
 
-        private void TryToggleFlying()
+        public abstract void Update(float deltaTime, World world);
+
+        /// <summary> Returns the max component of the AABB from this player. </summary>
+        protected Vector3 GetPlayerMaxAABB()
         {
-            jumpStopWatch.Stop();
-            float elapsedTime = jumpStopWatch.ElapsedMilliseconds;
-            if(elapsedTime < 300 && isInCreativeMode)
-            {
-                isFlying = !isFlying;
-                verticalSpeed = 0;
-            }
-            jumpStopWatch.Restart();
+            return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
         }
 
-        private void TryStopRunning()
+        protected void CalculatePlayerAABB()
         {
-            if (isRunning)
-            {
-                isRunning = false;
-                camera.SetFieldOfViewToDefault();
-            }
+            hitbox.SetHitbox(position, GetPlayerMaxAABB());
         }
 
-        private void TryStopCrouching()
+        ///<summary> Moves horizontal relative to the direction the player is facing. x is right, z is forward. </summary>
+        protected void MovePlayerHorizontally(float x, float z)
         {
-            if (isCrouching)
-            {
-                isCrouching = false;
-                camera.SetFieldOfViewToDefault();
-            }
+            Vector3 offset = new Vector3();
+            offset += x * right;
+            offset += z * moveForward;
+            velocity += offset;
         }
 
-        private void TryStartCrouching()
+        ///<summary> Moves vertical relative to world up vector. </summary>
+        protected void MovePlayerVertically(float y)
         {
-            if (isRunning)
-            {
-                TryStopRunning();
-            }
-
-            camera.SetFieldOfView(1.45F);
-            isCrouching = true;
+            velocity.Y += y;
         }
 
-        private void UpdateKeyboardInput()
-        {
-            speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
-
-            bool inputToRun = Game.input.OnKeyDown(Key.ControlLeft) || Game.input.OnKeyDown(Key.ControlRight);
-            bool inputToCrouch = Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight);
-            bool inputToMoveLeft = Game.input.OnKeyDown(Key.A);
-            bool inputToMoveBack = Game.input.OnKeyDown(Key.S);
-            bool inputToMoveRight = Game.input.OnKeyDown(Key.D);
-            bool inputToMoveForward = Game.input.OnKeyDown(Key.W);
-            bool inputToJump = Game.input.OnKeyDown(Key.Space);
-            bool inputToFly = Game.input.OnKeyPress(Key.Space);
-
-            //Prioritize crouching over running
-            if (inputToRun && !inputToCrouch)
-            {
-                TryStartRunning();
-            } else if (inputToCrouch)
-            {
-                TryStartCrouching();
-            } else if (!inputToCrouch)
-            {
-                TryStopCrouching();
-            }
-
-            if (!inputToMoveForward || inputToMoveBack)
-            {
-                TryStopRunning();
-            }
-
-            if (isInAir && !isFlying)
-            {
-                speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
-            }
-            if (isFlying)
-            {
-                speedMultiplier *= Constants.PLAYER_FLYING_MULTIPLIER;
-            }
-
-            if (isRunning)
-            {
-                speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
-            } else if (isCrouching)
-            {
-                if (isFlying)
-                {
-                    MovePlayerVertically(-speedMultiplier);
-                } else
-                {
-                    speedMultiplier *= Constants.PLAYER_CROUCH_MULTIPLIER;
-                }
-            }
-
-            if (inputToJump)
-            {
-                if (isFlying)
-                {
-                    MovePlayerVertically(speedMultiplier);
-                } else
-                {
-                    AttemptToJump();
-                }
-            }
-
-            if (inputToFly)
-            {
-                TryToggleFlying();
-            }
-
-            if (inputToMoveForward)
-            {
-                MovePlayerHorizontally(0, speedMultiplier);
-            }
-            if (inputToMoveBack)
-            {
-                MovePlayerHorizontally(0, -speedMultiplier);
-            }
-            if (inputToMoveRight)
-            {
-                MovePlayerHorizontally(speedMultiplier, 0);
-            }
-            if (inputToMoveLeft)
-            {
-                MovePlayerHorizontally(-speedMultiplier, 0);
-            }
-        }
-
-        private void UpdateGravityAppliedOnPlayer(double deltaTime)
+        protected void TryApplyGravity(double deltaTime)
         {
             if (!isInAir)
             {
@@ -280,6 +84,124 @@ namespace Minecraft
 
             verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
             MovePlayerVertically(verticalSpeed);
+        }
+
+        protected void TryStartRunning()
+        {
+            if (!isRunning && (isInCreativeMode || (!isInCreativeMode && !isInAir)))
+            {
+                isRunning = true;
+                OnToggleRunningHandler?.Invoke(isRunning);
+            }
+        }
+
+        protected void TryStopRunning()
+        {
+            if (isRunning)
+            {
+                isRunning = false;
+                OnToggleRunningHandler?.Invoke(isRunning);
+            }
+        }
+
+        protected void TryToggleFlying()
+        {
+            jumpStopWatch.Stop();
+            float elapsedTime = jumpStopWatch.ElapsedMilliseconds;
+            if (elapsedTime < 300 && isInCreativeMode)
+            {
+                isFlying = !isFlying;
+                verticalSpeed = 0;
+            }
+            jumpStopWatch.Restart();
+        }
+
+        protected void TryStopCrouching()
+        {
+            if (isCrouching)
+            {
+                isCrouching = false;
+                OnToggleCrouchingHandler?.Invoke(isCrouching);
+            }
+        }
+
+        protected void TryStartCrouching()
+        {
+            if (isRunning)
+            {
+                TryStopRunning();
+            }
+
+            isCrouching = true;
+            OnToggleCrouchingHandler?.Invoke(isCrouching);
+        }
+
+        protected void AttemptToJump()
+        {
+            if (!isInAir)
+            {
+                verticalSpeed = Constants.PLAYER_JUMP_FORCE;
+                isInAir = true;
+            }
+        }
+
+        protected void ApplyVelocityAndCheckCollision(float deltaTime, World world)
+        {
+            if (!isFlying)
+            {
+                TryApplyGravity(deltaTime);
+            }
+
+            List<BlockState> blocks = GetCollisionDetectionBlocks(world);
+            position.X += velocity.X * deltaTime;
+            CalculatePlayerAABB();
+            if (doCollisionDetection)
+            {
+                DoXAxisCollisionDetection(blocks);
+            }
+
+            position.Y += velocity.Y * deltaTime;
+            CalculatePlayerAABB();
+            if (doCollisionDetection)
+            {
+                DoYAxisCollisionDetection(blocks);
+            }
+
+            position.Z += velocity.Z * deltaTime;
+            CalculatePlayerAABB();
+            if (doCollisionDetection)
+            {
+                DoZAxisCollisionDetection(blocks);
+            }
+
+            velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
+        }
+
+        /// <summary> Returns all blocks around the players position used for collision detection </summary>
+        private List<BlockState> GetCollisionDetectionBlocks(World world)
+        {
+            List<BlockState> collidables = new List<BlockState>();
+
+            int intX = (int)position.X;
+            int intY = (int)position.Y;
+            int intZ = (int)position.Z;
+
+            for (int xx = intX - 1; xx <= intX + 1; xx++)
+            {
+                for (int yy = intY - 1; yy <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); yy++)
+                {
+                    for (int zz = intZ - 1; zz <= intZ + 1; zz++)
+                    {
+                        BlockState blockstate = world.GetBlockAt(xx, yy, zz);
+                        if (blockstate.GetBlock() != Blocks.Air)
+                        {
+                            collidables.Add(blockstate);
+                        }
+                    }
+                }
+            }
+
+            return collidables;
         }
 
         private void DoXAxisCollisionDetection(List<BlockState> blocks)
@@ -340,7 +262,7 @@ namespace Minecraft
         {
             foreach (BlockState collidable in blocks)
             {
-                foreach(AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -359,69 +281,6 @@ namespace Minecraft
                     TryStopRunning();
                 }
             }
-        }
-
-        ///<summary> Moves horizontal relative to the camera. x is right, z is forward. </summary>
-        private void MovePlayerHorizontally(float x, float z)
-        {
-            Vector3 offset = new Vector3();
-            Vector3 forward = new Vector3((float)Math.Sin(camera.pitch), 0, (float)Math.Cos(camera.pitch));
-            Vector3 right = new Vector3(-forward.Z, 0, forward.X);
-            offset += x * right;
-            offset += z * forward;
-            velocity += offset;
-        }
-
-        ///<summary> Moves vertical relative to world up vector. </summary>
-        private void MovePlayerVertically(float y)
-        {
-            velocity.Y += y;
-        }
-
-        private void AttemptToJump()
-        {
-            if (!isInAir)
-            {
-                verticalSpeed = Constants.PLAYER_JUMP_FORCE;
-                isInAir = true;
-            }
-        }
-
-        /// <summary> Returns the max component of the AABB from this player. </summary>
-        private Vector3 GetPlayerMaxAABB()
-        {
-            return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
-        }
-
-        private void CalculateAABBHitbox()
-        {
-            hitbox.SetHitbox(position, GetPlayerMaxAABB());
-        }
-
-        private List<BlockState> GetCollisionDetectionBlockPositions()
-        {
-            List<BlockState> collidables = new List<BlockState>();
-
-            int intX = (int)position.X;
-            int intY = (int)position.Y;
-            int intZ = (int)position.Z;
-
-            for (int xx = intX - 1; xx <= intX + 1; xx++)
-            {
-                for (int yy = intY - 1; yy <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); yy++)
-                {
-                    for (int zz = intZ - 1; zz <= intZ + 1; zz++)
-                    {
-                        BlockState blockstate = game.world.GetBlockAt(xx, yy, zz);
-                        if (blockstate.GetBlock() != Blocks.Air)
-                        {
-                            collidables.Add(blockstate);
-                        }
-                    }
-                }
-            }
-
-            return collidables;
         }
     }
 }

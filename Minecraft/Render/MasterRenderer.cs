@@ -13,7 +13,7 @@ namespace Minecraft
         private float colorClearB = 1.0F;
 
         private ShaderBasic basicShader;
-        private Camera playerCamera;
+        private CameraController cameraController;
         private WireframeRenderer wireframeRenderer;
         private PlayerHoverBlockRenderer playerBlockRenderer;
         private TextureAtlas textureAtlas;
@@ -27,7 +27,9 @@ namespace Minecraft
 
         public MasterRenderer(Game game)
         {
-            playerCamera = game.player.camera;
+            basicShader = new ShaderBasic();
+            cameraController = new CameraController(game.window);
+            SetActiveCamera(game.player.camera);
 
             textureLoader = new TextureLoader();
             int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack.png");
@@ -37,13 +39,20 @@ namespace Minecraft
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
-
-            basicShader = new ShaderBasic();
-            UploadProjectionMatrix();
-            playerCamera.OnProjectionChangedHandler += OnPlayerCameraProjectionChanged;
-
+          
             EnableDepthTest();
             EnableCulling();
+        }
+
+        public void SetActiveCamera(Camera camera)
+        {
+            if(cameraController.camera != null)
+            {
+                cameraController.camera.OnProjectionChangedHandler -= OnPlayerCameraProjectionChanged;
+            }
+            camera.OnProjectionChangedHandler += OnPlayerCameraProjectionChanged;
+            cameraController.ControlCamera(camera);
+            UploadProjectionMatrix();
         }
 
         public void Render(World world)
@@ -55,12 +64,12 @@ namespace Minecraft
 
             basicShader.Start();
             basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            basicShader.LoadMatrix(basicShader.location_ViewMatrix, playerCamera.currentViewMatrix);
+            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                 Vector3 max = min + new Vector3(16, 256, 16);
-                if (!playerCamera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
+                if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
                 {
                     continue;
                 }
@@ -74,7 +83,6 @@ namespace Minecraft
             GL.Disable(EnableCap.DepthTest);
             screenQuad.RenderToScreen();
         }
-
 
         private bool firstPass = false;
 
@@ -103,6 +111,8 @@ namespace Minecraft
 
             toRemeshChunks.Clear();
             firstPass = true;
+
+            cameraController.Update();
         }
 
         public void OnChunkLoaded(Chunk chunk)
@@ -150,7 +160,7 @@ namespace Minecraft
         private void UploadProjectionMatrix()
         {
             basicShader.Start();
-            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, playerCamera.currentProjectionMatrix);
+            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
             basicShader.Stop();
         }
 

@@ -11,7 +11,7 @@ namespace Minecraft
         public static Random randomizer { get; private set; }
 
         public MasterRenderer masterRenderer { get; private set; }
-        public Player player { get; private set; }
+        public ClientPlayer player { get; private set; }
         public FPSCounter fpsCounter { get; private set; }
         public Client client { get; private set; }
         public World world { get; private set; }
@@ -26,7 +26,6 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.window = window;
-            mode = mode;
 
             Blocks.RegisterBlocks();
             randomizer = new Random();
@@ -35,7 +34,7 @@ namespace Minecraft
 
             if (mode == RunMode.ClientServer)
             {
-                player = new Player(this);
+                player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
                 localServer = new IntegratedServer();
@@ -54,7 +53,7 @@ namespace Minecraft
 
                 window.VSync = OpenTK.VSyncMode.On;
             } else{
-                player = new Player(this);
+                player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
                 world = new ClientWorld(this);
@@ -86,7 +85,7 @@ namespace Minecraft
                 client?.Update(this);
 
                 input.Update();
-                player.Update((float)elapsedSeconds);
+                player.Update((float)elapsedSeconds, world);
 
                 world.Tick((float)elapsedSeconds);
 
@@ -96,7 +95,7 @@ namespace Minecraft
                 client?.Update(this);
 
                 input.Update();
-                player.Update((float)elapsedSeconds);
+                player.Update((float)elapsedSeconds, world);
 
                 world.Tick((float)elapsedSeconds);
 
