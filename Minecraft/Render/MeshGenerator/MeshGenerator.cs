@@ -8,6 +8,7 @@ namespace Minecraft
         protected List<float> vertexPositions = new List<float>();
         protected List<float> textureUVs = new List<float>();
         protected List<float> illumations = new List<float>();
+        protected List<float> normals = new List<float>();
         protected int indicesCount;
 
         protected BlockModelRegistry blockModelRegistry;
@@ -22,6 +23,7 @@ namespace Minecraft
             vertexPositions.Clear();
             textureUVs.Clear();
             illumations.Clear();
+            normals.Clear();
             indicesCount = 0;
         }
 
@@ -56,6 +58,13 @@ namespace Minecraft
                 illumations.Add(illumination);
                 illumations.Add(illumination);
                 illumations.Add(illumination);
+
+                for(int i = 0; i < 4; i++)
+                {
+                    normals.Add(face.normal.X);
+                    normals.Add(face.normal.Y);
+                    normals.Add(face.normal.Z);
+                }
             }
         }
 
@@ -89,6 +98,13 @@ namespace Minecraft
                 illumations.Add(illumination);
                 illumations.Add(illumination);
                 illumations.Add(illumination);
+
+                for (int i = 0; i < 4; i++)
+                {
+                    normals.Add(face.normal.X);
+                    normals.Add(face.normal.Y);
+                    normals.Add(face.normal.Z);
+                }
             }
         }
 

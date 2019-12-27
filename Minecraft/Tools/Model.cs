@@ -12,12 +12,7 @@ namespace Minecraft
 
         public List<int> buffers = new List<int>();
 
-        public Model(float[] positions, float[] textureCoordinates, float[] lights, int indicesCount)
-        {
-            CreateData(positions, textureCoordinates, lights, indicesCount);
-        }
-
-        private void CreateData(float[] positions, float[] textureCoordinates, float[] lights, int indicesCount)
+        public Model(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {
             this.indicesCount = indicesCount;
 
@@ -25,6 +20,7 @@ namespace Minecraft
             Bind();
 
             CreateVBO(3, positions);
+            CreateVBO(3, normals);
             CreateVBO(2, textureCoordinates);
             CreateVBO(1, lights);
             //CreateIBO(indices);

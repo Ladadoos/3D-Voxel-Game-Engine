@@ -25,7 +25,10 @@
 
         protected override void BindAttributes()
         {
-            
+            BindAttribute(0, "vertexPosition");
+            BindAttribute(1, "vertexNormal");
+            BindAttribute(2, "vertexUv");
+            BindAttribute(3, "vertexIllumination");
         }
     }
 }

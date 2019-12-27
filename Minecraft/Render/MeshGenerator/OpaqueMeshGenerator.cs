@@ -85,7 +85,7 @@ namespace Minecraft
                 }
             }
 
-            return new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), indicesCount);        
+            return new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), normals.ToArray(), indicesCount);        
         }
 
         private void BuildMeshForSide(Direction blockSide, BlockState state, BlockModel model, float lightValue)

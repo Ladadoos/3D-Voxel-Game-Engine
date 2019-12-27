@@ -5,6 +5,7 @@ layout (location = 1) out vec4 normalDepthColor;
 in vec2 uv;
 in float illumination;
 in vec3 position;
+in vec3 normal;
 
 uniform sampler2D textureAtlas;
 
@@ -15,6 +16,6 @@ void main()
    {
 		discard;
    }
-   fragmentColor = albedo / illumination;  
+   fragmentColor = (albedo / illumination) + vec4(normal, 0);  
    normalDepthColor = vec4(1, 0, 0, 1);
 }
