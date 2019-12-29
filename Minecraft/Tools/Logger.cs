@@ -18,7 +18,7 @@ namespace Minecraft
 
         public static void Info(string message)
         {
-            if(logLevel >= LogLevel.Info)
+            if(LogLevel.Info >= logLevel)
             {
                 Print(message, LogLevel.Info);
             }
@@ -26,7 +26,7 @@ namespace Minecraft
 
         public static void Warn(string message)
         {
-            if (logLevel >= LogLevel.Warn)
+            if (LogLevel.Warn >= logLevel)
             {
                 Print(message, LogLevel.Warn);
             }
@@ -34,7 +34,7 @@ namespace Minecraft
 
         public static void Error(string message)
         {
-            if (logLevel >= LogLevel.Error)
+            if (LogLevel.Error >= logLevel)
             {
                 Print(message, LogLevel.Error);
             }
