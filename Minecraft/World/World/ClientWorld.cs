@@ -1,11 +1,20 @@
 ﻿namespace Minecraft
 {
-    class ClientWorld : World
+    class ClientWorldHook : IEventHook
     {
-        public ClientWorld(Game game) : base(game)
+        private Game game;
+
+        public ClientWorldHook(Game game)
         {
-            OnBlockPlacedHandler += game.masterRenderer.OnBlockPlaced;
-            OnChunkLoadedHandler += game.masterRenderer.OnChunkLoaded;
+            this.game = game;
+        }
+
+        public void AddEventHooksFor(IEventAnnouncer obj)
+        {
+            World world = (World)obj;
+            world.OnBlockPlacedHandler += game.masterRenderer.OnBlockPlaced;
+            world.OnChunkLoadedHandler += game.masterRenderer.OnChunkLoaded;
+            world.OnBlockRemovedHandler += game.masterRenderer.OnBlockRemoved;
         }
     }
 }

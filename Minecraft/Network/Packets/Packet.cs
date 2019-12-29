@@ -15,7 +15,7 @@
             ToStream(bufferedStream);
         }
 
-        public abstract void Execute(Game game);
+        public abstract void Process(INetHandler netHandler);
 
         protected abstract void ToStream(NetBufferedStream bufferedStream);
     }

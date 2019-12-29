@@ -7,6 +7,6 @@
     <StartArguments>server local</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>clientserver server client</StartArguments>
+    <StartArguments>clientserver</StartArguments>
   </PropertyGroup>
 </Project>

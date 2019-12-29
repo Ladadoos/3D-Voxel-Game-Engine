@@ -2,16 +2,16 @@
 {
     class ChunkDataPacket : Packet
     {
-        private Chunk chunk;
+        public Chunk chunk { get; private set; }
 
-        public ChunkDataPacket(Chunk chunk) : base(PacketType.ChunkLoaded)
+        public ChunkDataPacket(Chunk chunk) : base(PacketType.ChunkLoad)
         {     
             this.chunk = chunk;
         }
 
-        public override void Execute(Game game)
+        public override void Process(INetHandler netHandler)
         {
-            game.world.LoadChunk(chunk);
+            netHandler.ProcessChunkDataPacket(this);
         }
 
         protected override void ToStream(NetBufferedStream bufferedStream)

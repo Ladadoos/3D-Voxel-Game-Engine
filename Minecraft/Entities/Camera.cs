@@ -1,7 +1,4 @@
 ﻿using OpenTK;
-using OpenTK.Input;
-using System;
-using System.Drawing;
 
 namespace Minecraft
 {

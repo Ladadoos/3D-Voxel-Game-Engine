@@ -33,7 +33,7 @@ namespace Minecraft
 
         public override bool OnInteract(BlockState blockstate, World world)
         {
-            ((BlockStateTNT)blockstate).triggered = true;
+            //((BlockStateTNT)blockstate).triggered = true;
             return true;
         }
 
@@ -59,7 +59,7 @@ namespace Minecraft
                             explosives.Add(state);
                         } else
                         {
-                            world.DeleteBlockAt(target);
+                            world.QueueToRemoveBlockAt(target);
                         }
                     }
                 }

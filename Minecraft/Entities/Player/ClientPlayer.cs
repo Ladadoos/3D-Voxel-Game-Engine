@@ -10,7 +10,11 @@ namespace Minecraft
 
         public Camera camera;
         public RayTraceResult mouseOverObject { get; private set; }
+
         private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
+
+        private float secondsPerPosUpdate = 1F;
+        private float elapsedMsSinceLastPosUpdate;
 
         public ClientPlayer(Game game) : base(new Vector3(0, 100, 0))
         {
@@ -65,51 +69,47 @@ namespace Minecraft
             cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
             camera.SetPosition(cameraPosition);
 
-            if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused/* && mouseOverObject != null*/)
+            if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused && mouseOverObject != null)
             {
-                //if (isCrouching)
-                //{
-                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                    newBlock.position = position + new Vector3(0, 10, 0);
-                    game.client.SendPacket(new PlaceBlockPacket(newBlock));
-
-                    //if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
-                    //{
-                        /*BlockState newBlock = selectedBlock.block.GetNewDefaultState();
+                if (isCrouching)
+                {
+                    if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    {
+                        BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
                         newBlock.position = mouseOverObject.blockPlacePosition;
-                        game.client.SendPacket(new PlaceBlockPacket(newBlock));*/
-                        //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
-                    //}
-                /*} else
+                        game.client.SendPacket(new PlaceBlockPacket(newBlock));
+                    }
+                } else
                 {
                     BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
-                    if(!state.block.OnInteract(state, game.world))
+                    if(!state.GetBlock().OnInteract(state, game.world))
                     {
-                        if (selectedBlock.block.CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                        if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                         {
-                            //game.world.AddBlockToWorld(mouseOverObject.blockPlacePosition, selectedBlock.block.GetNewDefaultState());
+                            game.client.SendPacket(new PlaceBlockPacket(state));
                         }
                     }
-                }*/
-            }
-            if (Game.input.OnMousePress(MouseButton.Middle))
-            {
-                if (mouseOverObject != null)
-                {
-                    selectedBlock = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
                 }
             }
-            if (Game.input.OnMousePress(MouseButton.Left))
+            if (Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
-                if (mouseOverObject != null)
-                {
-                    //game.world.DeleteBlockAt(mouseOverObject.blockstateHit.position);
-                }
+                selectedBlock = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
+            }
+            if (Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
+            {
+                game.client.SendPacket(new RemoveBlockPacket(mouseOverObject.blockstateHit.position));
             }
 
             realForward = camera.forward;
             moveForward = new Vector3((float)Math.Sin(camera.pitch), 0, (float)Math.Cos(camera.pitch));
             right = camera.right;
+
+            elapsedMsSinceLastPosUpdate += deltaTime;
+            if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
+            {
+                elapsedMsSinceLastPosUpdate = 0;
+                //game.client.SendPacket(new PlayerDataPacket(position, id));
+            }
         }
 
         private void UpdateKeyboardInput()

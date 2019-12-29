@@ -122,8 +122,26 @@ namespace Minecraft
 
         public void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState)
         {
-            int localX = (int)newState.position.X & 15;
-            int localZ = (int)newState.position.Z & 15;
+            MeshChunkAndSurroundings(world, chunk, newState);
+        }
+
+        public void OnBlockRemoved(World world, Chunk chunk, BlockState oldState)
+        {
+            MeshChunkAndSurroundings(world, chunk, oldState);
+        }
+
+        private void MeshChunk(Chunk chunk)
+        {
+            if (!toRemeshChunks.Contains(chunk))
+            {
+                toRemeshChunks.Add(chunk);
+            }
+        }
+
+        private void MeshChunkAndSurroundings(World world, Chunk chunk, BlockState state)
+        {
+            int localX = (int)state.position.X & 15;
+            int localZ = (int)state.position.Z & 15;
             MeshChunk(chunk);
 
             if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
@@ -141,14 +159,6 @@ namespace Minecraft
             if (localZ == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
             {
                 MeshChunk(cZPos);
-            }
-        }
-
-        private void MeshChunk(Chunk chunk)
-        {
-            if (!toRemeshChunks.Contains(chunk))
-            {
-                toRemeshChunks.Add(chunk);
             }
         }
 

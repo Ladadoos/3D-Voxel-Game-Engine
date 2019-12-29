@@ -2,16 +2,16 @@
 {
     class PlaceBlockPacket : Packet
     {
-        private BlockState state;
+        public BlockState state { get; private set; }
 
-        public PlaceBlockPacket(BlockState state) : base(PacketType.BlockPlaced)
+        public PlaceBlockPacket(BlockState state) : base(PacketType.PlaceBlock)
         {
             this.state = state;
         }
 
-        public override void Execute(Game game)
+        public override void Process(INetHandler netHandler)
         {
-            game.world.AddBlockToWorld(state.position, state);
+            netHandler.ProcessPlaceBlockPacket(this);
         }
 
         protected override void ToStream(NetBufferedStream bufferedStream)

@@ -4,7 +4,7 @@ using OpenTK;
 
 namespace Minecraft
 {
-    abstract class World
+    class World : IEventAnnouncer
     {
         public static int SeaLevel = 95;
 
@@ -12,12 +12,15 @@ namespace Minecraft
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
         protected Game game;
 
-        protected float secondsPerTick = 0.02F;
+        protected float secondsPerTick = 0.05F;
         protected float elapsedMillisecondsSinceLastTick;
         protected List<BlockState> toRemoveBlocks = new List<BlockState>();
 
         public delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
+
+        public delegate void OnBlockRemoved(World world, Chunk chunk, BlockState oldState);
+        public event OnBlockRemoved OnBlockRemovedHandler;
 
         public delegate void OnChunkLoaded(Chunk chunk);
         public event OnChunkLoaded OnChunkLoadedHandler;
@@ -26,6 +29,11 @@ namespace Minecraft
         {
             this.game = game;
             worldGenerator = new WorldGenerator();
+        }
+
+        public void AddEventHooks(IEventHook hook)
+        {
+            hook.AddEventHooksFor(this);
         }
 
         public void GenerateTestMap()
@@ -46,13 +54,14 @@ namespace Minecraft
 
         public void LoadChunk(Chunk chunk)
         {
-            if(!loadedChunks.ContainsKey(new Vector2(chunk.gridX, chunk.gridZ)))
+            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            if (!loadedChunks.ContainsKey(chunkPos))
             {
-                loadedChunks.Add(new Vector2(chunk.gridX, chunk.gridZ), chunk);
+                loadedChunks.Add(chunkPos, chunk);
                 OnChunkLoadedHandler?.Invoke(chunk);
             } else
             {
-                throw new Exception("Already had chunk data for " + new Vector2(chunk.gridX, chunk.gridZ));
+                //throw new Exception("Already had chunk data for " + chunkPos);
             }
         }
 
@@ -70,7 +79,7 @@ namespace Minecraft
 
             foreach(BlockState toRemoveBlock in toRemoveBlocks)
             {
-                AddBlockToWorld(toRemoveBlock.position, Blocks.Air.GetNewDefaultState());
+                RemoveBlockAt(toRemoveBlock.position);
             }
             toRemoveBlocks.Clear();
         }
@@ -80,9 +89,46 @@ namespace Minecraft
             return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
         }
 
-        public void DeleteBlockAt(Vector3 intPosition)
+        public void QueueToRemoveBlockAt(Vector3 intPosition)
         {
             toRemoveBlocks.Add(GetBlockAt(intPosition));
+        }
+
+        private bool RemoveBlockAt(Vector3 intPosition)
+        {
+            int worldX = (int)intPosition.X;
+            int worldY = (int)intPosition.Y;
+            int worldZ = (int)intPosition.Z;
+
+            if (IsOutsideBuildHeight(worldY))
+            {
+                Logger.Warn("Tried to remove block outside of building height.");
+                return false;
+            }
+
+            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            {
+                Logger.Warn("Tried to remove block in chunk that is not loaded.");
+                return false;
+            }
+
+            BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
+            if (oldState.GetBlock() == Blocks.Air)
+            {
+                Logger.Warn("Tried to remove block where there was none.");
+                return false;
+            }
+
+            int localX = worldX & 15;
+            int localZ = worldZ & 15;
+
+            BlockState air = Blocks.Air.GetNewDefaultState();
+            air.position = intPosition;
+            chunk.AddBlock(localX, worldY, localZ, air);
+            air.GetBlock().OnAdded(air, this);
+            OnBlockRemovedHandler?.Invoke(this, chunk, oldState);
+            return true;
         }
 
         public bool AddBlockToWorld(Vector3 intPosition, BlockState blockstate)
@@ -92,6 +138,12 @@ namespace Minecraft
 
         public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState newBlockState)
         {
+            if(newBlockState.GetBlock() == Blocks.Air)
+            {
+                Logger.Warn("Tried to place air.");
+                return false;
+            }
+
             //Dont like this whole setting position part like this....
             newBlockState.position = new Vector3(worldX, worldY, worldZ);
 

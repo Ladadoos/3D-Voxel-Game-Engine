@@ -11,12 +11,14 @@ namespace Minecraft
         public static Random randomizer { get; private set; }
 
         public MasterRenderer masterRenderer { get; private set; }
-        public ClientPlayer player { get; private set; }
+        public ClientPlayer player;// { get; private set; }
         public FPSCounter fpsCounter { get; private set; }
         public Client client { get; private set; }
         public World world { get; private set; }
         public Server localServer { get; private set; }
         public RunMode mode { get; private set; }
+        public bool isReadyToPlay = false;
+        private bool initialized = false;
 
         public Game(RunMode mode)
         {
@@ -37,30 +39,36 @@ namespace Minecraft
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                localServer = new IntegratedServer();
+                localServer = new Server();
                 localServer.Start(this, "127.0.0.1", 50000);
+                localServer.AddHook(new ClientWorldHook(this));
+                //localServer.AddHook(new ServerWorldHook(this));
+                localServer.GenerateMap();
 
-                client = new Client();
+                client = new Client(this);
                 client.ConnectWith("127.0.0.1", 50000);
 
-                world = localServer.GetLocalWorld();
+                world = localServer.GetWorldInstance();
             } else if(mode == RunMode.Server)
             {
                 localServer = new Server();
                 localServer.Start(this, "127.0.0.1", 50000);
+                localServer.AddHook(new ServerWorldHook(this));
+                localServer.GenerateMap();
 
-                world = localServer.GetLocalWorld();
+                world = localServer.GetWorldInstance();
 
                 window.VSync = OpenTK.VSyncMode.On;
             } else{
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                world = new ClientWorld(this);
+                world = new World(this);
+                world.AddEventHooks(new ClientWorldHook(this));
 
-                client = new Client();
+                client = new Client(this);
                 client.ConnectWith("127.0.0.1", 50000);
-            }
+            }          
         }
 
         public void OnCloseGame()
@@ -102,6 +110,8 @@ namespace Minecraft
                 masterRenderer.EndFrameUpdate(world);
             } else
             {
+                world.Tick((float)elapsedSeconds);
+
                 localServer.Update(this);
             }
         }

@@ -8,19 +8,17 @@ namespace Minecraft
     {
         public Packet ReadPacket(BinaryReader reader)
         {
-            PacketType type = (PacketType)reader.ReadInt32();
+            int packetType = reader.ReadInt32();
+            PacketType type = (PacketType)packetType;
 
             switch (type)
             {
                 case PacketType.Chat:
                     {
-                        int byteCount = reader.ReadInt32();
-                        byte[] messageBytes = reader.ReadBytes(byteCount);
-                        DataConverter converter = new DataConverter();
-                        string message = converter.BytesToUtf8String(messageBytes);
+                        string message = ReadUtf8String(reader);
                         return new ChatPacket(message);
                     }
-                case PacketType.BlockPlaced:
+                case PacketType.PlaceBlock:
                     {
                         int blockId = reader.ReadInt32();
                         Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -28,7 +26,12 @@ namespace Minecraft
                         state.position = position;
                         return new PlaceBlockPacket(state);
                     }
-                case PacketType.ChunkLoaded:
+                case PacketType.RemoveBlock:
+                    {
+                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        return new RemoveBlockPacket(position);
+                    }
+                case PacketType.ChunkLoad:
                     {
                         int gridX = reader.ReadInt32();
                         int gridY = reader.ReadInt32();
@@ -49,8 +52,33 @@ namespace Minecraft
                         }
                         return new ChunkDataPacket(chunk);
                     }
-                default: throw new Exception("Invalid packet type.");
+                /*case PacketType.EntityPosition:
+                    {
+                        int entityId = reader.ReadInt32();
+                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        return new PlayerDataPacket(position, entityId);
+                    }
+                case PacketType.PlayerJoinRequest:
+                    {
+                        string playerName = ReadUtf8String(reader);
+                        return new PlayerJoinRequestPacket(playerName);
+                    }
+                case PacketType.PlayerJoinAccept:
+                    {
+                        int playerId = reader.ReadInt32();
+                        string playerName = ReadUtf8String(reader);
+                        return new PlayerJoinAcceptPacket(playerName, playerId);
+                    }*/
+                default: throw new Exception("Invalid packet type: " + packetType);
             }
+        }
+
+        private string ReadUtf8String(BinaryReader reader)
+        {
+            DataConverter dataConverter = new DataConverter();
+            int byteCount = reader.ReadInt32();
+            byte[] messageBytes = reader.ReadBytes(byteCount);
+            return dataConverter.BytesToUtf8String(messageBytes);
         }
     }
 }

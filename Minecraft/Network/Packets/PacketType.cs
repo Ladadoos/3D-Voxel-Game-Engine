@@ -3,7 +3,11 @@
     enum PacketType
     {
         Chat,
-        BlockPlaced,
-        ChunkLoaded
+        PlaceBlock,
+        RemoveBlock,
+        ChunkLoad,
+        EntityPosition,
+        PlayerJoinRequest,
+        PlayerJoinAccept
     }
 }

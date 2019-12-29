@@ -11,17 +11,20 @@ namespace Minecraft
         private string host;
         private int port;
         private bool isConnected;
-        private TcpClient tcpClient;
-        private NetworkStream netStream;
-        private BinaryReader reader;
-        private BinaryWriter writer;
-        private NetBufferedStream bufferedStream;
+        private Connection serverConnection;
+        private Game game;
+
+        public Client(Game game)
+        {
+            this.game = game;
+        }
 
         public bool ConnectWith(string host, int port)
         {
             this.host = host;
             this.port = port;
 
+            TcpClient tcpClient = null;
             try
             {
                 tcpClient = new TcpClient(host, port);
@@ -31,20 +34,28 @@ namespace Minecraft
                 return false;
             }
 
-            netStream = tcpClient.GetStream();
-            reader = new BinaryReader(netStream);
-            writer = new BinaryWriter(netStream);
-            bufferedStream = new NetBufferedStream(new BufferedStream(netStream));
+            NetworkStream netStream = tcpClient.GetStream();
+            serverConnection = new Connection()
+            {
+                client = tcpClient,
+                netStream = netStream,
+                reader = new BinaryReader(netStream),
+                writer = new BinaryWriter(netStream),
+                bufferedStream = new NetBufferedStream(new BufferedStream(netStream))
+            };
+            ClientNetHandler netHandler = new ClientNetHandler(game, serverConnection);
+            serverConnection.netHandler = netHandler;
+
             isConnected = true;
             Logger.Info("Connected to server IP: " + host + " Port: " + port);
+            //SendPacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
             return true;
         }
 
         public void Stop()
         {
             isConnected = false;
-            netStream.Close();
-            tcpClient.Close();
+            serverConnection.Close();
         }
 
         public void Update(Game game)
@@ -53,18 +64,18 @@ namespace Minecraft
             {
                 return;
             }
-            while (netStream.DataAvailable)
+
+            while (serverConnection.netStream.DataAvailable)
             {
-                Packet packet = packetFactory.ReadPacket(reader);
+                Packet packet = packetFactory.ReadPacket(serverConnection.reader);
                 Logger.Info("Client received packet "+  packet.ToString());
-                packet.Execute(game);
+                packet.Process(serverConnection.netHandler);
             }
         }
 
         public void SendPacket(Packet packet)
         {
-            packet.WriteToStream(bufferedStream);
-            bufferedStream.FlushToSocket();
+            serverConnection.SendPacket(packet);
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class ChatPacket : Packet
     {
-        private string message;
+        public string message { get; private set; }
 
         public ChatPacket(string message) : base(PacketType.Chat)
         {
@@ -16,9 +14,9 @@ namespace Minecraft
             bufferedStream.WriteUtf8String(message);
         }
 
-        public override void Execute(Game game)
+        public override void Process(INetHandler netHandler)
         {
-            Logger.Info("Received message: " + message);
+            netHandler.ProcessChatPacket(this);
         }
     }
 }

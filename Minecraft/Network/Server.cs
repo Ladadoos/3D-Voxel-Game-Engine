@@ -10,18 +10,18 @@ namespace Minecraft
 {
     class Server
     {
-        protected PacketFactory packetFactory = new PacketFactory();
+        private PacketFactory packetFactory = new PacketFactory();
 
-        protected List<Connection> clients = new List<Connection>();
-        protected object clientsLock = new object();
-        protected Thread connectionsThread;
-        protected int port;
-        protected string address;
-        protected TcpListener tcpServer;
-        protected bool run;
+        private List<Connection> clients = new List<Connection>();
+        private object clientsLock = new object();
+        private Thread connectionsThread;
+        private int port;
+        private string address;
+        private TcpListener tcpServer;
+        private bool isRunning;
 
-        protected World world;
-        protected Game game;
+        private World world;
+        private Game game;
 
         public void Start(Game game, string address, int port)
         {
@@ -29,20 +29,24 @@ namespace Minecraft
             this.address = address;
             this.port = port;
 
-            InitializeWorld(game);
-            world.GenerateTestMap();
+            world = new World(game);
 
             connectionsThread = new Thread(ListenForConnections);
             connectionsThread.IsBackground = true;
             connectionsThread.Start();
         }
 
-        protected virtual void InitializeWorld(Game game)
+        public void GenerateMap()
         {
-            world = new ServerWorld(game);
+            world.GenerateTestMap();
         }
 
-        public World GetLocalWorld()
+        public void AddHook(IEventHook hook)
+        {
+            world.AddEventHooks(hook);
+        }
+
+        public World GetWorldInstance()
         {
             return world;
         }
@@ -52,44 +56,41 @@ namespace Minecraft
             tcpServer = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             tcpServer.Start();
             Logger.Info("Started listening for connections on " + GetType());
-            run = true;
-            while (run)
+            isRunning = true;
+            while (isRunning)
             {
                 TcpClient client = tcpServer.AcceptTcpClient();
                 Logger.Info("Server accepted new client.");
                 NetworkStream stream = client.GetStream();
-                Connection connection = new Connection
+                Connection clientConnection = new Connection
                 {
                     client = client,
-                    stream = stream,
+                    netStream = stream,
                     reader = new BinaryReader(stream),
                     writer = new BinaryWriter(stream),
                     bufferedStream = new NetBufferedStream(new BufferedStream(stream))
                 };
+                ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
+                clientConnection.netHandler = netHandler;
+
                 lock (clientsLock)
                 {
-                    clients.Add(connection);
+                    clients.Add(clientConnection);
                 }
-                Broadcast(null, new ChatPacket("New player joined!"));
-                if(!(this is IntegratedServer))
+
+                Logger.Info("Writing chunk data to stream.");
+                foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
                 {
-                    Logger.Info("Writing chunk data to stream.");
-                    foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
-                    {
-                        new ChunkDataPacket(kv.Value).WriteToStream(connection.bufferedStream);
-                    }
-                    connection.bufferedStream.FlushToSocket();
+                    clientConnection.SendPacket(new ChunkDataPacket(kv.Value));
                 }
+
+                BroadcastPacket(new ChatPacket("Someone joined!"));             
             }
 
             Logger.Warn("Server is closing down. Closing connections to all clients.");
             lock (clientsLock)
             {
-                foreach (Connection conn in clients)
-                {
-                    conn.stream.Close();
-                    conn.client.Close();
-                }
+                clients.ForEach(c => c.Close());
             }
             tcpServer.Stop();
             Logger.Info("Server closed.");
@@ -101,41 +102,37 @@ namespace Minecraft
             if (Console.KeyAvailable)
             {
                 string input = Console.ReadLine();
-                Broadcast(null, new ChatPacket(input));
+                BroadcastPacket(new ChatPacket(input));
             }
 
             lock (clientsLock)
             {
-                foreach (Connection conn in clients)
+                foreach (Connection client in clients)
                 {
-                    if (!conn.stream.DataAvailable)
+                    if (!client.netStream.DataAvailable)
                     {
                         continue;
                     }
 
-                    Packet packet = packetFactory.ReadPacket(conn.reader);
+                    Packet packet = packetFactory.ReadPacket(client.reader);
                     Logger.Info("Server received packet " + packet.ToString());
-                    packet.Execute(game);
+                    packet.Process(client.netHandler);
                 }
             }
         }
 
-        public void Broadcast(Game game, Packet packet)
+        public void BroadcastPacket(Packet packet)
         {
             lock (clientsLock)
             {
                 Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
-                foreach (Connection client in clients)
-                {
-                    packet.WriteToStream(client.bufferedStream);
-                    client.bufferedStream.FlushToSocket();
-                }
+                clients.ForEach(c => c.SendPacket(packet));
             }
         }
-        
+
         public void Stop()
         {
-            run = false;
+            isRunning = false;
         }
     }
 }

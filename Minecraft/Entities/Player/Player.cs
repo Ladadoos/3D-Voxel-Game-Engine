@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace Minecraft
 {
-    abstract class Player
+    abstract class Player : Entity
     {
         protected bool isFlying = true;
         protected bool isInCreativeMode = true;
@@ -29,7 +29,7 @@ namespace Minecraft
         protected delegate void OnToggleCrouching(bool isCrouching);
         protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        public Player(Vector3 startPosition)
+        public Player(Vector3 startPosition) : base(0)
         {
             position = startPosition;
             velocity = Vector3.Zero;
