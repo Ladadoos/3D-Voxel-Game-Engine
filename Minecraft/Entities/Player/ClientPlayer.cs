@@ -86,7 +86,9 @@ namespace Minecraft
                     {
                         if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                         {
-                            game.client.SendPacket(new PlaceBlockPacket(state));
+                            BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                            newBlock.position = mouseOverObject.blockPlacePosition;
+                            game.client.SendPacket(new PlaceBlockPacket(newBlock));
                         }
                     }
                 }
