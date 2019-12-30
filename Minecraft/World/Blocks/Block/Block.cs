@@ -7,6 +7,7 @@ namespace Minecraft
         public int id { get; private set; }
         protected readonly AABB[] emptyAABB = new AABB[0];
         public bool isTickable { get; protected set; }
+        public bool isInteractable { get; protected set; }
 
         public Block(int id)
         {
@@ -15,10 +16,7 @@ namespace Minecraft
 
         public abstract BlockState GetNewDefaultState();
 
-        public virtual bool OnInteract(BlockState blockstate, World world)
-        {
-            return false;
-        }
+        public virtual void OnInteract(BlockState blockstate, World world) { }
 
         public virtual bool CanAddBlockAt(World world, Vector3 intPosition)
         {

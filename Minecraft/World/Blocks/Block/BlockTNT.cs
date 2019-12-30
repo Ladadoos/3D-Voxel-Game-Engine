@@ -8,6 +8,7 @@ namespace Minecraft
         public BlockTNT(int id) : base(id)
         {
             isTickable = true;
+            isInteractable = true;
         }
 
         public override BlockState GetNewDefaultState()
@@ -31,10 +32,9 @@ namespace Minecraft
             }
         }
 
-        public override bool OnInteract(BlockState blockstate, World world)
+        public override void OnInteract(BlockState blockstate, World world)
         {
             //((BlockStateTNT)blockstate).triggered = true;
-            return true;
         }
 
         private void Explode(BlockState blockstate, World world)

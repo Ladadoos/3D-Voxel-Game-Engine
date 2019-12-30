@@ -18,12 +18,14 @@
 
         private void OnBlockPlacedServer(World world, Chunk chunk, BlockState oldState, BlockState newState)
         {
-            game.localServer.BroadcastPacket(new PlaceBlockPacket(newState));
+            if (game.server.isSingleplayer) return;
+            game.server.BroadcastPacket(new PlaceBlockPacket(newState));
         }
 
         private void OnBlockRemovedServer(World world, Chunk chunk, BlockState oldState)
         {
-            game.localServer.BroadcastPacket(new RemoveBlockPacket(oldState.position));
+            if (game.server.isSingleplayer) return;
+            game.server.BroadcastPacket(new RemoveBlockPacket(oldState.position));
         }
     }
 }

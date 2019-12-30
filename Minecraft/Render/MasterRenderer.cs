@@ -13,11 +13,13 @@ namespace Minecraft
         private float colorClearB = 1.0F;
 
         private ShaderBasic basicShader;
+        private EntityShader entityShader;
         private CameraController cameraController;
         private WireframeRenderer wireframeRenderer;
         private PlayerHoverBlockRenderer playerBlockRenderer;
         private TextureAtlas textureAtlas;
         private BlockModelRegistry blockModelRegistry;
+        private EntityMeshRegistry entityMeshRegistry;
         private TextureLoader textureLoader;
         private ScreenQuad screenQuad;
 
@@ -28,6 +30,7 @@ namespace Minecraft
         public MasterRenderer(Game game)
         {
             basicShader = new ShaderBasic();
+            entityShader = new EntityShader();
             cameraController = new CameraController(game.window);
             SetActiveCamera(game.player.camera);
 
@@ -36,6 +39,7 @@ namespace Minecraft
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
             blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
+            entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
@@ -77,6 +81,29 @@ namespace Minecraft
                 basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
             }
+
+            foreach (Entity entity in world.entities)
+            {
+                if (entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
+                {
+                    entityMeshModel.Bind();
+                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
+                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
+                }
+            }
+
+            /*entityShader.Start();
+            entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
+            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
+            foreach(Entity entity in world.entities)
+            {
+                if(entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
+                {
+                    entityMeshModel.Bind();
+                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
+                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
+                }
+            }*/
 
             playerBlockRenderer.RenderSelection();
             screenQuad.fbo.UnbindFBO();

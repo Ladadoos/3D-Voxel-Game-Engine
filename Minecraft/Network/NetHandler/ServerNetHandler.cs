@@ -26,7 +26,7 @@ namespace Minecraft
         public void ProcessChatPacket(ChatPacket chatPacket)
         {
             Logger.Info("Server received message " + chatPacket.message);
-            game.localServer.BroadcastPacket(chatPacket);
+            game.server.BroadcastPacket(chatPacket);
         }
 
         public void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket)
@@ -41,13 +41,31 @@ namespace Minecraft
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
         {
-            string playerName = playerJoinRequestPacket.name;
-            playerConnection.SendPacket(new PlayerJoinAcceptPacket("server_" + playerName, 0));
+            string playerName = playerJoinRequestPacket.name.Trim();
+            if(playerName == string.Empty || playerName == "Player")
+            {
+                playerConnection.state = ConnectionState.Closed;
+                playerConnection.WritePacket(new PlayerKickPacket(KickReason.Banned, "You are not allowed on this server."));
+                playerConnection.Close();
+                return;
+            }
+            playerConnection.state = ConnectionState.Accepted;
+            playerConnection.WritePacket(new PlayerJoinAcceptPacket("server_" + playerName, 0));
         }
 
         public void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket)
         {
             throw new InvalidOperationException();
+        }
+
+        public void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
+        {
+            throw new NotImplementedException();
         }
     }
 }

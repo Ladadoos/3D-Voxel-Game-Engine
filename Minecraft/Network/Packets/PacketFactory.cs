@@ -6,8 +6,10 @@ namespace Minecraft
 {
     class PacketFactory
     {
-        public Packet ReadPacket(BinaryReader reader)
+        public Packet ReadPacket(Connection connection)
         {
+            BinaryReader reader = connection.reader;
+
             int packetType = reader.ReadInt32();
             PacketType type = (PacketType)packetType;
 
@@ -52,7 +54,7 @@ namespace Minecraft
                         }
                         return new ChunkDataPacket(chunk);
                     }
-                /*case PacketType.EntityPosition:
+                case PacketType.EntityPosition:
                     {
                         int entityId = reader.ReadInt32();
                         Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
@@ -68,7 +70,13 @@ namespace Minecraft
                         int playerId = reader.ReadInt32();
                         string playerName = ReadUtf8String(reader);
                         return new PlayerJoinAcceptPacket(playerName, playerId);
-                    }*/
+                    }
+                case PacketType.PlayerKick:
+                    {
+                        KickReason kickReason = (KickReason)reader.ReadInt32();
+                        string message = ReadUtf8String(reader);
+                        return new PlayerKickPacket(kickReason, message);
+                    }
                 default: throw new Exception("Invalid packet type: " + packetType);
             }
         }

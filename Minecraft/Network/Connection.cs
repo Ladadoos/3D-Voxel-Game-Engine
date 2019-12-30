@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace Minecraft
 {
-    struct Connection
+    class Connection
     {
         public TcpClient client;
         public NetworkStream netStream;
@@ -12,16 +12,35 @@ namespace Minecraft
         public NetBufferedStream bufferedStream;
         public INetHandler netHandler;
 
+        private ConnectionState _state;
+        public ConnectionState state {
+            get { return _state; }
+            set {
+                _state = value;
+                OnStateChangedHandler?.Invoke(this);
+            }
+        }
+
+        public delegate void OnStateChanged(Connection connection);
+        public event OnStateChanged OnStateChangedHandler;
+
         public void Close()
-        {
+        {       
             netStream.Close();
             client.Close();
         }
 
-        public void SendPacket(Packet packet)
+        public void WritePacket(Packet packet)
         {
             packet.WriteToStream(bufferedStream);
             bufferedStream.FlushToSocket();
         }
+    }
+
+    enum ConnectionState
+    {
+        AwaitingAcceptance,
+        Accepted, 
+        Closed
     }
 }

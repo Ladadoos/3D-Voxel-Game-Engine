@@ -18,7 +18,6 @@ namespace Minecraft
         protected Vector3 realForward; //Vector facing towards where the player is looking
         protected Vector3 moveForward; //Vector facing where the player is looking, ignoring y
         protected Vector3 right;       //Vector facing to the right of where the player is looking
-        protected Vector3 position;    //Bottom-left of player AABB
         protected Vector3 velocity;
         protected float verticalSpeed;
         protected AABB hitbox;
@@ -29,7 +28,7 @@ namespace Minecraft
         protected delegate void OnToggleCrouching(bool isCrouching);
         protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        public Player(Vector3 startPosition) : base(0)
+        public Player(Vector3 startPosition) : base(0, EntityType.Player)
         {
             position = startPosition;
             velocity = Vector3.Zero;

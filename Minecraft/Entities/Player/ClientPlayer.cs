@@ -82,14 +82,14 @@ namespace Minecraft
                 } else
                 {
                     BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
-                    if(!state.GetBlock().OnInteract(state, game.world))
+                    if (state.GetBlock().isInteractable)
                     {
-                        if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
-                        {
-                            BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                            newBlock.position = mouseOverObject.blockPlacePosition;
-                            game.client.SendPacket(new PlaceBlockPacket(newBlock));
-                        }
+                        
+                    }else if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    {
+                        BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                        newBlock.position = mouseOverObject.blockPlacePosition;
+                        game.client.SendPacket(new PlaceBlockPacket(newBlock));
                     }
                 }
             }

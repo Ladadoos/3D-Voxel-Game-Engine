@@ -34,22 +34,7 @@ namespace Minecraft
 
         public Chunk GenerateBlocksForChunkAt(int x, int y)
         {
-            Chunk chunk = new Chunk(x, y);
-
-            for (int i = 0; i < Constants.CHUNK_SIZE; i++)
-            {
-                for (int j = 0; j < Constants.CHUNK_SIZE; j++)
-                {
-                    for (int k = 0; k < 100; k++)
-                    {
-                        chunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
-                    }
-                }
-            }
-
-            return chunk;
-
-            /*Chunk generatedChunk = new Chunk(x, y);
+            Chunk generatedChunk = new Chunk(x, y);
 
             double baseXoffset = 0;
             double baseYOffset = 0;
@@ -72,23 +57,21 @@ namespace Minecraft
                     double biomeDeterminer = GetBiomePerlinValueAt(biomeXoffset, biomeYOffset);
                     if (biomeDeterminer > 0.75D)
                     {
-                        if(Game.randomizer.Next(25) != 1)
+                        if (Game.randomizer.Next(25) != 1)
+                        {
+                            generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                        } else
                         {
                             generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
                         }
-                        else
-                        {
-                            generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
-                        }      
-                    }
-                    else if (biomeDeterminer < -0.75D)
+                    } else if (biomeDeterminer < -0.75D)
                     {
                         generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
-                    }else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
+                    } else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
                     {
                         forestBiome.Decorate(generatedChunk, i, height, j);
                         generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
-                    }else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
+                    } else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
                     {
                         sandBiome.Decorate(generatedChunk, i, height, j);
                         generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
@@ -101,8 +84,7 @@ namespace Minecraft
                         if (r == 1)
                         {
                             generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Flower.GetNewDefaultState());
-                        }
-                        else
+                        } else
                         {
                             generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Stone.GetNewDefaultState());
                         }
@@ -115,7 +97,8 @@ namespace Minecraft
                 }
                 baseYOffset += basePerlinDetail;
                 biomeYOffset += biomePerlinDetail;
-            return generatedChunk;*/
+            }
+            return generatedChunk;
         }
     }
 }

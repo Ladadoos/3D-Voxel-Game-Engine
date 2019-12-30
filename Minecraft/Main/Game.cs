@@ -15,7 +15,7 @@ namespace Minecraft
         public FPSCounter fpsCounter { get; private set; }
         public Client client { get; private set; }
         public World world { get; private set; }
-        public Server localServer { get; private set; }
+        public Server server { get; private set; }
         public RunMode mode { get; private set; }
         public bool isReadyToPlay = false;
         private bool initialized = false;
@@ -39,24 +39,24 @@ namespace Minecraft
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                localServer = new Server();
-                localServer.Start(this, "127.0.0.1", 50000);
-                localServer.AddHook(new ClientWorldHook(this));
+                server = new Server(this, true);
+                server.Start("127.0.0.1", 50000);
+                server.AddHook(new ClientWorldHook(this));
                 //localServer.AddHook(new ServerWorldHook(this));
-                localServer.GenerateMap();
+                server.GenerateMap();
 
                 client = new Client(this);
                 client.ConnectWith("127.0.0.1", 50000);
 
-                world = localServer.GetWorldInstance();
+                world = server.GetWorldInstance();
             } else if(mode == RunMode.Server)
             {
-                localServer = new Server();
-                localServer.Start(this, "127.0.0.1", 50000);
-                localServer.AddHook(new ServerWorldHook(this));
-                localServer.GenerateMap();
+                server = new Server(this, false);
+                server.Start("127.0.0.1", 50000);
+                server.AddHook(new ServerWorldHook(this));
+                server.GenerateMap();
 
-                world = localServer.GetWorldInstance();
+                world = server.GetWorldInstance();
 
                 window.VSync = OpenTK.VSyncMode.On;
             } else{
@@ -87,32 +87,25 @@ namespace Minecraft
             fpsCounter.IncrementFrameCounter();
             fpsCounter.AddElapsedTime(elapsedSeconds);
 
-            if (mode == RunMode.ClientServer)
+            if(mode == RunMode.Server)
             {
-                localServer?.Update(this);
-                client?.Update(this);
-
-                input.Update();
-                player.Update((float)elapsedSeconds, world);
-
                 world.Tick((float)elapsedSeconds);
-
-                masterRenderer.EndFrameUpdate(world);
-            } else if(mode == RunMode.Client)
-            {
-                client?.Update(this);
-
-                input.Update();
-                player.Update((float)elapsedSeconds, world);
-
-                world.Tick((float)elapsedSeconds);
-
-                masterRenderer.EndFrameUpdate(world);
+                server.Update(this);
             } else
             {
+                if(mode == RunMode.ClientServer)
+                {
+                    server?.Update(this);
+                }
+
+                client?.Update(this);
+
+                input.Update();
+                player.Update((float)elapsedSeconds, world);
+
                 world.Tick((float)elapsedSeconds);
 
-                localServer.Update(this);
+                masterRenderer.EndFrameUpdate(world);
             }
         }
 

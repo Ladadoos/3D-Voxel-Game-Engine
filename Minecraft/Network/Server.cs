@@ -22,10 +22,16 @@ namespace Minecraft
 
         private World world;
         private Game game;
+        public bool isSingleplayer { get; private set; }
 
-        public void Start(Game game, string address, int port)
+        public Server(Game game, bool isSingleplayer)
         {
             this.game = game;
+            this.isSingleplayer = isSingleplayer;
+        }
+
+        public void Start(string address, int port)
+        {
             this.address = address;
             this.port = port;
 
@@ -68,23 +74,17 @@ namespace Minecraft
                     netStream = stream,
                     reader = new BinaryReader(stream),
                     writer = new BinaryWriter(stream),
-                    bufferedStream = new NetBufferedStream(new BufferedStream(stream))
+                    bufferedStream = new NetBufferedStream(new BufferedStream(stream)),
+                    state = ConnectionState.AwaitingAcceptance
                 };
                 ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
                 clientConnection.netHandler = netHandler;
+                clientConnection.OnStateChangedHandler += OnConnectionStateChanged;
 
                 lock (clientsLock)
                 {
                     clients.Add(clientConnection);
-                }
-
-                Logger.Info("Writing chunk data to stream.");
-                foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
-                {
-                    clientConnection.SendPacket(new ChunkDataPacket(kv.Value));
-                }
-
-                BroadcastPacket(new ChatPacket("Someone joined!"));             
+                }            
             }
 
             Logger.Warn("Server is closing down. Closing connections to all clients.");
@@ -94,6 +94,27 @@ namespace Minecraft
             }
             tcpServer.Stop();
             Logger.Info("Server closed.");
+        }
+
+        private void OnConnectionStateChanged(Connection connection)
+        {
+            if(connection.state == ConnectionState.Accepted)
+            {
+                if (!isSingleplayer)
+                {
+                    Logger.Info("Writing chunk data to stream.");
+                    foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
+                    {
+                        connection.WritePacket(new ChunkDataPacket(kv.Value));
+                    }
+                }
+            }else if(connection.state == ConnectionState.Closed)
+            {
+                lock (clientsLock)
+                {
+                    clients.Remove(connection);
+                }
+            }
         }
 
         public void Update(Game game)
@@ -109,12 +130,12 @@ namespace Minecraft
             {
                 foreach (Connection client in clients)
                 {
-                    if (!client.netStream.DataAvailable)
+                    if (client.state == ConnectionState.Closed || !client.netStream.DataAvailable)
                     {
                         continue;
                     }
 
-                    Packet packet = packetFactory.ReadPacket(client.reader);
+                    Packet packet = packetFactory.ReadPacket(client);
                     Logger.Info("Server received packet " + packet.ToString());
                     packet.Process(client.netHandler);
                 }
@@ -126,7 +147,7 @@ namespace Minecraft
             lock (clientsLock)
             {
                 Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
-                clients.ForEach(c => c.SendPacket(packet));
+                clients.ForEach(c => c.WritePacket(packet));
             }
         }
 

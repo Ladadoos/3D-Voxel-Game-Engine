@@ -45,7 +45,20 @@ namespace Minecraft
 
         public void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket)
         {
-            Console.WriteLine(playerJoinAcceptPacket.name);
+            Logger.Info("Player: " + playerJoinAcceptPacket.name + " connected.");
+            playerConnection.state = ConnectionState.Accepted;
+        }
+
+        public void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket)
+        {
+            playerConnection.state = ConnectionState.Closed;
+            Logger.Info("You were kicked for reason: " + playerKickPacket.reason + " Message: " + playerKickPacket.message);
+        }
+
+        public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
+        {
+            BlockState state = game.world.GetBlockAt(playerInteractionPacket.intPosition);
+
         }
     }
 }

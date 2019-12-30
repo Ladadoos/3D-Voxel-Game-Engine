@@ -41,16 +41,33 @@ namespace Minecraft
                 netStream = netStream,
                 reader = new BinaryReader(netStream),
                 writer = new BinaryWriter(netStream),
-                bufferedStream = new NetBufferedStream(new BufferedStream(netStream))
+                bufferedStream = new NetBufferedStream(new BufferedStream(netStream)),
+                state = ConnectionState.AwaitingAcceptance
             };
             ClientNetHandler netHandler = new ClientNetHandler(game, serverConnection);
             serverConnection.netHandler = netHandler;
+            serverConnection.OnStateChangedHandler += OnConnectionStateChanged;
 
             isConnected = true;
             Logger.Info("Connected to server IP: " + host + " Port: " + port);
-            //SendPacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
+            SendPacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
+            //SendPacket(new PlayerJoinRequestPacket("Player"));
             return true;
         }
+
+        private void OnConnectionStateChanged(Connection connection)
+        {
+            if(connection.state == ConnectionState.Accepted)
+            {
+                Logger.Info("Server accepted your connection.");
+            } else if (connection.state == ConnectionState.Closed)
+            {
+                Logger.Info("Connection with server closed.");
+                isConnected = false;
+            }
+        }
+
+        public ConnectionState State() => serverConnection.state;
 
         public void Stop()
         {
@@ -67,7 +84,7 @@ namespace Minecraft
 
             while (serverConnection.netStream.DataAvailable)
             {
-                Packet packet = packetFactory.ReadPacket(serverConnection.reader);
+                Packet packet = packetFactory.ReadPacket(serverConnection);
                 Logger.Info("Client received packet "+  packet.ToString());
                 packet.Process(serverConnection.netHandler);
             }
@@ -75,7 +92,8 @@ namespace Minecraft
 
         public void SendPacket(Packet packet)
         {
-            serverConnection.SendPacket(packet);
+            if (!isConnected) return;
+            serverConnection.WritePacket(packet);
         }
     }
 }

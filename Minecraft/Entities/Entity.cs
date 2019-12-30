@@ -1,12 +1,18 @@
-﻿namespace Minecraft
+﻿using OpenTK;
+
+namespace Minecraft
 {
     abstract class Entity
     {
-        public int id;
+        public int id { get; private set; }
+        public EntityType entityType { get; private set; }
 
-        public Entity(int id)
+        public Vector3 position;
+
+        public Entity(int id, EntityType entityType)
         {
             this.id = id;
+            this.entityType = entityType;
         }
     }
 }

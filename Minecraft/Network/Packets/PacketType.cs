@@ -8,6 +8,8 @@
         ChunkLoad,
         EntityPosition,
         PlayerJoinRequest,
-        PlayerJoinAccept
+        PlayerJoinAccept,
+        PlayerKick,
+        PlayerBlockInteraction
     }
 }

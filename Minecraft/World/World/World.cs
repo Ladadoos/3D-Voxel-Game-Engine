@@ -16,6 +16,8 @@ namespace Minecraft
         protected float elapsedMillisecondsSinceLastTick;
         protected List<BlockState> toRemoveBlocks = new List<BlockState>();
 
+        public List<Entity> entities = new List<Entity>();
+
         public delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
@@ -29,6 +31,7 @@ namespace Minecraft
         {
             this.game = game;
             worldGenerator = new WorldGenerator();
+            //entities.Add(new Dummy(1));
         }
 
         public void AddEventHooks(IEventHook hook)
