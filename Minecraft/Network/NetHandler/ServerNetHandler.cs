@@ -44,13 +44,12 @@ namespace Minecraft
             string playerName = playerJoinRequestPacket.name.Trim();
             if(playerName == string.Empty || playerName == "Player")
             {
-                playerConnection.state = ConnectionState.Closed;
                 playerConnection.WritePacket(new PlayerKickPacket(KickReason.Banned, "You are not allowed on this server."));
-                playerConnection.Close();
+                playerConnection.state = ConnectionState.Closed;
                 return;
             }
-            playerConnection.state = ConnectionState.Accepted;
             playerConnection.WritePacket(new PlayerJoinAcceptPacket("server_" + playerName, 0));
+            playerConnection.state = ConnectionState.Accepted;
         }
 
         public void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket)
@@ -65,7 +64,8 @@ namespace Minecraft
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            throw new NotImplementedException();
+            BlockState state = game.world.GetBlockAt(playerInteractionPacket.intPosition);
+            //state.GetBlock().OnInteract(state, game.world);
         }
     }
 }

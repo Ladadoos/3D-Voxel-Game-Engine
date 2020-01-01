@@ -23,9 +23,8 @@ namespace Minecraft
                 case PacketType.PlaceBlock:
                     {
                         int blockId = reader.ReadInt32();
-                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                         BlockState state = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                        state.position = position;
+                        state.FromStream(reader);
                         return new PlaceBlockPacket(state);
                     }
                 case PacketType.RemoveBlock:
@@ -39,17 +38,16 @@ namespace Minecraft
                         int gridY = reader.ReadInt32();
                         int sectionsNumber = reader.ReadInt32();
                         Chunk chunk = new Chunk(gridX, gridY);
-                        for(int i = 0; i < sectionsNumber; i++)
+                        for (int i = 0; i < sectionsNumber; i++)
                         {
                             int statesNumber = reader.ReadInt32();
-                            for(int j = 0; j < statesNumber; j++)
+                            for (int j = 0; j < statesNumber; j++)
                             {
                                 int blockId = reader.ReadInt32();
-                                Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
                                 BlockState state = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                                state.position = position;
+                                state.FromStream(reader);
 
-                                chunk.AddBlock((int)position.X & 15, (int)position.Y, (int)position.Z & 15, state);
+                                chunk.AddBlock((int)state.position.X & 15, (int)state.position.Y, (int)state.position.Z & 15, state);
                             }
                         }
                         return new ChunkDataPacket(chunk);
@@ -76,6 +74,11 @@ namespace Minecraft
                         KickReason kickReason = (KickReason)reader.ReadInt32();
                         string message = ReadUtf8String(reader);
                         return new PlayerKickPacket(kickReason, message);
+                    }
+                case PacketType.PlayerBlockInteraction:
+                    {
+                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        return new PlayerBlockInteractionPacket(position);
                     }
                 default: throw new Exception("Invalid packet type: " + packetType);
             }

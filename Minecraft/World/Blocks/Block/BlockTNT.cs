@@ -34,7 +34,7 @@ namespace Minecraft
 
         public override void OnInteract(BlockState blockstate, World world)
         {
-            //((BlockStateTNT)blockstate).triggered = true;
+            ((BlockStateTNT)blockstate).triggered = true;
         }
 
         private void Explode(BlockState blockstate, World world)

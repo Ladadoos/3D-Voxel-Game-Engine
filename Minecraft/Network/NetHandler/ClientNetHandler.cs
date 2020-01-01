@@ -58,7 +58,7 @@ namespace Minecraft
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
             BlockState state = game.world.GetBlockAt(playerInteractionPacket.intPosition);
-
+            state.GetBlock().OnInteract(state, game.world);
         }
     }
 }

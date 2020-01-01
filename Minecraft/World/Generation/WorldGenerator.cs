@@ -34,6 +34,29 @@ namespace Minecraft
 
         public Chunk GenerateBlocksForChunkAt(int x, int y)
         {
+            Chunk chunk = new Chunk(x, y);
+
+            for (int i = 0; i < Constants.CHUNK_SIZE; i++)
+            {
+                for (int j = 0; j < Constants.CHUNK_SIZE; j++)
+                {
+                    for (int k = 0; k < 100; k++)
+                    {
+                        if(k > 98)
+                        {
+                            BlockStateTNT tnt = (BlockStateTNT)Blocks.Tnt.GetNewDefaultState();
+                            tnt.elapsedSecondsSinceTrigger = Game.randomizer.Next(100);
+                            chunk.AddBlock(i, k, j, tnt);
+                        } else
+                        {
+                            chunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
+                        }
+                    }
+                }
+            }
+
+            return chunk;
+
             Chunk generatedChunk = new Chunk(x, y);
 
             double baseXoffset = 0;
@@ -83,7 +106,9 @@ namespace Minecraft
                         int r = Game.randomizer.Next(1000);
                         if (r == 1)
                         {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Flower.GetNewDefaultState());
+                            BlockStateTNT tnt = (BlockStateTNT)Blocks.Tnt.GetNewDefaultState();
+                            tnt.elapsedSecondsSinceTrigger = Game.randomizer.Next(100);
+                            generatedChunk.AddBlock(i * 1, k, j * 1, tnt);
                         } else
                         {
                             generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Stone.GetNewDefaultState());

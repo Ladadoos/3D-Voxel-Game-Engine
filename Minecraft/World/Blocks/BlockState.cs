@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System.IO;
 
 namespace Minecraft
 {
@@ -12,6 +13,8 @@ namespace Minecraft
             return new Vector3((int)position.X & 15, position.Y, (int)position.Z & 15);
         }
 
+        public abstract Block GetBlock();
+
         public virtual void ToStream(NetBufferedStream bufferedStream)
         {
             bufferedStream.WriteInt32(GetBlock().id);
@@ -20,7 +23,11 @@ namespace Minecraft
             bufferedStream.WriteFloat(position.Z);
         }
 
-        public abstract Block GetBlock();
+        public virtual void FromStream(BinaryReader reader)
+        {
+            Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+            this.position = position;
+        }
     }
 
     class BlockStateDirt : BlockState
@@ -64,6 +71,22 @@ namespace Minecraft
         public override Block GetBlock()
         {
             return Blocks.Tnt;
+        }
+
+        public override void ToStream(NetBufferedStream bufferedStream)
+        {
+            base.ToStream(bufferedStream);
+            bufferedStream.WriteFloat(elapsedSecondsSinceTrigger);
+            bufferedStream.WriteBool(triggeredByTnt);
+            bufferedStream.WriteBool(triggered);
+        }
+
+        public override void FromStream(BinaryReader reader)
+        {
+            base.FromStream(reader);
+            elapsedSecondsSinceTrigger = reader.ReadSingle();
+            triggeredByTnt = reader.ReadBoolean();
+            triggered = reader.ReadBoolean();
         }
     }
 }

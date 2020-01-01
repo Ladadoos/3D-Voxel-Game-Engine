@@ -10,8 +10,6 @@ namespace Minecraft
 {
     class Server
     {
-        private PacketFactory packetFactory = new PacketFactory();
-
         private List<Connection> clients = new List<Connection>();
         private object clientsLock = new object();
         private Thread connectionsThread;
@@ -22,12 +20,14 @@ namespace Minecraft
 
         private World world;
         private Game game;
-        public bool isSingleplayer { get; private set; }
 
-        public Server(Game game, bool isSingleplayer)
+        /// <summary> Returns true if the server is open to more connections than the host. </summary>
+        public bool isOpen { get; private set; }
+
+        public Server(Game game, bool isOpen)
         {
             this.game = game;
-            this.isSingleplayer = isSingleplayer;
+            this.isOpen = isOpen;
         }
 
         public void Start(string address, int port)
@@ -100,7 +100,7 @@ namespace Minecraft
         {
             if(connection.state == ConnectionState.Accepted)
             {
-                if (!isSingleplayer)
+                //if (!isSingleplayer)
                 {
                     Logger.Info("Writing chunk data to stream.");
                     foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
@@ -113,11 +113,12 @@ namespace Minecraft
                 lock (clientsLock)
                 {
                     clients.Remove(connection);
+                    connection.Close();
                 }
             }
         }
 
-        public void Update(Game game)
+        public void Update()
         {
             //Check for console input in a non-blocking way
             if (Console.KeyAvailable)
@@ -128,14 +129,15 @@ namespace Minecraft
 
             lock (clientsLock)
             {
-                foreach (Connection client in clients)
+                for(int i = clients.Count - 1; i >= 0; i--)
                 {
+                    Connection client = clients[i];
                     if (client.state == ConnectionState.Closed || !client.netStream.DataAvailable)
                     {
                         continue;
                     }
 
-                    Packet packet = packetFactory.ReadPacket(client);
+                    Packet packet = client.ReadPacket();
                     Logger.Info("Server received packet " + packet.ToString());
                     packet.Process(client.netHandler);
                 }

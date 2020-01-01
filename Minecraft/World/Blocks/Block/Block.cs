@@ -5,9 +5,9 @@ namespace Minecraft
     abstract class Block
     {
         public int id { get; private set; }
-        protected readonly AABB[] emptyAABB = new AABB[0];
         public bool isTickable { get; protected set; }
         public bool isInteractable { get; protected set; }
+        protected readonly AABB[] emptyAABB = new AABB[0];
 
         public Block(int id)
         {

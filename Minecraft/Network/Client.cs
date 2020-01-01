@@ -6,8 +6,6 @@ namespace Minecraft
 {
     class Client
     {
-        private PacketFactory packetFactory = new PacketFactory();
-
         private string host;
         private int port;
         private bool isConnected;
@@ -50,8 +48,7 @@ namespace Minecraft
 
             isConnected = true;
             Logger.Info("Connected to server IP: " + host + " Port: " + port);
-            SendPacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
-            //SendPacket(new PlayerJoinRequestPacket("Player"));
+            WritePacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
             return true;
         }
 
@@ -75,7 +72,7 @@ namespace Minecraft
             serverConnection.Close();
         }
 
-        public void Update(Game game)
+        public void Update()
         {
             if (!isConnected)
             {
@@ -84,13 +81,13 @@ namespace Minecraft
 
             while (serverConnection.netStream.DataAvailable)
             {
-                Packet packet = packetFactory.ReadPacket(serverConnection);
+                Packet packet = serverConnection.ReadPacket();
                 Logger.Info("Client received packet "+  packet.ToString());
                 packet.Process(serverConnection.netHandler);
             }
         }
 
-        public void SendPacket(Packet packet)
+        public void WritePacket(Packet packet)
         {
             if (!isConnected) return;
             serverConnection.WritePacket(packet);

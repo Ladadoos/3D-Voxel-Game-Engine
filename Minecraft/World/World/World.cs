@@ -34,6 +34,14 @@ namespace Minecraft
             //entities.Add(new Dummy(1));
         }
 
+        public bool IsServer() => game.mode == RunMode.Server;
+
+        public bool IsServerOpen()
+        {
+            if (game.server == null) throw new Exception("This should not be called.");
+            return game.server.isOpen;
+        }
+
         public void AddEventHooks(IEventHook hook)
         {
             hook.AddEventHooksFor(this);
@@ -119,7 +127,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
             if (oldState.GetBlock() == Blocks.Air)
             {
-                Logger.Warn("Tried to remove block where there was none.");
+                //Logger.Warn("Tried to remove block where there was none.");
                 return false;
             }
 
@@ -170,11 +178,11 @@ namespace Minecraft
             }*/
 
             BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
-            if (oldState.GetBlock() != Blocks.Air)
+            /*if (oldState.GetBlock() != Blocks.Air)
             {
                 Logger.Warn("Tried to place block where there was already one.");
                 return false;
-            }
+            }*/
 
             int localX = worldX & 15;
             int localZ = worldZ & 15;

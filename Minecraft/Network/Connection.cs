@@ -21,6 +21,9 @@ namespace Minecraft
             }
         }
 
+        private PacketFactory packetFactory = new PacketFactory();
+        private object streamLock = new object();
+
         public delegate void OnStateChanged(Connection connection);
         public event OnStateChanged OnStateChangedHandler;
 
@@ -32,8 +35,19 @@ namespace Minecraft
 
         public void WritePacket(Packet packet)
         {
-            packet.WriteToStream(bufferedStream);
-            bufferedStream.FlushToSocket();
+            lock (streamLock)
+            {
+                packet.WriteToStream(bufferedStream);
+                bufferedStream.FlushToSocket();
+            }
+        }
+
+        public Packet ReadPacket()
+        {
+            lock (streamLock)
+            {
+                return packetFactory.ReadPacket(this);
+            }
         }
     }
 

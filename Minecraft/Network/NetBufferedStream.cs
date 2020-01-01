@@ -30,6 +30,12 @@ namespace Minecraft
             bufferedStream.Write(bytes, 0, bytes.Length);
         }
 
+        public void WriteBool(bool value)
+        {
+            byte[] boolByte = new byte[] { value ? (byte)1 : (byte)0 };
+            bufferedStream.Write(boolByte, 0, 1);
+        }
+
         public void WriteUtf8String(string value)
         {
             byte[] messageBytes = converter.StringUtf8ToBytes(value);

@@ -17,8 +17,6 @@ namespace Minecraft
         public World world { get; private set; }
         public Server server { get; private set; }
         public RunMode mode { get; private set; }
-        public bool isReadyToPlay = false;
-        private bool initialized = false;
 
         public Game(RunMode mode)
         {
@@ -42,7 +40,7 @@ namespace Minecraft
                 server = new Server(this, true);
                 server.Start("127.0.0.1", 50000);
                 server.AddHook(new ClientWorldHook(this));
-                //localServer.AddHook(new ServerWorldHook(this));
+                server.AddHook(new ServerWorldHook(this));
                 server.GenerateMap();
 
                 client = new Client(this);
@@ -90,15 +88,15 @@ namespace Minecraft
             if(mode == RunMode.Server)
             {
                 world.Tick((float)elapsedSeconds);
-                server.Update(this);
+                server.Update();
             } else
             {
                 if(mode == RunMode.ClientServer)
                 {
-                    server?.Update(this);
+                    server?.Update();
                 }
 
-                client?.Update(this);
+                client.Update();
 
                 input.Update();
                 player.Update((float)elapsedSeconds, world);
