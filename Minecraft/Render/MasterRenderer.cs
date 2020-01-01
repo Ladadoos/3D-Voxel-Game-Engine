@@ -147,14 +147,14 @@ namespace Minecraft
             MeshChunk(chunk);
         }
 
-        public void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState)
+        public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
-            MeshChunkAndSurroundings(world, chunk, newState);
+            MeshChunkAndSurroundings(world, chunk, blockPos, newState);
         }
 
-        public void OnBlockRemoved(World world, Chunk chunk, BlockState oldState)
+        public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
-            MeshChunkAndSurroundings(world, chunk, oldState);
+            MeshChunkAndSurroundings(world, chunk, blockPos, oldState);
         }
 
         private void MeshChunk(Chunk chunk)
@@ -165,10 +165,10 @@ namespace Minecraft
             }
         }
 
-        private void MeshChunkAndSurroundings(World world, Chunk chunk, BlockState state)
+        private void MeshChunkAndSurroundings(World world, Chunk chunk, Vector3i blockPos, BlockState state)
         {
-            int localX = (int)state.position.X & 15;
-            int localZ = (int)state.position.Z & 15;
+            int localX = blockPos.X & 15;
+            int localZ = blockPos.Z & 15;
             MeshChunk(chunk);
 
             if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))

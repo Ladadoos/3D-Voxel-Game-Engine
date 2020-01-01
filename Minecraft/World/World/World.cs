@@ -14,14 +14,14 @@ namespace Minecraft
 
         protected float secondsPerTick = 0.05F;
         protected float elapsedMillisecondsSinceLastTick;
-        protected List<BlockState> toRemoveBlocks = new List<BlockState>();
+        protected List<Vector3i> toRemoveBlocks = new List<Vector3i>();
 
         public List<Entity> entities = new List<Entity>();
 
-        public delegate void OnBlockPlaced(World world, Chunk chunk, BlockState oldState, BlockState newState);
+        public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
-        public delegate void OnBlockRemoved(World world, Chunk chunk, BlockState oldState);
+        public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState);
         public event OnBlockRemoved OnBlockRemovedHandler;
 
         public delegate void OnChunkLoaded(Chunk chunk);
@@ -31,7 +31,7 @@ namespace Minecraft
         {
             this.game = game;
             worldGenerator = new WorldGenerator();
-            //entities.Add(new Dummy(1));
+            entities.Add(new Dummy(1));
         }
 
         public bool IsServer() => game.mode == RunMode.Server;
@@ -88,66 +88,58 @@ namespace Minecraft
                 elapsedMillisecondsSinceLastTick = 0;
             }
 
-            foreach(BlockState toRemoveBlock in toRemoveBlocks)
+            foreach(Vector3i toRemoveBlock in toRemoveBlocks)
             {
-                RemoveBlockAt(toRemoveBlock.position);
+                RemoveBlockAt(toRemoveBlock);
             }
             toRemoveBlocks.Clear();
         }
 
+        //UPDATE
         public Vector2 GetChunkPosition(float worldX, float worldZ)
         {
             return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
         }
 
-        public void QueueToRemoveBlockAt(Vector3 intPosition)
+        public void QueueToRemoveBlockAt(Vector3i blockPos)
         {
-            toRemoveBlocks.Add(GetBlockAt(intPosition));
+            toRemoveBlocks.Add(blockPos);
         }
 
-        private bool RemoveBlockAt(Vector3 intPosition)
+        private bool RemoveBlockAt(Vector3i blockPos)
         {
-            int worldX = (int)intPosition.X;
-            int worldY = (int)intPosition.Y;
-            int worldZ = (int)intPosition.Z;
-
-            if (IsOutsideBuildHeight(worldY))
+            if (IsOutsideBuildHeight(blockPos.Y))
             {
                 Logger.Warn("Tried to remove block outside of building height.");
                 return false;
             }
 
-            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 Logger.Warn("Tried to remove block in chunk that is not loaded.");
                 return false;
             }
 
-            BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
+            BlockState oldState = GetBlockAt(blockPos);
             if (oldState.GetBlock() == Blocks.Air)
             {
                 //Logger.Warn("Tried to remove block where there was none.");
                 return false;
             }
 
-            int localX = worldX & 15;
-            int localZ = worldZ & 15;
+            int localX = blockPos.X & 15;
+            int localZ = blockPos.Z & 15;
+            int worldY = blockPos.Y;
 
             BlockState air = Blocks.Air.GetNewDefaultState();
-            air.position = intPosition;
             chunk.AddBlock(localX, worldY, localZ, air);
             air.GetBlock().OnAdded(air, this);
-            OnBlockRemovedHandler?.Invoke(this, chunk, oldState);
+            OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState);
             return true;
         }
 
-        public bool AddBlockToWorld(Vector3 intPosition, BlockState blockstate)
-        {
-            return AddBlockToWorld((int)intPosition.X, (int)intPosition.Y, (int)intPosition.Z, blockstate);
-        }
-
-        public bool AddBlockToWorld(int worldX, int worldY, int worldZ, BlockState newBlockState)
+        public bool AddBlockToWorld(Vector3i blockPos, BlockState newBlockState)
         {
             if(newBlockState.GetBlock() == Blocks.Air)
             {
@@ -155,16 +147,13 @@ namespace Minecraft
                 return false;
             }
 
-            //Dont like this whole setting position part like this....
-            newBlockState.position = new Vector3(worldX, worldY, worldZ);
-
-            if (IsOutsideBuildHeight(worldY))
+            if (IsOutsideBuildHeight(blockPos.Y))
             {
                 Logger.Warn("Tried to place block outside of building height.");
                 return false;
             }
 
-            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 Logger.Warn("Tried to place block in chunk that is not loaded.");
@@ -177,19 +166,20 @@ namespace Minecraft
                 return false;
             }*/
 
-            BlockState oldState = GetBlockAt(worldX, worldY, worldZ);
+            BlockState oldState = GetBlockAt(blockPos);
             /*if (oldState.GetBlock() != Blocks.Air)
             {
                 Logger.Warn("Tried to place block where there was already one.");
                 return false;
             }*/
 
-            int localX = worldX & 15;
-            int localZ = worldZ & 15;
+            int localX = blockPos.X & 15;
+            int localZ = blockPos.Z & 15;
+            int worldY = blockPos.Y;
 
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
             newBlockState.GetBlock().OnAdded(newBlockState, this);
-            OnBlockPlacedHandler?.Invoke(this, chunk, oldState, newBlockState);
+            OnBlockPlacedHandler?.Invoke(this, chunk, blockPos, oldState, newBlockState);
 
             //Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());
             return true;
@@ -200,33 +190,28 @@ namespace Minecraft
             return worldY < 0 || worldY >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
         }
         
-        public BlockState GetBlockAt(Vector3 worldIntPosition)
+        public BlockState GetBlockAt(Vector3i blockPos)
         {
-            return GetBlockAt((int)worldIntPosition.X, (int)worldIntPosition.Y, (int)worldIntPosition.Z);
-        }
-
-        public BlockState GetBlockAt(int worldX, int worldY, int worldZ)
-        {
-            if (IsOutsideBuildHeight(worldY))
+            if (IsOutsideBuildHeight(blockPos.Y))
             {
                 return Blocks.Air.GetNewDefaultState(); 
             }
 
-            Vector2 chunkPos = GetChunkPosition(worldX, worldZ);
+            Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 return Blocks.Air.GetNewDefaultState();
             }
 
-            int sectionHeight = worldY / Constants.SECTION_HEIGHT;
+            int sectionHeight = blockPos.Y / Constants.SECTION_HEIGHT;
             if(chunk.sections[sectionHeight] == null)
             {
                 return Blocks.Air.GetNewDefaultState(); 
             }
 
-            int localX = worldX & 15;    
-            int localY = worldY & 15;
-            int localZ = worldZ & 15;
+            int localX = blockPos.X & 15;    
+            int localY = blockPos.Y & 15;
+            int localZ = blockPos.Z & 15;
 
             BlockState blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
             if (blockType == null)

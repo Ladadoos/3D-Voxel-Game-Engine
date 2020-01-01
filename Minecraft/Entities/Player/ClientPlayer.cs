@@ -76,30 +76,28 @@ namespace Minecraft
                     if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                     {
                         BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                        newBlock.position = mouseOverObject.blockPlacePosition;
-                        game.client.WritePacket(new PlaceBlockPacket(newBlock));
+                        game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
                     }
                 } else
                 {
-                    BlockState state = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
+                    BlockState state = game.world.GetBlockAt(mouseOverObject.intersectedBlockPos);
                     if (state.GetBlock().isInteractable)
                     {
-                        game.client.WritePacket(new PlayerBlockInteractionPacket(state.position));
+                        game.client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.intersectedBlockPos));
                     }else if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
                     {
                         BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                        newBlock.position = mouseOverObject.blockPlacePosition;
-                        game.client.WritePacket(new PlaceBlockPacket(newBlock));
+                        game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
                     }
                 }
             }
             if (Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
-                selectedBlock = game.world.GetBlockAt(mouseOverObject.blockstateHit.position);
+                selectedBlock = game.world.GetBlockAt(mouseOverObject.intersectedBlockPos);
             }
             if (Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
             {
-                game.client.WritePacket(new RemoveBlockPacket(mouseOverObject.blockstateHit.position));
+                game.client.WritePacket(new RemoveBlockPacket(mouseOverObject.intersectedBlockPos));
             }
 
             realForward = camera.forward;

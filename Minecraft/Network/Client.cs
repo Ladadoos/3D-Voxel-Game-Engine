@@ -9,7 +9,7 @@ namespace Minecraft
         private string host;
         private int port;
         private bool isConnected;
-        private Connection serverConnection;
+        public Connection serverConnection { get; private set; }
         private Game game;
 
         public Client(Game game)
@@ -63,8 +63,6 @@ namespace Minecraft
                 isConnected = false;
             }
         }
-
-        public ConnectionState State() => serverConnection.state;
 
         public void Stop()
         {

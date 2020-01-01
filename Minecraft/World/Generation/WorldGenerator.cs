@@ -40,7 +40,7 @@ namespace Minecraft
             {
                 for (int j = 0; j < Constants.CHUNK_SIZE; j++)
                 {
-                    for (int k = 0; k < 100; k++)
+                    for (int k = 0; k < 20; k++)
                     {
                         if(k > 98)
                         {
@@ -54,10 +54,10 @@ namespace Minecraft
                     }
                 }
             }
-
+            
             return chunk;
 
-            Chunk generatedChunk = new Chunk(x, y);
+            /*Chunk generatedChunk = new Chunk(x, y);
 
             double baseXoffset = 0;
             double baseYOffset = 0;
@@ -123,7 +123,7 @@ namespace Minecraft
                 baseYOffset += basePerlinDetail;
                 biomeYOffset += biomePerlinDetail;
             }
-            return generatedChunk;
+            return generatedChunk;*/
         }
     }
 }

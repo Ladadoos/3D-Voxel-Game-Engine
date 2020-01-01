@@ -11,14 +11,14 @@ namespace Minecraft
             return new BlockStateFlower();
         }
 
-        public override AABB[] GetCollisionBox(BlockState state)
+        public override AABB[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
             return emptyAABB;
         }
 
-        public override bool CanAddBlockAt(World world, Vector3 intPosition)
+        public override bool CanAddBlockAt(World world, Vector3i blockPos)
         {
-            return world.GetBlockAt(intPosition + new Vector3(0, -1, 0)).GetBlock() == Blocks.Dirt;
+            return world.GetBlockAt(blockPos.Down()).GetBlock() == Blocks.Dirt;
         }
     }
 }

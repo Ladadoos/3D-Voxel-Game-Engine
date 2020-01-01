@@ -5,29 +5,14 @@ namespace Minecraft
 {
     abstract class BlockState
     {
-        //Position is automatically set by the world once the block is placed.
-        public Vector3 position;
-
-        public Vector3 ChunkLocalPosition()
-        {
-            return new Vector3((int)position.X & 15, position.Y, (int)position.Z & 15);
-        }
-
         public abstract Block GetBlock();
 
         public virtual void ToStream(NetBufferedStream bufferedStream)
         {
             bufferedStream.WriteInt32(GetBlock().id);
-            bufferedStream.WriteFloat(position.X);
-            bufferedStream.WriteFloat(position.Y);
-            bufferedStream.WriteFloat(position.Z);
         }
 
-        public virtual void FromStream(BinaryReader reader)
-        {
-            Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-            this.position = position;
-        }
+        public virtual void FromStream(BinaryReader reader) { }
     }
 
     class BlockStateDirt : BlockState

@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class Chunk
     {
-        private Dictionary<Vector3, BlockState> tickableBlocks = new Dictionary<Vector3, BlockState>();
+        private Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
         public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX;
         public int gridZ;
@@ -58,26 +58,26 @@ namespace Minecraft
             int sectionHeight = worldY / Constants.SECTION_HEIGHT;
             if(sections[sectionHeight] == null)
             {
-                sections[sectionHeight] = new Section((byte)sectionHeight);
+                sections[sectionHeight] = new Section(this, (byte)sectionHeight);
             }
 
+            Vector3i blockPos = new Vector3i(localX + gridX * 16, worldY, localZ + gridZ * 16);
             int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;
             if(blockstate.GetBlock() == Blocks.Air)
             {
                 sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
-                if(tickableBlocks.TryGetValue(blockstate.position, out BlockState tickable))
+                if(tickableBlocks.TryGetValue(blockPos, out BlockState tickable))
                 {
-                    tickableBlocks.Remove(blockstate.position);
+                    tickableBlocks.Remove(blockPos);
                 }
             }
             else
             {
-                blockstate.position = new Vector3(localX + gridX * 16, worldY, localZ + gridZ * 16);
                 sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
 
                 if (blockstate.GetBlock().isTickable)
                 {
-                    tickableBlocks.Add(blockstate.position, blockstate);
+                    tickableBlocks.Add(blockPos, blockstate);
                 }               
             }         
         }

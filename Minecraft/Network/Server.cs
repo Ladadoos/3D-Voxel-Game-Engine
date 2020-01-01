@@ -96,17 +96,27 @@ namespace Minecraft
             Logger.Info("Server closed.");
         }
 
+        private void test(object obj)
+        {
+            Connection connection = (Connection)obj;
+            Logger.Info("Writing chunk data to stream.");
+            foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
+            {
+                Logger.Info("Write chunk.");
+                Thread.Sleep(500);
+                connection.WritePacket(new ChunkDataPacket(kv.Value));
+            }
+        }
+
         private void OnConnectionStateChanged(Connection connection)
         {
             if(connection.state == ConnectionState.Accepted)
             {
-                //if (!isSingleplayer)
+                if (isOpen)
                 {
-                    Logger.Info("Writing chunk data to stream.");
-                    foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
-                    {
-                        connection.WritePacket(new ChunkDataPacket(kv.Value));
-                    }
+                    Thread t = new Thread(test);
+                    t.IsBackground = true;
+                    t.Start(connection);
                 }
             }else if(connection.state == ConnectionState.Closed)
             {
@@ -150,6 +160,19 @@ namespace Minecraft
             {
                 Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
                 clients.ForEach(c => c.WritePacket(packet));
+            }
+        }
+
+        public void BroadcastPacketExceptTo(Connection connection, Packet packet)
+        {
+            lock (clientsLock)
+            {
+                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
+                for (int i = clients.Count - 1; i >= 0; i--)
+                {
+                    if (clients[i] == connection) continue;
+                    clients[i].WritePacket(packet);
+                }
             }
         }
 

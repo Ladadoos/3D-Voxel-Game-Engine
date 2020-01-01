@@ -4,11 +4,11 @@ namespace Minecraft
 {
     class RemoveBlockPacket : Packet
     {
-        public Vector3 position { get; private set; }
+        public Vector3i blockPos { get; private set; }
 
-        public RemoveBlockPacket(Vector3 position) : base(PacketType.RemoveBlock)
+        public RemoveBlockPacket(Vector3i blockPos) : base(PacketType.RemoveBlock)
         {
-            this.position = position;
+            this.blockPos = blockPos;
         }
 
         public override void Process(INetHandler netHandler)
@@ -18,9 +18,9 @@ namespace Minecraft
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteFloat(position.X);
-            bufferedStream.WriteFloat(position.Y);
-            bufferedStream.WriteFloat(position.Z);
+            bufferedStream.WriteInt32(blockPos.X);
+            bufferedStream.WriteInt32(blockPos.Y);
+            bufferedStream.WriteInt32(blockPos.Z);
         }
     }
 }

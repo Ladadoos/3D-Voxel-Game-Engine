@@ -41,7 +41,7 @@ namespace Minecraft
         {
             List<BlockState> explosives = new List<BlockState>();
 
-            for (int x = -4; x <= 4; x++)
+            /*for (int x = -4; x <= 4; x++)
             {
                 for (int y = -4; y <= 4; y++)
                 {
@@ -63,7 +63,7 @@ namespace Minecraft
                         }
                     }
                 }
-            }
+            }*/
 
             foreach (BlockState state in explosives)
             {

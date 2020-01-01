@@ -22,15 +22,16 @@ namespace Minecraft
                     }
                 case PacketType.PlaceBlock:
                     {
+                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
                         int blockId = reader.ReadInt32();
-                        BlockState state = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                        state.FromStream(reader);
-                        return new PlaceBlockPacket(state);
+                        BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
+                        blockState.FromStream(reader);
+                        return new PlaceBlockPacket(blockState, blockPos);
                     }
                 case PacketType.RemoveBlock:
                     {
-                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                        return new RemoveBlockPacket(position);
+                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                        return new RemoveBlockPacket(blockPos);
                     }
                 case PacketType.ChunkLoad:
                     {
@@ -43,11 +44,13 @@ namespace Minecraft
                             int statesNumber = reader.ReadInt32();
                             for (int j = 0; j < statesNumber; j++)
                             {
-                                int blockId = reader.ReadInt32();
-                                BlockState state = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                                state.FromStream(reader);
+                                Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
 
-                                chunk.AddBlock((int)state.position.X & 15, (int)state.position.Y, (int)state.position.Z & 15, state);
+                                int blockId = reader.ReadInt32();
+                                BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
+                                blockState.FromStream(reader);
+
+                                chunk.AddBlock(blockPos.X & 15, blockPos.Y, blockPos.Z & 15, blockState);
                             }
                         }
                         return new ChunkDataPacket(chunk);
@@ -77,8 +80,8 @@ namespace Minecraft
                     }
                 case PacketType.PlayerBlockInteraction:
                     {
-                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                        return new PlayerBlockInteractionPacket(position);
+                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                        return new PlayerBlockInteractionPacket(blockPos);
                     }
                 default: throw new Exception("Invalid packet type: " + packetType);
             }

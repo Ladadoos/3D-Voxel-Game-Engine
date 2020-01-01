@@ -13,14 +13,14 @@ namespace Minecraft
             this.playerConnection = playerConnection;
         }
 
-        public void ProcessPlaceBlockPacket(PlaceBlockPacket blockPacket)
+        public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockpacket)
         {
-            game.world.AddBlockToWorld(blockPacket.state.position, blockPacket.state);
+            game.world.AddBlockToWorld(placedBlockpacket.blockPos, placedBlockpacket.blockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            game.world.QueueToRemoveBlockAt(removeBlockPacket.position);
+            game.world.QueueToRemoveBlockAt(removeBlockPacket.blockPos);
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)
@@ -64,7 +64,7 @@ namespace Minecraft
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            BlockState state = game.world.GetBlockAt(playerInteractionPacket.intPosition);
+            BlockState state = game.world.GetBlockAt(playerInteractionPacket.blockPos);
             //state.GetBlock().OnInteract(state, game.world);
         }
     }

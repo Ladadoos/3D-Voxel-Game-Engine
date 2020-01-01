@@ -36,7 +36,7 @@ namespace Minecraft
 
         protected abstract Model GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -47,7 +47,7 @@ namespace Minecraft
 
                 foreach (Vector3 modelSpacePosition in face.positions)
                 {
-                    Vector3 world = modelSpacePosition + new Vector3(sourceState.ChunkLocalPosition());
+                    Vector3 world = modelSpacePosition + blockPos;
                     vertexPositions.Add(world.X);
                     vertexPositions.Add(world.Y);
                     vertexPositions.Add(world.Z);
@@ -68,7 +68,7 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -82,12 +82,12 @@ namespace Minecraft
 
                 for (int i = 0; i < face.positions.Length; i += 2)
                 {
-                    Vector3 world = face.positions[i + 1] + new Vector3(sourceState.ChunkLocalPosition());
+                    Vector3 world = face.positions[i + 1] + blockPos;
                     vertexPositions.Add(world.X);
                     vertexPositions.Add(world.Y);
                     vertexPositions.Add(world.Z);
 
-                    world = face.positions[i] + new Vector3(sourceState.ChunkLocalPosition());
+                    world = face.positions[i] + blockPos;
                     vertexPositions.Add(world.X);
                     vertexPositions.Add(world.Y);
                     vertexPositions.Add(world.Z);
@@ -108,10 +108,10 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, BlockState sourceState, float illumination)
+        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
         {
-            AddFacesToMeshFromFront(toAddFaces, sourceState, illumination);
-            AddFacesToMeshFromBack(toAddFaces, sourceState, illumination);
+            AddFacesToMeshFromFront(toAddFaces, blockPos, illumination);
+            AddFacesToMeshFromBack(toAddFaces, blockPos, illumination);
         }
     }
 }

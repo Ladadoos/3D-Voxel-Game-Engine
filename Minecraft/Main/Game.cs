@@ -37,7 +37,7 @@ namespace Minecraft
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                server = new Server(this, true);
+                server = new Server(this, false);
                 server.Start("127.0.0.1", 50000);
                 server.AddHook(new ClientWorldHook(this));
                 server.AddHook(new ServerWorldHook(this));
@@ -49,7 +49,7 @@ namespace Minecraft
                 world = server.GetWorldInstance();
             } else if(mode == RunMode.Server)
             {
-                server = new Server(this, false);
+                server = new Server(this, true);
                 server.Start("127.0.0.1", 50000);
                 server.AddHook(new ServerWorldHook(this));
                 server.GenerateMap();

@@ -4,11 +4,11 @@ namespace Minecraft
 {
     class PlayerBlockInteractionPacket : Packet
     {
-        public Vector3 intPosition { get; private set; }
+        public Vector3i blockPos { get; private set; }
 
-        public PlayerBlockInteractionPacket(Vector3 intPosition) : base(PacketType.PlayerBlockInteraction)
+        public PlayerBlockInteractionPacket(Vector3i blockPos) : base(PacketType.PlayerBlockInteraction)
         {
-            this.intPosition = intPosition;
+            this.blockPos = blockPos;
         }
 
         public override void Process(INetHandler netHandler)
@@ -18,9 +18,9 @@ namespace Minecraft
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteFloat(intPosition.X);
-            bufferedStream.WriteFloat(intPosition.Y);
-            bufferedStream.WriteFloat(intPosition.Z);
+            bufferedStream.WriteFloat(blockPos.X);
+            bufferedStream.WriteFloat(blockPos.Y);
+            bufferedStream.WriteFloat(blockPos.Z);
         }
     }
 }

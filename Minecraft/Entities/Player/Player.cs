@@ -151,7 +151,7 @@ namespace Minecraft
                 TryApplyGravity(deltaTime);
             }
 
-            List<BlockState> blocks = GetCollisionDetectionBlocks(world);
+            Dictionary<Vector3i, BlockState> blocks = GetCollisionDetectionBlocks(world);
             position.X += velocity.X * deltaTime;
             CalculatePlayerAABB();
             if (doCollisionDetection)
@@ -177,24 +177,25 @@ namespace Minecraft
         }
 
         /// <summary> Returns all blocks around the players position used for collision detection </summary>
-        private List<BlockState> GetCollisionDetectionBlocks(World world)
+        private Dictionary<Vector3i, BlockState> GetCollisionDetectionBlocks(World world)
         {
-            List<BlockState> collidables = new List<BlockState>();
+            Dictionary<Vector3i, BlockState> collidables = new Dictionary<Vector3i, BlockState>();
 
             int intX = (int)position.X;
             int intY = (int)position.Y;
             int intZ = (int)position.Z;
 
-            for (int xx = intX - 1; xx <= intX + 1; xx++)
+            for (int worldX = intX - 1; worldX <= intX + 1; worldX++)
             {
-                for (int yy = intY - 1; yy <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); yy++)
+                for (int worldY = intY - 1; worldY <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); worldY++)
                 {
-                    for (int zz = intZ - 1; zz <= intZ + 1; zz++)
+                    for (int worldZ = intZ - 1; worldZ <= intZ + 1; worldZ++)
                     {
-                        BlockState blockstate = world.GetBlockAt(xx, yy, zz);
+                        Vector3i blockPos = new Vector3i(worldX, worldY, worldZ);
+                        BlockState blockstate = world.GetBlockAt(blockPos);
                         if (blockstate.GetBlock() != Blocks.Air)
                         {
-                            collidables.Add(blockstate);
+                            collidables.Add(blockPos, blockstate);
                         }
                     }
                 }
@@ -203,11 +204,11 @@ namespace Minecraft
             return collidables;
         }
 
-        private void DoXAxisCollisionDetection(List<BlockState> blocks)
+        private void DoXAxisCollisionDetection(Dictionary<Vector3i, BlockState> blocks)
         {
-            foreach (BlockState collidable in blocks)
+            foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -228,12 +229,12 @@ namespace Minecraft
             }
         }
 
-        private void DoYAxisCollisionDetection(List<BlockState> blocks)
+        private void DoYAxisCollisionDetection(Dictionary<Vector3i, BlockState> blocks)
         {
             bool collidedY = false;
-            foreach (BlockState collidable in blocks)
+            foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -257,11 +258,11 @@ namespace Minecraft
             isInAir = !collidedY;
         }
 
-        private void DoZAxisCollisionDetection(List<BlockState> blocks)
+        private void DoZAxisCollisionDetection(Dictionary<Vector3i, BlockState> blocks)
         {
-            foreach (BlockState collidable in blocks)
+            foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.GetBlock().GetCollisionBox(collidable))
+                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {

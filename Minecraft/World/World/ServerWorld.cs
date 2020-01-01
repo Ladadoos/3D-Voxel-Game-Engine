@@ -16,16 +16,30 @@
             world.OnBlockRemovedHandler += OnBlockRemovedServer;
         }
 
-        private void OnBlockPlacedServer(World world, Chunk chunk, BlockState oldState, BlockState newState)
+        private void OnBlockPlacedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
-            if (game.server.isOpen) return;
-            game.server.BroadcastPacket(new PlaceBlockPacket(newState));
+            if (!game.server.isOpen) return;
+            if(game.mode == RunMode.Server)
+            {
+                game.server.BroadcastPacket(new PlaceBlockPacket(newState, blockPos));
+            } else
+            {
+                game.server.BroadcastPacketExceptTo(game.client.serverConnection, new PlaceBlockPacket(newState, blockPos));
+            }
+
         }
 
-        private void OnBlockRemovedServer(World world, Chunk chunk, BlockState oldState)
+        private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
-            if (game.server.isOpen) return;
-            game.server.BroadcastPacket(new RemoveBlockPacket(oldState.position));
+            if (!game.server.isOpen) return;
+            if(game.mode == RunMode.Server)
+            {
+                game.server.BroadcastPacket(new RemoveBlockPacket(blockPos));
+            } else
+            {
+                game.server.BroadcastPacketExceptTo(game.client.serverConnection, new RemoveBlockPacket(blockPos));
+            }
+
         }
     }
 }

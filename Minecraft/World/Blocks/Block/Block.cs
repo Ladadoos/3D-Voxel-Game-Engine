@@ -18,7 +18,7 @@ namespace Minecraft
 
         public virtual void OnInteract(BlockState blockstate, World world) { }
 
-        public virtual bool CanAddBlockAt(World world, Vector3 intPosition)
+        public virtual bool CanAddBlockAt(World world, Vector3i blockPos)
         {
             return true;
         }
@@ -27,15 +27,15 @@ namespace Minecraft
 
         public virtual void OnAdded(BlockState blockstate, World world) { }
 
-        public virtual AABB[] GetCollisionBox(BlockState state)
+        public virtual AABB[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
-            return new AABB[] { GetFullBlockCollision(state) };
+            return new AABB[] { GetFullBlockCollision(blockPos) };
         }
 
-        public static AABB GetFullBlockCollision(BlockState state)
+        public static AABB GetFullBlockCollision(Vector3i blockPos)
         {
-            return new AABB(new Vector3(state.position.X, state.position.Y, state.position.Z),
-                new Vector3(state.position.X + Constants.CUBE_SIZE, state.position.Y + Constants.CUBE_SIZE, state.position.Z + Constants.CUBE_SIZE));
+            return new AABB(new Vector3(blockPos.X, blockPos.Y, blockPos.Z),
+                new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE));
         }
     }
 
@@ -48,7 +48,7 @@ namespace Minecraft
             return new BlockStateAir();
         }
 
-        public override AABB[] GetCollisionBox(BlockState state)
+        public override AABB[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
             return emptyAABB;
         }
