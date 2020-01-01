@@ -62,7 +62,7 @@ namespace Minecraft
         public void Render(World world)
         {
             GL.Enable(EnableCap.DepthTest);
-            screenQuad.fbo.BindFBO();
+            screenQuad.Bind();
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -82,7 +82,7 @@ namespace Minecraft
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
             }
 
-            foreach (Entity entity in world.entities)
+            foreach (Entity entity in world.entities.Values)
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
                 {
@@ -106,7 +106,7 @@ namespace Minecraft
             }*/
 
             playerBlockRenderer.RenderSelection();
-            screenQuad.fbo.UnbindFBO();
+            screenQuad.Unbind();
             GL.Disable(EnableCap.DepthTest);
             screenQuad.RenderToScreen();
         }
@@ -190,7 +190,8 @@ namespace Minecraft
         }
 
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)
-        {    
+        {
+            screenQuad.AdjustToWindowSize(pInfo.windowWidth, pInfo.windowHeight);
             UploadProjectionMatrix();
         }
 

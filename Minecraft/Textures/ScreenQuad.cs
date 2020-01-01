@@ -5,9 +5,7 @@ namespace Minecraft
 {
     class ScreenQuad
     {
-        //Add OnScreenSizeChanged...
-
-        public ScreenFBO fbo { get; private set; }
+        private ScreenFBO fbo;
         private PostRenderShader shader;
 
         private int vao, vbo;
@@ -46,6 +44,21 @@ namespace Minecraft
             GL.BindVertexArray(vao);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
             shader.Stop();
+        }
+
+        public void AdjustToWindowSize(int screenWidth, int screenHeight)
+        {
+            fbo.AdjustToWindowSize(screenWidth, screenHeight);
+        }
+
+        public void Bind()
+        {
+            fbo.BindFBO();
+        }
+
+        public void Unbind()
+        {
+            fbo.UnbindFBO();
         }
     }
 }

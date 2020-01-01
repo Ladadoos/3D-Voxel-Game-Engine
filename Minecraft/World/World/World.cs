@@ -16,7 +16,7 @@ namespace Minecraft
         protected float elapsedMillisecondsSinceLastTick;
         protected List<Vector3i> toRemoveBlocks = new List<Vector3i>();
 
-        public List<Entity> entities = new List<Entity>();
+        public Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
 
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
@@ -31,7 +31,7 @@ namespace Minecraft
         {
             this.game = game;
             worldGenerator = new WorldGenerator();
-            entities.Add(new Dummy(1));
+           // entities.Add(new Dummy(1));
         }
 
         public bool IsServer() => game.mode == RunMode.Server;

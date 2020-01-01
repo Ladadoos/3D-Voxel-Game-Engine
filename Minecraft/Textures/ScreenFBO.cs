@@ -12,6 +12,11 @@ namespace Minecraft
 
         public ScreenFBO(int screenWidth, int screenHeight)
         {
+            CreateFBO(screenWidth, screenHeight);
+        }
+
+        private void CreateFBO(int screenWidth, int screenHeight)
+        {
             // Create and bind FBO
             GL.Ext.GenFramebuffers(1, out fbo);
             GL.Ext.BindFramebuffer(FramebufferTarget.FramebufferExt, fbo);
@@ -43,7 +48,7 @@ namespace Minecraft
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             // Attach color texture to FBO
             GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, normalDepthTexture, 0);
-            
+
             // Create render buffer object and bind it
             GL.Ext.GenRenderbuffers(1, out renderBuffer);
             GL.Ext.BindRenderbuffer(RenderbufferTarget.RenderbufferExt, renderBuffer);
@@ -54,6 +59,12 @@ namespace Minecraft
 
             ValidateFBO();
             UnbindFBO();
+        }
+
+        public void AdjustToWindowSize(int screenWidth, int screenHeight)
+        {
+            OnCloseGame();
+            CreateFBO(screenWidth, screenHeight);
         }
 
         public void BindFBO()
@@ -68,6 +79,9 @@ namespace Minecraft
 
         public void OnCloseGame()
         {
+            GL.DeleteTexture(colorTexture);
+            GL.DeleteTexture(normalDepthTexture);
+            GL.DeleteRenderbuffer(renderBuffer);
             GL.DeleteFramebuffer(fbo);
         }
 
