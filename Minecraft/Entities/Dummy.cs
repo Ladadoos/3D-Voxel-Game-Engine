@@ -4,9 +4,9 @@ namespace Minecraft
 {
     class Dummy : Entity
     {
-        public Dummy(int id) : base(id, EntityType.Dummy)
+        public Dummy(int id) : base(id, new Vector3(15, 105, 15), EntityType.Dummy)
         {
-            position = new Vector3(15, 105, 15);
+            
         }
     }
 }

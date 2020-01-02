@@ -39,7 +39,6 @@
             {
                 game.server.BroadcastPacketExceptTo(game.client.serverConnection, new RemoveBlockPacket(blockPos));
             }
-
         }
     }
 }

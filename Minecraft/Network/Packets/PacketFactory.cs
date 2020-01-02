@@ -72,6 +72,12 @@ namespace Minecraft
                         string playerName = ReadUtf8String(reader);
                         return new PlayerJoinAcceptPacket(playerName, playerId);
                     }
+                case PacketType.PlayerJoin:
+                    {
+                        int playerId = reader.ReadInt32();
+                        string playerName = ReadUtf8String(reader);
+                        return new PlayerJoinPacket(playerName, playerId);
+                    }
                 case PacketType.PlayerKick:
                     {
                         KickReason kickReason = (KickReason)reader.ReadInt32();

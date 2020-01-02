@@ -6,8 +6,6 @@ namespace Minecraft
 {
     class World : IEventAnnouncer
     {
-        public static int SeaLevel = 95;
-
         protected WorldGenerator worldGenerator;
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
         protected Game game;
@@ -16,7 +14,9 @@ namespace Minecraft
         protected float elapsedMillisecondsSinceLastTick;
         protected List<Vector3i> toRemoveBlocks = new List<Vector3i>();
 
+        public Dictionary<int, Player> playerEntities = new Dictionary<int, Player>();
         public Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
+        public EntityIdTracker entityIdTracker = new EntityIdTracker();
 
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
@@ -51,9 +51,9 @@ namespace Minecraft
         {
             Logger.Info("Starting initial chunk generation.");
             var start = DateTime.Now;
-            for (int x = 0; x < 2; x++)
+            for (int x = 0; x < 4; x++)
             {
-                for (int y = 0; y < 2; y++)
+                for (int y = 0; y < 4; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
                    LoadChunk(chunk);

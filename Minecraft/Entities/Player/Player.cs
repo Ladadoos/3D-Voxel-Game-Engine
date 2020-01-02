@@ -28,7 +28,7 @@ namespace Minecraft
         protected delegate void OnToggleCrouching(bool isCrouching);
         protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        public Player(Vector3 startPosition) : base(0, EntityType.Player)
+        public Player(int id, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
         {
             position = startPosition;
             velocity = Vector3.Zero;

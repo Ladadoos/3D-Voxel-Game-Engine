@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 
 namespace Minecraft
 {
@@ -36,7 +37,8 @@ namespace Minecraft
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
-            Logger.Info(playerDataPacket.ToString());
+            game.server.BroadcastPacketExceptTo(playerConnection, playerDataPacket);
+            //Logger.Info(playerDataPacket.ToString());
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
@@ -48,8 +50,19 @@ namespace Minecraft
                 playerConnection.state = ConnectionState.Closed;
                 return;
             }
-            playerConnection.WritePacket(new PlayerJoinAcceptPacket("server_" + playerName, 0));
+            int playerId = game.world.entityIdTracker.GenerateId();
+            string serverPlayerName = "server_" + playerName + "_id_" + playerId;
+            Player player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
+
+            game.world.playerEntities.Add(playerId, player);
+            playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
             playerConnection.state = ConnectionState.Accepted;
+            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
+        }
+
+        public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
+        {
+            throw new InvalidOperationException();
         }
 
         public void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket)

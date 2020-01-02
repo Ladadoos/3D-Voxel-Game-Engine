@@ -1,4 +1,4 @@
-﻿namespace Minecraft.Entities
+﻿namespace Minecraft
 {
     class PlayerCamera
     {

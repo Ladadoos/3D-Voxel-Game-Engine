@@ -1,11 +1,11 @@
 ﻿namespace Minecraft
 {
-    class PlayerJoinAcceptPacket : Packet
+    class PlayerJoinPacket : Packet
     {
         public string name { get; private set; }
         public int playerId { get; private set; }
 
-        public PlayerJoinAcceptPacket(string name, int playerId) : base(PacketType.PlayerJoinAccept)
+        public PlayerJoinPacket(string name, int playerId) : base(PacketType.PlayerJoin)
         {
             this.name = name;
             this.playerId = playerId;
@@ -13,7 +13,7 @@
 
         public override void Process(INetHandler netHandler)
         {
-            netHandler.ProcessJoinAcceptPacket(this);
+            netHandler.ProcessPlayerJoinPacket(this);
         }
 
         protected override void ToStream(NetBufferedStream bufferedStream)

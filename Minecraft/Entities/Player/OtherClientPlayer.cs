@@ -2,11 +2,11 @@
 
 namespace Minecraft
 {
-    class ServerPlayer : Player
+    class OtherClientPlayer : Player
     {
-        public ServerPlayer(int id, Vector3 position) : base(id, position)
+        public OtherClientPlayer(int id) : base(id, new Vector3(10, 100, 10))
         {
-            
+
         }
 
         public override void Update(float deltaTime, World world)

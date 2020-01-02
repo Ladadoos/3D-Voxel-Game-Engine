@@ -16,6 +16,8 @@ namespace Minecraft
         private ForestBiome forestBiome = new ForestBiome();
         private SandBiome sandBiome = new SandBiome();
 
+        private int seaLevel = 95;
+
         public WorldGenerator()
         {
             basePerlinSeed = Game.randomizer.Next(1000000);
@@ -40,17 +42,17 @@ namespace Minecraft
             {
                 for (int j = 0; j < Constants.CHUNK_SIZE; j++)
                 {
-                    for (int k = 0; k < 20; k++)
+                    for (int k = 0; k < 30; k++)
                     {
-                        if(k > 98)
-                        {
-                            BlockStateTNT tnt = (BlockStateTNT)Blocks.Tnt.GetNewDefaultState();
-                            tnt.elapsedSecondsSinceTrigger = Game.randomizer.Next(100);
-                            chunk.AddBlock(i, k, j, tnt);
-                        } else
-                        {
+                        //if(k > 98)
+                        //{
+                        //    BlockStateTNT tnt = (BlockStateTNT)Blocks.Tnt.GetNewDefaultState();
+                        //    tnt.elapsedSecondsSinceTrigger = Game.randomizer.Next(100);
+                         //   chunk.AddBlock(i, k, j, tnt);
+                        //} else
+                        //{
                             chunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
-                        }
+                        //}
                     }
                 }
             }
@@ -75,7 +77,7 @@ namespace Minecraft
                 for (int j = 0; j < Constants.CHUNK_SIZE; j++)
                 {
                     double basePerlinValue = GetBasePerlinValueAt(baseXoffset, baseYOffset);
-                    int height = World.SeaLevel + System.Math.Abs((int)(basePerlinValue * 32));
+                    int height = seaLevel + System.Math.Abs((int)(basePerlinValue * 32));
 
                     double biomeDeterminer = GetBiomePerlinValueAt(biomeXoffset, biomeYOffset);
                     if (biomeDeterminer > 0.75D)

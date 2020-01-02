@@ -9,6 +9,7 @@
         EntityPosition,
         PlayerJoinRequest,
         PlayerJoinAccept,
+        PlayerJoin,
         PlayerKick,
         PlayerBlockInteraction
     }

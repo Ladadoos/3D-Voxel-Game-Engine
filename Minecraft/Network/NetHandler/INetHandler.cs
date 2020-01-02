@@ -16,6 +16,8 @@
 
         void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket);
 
+        void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket);
+
         void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket);
 
         void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket);

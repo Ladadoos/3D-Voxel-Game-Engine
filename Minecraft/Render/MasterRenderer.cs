@@ -92,6 +92,16 @@ namespace Minecraft
                 }
             }
 
+            foreach (Player player in world.playerEntities.Values)
+            {
+                if (entityMeshRegistry.models.TryGetValue(player.entityType, out Model entityMeshModel))
+                {
+                    entityMeshModel.Bind();
+                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(player.position));
+                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
+                }
+            }
+
             /*entityShader.Start();
             entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
             entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
