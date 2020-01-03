@@ -19,19 +19,19 @@ namespace Minecraft
         {
             float[] illumination = new float[4] { 1, 1, 1, 1 };
 
-            Vector3[] backFace = new Vector3[] { new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0) };
-            Vector3[] rightFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 1, 1) };
-            Vector3[] frontFace = new Vector3[] { new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(1, 1, 1), new Vector3(0, 1, 1) };
-            Vector3[] leftFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1), new Vector3(0, 1, 0) };
-            Vector3[] topFace = new Vector3[] { new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 0), new Vector3(0, 1, 0) };
-            Vector3[] bottomFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 0, 1) };
+            Vector3[] backFace = new Vector3[] { new Vector3(0.5f, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 0.5f, 0), new Vector3(0.5f, 0.5f, 0) };
+            Vector3[] rightFace = new Vector3[] { new Vector3(0.5f, 0, 0.5f), new Vector3(0.5f, 0, 0), new Vector3(0.5f, 0.5f, 0), new Vector3(0.5f, 0.5f, 0.5f) };
+            Vector3[] frontFace = new Vector3[] { new Vector3(0, 0, 0.5f), new Vector3(0.5f, 0, 0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0, 0.5f, 0.5f) };
+            Vector3[] leftFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(0, 0, 0.5f), new Vector3(0, 0.5f, 0.5f), new Vector3(0, 0.5f, 0) };
+            Vector3[] topFace = new Vector3[] { new Vector3(0, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0), new Vector3(0, 0.5f, 0) };
+            Vector3[] bottomFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(0.5f, 0, 0), new Vector3(0.5f, 0, 0.5f), new Vector3(0, 0, 0.5f) };
 
-            float[] uvBack = textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            float[] uvRight = textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            float[] uvFront = textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            float[] uvLeft = textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            float[] uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 0));
-            float[] uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 0));
+            float[] uvBack = textureAtlas.GetTextureCoords(new Vector2(2, 12));
+            float[] uvRight = textureAtlas.GetTextureCoords(new Vector2(2, 12));
+            float[] uvFront = textureAtlas.GetTextureCoords(new Vector2(2, 12));
+            float[] uvLeft = textureAtlas.GetTextureCoords(new Vector2(2, 12));
+            float[] uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 12));
+            float[] uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 12));
 
             entityFaces = new BlockFace[] { new BlockFace(backFace, uvBack, illumination),
                 new BlockFace(rightFace, uvRight, illumination),
