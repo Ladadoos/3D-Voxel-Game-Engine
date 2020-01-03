@@ -38,7 +38,6 @@ namespace Minecraft
                 client = tcpClient,
                 netStream = netStream,
                 reader = new BinaryReader(netStream),
-                writer = new BinaryWriter(netStream),
                 bufferedStream = new NetBufferedStream(new BufferedStream(netStream)),
                 state = ConnectionState.AwaitingAcceptance
             };

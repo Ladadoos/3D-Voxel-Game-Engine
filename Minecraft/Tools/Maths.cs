@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class Maths
     {
-        public static Matrix4 CreateTransformationMatrix(Vector3 translation, 
+        public static Matrix4 CreateTransformationMatrix(Vector3 translation,
                                                         float rx = 0, float ry = 0, float rz = 0,
                                                         float scaleX = 1, float scaleY = 1, float scaleZ = 1)
         {
@@ -36,6 +36,11 @@ namespace Minecraft
         public static float RadianToDegree(double angle)
         {
             return (float)(angle * (180.0 / Math.PI));
+        }
+
+        public static Vector3 Lerp(Vector3 from, Vector3 to, float t)
+        {
+            return from + (to - from) * t;
         }
     }
 }

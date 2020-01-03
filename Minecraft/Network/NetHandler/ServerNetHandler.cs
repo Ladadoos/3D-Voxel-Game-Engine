@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -16,12 +17,12 @@ namespace Minecraft
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockpacket)
         {
-            game.world.AddBlockToWorld(placedBlockpacket.blockPos, placedBlockpacket.blockState);
+            game.server.world.AddBlockToWorld(placedBlockpacket.blockPos, placedBlockpacket.blockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            game.world.QueueToRemoveBlockAt(removeBlockPacket.blockPos);
+            game.server.world.QueueToRemoveBlockAt(removeBlockPacket.blockPos);
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)
@@ -50,14 +51,20 @@ namespace Minecraft
                 playerConnection.state = ConnectionState.Closed;
                 return;
             }
-            int playerId = game.world.entityIdTracker.GenerateId();
+            int playerId = game.server.world.entityIdTracker.GenerateId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
-            Player player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
+            ServerPlayer player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
 
-            game.world.playerEntities.Add(playerId, player);
+            game.server.world.playerEntities.Add(playerId, player);
             playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
             playerConnection.state = ConnectionState.Accepted;
-            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
+            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));     
+            
+            foreach(KeyValuePair<Connection, ServerPlayer> client in game.server.players)
+            {
+                playerConnection.WritePacket(new PlayerJoinPacket("", client.Value.id));
+            }
+            game.server.players.Add(playerConnection, player);
         }
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
@@ -77,7 +84,7 @@ namespace Minecraft
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            BlockState state = game.world.GetBlockAt(playerInteractionPacket.blockPos);
+            BlockState state = game.server.world.GetBlockAt(playerInteractionPacket.blockPos);
             //state.GetBlock().OnInteract(state, game.world);
         }
     }

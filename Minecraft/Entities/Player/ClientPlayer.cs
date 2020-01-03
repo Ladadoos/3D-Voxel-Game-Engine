@@ -13,7 +13,7 @@ namespace Minecraft
 
         private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
 
-        private float secondsPerPosUpdate = 1F;
+        private float secondsPerPosUpdate = 0.05F;
         private float elapsedMsSinceLastPosUpdate;
 
         public ClientPlayer(Game game) : base(-1, new Vector3(0, 100, 0))

@@ -8,7 +8,6 @@ namespace Minecraft
         public TcpClient client;
         public NetworkStream netStream;
         public BinaryReader reader;
-        public BinaryWriter writer;
         public NetBufferedStream bufferedStream;
         public INetHandler netHandler;
 

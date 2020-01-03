@@ -47,7 +47,7 @@ namespace Minecraft
                 return;
             }
             OtherClientPlayer otherPlayer = (OtherClientPlayer)player;
-            otherPlayer.position = playerDataPacket.position;
+            otherPlayer.serverPosition = playerDataPacket.position;
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)

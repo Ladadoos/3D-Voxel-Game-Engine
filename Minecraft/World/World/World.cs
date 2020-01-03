@@ -4,7 +4,7 @@ using OpenTK;
 
 namespace Minecraft
 {
-    class World : IEventAnnouncer
+    abstract class World
     {
         protected WorldGenerator worldGenerator;
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
@@ -34,6 +34,11 @@ namespace Minecraft
            // entities.Add(new Dummy(1));
         }
 
+        public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
+        {
+            loadedChunks = storage;
+        }
+
         public bool IsServer() => game.mode == RunMode.Server;
 
         public bool IsServerOpen()
@@ -42,18 +47,13 @@ namespace Minecraft
             return game.server.isOpen;
         }
 
-        public void AddEventHooks(IEventHook hook)
-        {
-            hook.AddEventHooksFor(this);
-        }
-
         public void GenerateTestMap()
         {
             Logger.Info("Starting initial chunk generation.");
             var start = DateTime.Now;
-            for (int x = 0; x < 4; x++)
+            for (int x = 0; x < 1; x++)
             {
-                for (int y = 0; y < 4; y++)
+                for (int y = 0; y < 1; y++)
                 {
                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
                    LoadChunk(chunk);
@@ -78,6 +78,11 @@ namespace Minecraft
 
         public void Tick(float deltaTime)
         {
+            foreach(Player player in playerEntities.Values)
+            {
+                player.Update(deltaTime, this);
+            }
+
             elapsedMillisecondsSinceLastTick += deltaTime;
             if(elapsedMillisecondsSinceLastTick > secondsPerTick)
             {
@@ -124,7 +129,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(blockPos);
             if (oldState.GetBlock() == Blocks.Air)
             {
-                //Logger.Warn("Tried to remove block where there was none.");
+                Logger.Warn("Tried to remove block where there was none.");
                 return false;
             }
 
@@ -176,7 +181,7 @@ namespace Minecraft
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
             int worldY = blockPos.Y;
-
+            Console.WriteLine(GetType());
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
             newBlockState.GetBlock().OnAdded(newBlockState, this);
             OnBlockPlacedHandler?.Invoke(this, chunk, blockPos, oldState, newBlockState);

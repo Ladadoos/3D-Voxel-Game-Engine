@@ -37,32 +37,29 @@ namespace Minecraft
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                server = new Server(this, false);
+                server = new Server(this, true);
                 server.Start("127.0.0.1", 50000);
-                server.AddHook(new ClientWorldHook(this));
-                server.AddHook(new ServerWorldHook(this));
+                WorldClient.AddHooks(this, server.world);
                 server.GenerateMap();
 
                 client = new Client(this);
                 client.ConnectWith("127.0.0.1", 50000);
 
-                world = server.GetWorldInstance();
+                world = new WorldClient(this);
+                world.loadedChunks = server.GetChunKStorage();
             } else if(mode == RunMode.Server)
             {
                 server = new Server(this, true);
                 server.Start("127.0.0.1", 50000);
-                server.AddHook(new ServerWorldHook(this));
                 server.GenerateMap();
-
-                world = server.GetWorldInstance();
 
                 window.VSync = OpenTK.VSyncMode.On;
             } else{
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                world = new World(this);
-                world.AddEventHooks(new ClientWorldHook(this));
+                world = new WorldClient(this);
+                WorldClient.AddHooks(this, world);
 
                 client = new Client(this);
                 client.ConnectWith("127.0.0.1", 50000);
@@ -85,15 +82,16 @@ namespace Minecraft
             fpsCounter.IncrementFrameCounter();
             fpsCounter.AddElapsedTime(elapsedSeconds);
 
-            if(mode == RunMode.Server)
+            if (mode == RunMode.Server)
             {
-                world.Tick((float)elapsedSeconds);
+                server.world.Tick((float)elapsedSeconds);
                 server.Update();
             } else
             {
                 if(mode == RunMode.ClientServer)
                 {
-                    server?.Update();
+                    server.world.Tick((float)elapsedSeconds);
+                    server.Update();
                 }
 
                 client.Update();

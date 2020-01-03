@@ -11,6 +11,7 @@ namespace Minecraft
     class Server
     {
         private List<Connection> clients = new List<Connection>();
+        public Dictionary<Connection, ServerPlayer> players = new Dictionary<Connection, ServerPlayer>();
         private object clientsLock = new object();
         private Thread connectionsThread;
         private int port;
@@ -18,7 +19,7 @@ namespace Minecraft
         private TcpListener tcpServer;
         private bool isRunning;
 
-        private World world;
+        public WorldServer world;
         private Game game;
 
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
@@ -29,13 +30,13 @@ namespace Minecraft
             this.game = game;
             this.isOpen = isOpen;
         }
-
+    
         public void Start(string address, int port)
         {
             this.address = address;
             this.port = port;
 
-            world = new World(game);
+            world = new WorldServer(game);
 
             connectionsThread = new Thread(ListenForConnections);
             connectionsThread.IsBackground = true;
@@ -47,14 +48,9 @@ namespace Minecraft
             world.GenerateTestMap();
         }
 
-        public void AddHook(IEventHook hook)
+        public Dictionary<Vector2, Chunk> GetChunKStorage()
         {
-            world.AddEventHooks(hook);
-        }
-
-        public World GetWorldInstance()
-        {
-            return world;
+            return world.loadedChunks;
         }
 
         private void ListenForConnections()
@@ -73,7 +69,6 @@ namespace Minecraft
                     client = client,
                     netStream = stream,
                     reader = new BinaryReader(stream),
-                    writer = new BinaryWriter(stream),
                     bufferedStream = new NetBufferedStream(new BufferedStream(stream)),
                     state = ConnectionState.AwaitingAcceptance
                 };
@@ -96,7 +91,7 @@ namespace Minecraft
             Logger.Info("Server closed.");
         }
 
-        private void test(object obj)
+        private void ChunkSenderThread(object obj)
         {
             Connection connection = (Connection)obj;
             Logger.Info("Writing chunk data to stream.");
@@ -114,9 +109,17 @@ namespace Minecraft
             {
                 if (isOpen)
                 {
-                    Thread t = new Thread(test);
-                    t.IsBackground = true;
-                    t.Start(connection);
+                    Thread chunkThread = new Thread(ChunkSenderThread);
+                    chunkThread.IsBackground = true;
+                    chunkThread.Start(connection);
+
+                    lock (clientsLock)
+                    {
+                        for (int i = clients.Count - 1; i >= 0; i--)
+                        {
+                            Connection client = clients[i];
+                        }
+                    }
                 }
             }else if(connection.state == ConnectionState.Closed)
             {
@@ -171,6 +174,19 @@ namespace Minecraft
                 for (int i = clients.Count - 1; i >= 0; i--)
                 {
                     if (clients[i] == connection) continue;
+                    clients[i].WritePacket(packet);
+                }
+            }
+        }
+
+        public void BroadcastPacketExcepToHost(Packet packet)
+        {
+            lock (clientsLock)
+            {
+                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
+                for (int i = clients.Count - 1; i >= 0; i--)
+                {
+                    if (clients[i] == clients[0]) continue;
                     clients[i].WritePacket(packet);
                 }
             }
