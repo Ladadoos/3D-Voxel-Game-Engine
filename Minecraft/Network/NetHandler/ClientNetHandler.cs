@@ -36,7 +36,7 @@ namespace Minecraft
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             Logger.Info(playerDataPacket.ToString());
-            if(!game.world.playerEntities.TryGetValue(playerDataPacket.entityId, out Player player))
+            if(!game.world.loadedEntities.TryGetValue(playerDataPacket.entityId, out Entity player))
             {
                 Logger.Error("Received positional data for unregistered player " + playerDataPacket.entityId);
                 return;
@@ -65,8 +65,8 @@ namespace Minecraft
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
         {
-            Player otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId);
-            game.world.playerEntities.Add(playerJoinPacket.playerId, otherPlayer);
+            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId);
+            game.world.loadedEntities.Add(playerJoinPacket.playerId, otherPlayer);
         }
 
         public void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket)

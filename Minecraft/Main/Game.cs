@@ -84,13 +84,13 @@ namespace Minecraft
 
             if (mode == RunMode.Server)
             {
-                server.world.Tick((float)elapsedSeconds);
+                server.world.Update((float)elapsedSeconds);
                 server.Update();
             } else
             {
                 if(mode == RunMode.ClientServer)
                 {
-                    server.world.Tick((float)elapsedSeconds);
+                    server.world.Update((float)elapsedSeconds);
                     server.Update();
                 }
 
@@ -99,7 +99,7 @@ namespace Minecraft
                 input.Update();
                 player.Update((float)elapsedSeconds, world);
 
-                world.Tick((float)elapsedSeconds);
+                world.Update((float)elapsedSeconds);
 
                 masterRenderer.EndFrameUpdate(world);
             }

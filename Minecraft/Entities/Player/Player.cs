@@ -20,7 +20,6 @@ namespace Minecraft
         protected Vector3 right;       //Vector facing to the right of where the player is looking
         protected Vector3 velocity;
         protected float verticalSpeed;
-        public AABB hitbox;
 
         protected delegate void OnToggleRunning(bool isRunning);
         protected event OnToggleRunning OnToggleRunningHandler;
@@ -45,8 +44,6 @@ namespace Minecraft
         {
             return velocity;
         }
-
-        public abstract void Update(float deltaTime, World world);
 
         /// <summary> Returns the max component of the AABB from this player. </summary>
         protected Vector3 GetPlayerMaxAABB()

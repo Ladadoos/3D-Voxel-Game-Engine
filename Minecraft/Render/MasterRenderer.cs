@@ -82,22 +82,12 @@ namespace Minecraft
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
             }
 
-            foreach (Entity entity in world.entities.Values)
+            foreach (Entity entity in world.loadedEntities.Values)
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
                 {
                     entityMeshModel.Bind();
                     entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
-                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
-                }
-            }
-
-            foreach (Player player in world.playerEntities.Values)
-            {
-                if (entityMeshRegistry.models.TryGetValue(player.entityType, out Model entityMeshModel))
-                {
-                    entityMeshModel.Bind();
-                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(player.position));
                     GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
                 }
             }

@@ -7,17 +7,14 @@ namespace Minecraft
 {
     abstract class World
     {
-        protected WorldGenerator worldGenerator;
-        public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
         protected Game game;
 
-        protected float secondsPerTick = 0.05F;
-        protected float elapsedMillisecondsSinceLastTick;
-        protected List<Vector3i> toRemoveBlocks = new List<Vector3i>();
+        private float secondsPerTick = 0.05F;
+        private float elapsedMillisecondsSinceLastTick;
+        private List<Vector3i> toRemoveBlocks = new List<Vector3i>();
 
-        public Dictionary<int, Player> playerEntities = new Dictionary<int, Player>();
-        public Dictionary<int, Entity> entities = new Dictionary<int, Entity>();
-        public EntityIdTracker entityIdTracker = new EntityIdTracker();
+        public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
+        public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
 
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
@@ -31,37 +28,11 @@ namespace Minecraft
         public World(Game game)
         {
             this.game = game;
-            worldGenerator = new WorldGenerator();
-           // entities.Add(new Dummy(1));
         }
 
         public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
         {
             loadedChunks = storage;
-        }
-
-        public bool IsServer() => game.mode == RunMode.Server;
-
-        public bool IsServerOpen()
-        {
-            if (game.server == null) throw new Exception("This should not be called.");
-            return game.server.isOpen;
-        }
-
-        public void GenerateTestMap()
-        {
-            Logger.Info("Starting initial chunk generation.");
-            var start = DateTime.Now;
-            for (int x = 0; x < 1; x++)
-            {
-                for (int y = 0; y < 1; y++)
-                {
-                   Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
-                   LoadChunk(chunk);
-                }
-            }
-            var now2 = DateTime.Now - start;
-            Logger.Info("Finished generation initial chunks. Took " + now2);
         }
 
         public void LoadChunk(Chunk chunk)
@@ -77,15 +48,26 @@ namespace Minecraft
             }
         }
 
-        public void Tick(float deltaTime)
+        public void Update(float deltaTime)
         {
-            foreach(Player player in playerEntities.Values)
+            foreach(Entity entity in loadedEntities.Values)
             {
-                player.Update(deltaTime, this);
+                entity.Update(deltaTime, this);
             }
 
+            Tick(deltaTime);
+
+            foreach(Vector3i toRemoveBlock in toRemoveBlocks)
+            {
+                RemoveBlockAt(toRemoveBlock);
+            }
+            toRemoveBlocks.Clear();
+        }
+
+        private void Tick(float deltaTime)
+        {
             elapsedMillisecondsSinceLastTick += deltaTime;
-            if(elapsedMillisecondsSinceLastTick > secondsPerTick)
+            if (elapsedMillisecondsSinceLastTick > secondsPerTick)
             {
                 foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
                 {
@@ -93,12 +75,6 @@ namespace Minecraft
                 }
                 elapsedMillisecondsSinceLastTick = 0;
             }
-
-            foreach(Vector3i toRemoveBlock in toRemoveBlocks)
-            {
-                RemoveBlockAt(toRemoveBlock);
-            }
-            toRemoveBlocks.Clear();
         }
 
         //UPDATE
@@ -151,7 +127,7 @@ namespace Minecraft
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             bool blockPlacedInLoadedChunk = loadedChunks.TryGetValue(chunkPos, out Chunk chunk);
 
-            if (game.mode != RunMode.Client)
+            if (this is WorldServer)
             {
                 if (newBlockState.GetBlock() == Blocks.Air)
                 {
@@ -177,9 +153,9 @@ namespace Minecraft
                     return false;
                 }
 
-                foreach(Player player in playerEntities.Values)
+                foreach(Entity entity in loadedEntities.Values)
                 {
-                    if (newBlockState.GetBlock().GetCollisionBox(newBlockState, blockPos).Any(aabb => player.hitbox.Intersects(aabb)))
+                    if (newBlockState.GetBlock().GetCollisionBox(newBlockState, blockPos).Any(aabb => entity.hitbox.Intersects(aabb)))
                     {
                         Console.WriteLine("Block tried to placed was in player");
                         return false;

@@ -8,6 +8,7 @@ namespace Minecraft
         public EntityType entityType { get; private set; }
 
         public Vector3 position;
+        public AABB hitbox;
 
         public Entity(int id, Vector3 position, EntityType entityType)
         {
@@ -15,5 +16,8 @@ namespace Minecraft
             this.position = position;
             this.entityType = entityType;
         }
+
+        /// <summary> Called as often as possible </summary>
+        public virtual void Update(float deltaTime, World world) { }
     }
 }

@@ -57,7 +57,7 @@ namespace Minecraft
             ServerPlayer player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
             playerConnection.player = player;
 
-            game.server.world.playerEntities.Add(playerId, player);
+            game.server.world.loadedEntities.Add(playerId, player);
             playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
             playerConnection.state = ConnectionState.Accepted;
             game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
