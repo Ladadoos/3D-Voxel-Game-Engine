@@ -11,7 +11,7 @@ namespace Minecraft
         public static Random randomizer { get; private set; }
 
         public MasterRenderer masterRenderer { get; private set; }
-        public ClientPlayer player;// { get; private set; }
+        public ClientPlayer player { get; private set; }
         public FPSCounter fpsCounter { get; private set; }
         public Client client { get; private set; }
         public World world { get; private set; }

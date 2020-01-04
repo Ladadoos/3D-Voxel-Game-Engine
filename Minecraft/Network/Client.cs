@@ -9,7 +9,7 @@ namespace Minecraft
         private string host;
         private int port;
         private bool isConnected;
-        public Connection serverConnection { get; private set; }
+        private Connection serverConnection;
         private Game game;
 
         public Client(Game game)

@@ -7,7 +7,7 @@ namespace Minecraft
     {
         protected List<float> vertexPositions = new List<float>();
         protected List<float> textureUVs = new List<float>();
-        protected List<float> illumations = new List<float>();
+        protected List<float> illuminations = new List<float>();
         protected List<float> normals = new List<float>();
         protected int indicesCount;
 
@@ -22,7 +22,7 @@ namespace Minecraft
         {
             vertexPositions.Clear();
             textureUVs.Clear();
-            illumations.Clear();
+            illuminations.Clear();
             normals.Clear();
             indicesCount = 0;
         }
@@ -36,7 +36,7 @@ namespace Minecraft
 
         protected abstract Model GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3 blockPos, float globalIllumination)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -54,10 +54,10 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                illumations.Add(illumination);
-                illumations.Add(illumination);
-                illumations.Add(illumination);
-                illumations.Add(illumination);
+                foreach(float illum in face.illumination)
+                {
+                    illuminations.Add(illum * globalIllumination);
+                }
 
                 for(int i = 0; i < 4; i++)
                 {
@@ -68,7 +68,7 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3 blockPos, float globalIllumination)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -94,10 +94,10 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                illumations.Add(illumination);
-                illumations.Add(illumination);
-                illumations.Add(illumination);
-                illumations.Add(illumination);
+                foreach (float illum in face.illumination)
+                {
+                    illuminations.Add(illum * globalIllumination);
+                }
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -108,10 +108,10 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3 blockPos, float illumination)
+        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3 blockPos, float globalIllumination)
         {
-            AddFacesToMeshFromFront(toAddFaces, blockPos, illumination);
-            AddFacesToMeshFromBack(toAddFaces, blockPos, illumination);
+            AddFacesToMeshFromFront(toAddFaces, blockPos, globalIllumination);
+            AddFacesToMeshFromBack(toAddFaces, blockPos, globalIllumination);
         }
     }
 }

@@ -16,6 +16,6 @@ void main()
    {
 		discard;
    }
-   fragmentColor = (albedo / illumination);  
+   fragmentColor = albedo * illumination;  
    normalDepthColor = vec4(normal, 1);
 }

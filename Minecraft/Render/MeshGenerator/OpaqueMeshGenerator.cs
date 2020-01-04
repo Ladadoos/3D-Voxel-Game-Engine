@@ -4,10 +4,10 @@ namespace Minecraft
 {
     class OpaqueMeshGenerator : MeshGenerator
     {
-        private float topLight = 0.9F;
-        private float bottomLight = 2.4F;
-        private float sideXLight = 1.15F;
-        private float sideZLight = 1.4F;
+        private float topLight = 1.35F;
+        private float bottomLight = 0.75F;
+        private float sideXLight = 1F;
+        private float sideZLight = 1.15F;
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {
@@ -86,7 +86,7 @@ namespace Minecraft
                 }
             }
 
-            return new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), normals.ToArray(), indicesCount);        
+            return new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illuminations.ToArray(), normals.ToArray(), indicesCount);        
         }
 
         private void BuildMeshForSide(Direction blockSide, BlockState state, Vector3 blockPos, BlockModel model, float lightValue)
