@@ -38,6 +38,7 @@ namespace Minecraft
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
+            playerConnection.player.position = playerDataPacket.position;
             game.server.BroadcastPacketExceptTo(playerConnection, playerDataPacket);
             //Logger.Info(playerDataPacket.ToString());
         }
@@ -45,7 +46,7 @@ namespace Minecraft
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
         {
             string playerName = playerJoinRequestPacket.name.Trim();
-            if(playerName == string.Empty || playerName == "Player")
+            if (playerName == string.Empty || playerName == "Player")
             {
                 playerConnection.WritePacket(new PlayerKickPacket(KickReason.Banned, "You are not allowed on this server."));
                 playerConnection.state = ConnectionState.Closed;
@@ -54,17 +55,21 @@ namespace Minecraft
             int playerId = game.server.world.entityIdTracker.GenerateId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
             ServerPlayer player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
+            playerConnection.player = player;
 
             game.server.world.playerEntities.Add(playerId, player);
             playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
             playerConnection.state = ConnectionState.Accepted;
-            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));     
-            
-            foreach(KeyValuePair<Connection, ServerPlayer> client in game.server.players)
+            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
+
+            foreach (Connection client in game.server.clients)
             {
-                playerConnection.WritePacket(new PlayerJoinPacket("", client.Value.id));
+                if (client.player == player)
+                {
+                    continue;
+                }
+                playerConnection.WritePacket(new PlayerJoinPacket("", client.player.id));
             }
-            game.server.players.Add(playerConnection, player);
         }
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)

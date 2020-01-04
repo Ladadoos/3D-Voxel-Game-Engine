@@ -15,6 +15,7 @@ namespace Minecraft
         public override void Update(float deltaTime, World world)
         {
             position = Maths.Lerp(position, serverPosition, deltaTime * positionLerpSmoothFactor);
+            CalculatePlayerAABB();
         }
     }
 }

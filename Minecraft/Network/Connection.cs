@@ -10,6 +10,7 @@ namespace Minecraft
         public BinaryReader reader;
         public NetBufferedStream bufferedStream;
         public INetHandler netHandler;
+        public Player player;
 
         private ConnectionState _state;
         public ConnectionState state {

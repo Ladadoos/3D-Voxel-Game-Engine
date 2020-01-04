@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 
 namespace Minecraft
@@ -146,47 +147,53 @@ namespace Minecraft
 
         public bool AddBlockToWorld(Vector3i blockPos, BlockState newBlockState)
         {
-            if(newBlockState.GetBlock() == Blocks.Air)
-            {
-                Logger.Warn("Tried to place air.");
-                return false;
-            }
-
-            if (IsOutsideBuildHeight(blockPos.Y))
-            {
-                Logger.Warn("Tried to place block outside of building height.");
-                return false;
-            }
-
-            Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
-            if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
-            {
-                Logger.Warn("Tried to place block in chunk that is not loaded.");
-                return false;
-            }
-
-            /*if(newBlockState.block.GetCollisionBox(newBlockState).Any(aabb => game.player.hitbox.Intersects(aabb)))
-            {
-                Console.WriteLine("Block tried to placed was in player");
-                return false;
-            }*/
-
             BlockState oldState = GetBlockAt(blockPos);
-            /*if (oldState.GetBlock() != Blocks.Air)
+            Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
+            bool blockPlacedInLoadedChunk = loadedChunks.TryGetValue(chunkPos, out Chunk chunk);
+
+            if (game.mode != RunMode.Client)
             {
-                Logger.Warn("Tried to place block where there was already one.");
-                return false;
-            }*/
+                if (newBlockState.GetBlock() == Blocks.Air)
+                {
+                    Logger.Warn("Tried to place air.");
+                    return false;
+                }
+
+                if (IsOutsideBuildHeight(blockPos.Y))
+                {
+                    Logger.Warn("Tried to place block outside of building height.");
+                    return false;
+                }
+
+                if (!blockPlacedInLoadedChunk)
+                {
+                    Logger.Warn("Tried to place block in chunk that is not loaded.");
+                    return false;
+                }
+
+                if(oldState.GetBlock() != Blocks.Air)
+                {
+                    Logger.Warn("Tried to place block where there was already one.");
+                    return false;
+                }
+
+                foreach(Player player in playerEntities.Values)
+                {
+                    if (newBlockState.GetBlock().GetCollisionBox(newBlockState, blockPos).Any(aabb => player.hitbox.Intersects(aabb)))
+                    {
+                        Console.WriteLine("Block tried to placed was in player");
+                        return false;
+                    }
+                }
+            }
 
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
             int worldY = blockPos.Y;
-            Console.WriteLine(GetType());
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
             newBlockState.GetBlock().OnAdded(newBlockState, this);
             OnBlockPlacedHandler?.Invoke(this, chunk, blockPos, oldState, newBlockState);
 
-            //Console.WriteLine("Changed block at " + worldX + "," + worldY + "," + worldZ + " from " + oldState.block.GetType() + " to " + newBlockState.block.GetType());
             return true;
         }
 

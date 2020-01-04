@@ -42,6 +42,7 @@ namespace Minecraft
                 state = ConnectionState.AwaitingAcceptance
             };
             ClientNetHandler netHandler = new ClientNetHandler(game, serverConnection);
+            serverConnection.player = game.player;
             serverConnection.netHandler = netHandler;
             serverConnection.OnStateChangedHandler += OnConnectionStateChanged;
 

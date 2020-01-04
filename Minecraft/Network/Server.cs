@@ -10,9 +10,7 @@ namespace Minecraft
 {
     class Server
     {
-        private List<Connection> clients = new List<Connection>();
-        public Dictionary<Connection, ServerPlayer> players = new Dictionary<Connection, ServerPlayer>();
-        private object clientsLock = new object();
+        public List<Connection> clients = new List<Connection>();
         private Thread connectionsThread;
         private int port;
         private string address;
@@ -25,12 +23,15 @@ namespace Minecraft
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
         public bool isOpen { get; private set; }
 
+        private object newJoinsLock = new object();
+        private Queue<TcpClient> joinQueue = new Queue<TcpClient>();
+
         public Server(Game game, bool isOpen)
         {
             this.game = game;
             this.isOpen = isOpen;
         }
-    
+
         public void Start(string address, int port)
         {
             this.address = address;
@@ -38,7 +39,7 @@ namespace Minecraft
 
             world = new WorldServer(game);
 
-            connectionsThread = new Thread(ListenForConnections);
+            connectionsThread = new Thread(StartServerAndListenForConnections);
             connectionsThread.IsBackground = true;
             connectionsThread.Start();
         }
@@ -53,40 +54,25 @@ namespace Minecraft
             return world.loadedChunks;
         }
 
-        private void ListenForConnections()
+        private void StartServerAndListenForConnections()
         {
             tcpServer = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             tcpServer.Start();
             Logger.Info("Started listening for connections on " + GetType());
+
             isRunning = true;
             while (isRunning)
             {
                 TcpClient client = tcpServer.AcceptTcpClient();
+                lock (newJoinsLock)
+                {
+                    joinQueue.Enqueue(client);
+                }
                 Logger.Info("Server accepted new client.");
-                NetworkStream stream = client.GetStream();
-                Connection clientConnection = new Connection
-                {
-                    client = client,
-                    netStream = stream,
-                    reader = new BinaryReader(stream),
-                    bufferedStream = new NetBufferedStream(new BufferedStream(stream)),
-                    state = ConnectionState.AwaitingAcceptance
-                };
-                ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
-                clientConnection.netHandler = netHandler;
-                clientConnection.OnStateChangedHandler += OnConnectionStateChanged;
-
-                lock (clientsLock)
-                {
-                    clients.Add(clientConnection);
-                }            
             }
 
             Logger.Warn("Server is closing down. Closing connections to all clients.");
-            lock (clientsLock)
-            {
-                clients.ForEach(c => c.Close());
-            }
+            clients.ForEach(c => c.Close());
             tcpServer.Stop();
             Logger.Info("Server closed.");
         }
@@ -105,34 +91,44 @@ namespace Minecraft
 
         private void OnConnectionStateChanged(Connection connection)
         {
-            if(connection.state == ConnectionState.Accepted)
+            if (connection.state == ConnectionState.Accepted)
             {
                 if (isOpen)
                 {
                     Thread chunkThread = new Thread(ChunkSenderThread);
                     chunkThread.IsBackground = true;
                     chunkThread.Start(connection);
-
-                    lock (clientsLock)
-                    {
-                        for (int i = clients.Count - 1; i >= 0; i--)
-                        {
-                            Connection client = clients[i];
-                        }
-                    }
                 }
-            }else if(connection.state == ConnectionState.Closed)
+            } else if (connection.state == ConnectionState.Closed)
             {
-                lock (clientsLock)
-                {
-                    clients.Remove(connection);
-                    connection.Close();
-                }
+                clients.Remove(connection);
+                connection.Close();
             }
         }
 
         public void Update()
         {
+            lock (newJoinsLock)
+            {
+                if (joinQueue.Count > 0)
+                {
+                    TcpClient newClient = joinQueue.Dequeue();
+                    NetworkStream stream = newClient.GetStream();
+                    Connection clientConnection = new Connection
+                    {
+                        client = newClient,
+                        netStream = stream,
+                        reader = new BinaryReader(stream),
+                        bufferedStream = new NetBufferedStream(new BufferedStream(stream)),
+                        state = ConnectionState.AwaitingAcceptance
+                    };
+                    ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
+                    clientConnection.netHandler = netHandler;
+                    clientConnection.OnStateChangedHandler += OnConnectionStateChanged;
+                    clients.Add(clientConnection);
+                }
+            }
+
             //Check for console input in a non-blocking way
             if (Console.KeyAvailable)
             {
@@ -140,55 +136,45 @@ namespace Minecraft
                 BroadcastPacket(new ChatPacket(input));
             }
 
-            lock (clientsLock)
+            foreach (Connection client in clients)
             {
-                for(int i = clients.Count - 1; i >= 0; i--)
+                if (client.state == ConnectionState.Closed || !client.netStream.DataAvailable)
                 {
-                    Connection client = clients[i];
-                    if (client.state == ConnectionState.Closed || !client.netStream.DataAvailable)
-                    {
-                        continue;
-                    }
-
-                    Packet packet = client.ReadPacket();
-                    Logger.Info("Server received packet " + packet.ToString());
-                    packet.Process(client.netHandler);
+                    continue;
                 }
+
+                Packet packet = client.ReadPacket();
+                Logger.Info("Server received packet " + packet.ToString());
+                packet.Process(client.netHandler);
             }
         }
 
         public void BroadcastPacket(Packet packet)
         {
-            lock (clientsLock)
-            {
-                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
-                clients.ForEach(c => c.WritePacket(packet));
-            }
+            Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
+            clients.ForEach(c => c.WritePacket(packet));
         }
 
         public void BroadcastPacketExceptTo(Connection connection, Packet packet)
         {
-            lock (clientsLock)
+            Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
+            foreach (Connection client in clients)
             {
-                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
-                for (int i = clients.Count - 1; i >= 0; i--)
+                if (client == connection)
                 {
-                    if (clients[i] == connection) continue;
-                    clients[i].WritePacket(packet);
+                    continue;
                 }
+                client.WritePacket(packet);
             }
         }
 
         public void BroadcastPacketExcepToHost(Packet packet)
         {
-            lock (clientsLock)
+            Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
+            for (int i = clients.Count - 1; i >= 0; i--)
             {
-                Logger.Info("Server broadcasting packet [" + packet.GetType() + "]");
-                for (int i = clients.Count - 1; i >= 0; i--)
-                {
-                    if (clients[i] == clients[0]) continue;
-                    clients[i].WritePacket(packet);
-                }
+                if (clients[i] == clients[0]) continue;
+                clients[i].WritePacket(packet);
             }
         }
 

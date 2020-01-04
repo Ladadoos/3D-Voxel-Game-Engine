@@ -20,7 +20,7 @@ namespace Minecraft
         protected Vector3 right;       //Vector facing to the right of where the player is looking
         protected Vector3 velocity;
         protected float verticalSpeed;
-        protected AABB hitbox;
+        public AABB hitbox;
 
         protected delegate void OnToggleRunning(bool isRunning);
         protected event OnToggleRunning OnToggleRunningHandler;
