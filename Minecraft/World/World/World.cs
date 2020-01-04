@@ -28,6 +28,7 @@ namespace Minecraft
         public World(Game game)
         {
             this.game = game;
+            loadedEntities.Add(100, new Dummy(100));
         }
 
         public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)

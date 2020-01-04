@@ -27,7 +27,7 @@ namespace Minecraft
                     LoadChunk(chunk);
                 }
             }
-            DateTime now2 = DateTime.Now - start;
+            TimeSpan now2 = DateTime.Now - start;
             Logger.Info("Finished generation initial chunks. Took " + now2);
         }
 

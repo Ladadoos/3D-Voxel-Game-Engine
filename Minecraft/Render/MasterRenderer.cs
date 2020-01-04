@@ -82,6 +82,9 @@ namespace Minecraft
                 GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
             }
 
+            entityShader.Start();
+            entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
+            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
             foreach (Entity entity in world.loadedEntities.Values)
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
@@ -91,19 +94,6 @@ namespace Minecraft
                     GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
                 }
             }
-
-            /*entityShader.Start();
-            entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
-            foreach(Entity entity in world.entities)
-            {
-                if(entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
-                {
-                    entityMeshModel.Bind();
-                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
-                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
-                }
-            }*/
 
             playerBlockRenderer.RenderSelection();
             screenQuad.Unbind();
@@ -199,7 +189,9 @@ namespace Minecraft
         {
             basicShader.Start();
             basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
-            basicShader.Stop();
+            entityShader.Start();
+            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
+            entityShader.Stop();
         }
 
         public void OnCloseGame()
