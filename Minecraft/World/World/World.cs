@@ -11,8 +11,8 @@ namespace Minecraft
 
         private float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
-        //Change to queue
-        private List<Vector3i> toRemoveBlocks = new List<Vector3i>();
+
+        private Queue<Vector3i> toRemoveBlocks = new Queue<Vector3i>();
         private Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
         public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
@@ -27,6 +27,12 @@ namespace Minecraft
         public delegate void OnChunkLoaded(Chunk chunk);
         public event OnChunkLoaded OnChunkLoadedHandler;
 
+        public delegate void OnEntitySpawned(Entity entity);
+        public event OnEntitySpawned OnEntitySpawnedHandler;
+
+        public delegate void OnEntityDespawned(Entity entity);
+        public event OnEntityDespawned OnEntityDespawnedHandler;
+
         public World(Game game)
         {
             this.game = game;
@@ -39,7 +45,23 @@ namespace Minecraft
 
         public bool DespawnEntity(int entityId)
         {
-            return loadedEntities.Remove(entityId);
+            if(!loadedEntities.TryGetValue(entityId, out Entity despawnedEntity))
+            {
+                return false;
+            }
+
+            if (loadedEntities.Remove(entityId))
+            {
+                OnEntityDespawnedHandler?.Invoke(despawnedEntity);
+                return true;
+            }
+            return false;
+        }
+
+        public void SpawnEntity(Entity entity)
+        {
+            loadedEntities.Add(entity.id, entity);
+            OnEntitySpawnedHandler?.Invoke(entity);
         }
 
         public void LoadChunk(Chunk chunk)
@@ -97,7 +119,7 @@ namespace Minecraft
 
         public void QueueToRemoveBlockAt(Vector3i blockPos)
         {
-            toRemoveBlocks.Add(blockPos);
+            toRemoveBlocks.Enqueue(blockPos);
         }
 
         private bool RemoveBlockAt(Vector3i blockPos)

@@ -11,6 +11,7 @@ namespace Minecraft
         {
             OnBlockPlacedHandler += OnBlockPlacedServer;
             OnBlockRemovedHandler += OnBlockRemovedServer;
+            OnEntityDespawnedHandler += OnEntityDespawnedServer;
 
             worldGenerator = new WorldGenerator();
         }
@@ -29,6 +30,16 @@ namespace Minecraft
             }
             TimeSpan now2 = DateTime.Now - start;
             Logger.Info("Finished generation initial chunks. Took " + now2);
+        }
+
+        private void OnEntityDespawnedServer(Entity entity)
+        {
+            entityIdTracker.ReleaseId(entity.id);
+
+            if(entity is ServerPlayer)
+            {
+                game.server.BroadcastPacket(new PlayerLeavePacket(entity.id, LeaveReason.Leave, "disconnect"));
+            }
         }
 
         private void OnBlockPlacedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)

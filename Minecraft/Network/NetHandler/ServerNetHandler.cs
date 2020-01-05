@@ -39,7 +39,6 @@ namespace Minecraft
         {
             playerConnection.player.position = playerDataPacket.position;
             game.server.BroadcastPacketExceptTo(playerConnection, playerDataPacket);
-            //Logger.Info(playerDataPacket.ToString());
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
@@ -56,17 +55,14 @@ namespace Minecraft
             ServerPlayer player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
             playerConnection.player = player;
 
-            game.server.world.loadedEntities.Add(playerId, player);
+            game.server.world.SpawnEntity(player);
             playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
             playerConnection.state = ConnectionState.Accepted;
             game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
 
             foreach (Connection client in game.server.clients)
             {
-                if (client.player == player)
-                {
-                    continue;
-                }
+                if (client.player == player) continue;
                 playerConnection.WritePacket(new PlayerJoinPacket("", client.player.id));
             }
         }

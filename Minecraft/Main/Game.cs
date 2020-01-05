@@ -48,7 +48,7 @@ namespace Minecraft
                 client.ConnectWith("127.0.0.1", 50000);
 
                 world = new WorldClient(this);
-                world.loadedChunks = server.GetChunKStorage();
+                world.loadedChunks = server.world.loadedChunks;
             } else if(mode == RunMode.Server)
             {
                 server = new Server(this, true);

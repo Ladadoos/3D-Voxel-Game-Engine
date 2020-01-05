@@ -18,7 +18,7 @@ namespace Minecraft
         private TcpListener tcpServer;
         private bool isRunning;
 
-        public WorldServer world;
+        public WorldServer world { get; private set; }
         private Game game;
 
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
@@ -51,11 +51,6 @@ namespace Minecraft
         public void GenerateMap()
         {
             world.GenerateTestMap();
-        }
-
-        public Dictionary<Vector2, Chunk> GetChunKStorage()
-        {
-            return world.loadedChunks;
         }
 
         public void UpdateKeepAliveFor(Connection connection)
@@ -144,16 +139,13 @@ namespace Minecraft
                     client.Close();
                 }catch(Exception e)
                 {
-                    Logger.Error(e.Message);
+                    Logger.Error("Closing client connection: " + e.Message);
                 }
                 keepAlives.Remove(client);
 
                 if(client.player != null)
                 {
-                    world.entityIdTracker.ReleaseId(client.player.id);
                     world.DespawnEntity(client.player.id);
-
-                    BroadcastPacket(new PlayerLeavePacket(client.player.id, LeaveReason.Leave, ""));
                 }
             }
         }
