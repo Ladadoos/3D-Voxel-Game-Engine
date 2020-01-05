@@ -78,16 +78,21 @@ namespace Minecraft
                         string playerName = ReadUtf8String(reader);
                         return new PlayerJoinPacket(playerName, playerId);
                     }
-                case PacketType.PlayerKick:
+                case PacketType.PlayerLeave:
                     {
-                        KickReason kickReason = (KickReason)reader.ReadInt32();
+                        int id = reader.ReadInt32();
+                        LeaveReason kickReason = (LeaveReason)reader.ReadInt32();
                         string message = ReadUtf8String(reader);
-                        return new PlayerKickPacket(kickReason, message);
+                        return new PlayerLeavePacket(id, kickReason, message);
                     }
                 case PacketType.PlayerBlockInteraction:
                     {
                         Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
                         return new PlayerBlockInteractionPacket(blockPos);
+                    }
+                case PacketType.PlayerKeepAlive:
+                    {
+                        return new PlayerKeepAlivePacket();
                     }
                 default: throw new Exception("Invalid packet type: " + packetType);
             }

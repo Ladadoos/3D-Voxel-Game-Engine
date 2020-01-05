@@ -39,7 +39,7 @@ namespace Minecraft
                 game.server.BroadcastPacket(new PlaceBlockPacket(newState, blockPos));
             } else
             {
-                game.server.BroadcastPacketExcepToHost(new PlaceBlockPacket(newState, blockPos));
+                game.server.BroadcastPacketExceptToHost(new PlaceBlockPacket(newState, blockPos));
             }
         }
 
@@ -51,7 +51,7 @@ namespace Minecraft
                 game.server.BroadcastPacket(new RemoveBlockPacket(blockPos));
             } else
             {
-                game.server.BroadcastPacketExcepToHost(new RemoveBlockPacket(blockPos));
+                game.server.BroadcastPacketExceptToHost(new RemoveBlockPacket(blockPos));
             }
         }
     }

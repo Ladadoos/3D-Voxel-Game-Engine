@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Minecraft
 {
@@ -13,9 +14,17 @@ namespace Minecraft
             converter = new DataConverter();
         }
 
-        public void FlushToSocket()
+        public bool FlushToSocket()
         {
-            bufferedStream.Flush();
+            try
+            {
+                bufferedStream.Flush();
+                return true;
+            }catch(Exception e)
+            {
+                Logger.Error("Flushing failed: " + e.Message);
+                return false;
+            }
         }
 
         public void WriteInt32(int value)

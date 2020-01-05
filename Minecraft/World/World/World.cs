@@ -11,7 +11,9 @@ namespace Minecraft
 
         private float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
+        //Change to queue
         private List<Vector3i> toRemoveBlocks = new List<Vector3i>();
+        private Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
         public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
@@ -33,6 +35,11 @@ namespace Minecraft
         public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
         {
             loadedChunks = storage;
+        }
+
+        public bool DespawnEntity(int entityId)
+        {
+            return loadedEntities.Remove(entityId);
         }
 
         public void LoadChunk(Chunk chunk)
@@ -62,6 +69,11 @@ namespace Minecraft
                 RemoveBlockAt(toRemoveBlock);
             }
             toRemoveBlocks.Clear();
+
+            while(toRemoveEntities.Count > 0)
+            {
+                loadedEntities.Remove(toRemoveEntities.Dequeue().id);
+            }
         }
 
         private void Tick(float deltaTime)

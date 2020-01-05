@@ -12,7 +12,7 @@ namespace Minecraft
         {
             while (true)
             {
-                int rand = random.Next(int.MaxValue);
+                int rand = 1 + random.Next(int.MaxValue - 1);
                 if (!entityIdsTaken.Contains(rand))
                 {
                     entityIdsTaken.Add(rand);

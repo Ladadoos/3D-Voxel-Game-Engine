@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using System;
-using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -48,7 +47,7 @@ namespace Minecraft
             string playerName = playerJoinRequestPacket.name.Trim();
             if (playerName == string.Empty || playerName == "Player")
             {
-                playerConnection.WritePacket(new PlayerKickPacket(KickReason.Banned, "You are not allowed on this server."));
+                playerConnection.WritePacket(new PlayerLeavePacket(0, LeaveReason.Banned, "You are not allowed on this server."));
                 playerConnection.state = ConnectionState.Closed;
                 return;
             }
@@ -82,7 +81,7 @@ namespace Minecraft
             throw new InvalidOperationException();
         }
 
-        public void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket)
+        public void ProcessPlayerLeavePacket(PlayerLeavePacket playerKickPacket)
         {
             throw new NotImplementedException();
         }
@@ -91,6 +90,11 @@ namespace Minecraft
         {
             BlockState state = game.server.world.GetBlockAt(playerInteractionPacket.blockPos);
             //state.GetBlock().OnInteract(state, game.world);
+        }
+
+        public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
+        {
+            game.server.UpdateKeepAliveFor(playerConnection);
         }
     }
 }

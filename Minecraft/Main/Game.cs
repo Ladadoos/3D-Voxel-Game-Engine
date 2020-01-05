@@ -26,11 +26,13 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.window = window;
+            Logger.SetLogLevel(LogLevel.Info);
 
             Blocks.RegisterBlocks();
             randomizer = new Random();
             input = new Input();
             fpsCounter = new FPSCounter();
+            window.VSync = OpenTK.VSyncMode.On;
 
             if (mode == RunMode.ClientServer)
             {
@@ -77,29 +79,31 @@ namespace Minecraft
             }
         }
 
-        public void OnUpdateGame(double elapsedSeconds)
+        public void OnUpdateGame(double deltaTime)
         {
+            float elapsedSeconds = (float)deltaTime;
+
             fpsCounter.IncrementFrameCounter();
-            fpsCounter.AddElapsedTime(elapsedSeconds);
+            fpsCounter.AddElapsedTime(deltaTime);
 
             if (mode == RunMode.Server)
             {
-                server.world.Update((float)elapsedSeconds);
+                server.world.Update(elapsedSeconds);
                 server.Update();
             } else
             {
                 if(mode == RunMode.ClientServer)
                 {
-                    server.world.Update((float)elapsedSeconds);
+                    server.world.Update(elapsedSeconds);
                     server.Update();
                 }
 
-                client.Update();
+                client.Update(elapsedSeconds);
 
                 input.Update();
-                player.Update((float)elapsedSeconds, world);
+                player.Update(elapsedSeconds, world);
 
-                world.Update((float)elapsedSeconds);
+                world.Update(elapsedSeconds);
 
                 masterRenderer.EndFrameUpdate(world);
             }

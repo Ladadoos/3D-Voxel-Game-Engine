@@ -1,6 +1,4 @@
-﻿using OpenTK;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class BlockFlower : Block
     {

@@ -18,7 +18,9 @@
 
         void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket);
 
-        void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket);
+        void ProcessPlayerLeavePacket(PlayerLeavePacket playerKickPacket);
+
+        void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket);
 
         void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket);
     }

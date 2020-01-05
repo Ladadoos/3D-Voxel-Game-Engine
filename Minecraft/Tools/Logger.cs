@@ -39,10 +39,18 @@ namespace Minecraft
                 Print(message, LogLevel.Error);
             }
         }
+
+        public static void Packet(string message)
+        {
+            if (LogLevel.Packet >= logLevel)
+            {
+                Print(message, LogLevel.Packet);
+            }
+        }
     }
 
     public enum LogLevel
     {
-        Info, Warn, Error
+        Packet, Info, Warn, Error
     };
 }

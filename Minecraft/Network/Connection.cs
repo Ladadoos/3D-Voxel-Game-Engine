@@ -35,10 +35,19 @@ namespace Minecraft
 
         public void WritePacket(Packet packet)
         {
+            if (state == ConnectionState.Closed)
+            {
+                Logger.Error("Trying to send packet " + packet.GetType() + " while connection closed");
+                return;
+            }
+
             lock (streamLock)
             {
                 packet.WriteToStream(bufferedStream);
-                bufferedStream.FlushToSocket();
+                if (!bufferedStream.FlushToSocket())
+                {
+                    state = ConnectionState.Closed;
+                }
             }
         }
 

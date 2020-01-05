@@ -10,7 +10,8 @@
         PlayerJoinRequest,
         PlayerJoinAccept,
         PlayerJoin,
-        PlayerKick,
-        PlayerBlockInteraction
+        PlayerLeave,
+        PlayerBlockInteraction,
+        PlayerKeepAlive
     }
 }

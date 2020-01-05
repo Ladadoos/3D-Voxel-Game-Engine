@@ -69,16 +69,28 @@ namespace Minecraft
             game.world.loadedEntities.Add(playerJoinPacket.playerId, otherPlayer);
         }
 
-        public void ProcessPlayerKickPacket(PlayerKickPacket playerKickPacket)
+        public void ProcessPlayerLeavePacket(PlayerLeavePacket playerLeavePacket)
         {
-            playerConnection.state = ConnectionState.Closed;
-            Logger.Info("You were kicked for reason: " + playerKickPacket.reason + " Message: " + playerKickPacket.message);
+            if(playerLeavePacket.id == 0)
+            {
+                Logger.Info("You were disconnected for reason: " + playerLeavePacket.reason + " Message: " + playerLeavePacket.message);
+                playerConnection.state = ConnectionState.Closed;
+            } else
+            {
+                Logger.Info("Player " + playerLeavePacket.id + " left for reason " + playerLeavePacket.reason + " with message " + playerLeavePacket.message);
+                game.world.DespawnEntity(playerLeavePacket.id);
+            }           
         }
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
             BlockState state = game.world.GetBlockAt(playerInteractionPacket.blockPos);
             state.GetBlock().OnInteract(state, game.world);
+        }
+
+        public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -8,13 +8,21 @@ namespace Minecraft
     {
         private string host;
         private int port;
-        private bool isConnected;
         private Connection serverConnection;
         private Game game;
+
+        public static readonly float KeepAliveTimeoutSeconds = 8;
+        private static readonly float timeoutInSeconds = 5;
+        private float elapsedTime;
 
         public Client(Game game)
         {
             this.game = game;
+
+            serverConnection = new Connection()
+            {
+                state = ConnectionState.Closed
+            };
         }
 
         public bool ConnectWith(string host, int port)
@@ -46,7 +54,6 @@ namespace Minecraft
             serverConnection.netHandler = netHandler;
             serverConnection.OnStateChangedHandler += OnConnectionStateChanged;
 
-            isConnected = true;
             Logger.Info("Connected to server IP: " + host + " Port: " + port);
             WritePacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
             return true;
@@ -56,38 +63,60 @@ namespace Minecraft
         {
             if(connection.state == ConnectionState.Accepted)
             {
-                Logger.Info("Server accepted your connection.");
+                Logger.Info("Client: server accepted my connection.");
             } else if (connection.state == ConnectionState.Closed)
             {
-                Logger.Info("Connection with server closed.");
-                isConnected = false;
+                serverConnection.Close();
+                Logger.Info("Client: my connection with server closed.");
             }
         }
 
         public void Stop()
         {
-            isConnected = false;
-            serverConnection.Close();
+            serverConnection.state = ConnectionState.Closed;
         }
 
-        public void Update()
+        private void CheckForKeepAlive(float deltaTime)
         {
-            if (!isConnected)
+            elapsedTime += deltaTime;
+            if (elapsedTime > timeoutInSeconds)
+            {
+                elapsedTime = 0;
+                Logger.Info("Keep alive sent.");
+                serverConnection.WritePacket(new PlayerKeepAlivePacket());
+            }
+        }
+
+        public void Update(float deltaTime)
+        {
+            if (serverConnection.state == ConnectionState.Closed)
             {
                 return;
             }
 
-            while (serverConnection.netStream.DataAvailable)
+            CheckForKeepAlive(deltaTime);
+
+            try
             {
-                Packet packet = serverConnection.ReadPacket();
-                Logger.Info("Client received packet "+  packet.ToString());
-                packet.Process(serverConnection.netHandler);
+                while (serverConnection.netStream.DataAvailable)
+                {
+                    Packet packet = serverConnection.ReadPacket();
+                    Logger.Info("Client received packet " + packet.ToString());
+                    packet.Process(serverConnection.netHandler);
+                }
+            }catch(Exception e)
+            {
+                Logger.Error("Failed reading packet: " + e.Message);
+                Stop();
             }
         }
 
         public void WritePacket(Packet packet)
         {
-            if (!isConnected) return;
+            if (serverConnection.state == ConnectionState.Closed)
+            {
+                return;
+            }
             serverConnection.WritePacket(packet);
         }
     }
