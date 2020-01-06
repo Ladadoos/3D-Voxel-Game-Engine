@@ -5,14 +5,14 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Minecraft
 {
-    class Model
+    class VAOModel
     {
         public int vaoId;
         public int indicesCount;
 
         public List<int> buffers = new List<int>();
 
-        public Model(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
+        public VAOModel(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {
             this.indicesCount = indicesCount;
 
@@ -28,7 +28,7 @@ namespace Minecraft
             Unbind();
         }
 
-        public Model(float[] positions, int[] indices)
+        public VAOModel(float[] positions, int[] indices)
         {
             indicesCount = indices.Length;
 

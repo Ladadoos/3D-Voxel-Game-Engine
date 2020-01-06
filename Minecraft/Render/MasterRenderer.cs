@@ -89,7 +89,7 @@ namespace Minecraft
             entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
             foreach (Entity entity in world.loadedEntities.Values)
             {
-                if (entityMeshRegistry.models.TryGetValue(entity.entityType, out Model entityMeshModel))
+                if (entityMeshRegistry.models.TryGetValue(entity.entityType, out VAOModel entityMeshModel))
                 {
                     entityMeshModel.Bind();
                     entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));

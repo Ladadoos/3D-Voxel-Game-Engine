@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class RenderChunk
     {
-        public Model hardBlocksModel;
+        public VAOModel hardBlocksModel;
         public Matrix4 transformationMatrix { get; private set; }
         public Vector2 gridPosition { get; private set; }
 

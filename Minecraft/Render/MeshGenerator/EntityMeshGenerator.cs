@@ -27,7 +27,7 @@ namespace Minecraft
             indicesCount = 0;
         }
 
-        public Model GenerateMeshFor(EntityModel entityModel)
+        public VAOModel GenerateMeshFor(EntityModel entityModel)
         {
             foreach (BlockFace face in entityModel.entityFaces)
             {
@@ -57,7 +57,7 @@ namespace Minecraft
                 }
             }
 
-            Model chunkModel = new Model(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), normals.ToArray(), indicesCount);
+            VAOModel chunkModel = new VAOModel(vertexPositions.ToArray(), textureUVs.ToArray(), illumations.ToArray(), normals.ToArray(), indicesCount);
             ClearData();
             return chunkModel;
         }

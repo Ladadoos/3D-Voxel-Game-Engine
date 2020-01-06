@@ -7,7 +7,7 @@ namespace Minecraft
     {
         private WireframeShader shader = new WireframeShader();
         private Camera camera;
-        private Model aabbCube;
+        private VAOModel aabbCube;
 
         public WireframeRenderer(Camera camera)
         {
@@ -38,7 +38,7 @@ namespace Minecraft
                 0, 4, 5, 1, //Front
                 3, 2, 6, 7  //Back
             };
-            aabbCube = new Model(positions, indices);
+            aabbCube = new VAOModel(positions, indices);
         }
 
         /// <summary> Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. </summary>
