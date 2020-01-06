@@ -32,7 +32,7 @@ namespace Minecraft
             {
                 foreach(Entity entity in game.world.loadedEntities.Values)
                 {
-                    AABB aabb = entity.hitbox;
+                    AxisAlignedBox aabb = entity.hitbox;
                     float width = Math.Abs(aabb.max.X - aabb.min.X);
                     float length = Math.Abs(aabb.max.Z - aabb.min.Z);
                     float height = Math.Abs(aabb.max.Y - aabb.min.Y);

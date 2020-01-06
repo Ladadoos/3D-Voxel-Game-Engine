@@ -42,7 +42,7 @@ namespace Minecraft
                 return null;
             }
 
-            AABB hitAABB = Block.GetFullBlockCollision(new Vector3i(position));
+            AxisAlignedBox hitAABB = Block.GetFullBlockCollision(new Vector3i(position));
             float dist = hitAABB.Intersects(this);
             if (dist == float.MaxValue)
             {

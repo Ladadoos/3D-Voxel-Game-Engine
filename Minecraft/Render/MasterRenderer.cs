@@ -75,7 +75,7 @@ namespace Minecraft
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                 Vector3 max = min + new Vector3(16, 256, 16);
-                if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AABB(min, max)))
+                if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AxisAlignedBox(min, max)))
                 {
                     continue;
                 }

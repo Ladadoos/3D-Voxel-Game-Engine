@@ -18,7 +18,6 @@ namespace Minecraft
         protected Vector3 realForward; //Vector facing towards where the player is looking
         protected Vector3 moveForward; //Vector facing where the player is looking, ignoring y
         protected Vector3 right;       //Vector facing to the right of where the player is looking
-        protected Vector3 velocity;
         protected float verticalSpeed;
 
         protected delegate void OnToggleRunning(bool isRunning);
@@ -29,31 +28,14 @@ namespace Minecraft
 
         public Player(int id, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
         {
-            position = startPosition;
-            velocity = Vector3.Zero;
-            hitbox = new AABB(position, GetPlayerMaxAABB());
             jumpStopWatch.Start();
         }
 
-        public Vector3 GetPosition()
+        protected override void SetInitialDimensions()
         {
-            return position;
-        }
-
-        public Vector3 GetVelocity()
-        {
-            return velocity;
-        }
-
-        /// <summary> Returns the max component of the AABB from this player. </summary>
-        protected Vector3 GetPlayerMaxAABB()
-        {
-            return new Vector3(position.X + Constants.PLAYER_WIDTH, position.Y + Constants.PLAYER_HEIGHT, position.Z + Constants.PLAYER_LENGTH);
-        }
-
-        protected void CalculatePlayerAABB()
-        {
-            hitbox.SetHitbox(position, GetPlayerMaxAABB());
+            width = Constants.PLAYER_WIDTH;
+            height = Constants.PLAYER_HEIGHT;
+            length = Constants.PLAYER_LENGTH;
         }
 
         ///<summary> Moves horizontal relative to the direction the player is facing. x is right, z is forward. </summary>
@@ -150,21 +132,21 @@ namespace Minecraft
 
             Dictionary<Vector3i, BlockState> blocks = GetCollisionDetectionBlocks(world);
             position.X += velocity.X * deltaTime;
-            CalculatePlayerAABB();
+            UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
                 DoXAxisCollisionDetection(blocks);
             }
 
             position.Y += velocity.Y * deltaTime;
-            CalculatePlayerAABB();
+            UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
                 DoYAxisCollisionDetection(blocks);
             }
 
             position.Z += velocity.Z * deltaTime;
-            CalculatePlayerAABB();
+            UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
                 DoZAxisCollisionDetection(blocks);
@@ -205,7 +187,7 @@ namespace Minecraft
         {
             foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
+                foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -231,7 +213,7 @@ namespace Minecraft
             bool collidedY = false;
             foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
+                foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {
@@ -259,7 +241,7 @@ namespace Minecraft
         {
             foreach (KeyValuePair<Vector3i, BlockState> collidable in blocks)
             {
-                foreach (AABB aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
+                foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!hitbox.Intersects(aabb))
                     {

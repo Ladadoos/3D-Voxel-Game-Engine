@@ -90,7 +90,7 @@ namespace Minecraft
             return true;
         }
 
-        public bool IsAABBInFrustum(AABB aabb)
+        public bool IsAABBInFrustum(AxisAlignedBox aabb)
         {
             Vector3[] corners = aabb.GetAllCorners();
             for (int i = 0; i < 6; i++)

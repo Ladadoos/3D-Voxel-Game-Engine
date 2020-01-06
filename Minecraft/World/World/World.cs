@@ -7,7 +7,7 @@ namespace Minecraft
 {
     abstract class World
     {
-        protected Game game;
+        public Game game;
 
         private float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
@@ -36,6 +36,7 @@ namespace Minecraft
         public World(Game game)
         {
             this.game = game;
+            SpawnEntity(new Dummy(100));
         }
 
         public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
@@ -103,11 +104,17 @@ namespace Minecraft
             elapsedMillisecondsSinceLastTick += deltaTime;
             if (elapsedMillisecondsSinceLastTick > secondsPerTick)
             {
+                elapsedMillisecondsSinceLastTick = 0;
+
                 foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
                 {
                     loadedChunk.Value.Tick(this, elapsedMillisecondsSinceLastTick);
                 }
-                elapsedMillisecondsSinceLastTick = 0;
+
+                foreach (Entity entity in loadedEntities.Values)
+                {
+                    entity.Tick(deltaTime, this);
+                }
             }
         }
 

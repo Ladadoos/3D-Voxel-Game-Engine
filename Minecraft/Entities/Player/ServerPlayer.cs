@@ -8,10 +8,5 @@ namespace Minecraft
         {
             
         }
-
-        public override void Update(float deltaTime, World world)
-        {
-            CalculatePlayerAABB();
-        }
     }
 }

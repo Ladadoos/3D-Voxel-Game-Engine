@@ -9,7 +9,7 @@
             return new BlockStateFlower();
         }
 
-        public override AABB[] GetCollisionBox(BlockState state, Vector3i blockPos)
+        public override AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
             return emptyAABB;
         }

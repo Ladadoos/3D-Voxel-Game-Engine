@@ -56,14 +56,14 @@ namespace Minecraft
 
             if(game.mode != RunMode.Server)
             {
-                Vector2 chunkPos = game.world.GetChunkPosition(game.player.GetPosition().X, game.player.GetPosition().Z);
+                Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
                 Title = "Focused:" + Focused + 
                         "Vsync: " + VSync +
                         " FPS: " + (int)(1f / e.Time) +
                         " AVG FPS: " + game.fpsCounter.GetAverageFPS() +
-                        " Position: " + game.player.GetPosition() +
+                        " Position: " + game.player.position +
                         " Grid Pos: " + chunkPos +
-                        " Velocity: " + game.player.GetVelocity();
+                        " Velocity: " + game.player.velocity;
             }
 
 

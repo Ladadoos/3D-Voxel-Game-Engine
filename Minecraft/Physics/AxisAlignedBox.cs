@@ -3,25 +3,23 @@ using System;
 
 namespace Minecraft
 {
-    class AABB
+    class AxisAlignedBox
     {
-        //change to private
-        public Vector3 max;
-        public Vector3 min;
+        public Vector3 min, max;
 
-        public AABB(Vector3 min, Vector3 max)
+        public AxisAlignedBox(Vector3 min, Vector3 max)
         {
             this.min = min;
             this.max = max;
         }
 
-        public void SetHitbox(Vector3 min, Vector3 max)
+        public void SetDimensions(Vector3 min, Vector3 max)
         {
             this.min = min;
             this.max = max;
         }
 
-        public bool Intersects(AABB c)
+        public bool Intersects(AxisAlignedBox c)
         {
             return min.X < c.max.X && max.X > c.min.X &&
                    min.Y < c.max.Y && max.Y > c.min.Y &&
