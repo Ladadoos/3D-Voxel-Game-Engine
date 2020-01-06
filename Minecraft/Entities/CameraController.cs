@@ -19,13 +19,13 @@ namespace Minecraft
 
         public void Update()
         {
+            camera.Update();
             if (!window.Focused)
             {
                 return;
             }
             UpdateCameraPitchAndYaw();
             ResetCursorToWindowCenter();
-            camera.Update();
         }
 
         public void ControlCamera(Camera camera)

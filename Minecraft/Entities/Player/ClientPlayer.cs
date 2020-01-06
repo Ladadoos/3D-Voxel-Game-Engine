@@ -49,19 +49,9 @@ namespace Minecraft
 
         public override void Update(float deltaTime, World world)
         {
-            if (game.window.Focused)
-            {
-                UpdateKeyboardInput();
-            }
-
-            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
-
+            UpdateKeyboardInput();
             ApplyVelocityAndCheckCollision(deltaTime, game.world);
-
-            if (game.window.Focused)
-            {
-                camera.Update();
-            }
+            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
 
             Vector3 cameraPosition = position;
             cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
@@ -116,14 +106,15 @@ namespace Minecraft
         {
             float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
-            bool inputToRun = Game.input.OnKeyDown(Key.ControlLeft) || Game.input.OnKeyDown(Key.ControlRight);
-            bool inputToCrouch = Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight);
-            bool inputToMoveLeft = Game.input.OnKeyDown(Key.A);
-            bool inputToMoveBack = Game.input.OnKeyDown(Key.S);
-            bool inputToMoveRight = Game.input.OnKeyDown(Key.D);
-            bool inputToMoveForward = Game.input.OnKeyDown(Key.W);
-            bool inputToJump = Game.input.OnKeyDown(Key.Space);
-            bool inputToFly = Game.input.OnKeyPress(Key.Space);
+            bool wFocused = game.window.Focused;
+            bool inputToRun = wFocused && (Game.input.OnKeyDown(Key.ControlLeft) || Game.input.OnKeyDown(Key.ControlRight));
+            bool inputToCrouch = wFocused && (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight));
+            bool inputToMoveLeft = wFocused && Game.input.OnKeyDown(Key.A);
+            bool inputToMoveBack = wFocused && Game.input.OnKeyDown(Key.S);
+            bool inputToMoveRight = wFocused && Game.input.OnKeyDown(Key.D);
+            bool inputToMoveForward = wFocused && Game.input.OnKeyDown(Key.W);
+            bool inputToJump = wFocused && Game.input.OnKeyDown(Key.Space);
+            bool inputToFly = wFocused && Game.input.OnKeyPress(Key.Space);
 
             //Prioritize crouching over running
             if (inputToRun && !inputToCrouch)
