@@ -20,11 +20,10 @@ namespace Minecraft
                 return;
             }
 
-            float scale = 1.001f;
-            float offset = (scale - 1) / 2; 
-            Vector3 scaleVector = new Vector3(scale, scale, scale);
-            Vector3 translation = player.mouseOverObject.intersectedBlockPos.ToFloat() - new Vector3(offset, offset, offset);
-            wireframeRenderer.RenderWireframeAt(3, translation, scaleVector);
+            float offset = 0.001f;
+            Vector3 scaleVector = new Vector3(1, 1, 1);
+            Vector3 translation = player.mouseOverObject.intersectedBlockPos.ToFloat();
+            wireframeRenderer.RenderWireframeAt(3, translation, scaleVector, new Vector3(offset, offset, offset));
         }
     }
 }

@@ -61,6 +61,14 @@ namespace Minecraft
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
         }
 
+        /// <summary> Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. </summary>
+        public void RenderWireframeAt(int lineWidth, Vector3 translation, Vector3 scale, Vector3 offset)
+        {
+            scale += offset;
+            translation -= (offset / 2);
+            RenderWireframeAt(lineWidth, translation, scale);
+        }
+
         public void OnCloseGame()
         {
             aabbCube.OnCloseGame();

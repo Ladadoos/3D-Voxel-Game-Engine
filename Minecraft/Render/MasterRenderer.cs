@@ -16,6 +16,7 @@ namespace Minecraft
         private EntityShader entityShader;
         private CameraController cameraController;
         private WireframeRenderer wireframeRenderer;
+        private DebugHelper debugHelper;
         private PlayerHoverBlockRenderer playerBlockRenderer;
         private TextureAtlas textureAtlas;
         private BlockModelRegistry blockModelRegistry;
@@ -42,6 +43,7 @@ namespace Minecraft
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(game.player.camera);
+            debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
           
             EnableDepthTest();
@@ -96,6 +98,8 @@ namespace Minecraft
             }
 
             playerBlockRenderer.RenderSelection();
+            debugHelper.UpdateAndRender();
+
             screenQuad.Unbind();
             GL.Disable(EnableCap.DepthTest);
             screenQuad.RenderToScreen();
