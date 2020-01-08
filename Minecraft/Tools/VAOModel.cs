@@ -7,37 +7,39 @@ namespace Minecraft
 {
     class VAOModel
     {
-        public int vaoId;
-        public int indicesCount;
-
+        public int vaoId { get; private set; }
+        public int indicesCount { get; private set; }
         public List<int> buffers = new List<int>();
 
         public VAOModel(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {
             this.indicesCount = indicesCount;
-
             CreateVAO();
             Bind();
-
             CreateVBO(3, positions);
             CreateVBO(3, normals);
             CreateVBO(2, textureCoordinates);
             CreateVBO(1, lights);
-            //CreateIBO(indices);
-
             Unbind();
         }
 
         public VAOModel(float[] positions, int[] indices)
         {
-            indicesCount = indices.Length;
-
+            this.indicesCount = indices.Length;
             CreateVAO();
             Bind();
-
             CreateVBO(3, positions);
             CreateIBO(indices);
+            Unbind();
+        }
 
+        public VAOModel(float[] positions, float[] textureCoordinates, int indicesCount)
+        {
+            this.indicesCount = indicesCount;
+            CreateVAO();
+            Bind();
+            CreateVBO(3, positions);
+            CreateVBO(2, textureCoordinates);
             Unbind();
         }
 

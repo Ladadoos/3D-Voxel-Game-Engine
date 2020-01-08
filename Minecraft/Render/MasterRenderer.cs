@@ -23,6 +23,7 @@ namespace Minecraft
         private EntityMeshRegistry entityMeshRegistry;
         private TextureLoader textureLoader;
         private ScreenQuad screenQuad;
+        private UIRenderer uiRenderer;
 
         private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
         private HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
@@ -45,14 +46,16 @@ namespace Minecraft
             wireframeRenderer = new WireframeRenderer(game.player.camera);
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
-          
+
+            uiRenderer = new UIRenderer(game.window, cameraController, textureLoader);
+
             EnableDepthTest();
             EnableCulling();
         }
 
         public void SetActiveCamera(Camera camera)
         {
-            if(cameraController.camera != null)
+            if (cameraController.camera != null)
             {
                 cameraController.camera.OnProjectionChangedHandler -= OnPlayerCameraProjectionChanged;
             }
@@ -99,9 +102,16 @@ namespace Minecraft
 
             playerBlockRenderer.RenderSelection();
             debugHelper.UpdateAndRender();
+            GL.Enable(EnableCap.Blend);
+            GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.DepthTest);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            uiRenderer.Render();
+            GL.Disable(EnableCap.Blend);
+            GL.Enable(EnableCap.CullFace);
 
             screenQuad.Unbind();
-            GL.Disable(EnableCap.DepthTest);
+
             screenQuad.RenderToScreen();
         }
 
@@ -212,8 +222,8 @@ namespace Minecraft
 
         private void EnableCulling()
         {
-           GL.Enable(EnableCap.CullFace);
-           GL.CullFace(CullFaceMode.Back);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
         }
 
         private void DisableCulling()

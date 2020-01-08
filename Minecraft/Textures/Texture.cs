@@ -1,12 +1,16 @@
 ﻿namespace Minecraft
 {
-    abstract class Texture
+    class Texture
     {
-        public int textureId { get; protected set; }
+        public int textureId { get; private set; }
+        public int pixelWidth { get; private set; }
+        public int pixelHeight { get; private set; }
 
-        public Texture(int textureId)
+        public Texture(int textureId, int pixelWidth, int pixelHeight)
         {
             this.textureId = textureId;
+            this.pixelWidth = pixelWidth;
+            this.pixelHeight = pixelHeight;
         }      
     }
 }

@@ -6,7 +6,7 @@ namespace Minecraft
     {
         private float cellUVSize;
 
-        public TextureAtlas(int textureId, int atlasSizeInPixels, int atlasCellSizeInPixels) : base(textureId)
+        public TextureAtlas(int textureId, int atlasSizeInPixels, int atlasCellSizeInPixels) : base(textureId, atlasSizeInPixels, atlasSizeInPixels)
         {
             int cellsPerRow = atlasSizeInPixels / atlasCellSizeInPixels;
             cellUVSize = 1.0F / cellsPerRow;
