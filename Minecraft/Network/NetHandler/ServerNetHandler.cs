@@ -52,18 +52,20 @@ namespace Minecraft
             }
             int playerId = game.server.world.entityIdTracker.GenerateId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
-            ServerPlayer player = new ServerPlayer(playerId, new Vector3(10, 100, 10));
+            ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
             playerConnection.player = player;
 
             game.server.world.SpawnEntity(player);
-            playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId));
+            playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId)); // Accept join
             playerConnection.state = ConnectionState.Accepted;
+            //Let all the online players know about the new player
             game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
 
+            //let the new player know about all the already only players
             foreach (Connection client in game.server.clients)
             {
                 if (client.player == player) continue;
-                playerConnection.WritePacket(new PlayerJoinPacket("", client.player.id));
+                playerConnection.WritePacket(new PlayerJoinPacket(client.player.playerName, client.player.id));
             }
         }
 

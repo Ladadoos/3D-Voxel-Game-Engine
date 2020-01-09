@@ -6,11 +6,11 @@ using System.Drawing.Imaging;
 
 namespace Minecraft
 {
-    class TextureLoader
+    static class TextureLoader
     {
-        private List<int> textures = new List<int>();
+        private static List<int> textures = new List<int>();
 
-        public void OnCloseGame()
+        public static void OnCloseGame()
         {
             foreach (int texture in textures)
             {
@@ -18,7 +18,7 @@ namespace Minecraft
             }
         }
 
-        public int LoadTexture(string filePath)
+        public static int LoadTexture(string filePath)
         {
             int texture;
             GL.GenTextures(1, out texture);

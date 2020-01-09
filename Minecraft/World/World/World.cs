@@ -53,10 +53,16 @@ namespace Minecraft
 
             if (loadedEntities.Remove(entityId))
             {
+                despawnedEntity.RaiseOnDespawned();
                 OnEntityDespawnedHandler?.Invoke(despawnedEntity);
                 return true;
             }
             return false;
+        }
+
+        private void DespawnedEntity_OnDespawnedHandler()
+        {
+            throw new NotImplementedException();
         }
 
         public void SpawnEntity(Entity entity)

@@ -5,18 +5,16 @@ namespace Minecraft
 {
     class Font
     {
-        public Texture fontMap { get; private set; }
-        public string fontFilePath { get; private set; }
-
+        public Texture fontMaTexture { get; private set; }
         private Dictionary<int, Character> fontChars;
 
-        public Font(Texture fontMap, string fontFilePath)
+        public Font(string fontFilePath, string fontMapFilePath, int fontMapWidth, int fontMapHeight)
         {
-            this.fontMap = fontMap;
-            this.fontFilePath = fontFilePath;
+            int fontMapTextureid = TextureLoader.LoadTexture(fontMapFilePath);
+            fontMaTexture = new Texture(fontMapTextureid, fontMapWidth, fontMapHeight);
 
             CharacterBuilder charBuilder = new CharacterBuilder();
-            fontChars = charBuilder.BuildFont(fontMap, fontFilePath);
+            fontChars = charBuilder.BuildFont(fontMaTexture, fontFilePath);
         }
 
         public float[] GetVerticesForText(UIText textComponent)

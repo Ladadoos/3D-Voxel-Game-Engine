@@ -13,6 +13,9 @@ namespace Minecraft
 
         protected float width, height, length;
 
+        public delegate void OnDespawned();
+        public event OnDespawned OnDespawnedHandler;
+
         public Entity(int id, Vector3 position, EntityType entityType)
         {
             this.id = id;
@@ -22,6 +25,8 @@ namespace Minecraft
             SetInitialDimensions();
             InitialAxisAlignedBox();
         }
+
+        public void RaiseOnDespawned() => OnDespawnedHandler?.Invoke();
 
         protected abstract void SetInitialDimensions();
 

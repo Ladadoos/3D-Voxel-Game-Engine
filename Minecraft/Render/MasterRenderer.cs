@@ -21,7 +21,6 @@ namespace Minecraft
         private TextureAtlas textureAtlas;
         private BlockModelRegistry blockModelRegistry;
         private EntityMeshRegistry entityMeshRegistry;
-        private TextureLoader textureLoader;
         private ScreenQuad screenQuad;
         private UIRenderer uiRenderer;
 
@@ -36,8 +35,7 @@ namespace Minecraft
             cameraController = new CameraController(game.window);
             SetActiveCamera(game.player.camera);
 
-            textureLoader = new TextureLoader();
-            int textureAtlasId = textureLoader.LoadTexture("../../Resources/texturePack.png");
+            int textureAtlasId = TextureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
             blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
@@ -47,7 +45,7 @@ namespace Minecraft
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
-            uiRenderer = new UIRenderer(game.window, cameraController, textureLoader);
+            uiRenderer = new UIRenderer(game.window, cameraController);
 
             EnableDepthTest();
             EnableCulling();
@@ -63,6 +61,10 @@ namespace Minecraft
             cameraController.ControlCamera(camera);
             UploadProjectionMatrix();
         }
+
+        public void AddCanvas(UICanvas canvas) => uiRenderer.AddCanvas(canvas);
+        public void RemoveCanvas(UICanvas canvas) => uiRenderer.RemoveCanvas(canvas);
+        public Font GetFont(FontType type) => uiRenderer.GetFont(type);
 
         public void Render(World world)
         {
@@ -211,7 +213,7 @@ namespace Minecraft
         public void OnCloseGame()
         {
             basicShader.OnCloseGame();
-            textureLoader.OnCloseGame();
+            TextureLoader.OnCloseGame();
             wireframeRenderer.OnCloseGame();
 
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)

@@ -11,6 +11,13 @@
             this.textureId = textureId;
             this.pixelWidth = pixelWidth;
             this.pixelHeight = pixelHeight;
-        }      
+        }    
+        
+        public Texture(string pathToFile, int pixelWidth, int pixelHeight)
+        {
+            this.textureId = TextureLoader.LoadTexture(pathToFile);
+            this.pixelWidth = pixelWidth;
+            this.pixelHeight = pixelHeight;
+        }
     }
 }

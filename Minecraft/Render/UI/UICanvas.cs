@@ -5,11 +5,11 @@ namespace Minecraft
 {
     class UICanvas
     {
-        public RenderSpace renderSpace { get; private set; }
+        public RenderSpace renderSpace { get; protected set; }
         public int pixelWidth { get; private set; }
         public int pixelHeight { get; private set; }
-        public Vector3 position { get; private set; }
-        public Vector3 rotation { get; private set; }
+        public Vector3 position { get; protected set; }
+        public Vector3 rotation { get; protected set; }
 
         private HashSet<UIComponent> components = new HashSet<UIComponent>();
         private HashSet<UIComponent> toCleanComponents = new HashSet<UIComponent>();
@@ -69,5 +69,7 @@ namespace Minecraft
         {
             return components.Remove(component);
         }
+
+        public virtual void Update() { }
     }
 }

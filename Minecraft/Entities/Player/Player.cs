@@ -7,6 +7,8 @@ namespace Minecraft
 {
     abstract class Player : Entity
     {
+        public string playerName;
+
         protected bool isFlying = true;
         protected bool isInCreativeMode = true;
         protected bool doCollisionDetection = true;
@@ -26,8 +28,9 @@ namespace Minecraft
         protected delegate void OnToggleCrouching(bool isCrouching);
         protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        public Player(int id, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
+        public Player(int id, string playerName, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
         {
+            this.playerName = playerName;
             jumpStopWatch.Start();
         }
 

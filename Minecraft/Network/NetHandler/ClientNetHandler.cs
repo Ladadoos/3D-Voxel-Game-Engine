@@ -60,12 +60,15 @@ namespace Minecraft
             Logger.Info("You: " + playerJoinAcceptPacket.name + " connected.");
 
             game.player.id = playerJoinAcceptPacket.playerId;
+            game.player.playerName = playerJoinAcceptPacket.name;
             playerConnection.state = ConnectionState.Accepted;
         }
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
         {
-            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId);
+            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId, playerJoinPacket.name);
+            UICanvasEntityName playerNameCanvas = new UICanvasEntityName(game, otherPlayer, playerJoinPacket.name);
+            game.masterRenderer.AddCanvas(playerNameCanvas);
             game.world.loadedEntities.Add(playerJoinPacket.playerId, otherPlayer);
         }
 
