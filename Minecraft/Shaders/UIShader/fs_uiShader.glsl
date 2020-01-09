@@ -9,7 +9,7 @@ uniform sampler2D uiTexture;
 void main()
 {
 	vec4 albedo = texture(uiTexture, uv);
-	if(albedo.rgb == vec3(0))
+	if(albedo.a == 0)
 	{
 		discard;
 	}

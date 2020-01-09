@@ -10,12 +10,15 @@ namespace Minecraft
                                                         float scaleX = 1, float scaleY = 1, float scaleZ = 1)
         {
             Matrix4 scaleMatrix = new Matrix4(scaleX, 0, 0, 0, 0, scaleY, 0, 0, 0, 0, scaleZ, 0, 0, 0, 0, 1);
-            Matrix4 transformationmatrix = scaleMatrix *
-                Matrix4.CreateRotationX(DegreeToRadian(rx)) *
-                Matrix4.CreateRotationY(DegreeToRadian(ry)) *
-                Matrix4.CreateRotationZ(DegreeToRadian(rz)) *
+            return scaleMatrix * CreateRotationAndTranslationMatrix(translation, new Vector3(rx, ry, rz));
+        }
+
+        public static Matrix4 CreateRotationAndTranslationMatrix(Vector3 translation, Vector3 rotation)
+        {
+            return Matrix4.CreateRotationX(DegreeToRadian(rotation.X)) *
+                Matrix4.CreateRotationY(DegreeToRadian(rotation.Y)) *
+                Matrix4.CreateRotationZ(DegreeToRadian(rotation.Z)) *
                 Matrix4.CreateTranslation(translation);
-            return transformationmatrix;
         }
 
         public static Vector3 CreateLookAtVector(float yaw, float pitch)

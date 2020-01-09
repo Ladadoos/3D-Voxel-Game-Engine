@@ -43,7 +43,7 @@ namespace Minecraft
             blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
-            wireframeRenderer = new WireframeRenderer(game.player.camera);
+            wireframeRenderer = new WireframeRenderer(cameraController.camera);
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 

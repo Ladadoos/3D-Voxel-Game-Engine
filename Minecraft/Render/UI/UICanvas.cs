@@ -1,30 +1,61 @@
-﻿using System.Collections.Generic;
+﻿using OpenTK;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
     class UICanvas
     {
-        public bool isDirty { get; private set; }
         public RenderSpace renderSpace { get; private set; }
-        public GameWindow window { get; private set; }
-        private HashSet<UIComponent> components = new HashSet<UIComponent>();
+        public int pixelWidth { get; private set; }
+        public int pixelHeight { get; private set; }
+        public Vector3 position { get; private set; }
+        public Vector3 rotation { get; private set; }
 
-        public UICanvas(GameWindow window, RenderSpace renderSpace)
+        private HashSet<UIComponent> components = new HashSet<UIComponent>();
+        private HashSet<UIComponent> toCleanComponents = new HashSet<UIComponent>();
+
+        public UICanvas(Vector3 position, Vector3 rotation, int pixelWidth, int pixelHeight, RenderSpace renderSpace)
         {
-            this.window = window;
+            this.position = position;
+            this.rotation = rotation;
+            this.pixelWidth = pixelWidth;
+            this.pixelHeight = pixelHeight;
             this.renderSpace = renderSpace;
-            isDirty = true;
         }
 
-        public void Render(UIShader shader)
+        public void Render(UIShader uiShader)
         {
-            foreach(UIComponent component in components)
+            Matrix4 transformationMatrix = Matrix4.Identity;
+            if(renderSpace == RenderSpace.World)
             {
-                component.Render(shader);
+                transformationMatrix = Maths.CreateRotationAndTranslationMatrix(position, rotation);
+            }
+            uiShader.LoadMatrix(uiShader.location_TransformationMatrix, transformationMatrix);
+
+            foreach (UIComponent component in components)
+            {
+                component.Render(uiShader);
             }
         }
 
-        public bool AddComponent(UIComponent component)
+        public void Clean()
+        {
+            foreach(UIComponent toCleanComp in toCleanComponents)
+            {
+                toCleanComp.Clean();
+            }
+            toCleanComponents.Clear();
+        }
+
+        public void AddComponentToClean(UIComponent component)
+        {
+            if (!toCleanComponents.Contains(component))
+            {
+                toCleanComponents.Add(component);
+            }
+        }
+
+        public bool AddComponentToRender(UIComponent component)
         {
             if (components.Contains(component))
             {
@@ -34,7 +65,7 @@ namespace Minecraft
             return true;
         }
 
-        public bool RemoveComponent(UIComponent component)
+        public bool RemoveComponentFromRender(UIComponent component)
         {
             return components.Remove(component);
         }
