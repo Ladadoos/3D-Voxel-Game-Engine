@@ -10,7 +10,7 @@ namespace Minecraft
         private Entity otherEntity;
 
         public UICanvasEntityName(Game game, Entity otherEntity, string text) :
-            base(otherEntity.position + new Vector3(0, 1, 0), Vector3.Zero, 500, 100, RenderSpace.World)
+            base(otherEntity.position + new Vector3(0, 1, 0), Vector3.Zero, 800, 450, RenderSpace.World)
         {
             this.otherEntity = otherEntity;
             this.myPlayer = game.player;
@@ -18,7 +18,7 @@ namespace Minecraft
 
             otherEntity.OnDespawnedHandler += OnEntityDespawned;
 
-            UIText playerName = new UIText(this, game.masterRenderer.GetFont(FontType.Arial), new Vector2(0, 0), text);
+            UIText playerName = new UIText(this, game.masterRenderer.GetFont(FontType.Arial), new Vector2(0, 0), Vector2.One, text);
             AddComponentToRender(playerName);
         }
 

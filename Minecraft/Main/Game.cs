@@ -12,11 +12,12 @@ namespace Minecraft
 
         public MasterRenderer masterRenderer { get; private set; }
         public ClientPlayer player { get; private set; }
-        public FPSCounter fpsCounter { get; private set; }
+        public FPSCounter averageFpsCounter { get; private set; }
         public Client client { get; private set; }
         public World world { get; private set; }
         public Server server { get; private set; }
         public RunMode mode { get; private set; }
+        public float currentFps;
 
         public Game(RunMode mode)
         {
@@ -31,7 +32,7 @@ namespace Minecraft
             Blocks.RegisterBlocks();
             randomizer = new Random();
             input = new Input();
-            fpsCounter = new FPSCounter();
+            averageFpsCounter = new FPSCounter();
             window.VSync = OpenTK.VSyncMode.On;
 
             if (mode == RunMode.ClientServer)
@@ -83,8 +84,8 @@ namespace Minecraft
         {
             float elapsedSeconds = (float)deltaTime;
 
-            fpsCounter.IncrementFrameCounter();
-            fpsCounter.AddElapsedTime(deltaTime);
+            averageFpsCounter.IncrementFrameCounter();
+            averageFpsCounter.AddElapsedTime(deltaTime);
 
             if (mode == RunMode.Server)
             {

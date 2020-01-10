@@ -11,32 +11,40 @@ namespace Minecraft
                 return _text;
             }
             set {
+                if(_text == value)
+                {
+                    return;
+                }
+
                 _text = value;
                 parentCanvas.AddComponentToClean(this);
             }
         }
 
-        private Font font;
-        private VAOModel vaoModel;
+        public Font font { get; private set; }
+        public Vector2 scale { get; private set; }
 
-        public UIText(UICanvas parentCanvas, Font font, Vector2 position, string text) : base(parentCanvas, position)
+        private TextMeshBuilder meshBuilder = new TextMeshBuilder();
+
+        public UIText(UICanvas parentCanvas, Font font, Vector2 position, Vector2 scale, string text) : base(parentCanvas, position)
         {
             this.font = font;
             this.text = text;
+            this.scale = scale;
         }
 
         public override void Clean()
         {
-            float[] vertices = font.GetVerticesForText(this);
-            float[] textures = font.GetTexturesForText(this);
-            int indicesCount = text.Length * 6;
+            float[] vertices = meshBuilder.GetVerticesForText(this);
+            float[] textures = meshBuilder.GetTexturesForText(this);
+            int indicesCount = vertices.Length / 3;
             vaoModel = new VAOModel(vertices, textures, indicesCount);
         }
 
         public override void Render(UIShader uiShader)
         {
             vaoModel.Bind();
-            uiShader.LoadTexture(uiShader.location_Texture, 0, font.fontMaTexture.textureId);
+            uiShader.LoadTexture(uiShader.location_Texture, 0, font.fontMapTexture.textureId);
             GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.indicesCount);
         }
     }

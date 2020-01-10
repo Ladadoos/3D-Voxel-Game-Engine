@@ -12,7 +12,7 @@ namespace Minecraft
         protected override void SetInitialDimensions()
         {
             width = 1;
-            height = 1;
+            height = 2;
             length = 1;
         }
     }

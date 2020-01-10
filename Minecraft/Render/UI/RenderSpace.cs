@@ -2,7 +2,7 @@
 {
     enum RenderSpace
     {
-        Screen,
-        World
+        World,
+        Screen
     }
 }

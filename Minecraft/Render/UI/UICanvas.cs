@@ -23,6 +23,12 @@ namespace Minecraft
             this.renderSpace = renderSpace;
         }
 
+        public void SetDimensions(int pixelWidth, int pixelHeight)
+        {
+            this.pixelWidth = pixelWidth;
+            this.pixelHeight = pixelHeight;
+        }
+
         public void Render(UIShader uiShader)
         {
             Matrix4 transformationMatrix = Matrix4.Identity;

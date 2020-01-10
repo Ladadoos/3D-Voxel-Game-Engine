@@ -8,7 +8,10 @@ namespace Minecraft
         private WireframeRenderer wireframeRenderer;
         private Game game;
 
+        private UICanvasDebug debugCanvas;
+
         private bool renderHitboxes;
+        private bool displayDebugInfo;
 
         public DebugHelper(Game game, WireframeRenderer wireframeRenderer)
         {
@@ -21,6 +24,17 @@ namespace Minecraft
             if (Game.input.OnKeyPress(OpenTK.Input.Key.F1))
             {
                 renderHitboxes = !renderHitboxes;
+            }else if (Game.input.OnKeyPress(OpenTK.Input.Key.F2) && game.mode != RunMode.Server)
+            {
+                displayDebugInfo = !displayDebugInfo;
+                if (displayDebugInfo)
+                {
+                    debugCanvas = new UICanvasDebug(game);
+                    game.masterRenderer.AddCanvas(debugCanvas);
+                } else
+                {
+                    game.masterRenderer.RemoveCanvas(debugCanvas);
+                }
             }
 
             Render();

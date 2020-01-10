@@ -54,19 +54,7 @@ namespace Minecraft
                 Exit();
             }
 
-            if(game.mode != RunMode.Server)
-            {
-                Vector2 chunkPos = game.world.GetChunkPosition(game.player.position.X, game.player.position.Z);
-                Title = "Focused:" + Focused + 
-                        "Vsync: " + VSync +
-                        " FPS: " + (int)(1f / e.Time) +
-                        " AVG FPS: " + game.fpsCounter.GetAverageFPS() +
-                        " Position: " + game.player.position +
-                        " Grid Pos: " + chunkPos +
-                        " Velocity: " + game.player.velocity;
-            }
-
-
+            game.currentFps = (int)(1f / e.Time);
             game.OnUpdateGame(e.Time);
         }
 
