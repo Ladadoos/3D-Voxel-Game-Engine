@@ -27,7 +27,6 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.window = window;
-            Logger.SetLogLevel(LogLevel.Warn);
 
             Blocks.RegisterBlocks();
             randomizer = new Random();

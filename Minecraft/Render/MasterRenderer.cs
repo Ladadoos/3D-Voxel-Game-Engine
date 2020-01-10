@@ -23,6 +23,7 @@ namespace Minecraft
         private EntityMeshRegistry entityMeshRegistry;
         private ScreenQuad screenQuad;
         private UIRenderer uiRenderer;
+        private UICanvasIngame ingameCanvas;
 
         private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
         private HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
@@ -46,6 +47,8 @@ namespace Minecraft
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
             uiRenderer = new UIRenderer(game.window, cameraController);
+            ingameCanvas = new UICanvasIngame(game);
+            AddCanvas(ingameCanvas);
 
             EnableDepthTest();
             EnableCulling();
