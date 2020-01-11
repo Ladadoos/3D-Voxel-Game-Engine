@@ -35,6 +35,16 @@ namespace Minecraft
                 {
                     game.masterRenderer.RemoveCanvas(debugCanvas);
                 }
+            }else if (Game.input.OnKeyPress(OpenTK.Input.Key.F3))
+            {
+                GC.Collect();
+                Logger.Info("Manual garbage collected.");
+            } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F4))
+            {
+                for (int x = -3; x < 3; x++)
+                    for (int y = -3; y < 3; y++)
+                        for (int z = -3; z < 3; z++)
+                            game.client.WritePacket(new RemoveBlockPacket(new Vector3i(x, y, z) + new Vector3i(game.player.position)));
             }
 
             Render();

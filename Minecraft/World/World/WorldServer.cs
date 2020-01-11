@@ -20,9 +20,9 @@ namespace Minecraft
         {
             Logger.Info("Starting initial chunk generation.");
             DateTime start = DateTime.Now;
-            for (int x = 0; x < 1; x++)
+            for (int x = 0; x < 4; x++)
             {
-                for (int y = 0; y < 1; y++)
+                for (int y = 0; y < 4; y++)
                 {
                     Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
                     LoadChunk(chunk);
