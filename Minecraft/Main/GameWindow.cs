@@ -12,12 +12,12 @@ namespace Minecraft
     {
         private Game game;
 
-        public GameWindow(RunMode mode) : base(720, 480, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
+        public GameWindow(StartArgs startArgs) : base(720, 480, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
         {
             Logger.Info("OpenGL version: " + GL.GetString(StringName.Version));
-            game = new Game(mode);
+            game = new Game(startArgs);
 
-            if(mode == RunMode.Server)
+            if(startArgs.runMode == RunMode.Server)
             {
                 Width = 10;
                 Height = 10;

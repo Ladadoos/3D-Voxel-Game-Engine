@@ -78,7 +78,7 @@ namespace Minecraft
 
         private void StartServerAndListenForConnections()
         {
-            tcpServer = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            tcpServer = new TcpListener(IPAddress.Any, port);
             tcpServer.Start();
             Logger.Info("Started listening for connections on " + GetType());
 

@@ -19,9 +19,12 @@ namespace Minecraft
         public RunMode mode { get; private set; }
         public float currentFps;
 
-        public Game(RunMode mode)
+        private StartArgs startArgs;
+
+        public Game(StartArgs startArgs)
         {
-            this.mode = mode;
+            this.mode = startArgs.runMode;
+            this.startArgs = startArgs;
         }
 
         public void OnStartGame(GameWindow window)
@@ -32,27 +35,26 @@ namespace Minecraft
             randomizer = new Random();
             input = new Input();
             averageFpsCounter = new FPSCounter();
-            window.VSync = OpenTK.VSyncMode.On;
 
             if (mode == RunMode.ClientServer)
             {
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
 
-                server = new Server(this, true);
-                server.Start("127.0.0.1", 50000);
+                server = new Server(this, false);
+                server.Start(startArgs.ip, startArgs.port);
                 WorldClient.AddHooks(this, server.world);
                 server.GenerateMap();
 
                 client = new Client(this);
-                client.ConnectWith("127.0.0.1", 50000);
+                client.ConnectWith(startArgs.ip, startArgs.port);
 
                 world = new WorldClient(this);
                 world.loadedChunks = server.world.loadedChunks;
             } else if(mode == RunMode.Server)
             {
                 server = new Server(this, true);
-                server.Start("127.0.0.1", 50000);
+                server.Start(startArgs.ip, startArgs.port);
                 server.GenerateMap();
 
                 window.VSync = OpenTK.VSyncMode.On;
@@ -64,7 +66,7 @@ namespace Minecraft
                 WorldClient.AddHooks(this, world);
 
                 client = new Client(this);
-                client.ConnectWith("127.0.0.1", 50000);
+                client.ConnectWith(startArgs.ip, startArgs.port);
             }          
         }
 
