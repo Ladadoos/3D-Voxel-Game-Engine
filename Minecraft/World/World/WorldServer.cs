@@ -16,7 +16,12 @@ namespace Minecraft
             worldGenerator = new WorldGenerator();
         }
 
-        public void GenerateTestMap()
+        public Chunk GenerateBlocksForChunk(int gridX, int gridZ)
+        {
+            return worldGenerator.GenerateBlocksForChunkAt(gridX, gridZ);
+        }
+
+        public void GenerateSpawnArea()
         {
             Logger.Info("Starting initial chunk generation.");
             DateTime start = DateTime.Now;
@@ -24,8 +29,7 @@ namespace Minecraft
             {
                 for (int y = 0; y < 4; y++)
                 {
-                    Chunk chunk = worldGenerator.GenerateBlocksForChunkAt(x, y);
-                    LoadChunk(chunk);
+                    LoadChunk(GenerateBlocksForChunk(x, y));
                 }
             }
             TimeSpan now2 = DateTime.Now - start;

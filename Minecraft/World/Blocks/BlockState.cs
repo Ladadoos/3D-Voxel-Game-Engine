@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Minecraft
 {
+    [Serializable]
     abstract class BlockState
     {
         public abstract Block GetBlock();
@@ -14,6 +16,7 @@ namespace Minecraft
         public virtual void FromStream(BinaryReader reader) { }
     }
 
+    [Serializable]
     class BlockStateDirt : BlockState
     {
         public override Block GetBlock()
@@ -22,6 +25,7 @@ namespace Minecraft
         }
     }
 
+    [Serializable]
     class BlockStateAir : BlockState
     {
         public override Block GetBlock()
@@ -30,6 +34,7 @@ namespace Minecraft
         }
     }
 
+    [Serializable]
     class BlockStateStone : BlockState
     {
         public override Block GetBlock()
@@ -38,6 +43,7 @@ namespace Minecraft
         }
     }
 
+    [Serializable]
     class BlockStateFlower : BlockState
     {
         public override Block GetBlock()
@@ -46,6 +52,7 @@ namespace Minecraft
         }
     }
 
+    [Serializable]
     class BlockStateTNT : BlockState
     {
         public float elapsedSecondsSinceTrigger;

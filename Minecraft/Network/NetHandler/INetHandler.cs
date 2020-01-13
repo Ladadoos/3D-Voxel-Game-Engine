@@ -10,6 +10,8 @@
 
         void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket);
 
+        void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket);
+
         void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket);
 
         void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket);

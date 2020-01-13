@@ -33,6 +33,11 @@ namespace Minecraft
             game.world.LoadChunk(chunkDataPacket.chunk);
         }
 
+        public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket)
+        {
+            throw new InvalidOperationException();
+        }
+
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             Logger.Info(playerDataPacket.ToString());

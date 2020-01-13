@@ -35,6 +35,7 @@ namespace Minecraft
             randomizer = new Random();
             input = new Input();
             averageFpsCounter = new FPSCounter();
+            window.VSync = OpenTK.VSyncMode.Off;
 
             if (mode == RunMode.ClientServer)
             {
@@ -44,7 +45,7 @@ namespace Minecraft
                 server = new Server(this, false);
                 server.Start(startArgs.ip, startArgs.port);
                 WorldClient.AddHooks(this, server.world);
-                server.GenerateMap();
+                server.GenerateSpawnArea();
 
                 client = new Client(this);
                 client.ConnectWith(startArgs.ip, startArgs.port);
@@ -55,7 +56,7 @@ namespace Minecraft
             {
                 server = new Server(this, true);
                 server.Start(startArgs.ip, startArgs.port);
-                server.GenerateMap();
+                server.GenerateSpawnArea();
 
                 window.VSync = OpenTK.VSyncMode.On;
             } else{

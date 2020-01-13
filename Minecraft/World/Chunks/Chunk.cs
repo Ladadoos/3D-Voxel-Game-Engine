@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
+    [Serializable]
     class Chunk
     {
+        [NonSerialized]
         private Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
         public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX;
@@ -13,27 +16,6 @@ namespace Minecraft
         {
             this.gridX = gridX;
             this.gridZ = gridZ;
-        }
-
-        public void ToStream(NetBufferedStream bufferedStream)
-        {
-            bufferedStream.WriteInt32(gridX);
-            bufferedStream.WriteInt32(gridZ);
-
-            List<Section> validSections = new List<Section>();
-            foreach (Section section in sections)
-            {
-                if (section != null)
-                {
-                    validSections.Add(section);
-                }
-            }
-
-            bufferedStream.WriteInt32(validSections.Count);
-            foreach (Section section in validSections)
-            {
-                section.ToStream(bufferedStream);
-            }
         }
 
         public void Tick(World world, float deltaTime)

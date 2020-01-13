@@ -35,6 +35,17 @@ namespace Minecraft
             throw new InvalidOperationException();
         }
 
+        public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket packet)
+        {
+            Vector2 gridPosition = new Vector2(packet.gridX, packet.gridZ);
+            if(!game.server.world.loadedChunks.TryGetValue(gridPosition, out Chunk chunk))
+            {
+                chunk = game.server.world.GenerateBlocksForChunk(packet.gridX, packet.gridZ);
+                game.server.world.LoadChunk(chunk);
+            }
+            playerConnection.WritePacket(new ChunkDataPacket(chunk));
+        }
+
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             playerConnection.player.position = playerDataPacket.position;

@@ -36,7 +36,6 @@ namespace Minecraft
         public World(Game game)
         {
             this.game = game;
-            SpawnEntity(new Dummy(100));
         }
 
         public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
@@ -60,11 +59,6 @@ namespace Minecraft
             return false;
         }
 
-        private void DespawnedEntity_OnDespawnedHandler()
-        {
-            throw new NotImplementedException();
-        }
-
         public void SpawnEntity(Entity entity)
         {
             loadedEntities.Add(entity.id, entity);
@@ -84,7 +78,7 @@ namespace Minecraft
             }
         }
 
-        public void Update(float deltaTime)
+        public virtual void Update(float deltaTime)
         {
             foreach(Entity entity in loadedEntities.Values)
             {
@@ -174,6 +168,12 @@ namespace Minecraft
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             bool blockPlacedInLoadedChunk = loadedChunks.TryGetValue(chunkPos, out Chunk chunk);
 
+            if (!blockPlacedInLoadedChunk)
+            {
+                Logger.Warn("Tried to place block in chunk that is not loaded.");
+                return false;
+            }
+
             if (this is WorldServer)
             {
                 if (newBlockState.GetBlock() == Blocks.Air)
@@ -185,12 +185,6 @@ namespace Minecraft
                 if (IsOutsideBuildHeight(blockPos.Y))
                 {
                     Logger.Warn("Tried to place block outside of building height.");
-                    return false;
-                }
-
-                if (!blockPlacedInLoadedChunk)
-                {
-                    Logger.Warn("Tried to place block in chunk that is not loaded.");
                     return false;
                 }
 

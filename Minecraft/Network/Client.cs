@@ -101,7 +101,7 @@ namespace Minecraft
                 while (serverConnection.netStream.DataAvailable)
                 {
                     Packet packet = serverConnection.ReadPacket();
-                    Logger.Info("Client received packet " + packet.ToString());
+                    Logger.Packet("Client received packet " + packet.ToString());
                     packet.Process(serverConnection.netHandler);
                 }
             }catch(Exception e)
@@ -117,6 +117,7 @@ namespace Minecraft
             {
                 return;
             }
+            Logger.Packet("Client wrote packet " + packet.ToString());
             serverConnection.WritePacket(packet);
         }
     }

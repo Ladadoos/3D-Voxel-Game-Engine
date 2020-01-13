@@ -4,7 +4,7 @@
     {
         public Chunk chunk { get; private set; }
 
-        public ChunkDataPacket(Chunk chunk) : base(PacketType.ChunkLoad)
+        public ChunkDataPacket(Chunk chunk) : base(PacketType.ChunkData)
         {     
             this.chunk = chunk;
         }
@@ -16,7 +16,9 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            chunk.ToStream(bufferedStream);
+            byte[] bytes = DataConverter.ObjectToByteArray(chunk);
+            bufferedStream.WriteInt32(bytes.Length);
+            bufferedStream.WriteBytes(bytes);
         }
     }
 }

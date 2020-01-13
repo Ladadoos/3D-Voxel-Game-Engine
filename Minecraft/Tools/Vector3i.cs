@@ -1,7 +1,9 @@
 ﻿using OpenTK;
+using System;
 
 namespace Minecraft
 {
+    [Serializable]
     struct Vector3i
     {
         public int X;

@@ -1,5 +1,4 @@
-﻿using OpenTK;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -48,9 +47,9 @@ namespace Minecraft
             connectionsThread.Start();
         }
 
-        public void GenerateMap()
+        public void GenerateSpawnArea()
         {
-            world.GenerateTestMap();
+            world.GenerateSpawnArea();
         }
 
         public void UpdateKeepAliveFor(Connection connection)
@@ -99,28 +98,11 @@ namespace Minecraft
             Logger.Info("Server closed.");
         }
 
-        private void ChunkSenderThread(object obj)
-        {
-            Connection connection = (Connection)obj;
-            Logger.Info("Writing chunk data to stream.");
-            foreach (KeyValuePair<Vector2, Chunk> kv in world.loadedChunks)
-            {
-                Logger.Info("Write chunk.");
-                Thread.Sleep(500);
-                connection.WritePacket(new ChunkDataPacket(kv.Value));
-            }
-        }
-
         private void OnConnectionStateChanged(Connection connection)
         {
             if (connection.state == ConnectionState.Accepted)
             {
-                if (isOpen)
-                {
-                    Thread chunkThread = new Thread(ChunkSenderThread);
-                    chunkThread.IsBackground = true;
-                    chunkThread.Start(connection);
-                }
+
             } else if (connection.state == ConnectionState.Closed)
             {
                 Logger.Info("Connection closed with " + connection?.player.id);
