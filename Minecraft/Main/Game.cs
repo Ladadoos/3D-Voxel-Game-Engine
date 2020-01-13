@@ -45,13 +45,14 @@ namespace Minecraft
                 server = new Server(this, false);
                 server.Start(startArgs.ip, startArgs.port);
                 WorldClient.AddHooks(this, server.world);
-                server.GenerateSpawnArea();
 
                 client = new Client(this);
                 client.ConnectWith(startArgs.ip, startArgs.port);
 
                 world = new WorldClient(this);
                 world.loadedChunks = server.world.loadedChunks;
+
+                server.GenerateSpawnArea();
             } else if(mode == RunMode.Server)
             {
                 server = new Server(this, true);
