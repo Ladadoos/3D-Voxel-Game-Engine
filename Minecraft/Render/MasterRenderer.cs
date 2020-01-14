@@ -3,9 +3,19 @@ using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
 using System;
+using System.Threading;
 
 namespace Minecraft
 {
+    class ChunkBufferLayout
+    {
+        public float[] positions;
+        public float[] textureCoordinates;
+        public float[] lights;
+        public float[] normals;
+        public int indicesCount;
+    }
+
     class MasterRenderer
     {
         private float colorClearR = 0.57F;
@@ -29,8 +39,11 @@ namespace Minecraft
         private HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
         private OpaqueMeshGenerator blocksMeshGenerator;
 
+        private Game game;
+
         public MasterRenderer(Game game)
         {
+            this.game = game;
             basicShader = new ShaderBasic();
             entityShader = new EntityShader();
             cameraController = new CameraController(game.window);
@@ -52,6 +65,10 @@ namespace Minecraft
 
             EnableDepthTest();
             EnableCulling();
+
+            /*Thread meshThread = new Thread(MeshGenerator);
+            meshThread.IsBackground = true;
+            meshThread.Start();*/
         }
 
         public void SetActiveCamera(Camera camera)
@@ -79,19 +96,26 @@ namespace Minecraft
             basicShader.Start();
             basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
             basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
-            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
-            {
-                Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                Vector3 max = min + new Vector3(16, 256, 16);
-                if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AxisAlignedBox(min, max)))
-                {
-                    continue;
-                }
-                chunkToRender.Value.hardBlocksModel.Bind();
-                basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
-                GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
-            }
 
+            lock (meshLock)
+            {
+                foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
+                {
+                    if (chunkToRender.Value.hardBlocksModel == null) continue;
+
+                    Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
+                    Vector3 max = min + new Vector3(16, 256, 16);
+                    if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AxisAlignedBox(min, max)))
+                    {
+                        continue;
+                    }
+
+                    chunkToRender.Value.hardBlocksModel.Bind();
+                    basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
+                    GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
+                }
+            }
+            
             entityShader.Start();
             entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
             entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
@@ -116,17 +140,90 @@ namespace Minecraft
             GL.Enable(EnableCap.CullFace);
 
             screenQuad.Unbind();
-
             screenQuad.RenderToScreen();
         }
 
-        private bool firstPass = false;
+        struct Test {
+            public RenderChunk rr;
+            public ChunkBufferLayout cbl;
+        }
+        
+        private Queue<Test> toProcess = new Queue<Test>();
+        private object meshLock = new object();
+        private void MeshGenerator()
+        {
+            while (true)
+            {
+                Thread.Sleep(10);
 
+                lock (meshLock)
+                {
+                    Chunk toRemove = null;
+                    foreach (Chunk chunk in toRemeshChunks)
+                    {
+                        Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
+
+                        if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
+                        {
+                            renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
+                            toRenderChunks.Add(gridPosition, renderChunk);
+                        }
+
+                        toProcess.Enqueue(new Test()
+                        {
+                            rr =renderChunk,
+                            cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone())
+                        });
+
+                        toRemove = chunk;
+                        break;
+                    }
+                    // toRemeshChunks.Clear();
+                    toRemeshChunks.Remove(toRemove);
+                }
+            }
+        }
+
+       // private bool firstPass = false;
         public void EndFrameUpdate(World world)
         {
-            var start = DateTime.Now;
+            lock (meshLock)
+            {
+                Chunk toRemove = null;
+                foreach (Chunk chunk in toRemeshChunks)
+                {
+                    Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
 
-            foreach (Chunk chunk in toRemeshChunks)
+                    if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
+                    {
+                        renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
+                        toRenderChunks.Add(gridPosition, renderChunk);
+                    }
+
+                    toProcess.Enqueue(new Test()
+                    {
+                        rr = renderChunk,
+                        cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone())
+                    });
+
+                    toRemove = chunk;
+                    break;
+                }
+                // toRemeshChunks.Clear();
+                toRemeshChunks.Remove(toRemove);
+
+                if (toProcess.Count > 0)
+                {
+                    Test t = toProcess.Dequeue();
+                    t.rr.hardBlocksModel?.OnCloseGame();
+                    t.rr.hardBlocksModel = new VAOModel(t.cbl);
+                }
+            }
+
+
+            //var start = DateTime.Now;
+
+            /*foreach (Chunk chunk in toRemeshChunks)
             {
                 Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
 
@@ -137,16 +234,31 @@ namespace Minecraft
                 }
 
                 renderChunk.hardBlocksModel = blocksMeshGenerator.GenerateMeshFor(world, chunk);
-            }
+            }*/
 
-            var now2 = DateTime.Now - start;
+            /*var now2 = DateTime.Now - start;
             if (!firstPass)
             {
                 Logger.Info("Generating initial meshes took: " + now2);
             }
 
-            toRemeshChunks.Clear();
-            firstPass = true;
+            toRemeshChunks.Clear();*/
+            //firstPass = true;
+
+           /* foreach (Chunk chunk in toRemeshChunks)
+            {
+                Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
+
+                if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
+                {
+                    renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
+                    toRenderChunks.Add(gridPosition, renderChunk);
+                }
+
+                renderChunk.hardBlocksModel?.OnCloseGame();
+                renderChunk.hardBlocksModel = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone());
+            }
+            toRemeshChunks.Clear();*/
 
             cameraController.Update();
         }
@@ -154,6 +266,23 @@ namespace Minecraft
         public void OnChunkLoaded(Chunk chunk)
         {
             MeshChunk(chunk);
+
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
+            {
+                MeshChunk(cXNeg);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
+            {
+                MeshChunk(cXPos);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
+            {
+                MeshChunk(cZNeg);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
+            {
+                MeshChunk(cZPos);
+            }
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
@@ -168,9 +297,12 @@ namespace Minecraft
 
         private void MeshChunk(Chunk chunk)
         {
-            if (!toRemeshChunks.Contains(chunk))
+            lock (meshLock)
             {
-                toRemeshChunks.Add(chunk);
+                if (!toRemeshChunks.Contains(chunk))
+                {
+                    toRemeshChunks.Add(chunk);
+                }
             }
         }
 

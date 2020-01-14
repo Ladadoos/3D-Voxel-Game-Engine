@@ -8,6 +8,11 @@ namespace Minecraft
     {
         public abstract Block GetBlock();
 
+        public BlockState ShallowCopy()
+        {
+            return (BlockState)MemberwiseClone();
+        }
+
         public virtual void ToStream(NetBufferedStream bufferedStream)
         {
             bufferedStream.WriteInt32(GetBlock().id);

@@ -23,6 +23,18 @@ namespace Minecraft
             Unbind();
         }
 
+        public VAOModel(ChunkBufferLayout cbl)
+        {
+            this.indicesCount = cbl.indicesCount;
+            CreateVAO();
+            Bind();
+            CreateVBO(3, cbl.positions);
+            CreateVBO(3, cbl.normals);
+            CreateVBO(2, cbl.textureCoordinates);
+            CreateVBO(1, cbl.lights);
+            Unbind();
+        }
+
         public VAOModel(float[] positions, int[] indices)
         {
             this.indicesCount = indices.Length;

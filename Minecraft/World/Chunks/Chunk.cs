@@ -18,6 +18,25 @@ namespace Minecraft
             this.gridZ = gridZ;
         }
 
+        public Chunk DeepClone()
+        {
+            Chunk newChunk = new Chunk(gridX, gridZ);
+            Section[] newSections = new Section[Constants.SECTIONS_IN_CHUNKS];
+
+            for (int i = 0; i < 16; i++)
+            {
+                newSections[i] = sections[i]?.DeepCopy();
+                if (newSections[i] != null)
+                {
+                    newSections[i].gridX = gridX;
+                    newSections[i].gridZ = gridZ;
+                }
+
+            }
+            newChunk.sections = newSections;
+            return newChunk;
+        }
+
         public void Tick(World world, float deltaTime)
         {
             foreach(BlockState state in tickableBlocks.Values)
@@ -39,7 +58,7 @@ namespace Minecraft
             int sectionHeight = worldY / Constants.SECTION_HEIGHT;
             if(sections[sectionHeight] == null)
             {
-                sections[sectionHeight] = new Section(this, (byte)sectionHeight);
+                sections[sectionHeight] = new Section(gridX, gridZ, (byte)sectionHeight);
             }
 
             Vector3i blockPos = new Vector3i(localX + gridX * 16, worldY, localZ + gridZ * 16);

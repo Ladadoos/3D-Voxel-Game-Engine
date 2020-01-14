@@ -27,7 +27,7 @@ namespace Minecraft
 
         public void CheckForNewChunks(World world)
         {
-            int viewDistance = 2;
+            int viewDistance = 6;
             for (int x = -viewDistance; x <= viewDistance; x++)
             {
                 for (int z = -viewDistance; z <= viewDistance; z++)

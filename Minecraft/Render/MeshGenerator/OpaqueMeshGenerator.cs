@@ -14,7 +14,7 @@ namespace Minecraft
             
         }
 
-        protected override VAOModel GenerateMesh(World world, Chunk chunk)
+        protected override ChunkBufferLayout GenerateMesh(World world, Chunk chunk)
         {
             world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg);
             world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos);
@@ -86,7 +86,14 @@ namespace Minecraft
                 }
             }
 
-            return new VAOModel(vertexPositions.ToArray(), textureUVs.ToArray(), illuminations.ToArray(), normals.ToArray(), indicesCount);        
+            return new ChunkBufferLayout()
+            {
+                positions = vertexPositions.ToArray(),
+                textureCoordinates = textureUVs.ToArray(),
+                lights = illuminations.ToArray(),
+                normals = normals.ToArray(),
+                indicesCount = indicesCount
+            };                   
         }
 
         private void BuildMeshForSide(Direction blockSide, BlockState state, Vector3 blockPos, BlockModel model, float lightValue)

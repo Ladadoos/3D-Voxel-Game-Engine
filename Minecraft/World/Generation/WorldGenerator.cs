@@ -16,7 +16,7 @@ namespace Minecraft
         private ForestBiome forestBiome = new ForestBiome();
         private SandBiome sandBiome = new SandBiome();
 
-        private int seaLevel = 95;
+        private int seaLevel = 15;
 
         public WorldGenerator()
         {

@@ -27,14 +27,14 @@ namespace Minecraft
             indicesCount = 0;
         }
 
-        public VAOModel GenerateMeshFor(World world, Chunk chunk)
+        public ChunkBufferLayout GenerateMeshFor(World world, Chunk chunk)
         {
-            VAOModel chunkModel = GenerateMesh(world, chunk);
+            ChunkBufferLayout chunkModel = GenerateMesh(world, chunk);
             ClearData();
             return chunkModel;
         }
 
-        protected abstract VAOModel GenerateMesh(World world, Chunk chunk);
+        protected abstract ChunkBufferLayout GenerateMesh(World world, Chunk chunk);
 
         protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3 blockPos, float globalIllumination)
         {
