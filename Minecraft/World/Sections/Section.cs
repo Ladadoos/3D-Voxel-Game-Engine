@@ -1,13 +1,19 @@
 ﻿using System;
 
+using ProtoBuf;
+
 namespace Minecraft
 {
-    [Serializable]
+    [ProtoContract]
     class Section
     {  
+        [ProtoMember(1)]
         public byte height;
-        public BlockState[,,] blocks = new BlockState[Constants.CHUNK_SIZE, Constants.SECTION_HEIGHT, Constants.CHUNK_SIZE];
+        [ProtoMember(2)]
+        public BlockState[] blocks = new BlockState[Constants.CHUNK_SIZE * Constants.SECTION_HEIGHT * Constants.CHUNK_SIZE];
+        [ProtoMember(3)]
         public int gridX;
+        [ProtoMember(4)]
         public int gridZ;
 
         public Section(int gridX, int gridZ, byte height)
@@ -16,6 +22,8 @@ namespace Minecraft
             this.gridZ = gridZ;
             this.height = height;
         }
+
+        public Section() { }
 
         public Section DeepCopy()
         {
@@ -26,7 +34,8 @@ namespace Minecraft
                 {
                     for (int z = 0; z < 16; z++)
                     {
-                        newSection.blocks[x, y, z] = blocks[x, y, z]?.ShallowCopy();
+                        int r = x * 16 * 16 + y * 16 + z;
+                        newSection.blocks[r] = blocks[r]?.ShallowCopy();
                     }
                 }
             }
@@ -35,13 +44,19 @@ namespace Minecraft
 
         public void AddBlock(int localX, int localY, int localZ, BlockState blockstate)
         {
-            blocks[localX, localY, localZ] = blockstate;
+            blocks[localX * 16 * 16 + localY * 16 + localZ] = blockstate;
         }
 
         //Consider optimalization where you completely ignore a section if its fully opaque and surrounding section walls are full opaque
         public void RemoveBlock(int localX, int localY, int localZ)
         {
-            blocks[localX, localY, localZ] = null;
+            blocks[localX * 16 * 16 + localY * 16 + localZ] = null;
+        }
+
+        public BlockState GetBlockAt(int localX, int localY, int localZ)
+        {
+            //Console.WriteLine(localX + "|" + localY + "|" + localZ + " mult " + (localX * 16 * 16 + localY * 16 + localZ) + " len " + blocks.Length);
+            return blocks[localX * 16 * 16 + localY * 16 + localZ];
         }
     }
 }

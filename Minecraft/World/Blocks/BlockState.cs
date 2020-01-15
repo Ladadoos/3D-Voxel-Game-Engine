@@ -1,9 +1,16 @@
 ﻿using System;
 using System.IO;
 
+using ProtoBuf;
+
 namespace Minecraft
 {
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
+    [ProtoInclude(1, typeof(BlockStateDirt))]
+    [ProtoInclude(2, typeof(BlockStateAir))]
+    [ProtoInclude(3, typeof(BlockStateStone))]
+    [ProtoInclude(4, typeof(BlockStateFlower))]
+    [ProtoInclude(5, typeof(BlockStateTNT))]
     abstract class BlockState
     {
         public abstract Block GetBlock();
@@ -21,7 +28,7 @@ namespace Minecraft
         public virtual void FromStream(BinaryReader reader) { }
     }
 
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
     class BlockStateDirt : BlockState
     {
         public override Block GetBlock()
@@ -30,7 +37,7 @@ namespace Minecraft
         }
     }
 
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
     class BlockStateAir : BlockState
     {
         public override Block GetBlock()
@@ -39,7 +46,7 @@ namespace Minecraft
         }
     }
 
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
     class BlockStateStone : BlockState
     {
         public override Block GetBlock()
@@ -48,7 +55,7 @@ namespace Minecraft
         }
     }
 
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
     class BlockStateFlower : BlockState
     {
         public override Block GetBlock()
@@ -57,11 +64,14 @@ namespace Minecraft
         }
     }
 
-    [Serializable]
+    [ProtoContract(SkipConstructor = true)]
     class BlockStateTNT : BlockState
     {
+        [ProtoMember(1)]
         public float elapsedSecondsSinceTrigger;
+        [ProtoMember(2)]
         public bool triggeredByTnt;
+        [ProtoMember(3)]
         public bool triggered;
 
         public override Block GetBlock()

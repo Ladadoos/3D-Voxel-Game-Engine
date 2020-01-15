@@ -38,11 +38,6 @@ namespace Minecraft
             this.game = game;
         }
 
-        public void AssignChunkStorage(Dictionary<Vector2, Chunk> storage)
-        {
-            loadedChunks = storage;
-        }
-
         public bool DespawnEntity(int entityId)
         {
             if(!loadedEntities.TryGetValue(entityId, out Entity despawnedEntity))
@@ -74,7 +69,7 @@ namespace Minecraft
                 OnChunkLoadedHandler?.Invoke(chunk);
             } else
             {
-                //throw new Exception("Already had chunk data for " + chunkPos);
+                throw new Exception("Already had chunk data for " + chunkPos);
             }
         }
 
@@ -144,17 +139,11 @@ namespace Minecraft
                 return false;
             }
 
-            BlockState oldState = GetBlockAt(blockPos);
-            if (oldState.GetBlock() == Blocks.Air)
-            {
-                Logger.Warn("Tried to remove block where there was none.");
-                return false;
-            }
-
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
             int worldY = blockPos.Y;
 
+            BlockState oldState = GetBlockAt(blockPos);
             BlockState air = Blocks.Air.GetNewDefaultState();
             chunk.AddBlock(localX, worldY, localZ, air);
             air.GetBlock().OnAdded(air, this);
@@ -242,7 +231,7 @@ namespace Minecraft
             int localY = blockPos.Y & 15;
             int localZ = blockPos.Z & 15;
 
-            BlockState blockType = chunk.sections[sectionHeight].blocks[localX, localY, localZ];
+            BlockState blockType = chunk.sections[sectionHeight].GetBlockAt(localX, localY, localZ);
             if (blockType == null)
             {
                 return Blocks.Air.GetNewDefaultState(); 

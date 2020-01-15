@@ -2,7 +2,7 @@
 {
     class WorldClient : World
     {
-        private ChunkProvider chunkProvider;
+        public ChunkProvider chunkProvider { get; private set; }
 
         public WorldClient(Game game) : base(game)
         {

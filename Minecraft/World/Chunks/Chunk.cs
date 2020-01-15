@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using ProtoBuf;
+
 namespace Minecraft
 {
-    [Serializable]
+    [ProtoContract]
     class Chunk
     {
-        [NonSerialized]
-        private Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
+        [ProtoIgnore]
+        public Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
+        [ProtoMember(1)]
         public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
+        [ProtoMember(2)]
         public int gridX;
+        [ProtoMember(3)]
         public int gridZ;
 
         public Chunk(int gridX, int gridZ)
@@ -17,6 +22,8 @@ namespace Minecraft
             this.gridX = gridX;
             this.gridZ = gridZ;
         }
+
+        public Chunk() { }
 
         public Chunk DeepClone()
         {

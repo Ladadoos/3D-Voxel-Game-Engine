@@ -43,7 +43,10 @@ namespace Minecraft
                 chunk = game.server.world.GenerateBlocksForChunk(packet.gridX, packet.gridZ);
                 game.server.world.LoadChunk(chunk);
             }
-            playerConnection.WritePacket(new ChunkDataPacket(chunk));
+            if(game.server.isOpen && !game.server.IsHost(playerConnection))
+            {
+                playerConnection.WritePacket(new ChunkDataPacket(chunk));
+            }
         }
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)

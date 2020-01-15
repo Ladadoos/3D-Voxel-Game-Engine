@@ -4,7 +4,7 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <StartArguments>clientserver</StartArguments>
+    <StartArguments>mode=clientserver ip=127.0.0.1 port=50000</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>mode=clientserver ip=127.0.0.1 port=50000</StartArguments>

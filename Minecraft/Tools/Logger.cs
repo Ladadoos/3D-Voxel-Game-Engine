@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class Logger
     {
-        private static LogLevel logLevel = LogLevel.Info;
+        private static LogLevel logLevel = LogLevel.Packet;
 
         public static void SetLogLevel(LogLevel logLevel)
         {

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Minecraft
 {
@@ -15,14 +17,66 @@ namespace Minecraft
         private static readonly float timeoutInSeconds = 5;
         private float elapsedTime;
 
+        private object writePacketLock = new object();
+        private object readPacketLock = new object();
+        private Queue<Packet> toSendPackets = new Queue<Packet>();
+        private Queue<Packet> toProcessPackets = new Queue<Packet>();
+
+        private Thread packetTransferThread;
+
         public Client(Game game)
         {
             this.game = game;
 
-            serverConnection = new Connection()
+            serverConnection = new Connection() { state = ConnectionState.Started };
+
+            packetTransferThread = new Thread(HandlePacketCommunication);
+            packetTransferThread.IsBackground = true;
+            packetTransferThread.Start();
+        }
+
+        private void HandlePacketCommunication()
+        {
+            while (serverConnection.state == ConnectionState.Started) { }
+
+            while (true)
             {
-                state = ConnectionState.Closed
-            };
+                Thread.Sleep(5);
+
+                if (serverConnection.state == ConnectionState.Closed)
+                {
+                    break;
+                }
+
+                lock (readPacketLock)
+                {
+                    //try
+                   // {
+                        while (serverConnection.netStream.DataAvailable)
+                        {
+                            Packet packet = serverConnection.ReadPacket();
+                            Logger.Packet("Client received packet " + packet.ToString());
+                            //packet.Process(serverConnection.netHandler);
+                            toProcessPackets.Enqueue(packet);
+                        }
+                   // } catch (Exception e)
+                    //{
+                    //    Logger.Error("Failed reading packet: " + e.Message);
+                    //    Stop();
+                    //}
+                }
+
+                lock (writePacketLock)
+                {
+                    while(toSendPackets.Count > 0)
+                    {
+                        Packet p = toSendPackets.Dequeue();
+                        serverConnection.WritePacket(p);
+                    }
+                }
+            }
+
+            Logger.Info("Client packet communication thread terminated.");
         }
 
         public bool ConnectWith(string host, int port)
@@ -76,17 +130,6 @@ namespace Minecraft
             serverConnection.state = ConnectionState.Closed;
         }
 
-        private void CheckForKeepAlive(float deltaTime)
-        {
-            elapsedTime += deltaTime;
-            if (elapsedTime > timeoutInSeconds)
-            {
-                elapsedTime = 0;
-                Logger.Info("Keep alive sent.");
-                serverConnection.WritePacket(new PlayerKeepAlivePacket());
-            }
-        }
-
         public void Update(float deltaTime)
         {
             if (serverConnection.state == ConnectionState.Closed)
@@ -96,18 +139,23 @@ namespace Minecraft
 
             CheckForKeepAlive(deltaTime);
 
-            try
+            lock (readPacketLock)
             {
-                while (serverConnection.netStream.DataAvailable)
+                while (toProcessPackets.Count > 0)
                 {
-                    Packet packet = serverConnection.ReadPacket();
-                    Logger.Packet("Client received packet " + packet.ToString());
-                    packet.Process(serverConnection.netHandler);
+                    toProcessPackets.Dequeue().Process(serverConnection.netHandler);
                 }
-            }catch(Exception e)
+            }
+        }
+
+        private void CheckForKeepAlive(float deltaTime)
+        {
+            elapsedTime += deltaTime;
+            if (elapsedTime > timeoutInSeconds)
             {
-                Logger.Error("Failed reading packet: " + e.Message);
-                Stop();
+                elapsedTime = 0;
+                Logger.Info("Keep alive sent.");
+                WritePacket(new PlayerKeepAlivePacket());
             }
         }
 
@@ -118,7 +166,11 @@ namespace Minecraft
                 return;
             }
             Logger.Packet("Client wrote packet " + packet.ToString());
-            serverConnection.WritePacket(packet);
+            lock (writePacketLock)
+            {
+                //serverConnection.WritePacket(packet);
+                toSendPackets.Enqueue(packet);
+            }
         }
     }
 }

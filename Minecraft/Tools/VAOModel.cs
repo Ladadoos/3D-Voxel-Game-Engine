@@ -62,6 +62,7 @@ namespace Minecraft
                 GL.DeleteBuffer(buffer);
             }
             GL.DeleteVertexArray(vaoId);
+            buffers.Clear();
         }
 
         /// <summary> Creates an index buffer object and buffers the given indices. </summary>

@@ -35,7 +35,7 @@ namespace Minecraft
                     {
                         for (int sectionLocalY = 0; sectionLocalY < Constants.SECTION_HEIGHT; sectionLocalY++)
                         {
-                            BlockState state = section.blocks[localX, sectionLocalY, localZ];
+                            BlockState state = section.GetBlockAt(localX, sectionLocalY, localZ);
                             if (state == null)
                             {
                                 continue;
@@ -56,6 +56,8 @@ namespace Minecraft
 
                             BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
                             AddFacesToMeshFromFront(faces, blockPos, 1);
+
+                           //System.Console.WriteLine(section.height + "-");
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
@@ -113,7 +115,7 @@ namespace Minecraft
                 if (westSection == null)
                     return true;
 
-                BlockState blockWest = westSection.blocks[Constants.CHUNK_SIZE - 1, localY, localZ];
+                BlockState blockWest = westSection.GetBlockAt(16 - 1, localY, localZ);
                 if (blockWest == null)
                     return true;
 
@@ -121,7 +123,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Right);
             } else
             {
-                BlockState blockWest = currentSection.blocks[localX - 1, localY, localZ];
+                BlockState blockWest = currentSection.GetBlockAt(localX - 1, localY, localZ);
                 if (blockWest == null)
                     return true;
 
@@ -142,7 +144,7 @@ namespace Minecraft
                 if (eastSection == null)
                     return true;
 
-                BlockState blockEast = eastSection.blocks[0, localY, localZ];
+                BlockState blockEast = eastSection.GetBlockAt(0, localY, localZ);
                 if (blockEast == null)
                     return true;
 
@@ -150,7 +152,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Left);
             } else
             {
-                BlockState blockEast = currentSection.blocks[localX + 1, localY, localZ];
+                BlockState blockEast = currentSection.GetBlockAt(localX + 1, localY, localZ);
                 if (blockEast == null)
                     return true;
 
@@ -171,7 +173,7 @@ namespace Minecraft
                 if (northSection == null)
                     return true;
 
-                BlockState blockNorth = northSection.blocks[localX, localY, 0];
+                BlockState blockNorth = northSection.GetBlockAt(localX, localY, 0);
                 if (blockNorth == null)
                     return true;
 
@@ -179,7 +181,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Back);
             } else
             {
-                BlockState blockNorth = currentSection.blocks[localX, localY, localZ + 1];
+                BlockState blockNorth = currentSection.GetBlockAt(localX, localY, localZ + 1);
                 if (blockNorth == null)
                     return true;
 
@@ -200,7 +202,7 @@ namespace Minecraft
                 if (southSection == null)
                     return true;
 
-                BlockState blockSouth = southSection.blocks[localX, localY, Constants.CHUNK_SIZE - 1];
+                BlockState blockSouth = southSection.GetBlockAt(localX, localY, 16 - 1);
                 if (blockSouth == null)
                     return true;
 
@@ -208,7 +210,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Front);
             } else
             {
-                BlockState blockSouth = currentSection.blocks[localX, localY, localZ - 1];
+                BlockState blockSouth = currentSection.GetBlockAt(localX, localY, localZ - 1);
                 if (blockSouth == null)
                     return true;
 
@@ -229,7 +231,7 @@ namespace Minecraft
                 if (sectionAbove == null)
                     return true;
 
-                BlockState blockAbove = sectionAbove.blocks[localX, 0, localZ];
+                BlockState blockAbove = sectionAbove.GetBlockAt(localX, 0, localZ);
                 if (blockAbove == null)
                     return true;
 
@@ -237,7 +239,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Bottom);
             } else
             {
-                BlockState blockAbove = currentSection.blocks[localX, localY + 1, localZ];
+                BlockState blockAbove = currentSection.GetBlockAt(localX, localY + 1, localZ);
                 if (blockAbove == null)
                     return true;
 
@@ -258,7 +260,7 @@ namespace Minecraft
                 if (sectionBelow == null)
                     return true;
 
-                BlockState blockBottom = sectionBelow.blocks[localX, Constants.SECTION_HEIGHT - 1, localZ];
+                BlockState blockBottom = sectionBelow.GetBlockAt(localX, 16 - 1, localZ);
                 if (blockBottom == null)
                     return true;
 
@@ -266,7 +268,7 @@ namespace Minecraft
                     return !blockModel.IsOpaqueOnSide(Direction.Top);
             } else
             {
-                BlockState blockBottom = currentSection.blocks[localX, localY - 1, localZ];
+                BlockState blockBottom = currentSection.GetBlockAt(localX, localY - 1, localZ);
                 if (blockBottom == null)
                     return true;
 

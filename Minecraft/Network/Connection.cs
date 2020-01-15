@@ -22,7 +22,7 @@ namespace Minecraft
         }
 
         private PacketFactory packetFactory = new PacketFactory();
-        private object streamLock = new object();
+        //private object streamLock = new object();
 
         public delegate void OnStateChanged(Connection connection);
         public event OnStateChanged OnStateChangedHandler;
@@ -41,7 +41,7 @@ namespace Minecraft
                 return;
             }
 
-            lock (streamLock)
+            //lock (streamLock)
             {
                 packet.WriteToStream(bufferedStream);
                 if (!bufferedStream.FlushToSocket())
@@ -53,7 +53,7 @@ namespace Minecraft
 
         public Packet ReadPacket()
         {
-            lock (streamLock)
+            //lock (streamLock)
             {
                 return packetFactory.ReadPacket(this);
             }
@@ -62,6 +62,7 @@ namespace Minecraft
 
     enum ConnectionState
     {
+        Started,
         AwaitingAcceptance,
         Accepted, 
         Closed

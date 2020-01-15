@@ -1,4 +1,6 @@
-﻿namespace Minecraft
+﻿using ProtoBuf;
+
+namespace Minecraft
 {
     class ChunkDataPacket : Packet
     {
@@ -16,9 +18,11 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            byte[] bytes = DataConverter.ObjectToByteArray(chunk);
+            NetChunk netChunk = new NetChunk(chunk);
+            Serializer.SerializeWithLengthPrefix(bufferedStream.bufferedStream, netChunk, PrefixStyle.Base128);
+            /*byte[] bytes = DataConverter.ObjectToByteArray(chunk);
             bufferedStream.WriteInt32(bytes.Length);
-            bufferedStream.WriteBytes(bytes);
+            bufferedStream.WriteBytes(bytes);*/
         }
     }
 }

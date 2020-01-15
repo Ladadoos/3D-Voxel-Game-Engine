@@ -133,7 +133,12 @@ namespace Minecraft
                 TryApplyGravity(deltaTime);
             }
 
-            Dictionary<Vector3i, BlockState> blocks = GetCollisionDetectionBlocks(world);
+            Dictionary<Vector3i, BlockState> blocks = new Dictionary<Vector3i, BlockState>();
+            if (doCollisionDetection)
+            {
+                blocks = GetCollisionDetectionBlocks(world);
+            }
+                
             position.X += velocity.X * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)

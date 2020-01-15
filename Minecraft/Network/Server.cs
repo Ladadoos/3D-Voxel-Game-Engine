@@ -23,16 +23,25 @@ namespace Minecraft
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
         public bool isOpen { get; private set; }
 
+        private Connection host;
+
         private object newJoinsLock = new object();
         private Queue<TcpClient> joinQueue = new Queue<TcpClient>();
         private Queue<Connection> toRemoveClients = new Queue<Connection>();
 
         private Dictionary<Connection, Stopwatch> keepAlives = new Dictionary<Connection, Stopwatch>();
 
+        private Thread packetTransferThread;
+
         public Server(Game game, bool isOpen)
         {
             this.game = game;
             this.isOpen = isOpen;
+        }
+
+        public bool IsHost(Connection connection)
+        {
+            return connection == host;
         }
 
         public void Start(string address, int port)
@@ -45,12 +54,16 @@ namespace Minecraft
             connectionsThread = new Thread(StartServerAndListenForConnections);
             connectionsThread.IsBackground = true;
             connectionsThread.Start();
+
+            /*packetTransferThread = new Thread(HandlePacketCommunication);
+            packetTransferThread.IsBackground = true;
+            packetTransferThread.Start();*/
         }
 
-        public void GenerateSpawnArea()
+       /* private void HandlePacketCommunication()
         {
-            world.GenerateSpawnArea();
-        }
+
+        }*/
 
         public void UpdateKeepAliveFor(Connection connection)
         {
@@ -69,8 +82,8 @@ namespace Minecraft
             {
                 if(client.Value.ElapsedMilliseconds >= Client.KeepAliveTimeoutSeconds * 1000)
                 {
-                    Logger.Warn("Failed to keep connection with " + client.Key.player?.id);
-                    client.Key.state = ConnectionState.Closed;
+                   // Logger.Warn("Failed to keep connection with " + client.Key.player?.id);
+                   // client.Key.state = ConnectionState.Closed;
                 }
             }
         }
@@ -151,6 +164,11 @@ namespace Minecraft
                     ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
                     clientConnection.netHandler = netHandler;
                     clientConnection.OnStateChangedHandler += OnConnectionStateChanged;
+
+                    if (game.mode == RunMode.ClientServer && clients.Count == 0)
+                    {
+                        host = clientConnection;
+                    }
                     clients.Add(clientConnection);
 
                     Stopwatch timeoutWatch = new Stopwatch();
@@ -210,7 +228,7 @@ namespace Minecraft
             Logger.Packet("Server broadcasting packet [" + packet.GetType() + "]");
             for (int i = clients.Count - 1; i >= 0; i--)
             {
-                if (clients[i] == clients[0]) continue;
+                if (clients[i] == host) continue;
                 clients[i].WritePacket(packet);
             }
         }

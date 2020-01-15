@@ -19,6 +19,11 @@ namespace Minecraft
             world.OnChunkLoadedHandler += OnChunkLoaded;
         }
 
+        public bool IsChunkRequestOutgoingFor(Vector2 chunkPosition)
+        {
+            return outgoingRequests.Contains(chunkPosition);
+        }
+
         public void OnChunkLoaded(Chunk chunk)
         {
             Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
@@ -27,7 +32,7 @@ namespace Minecraft
 
         public void CheckForNewChunks(World world)
         {
-            int viewDistance = 6;
+            int viewDistance = 1;
             for (int x = -viewDistance; x <= viewDistance; x++)
             {
                 for (int z = -viewDistance; z <= viewDistance; z++)

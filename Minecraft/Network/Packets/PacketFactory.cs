@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 
+using ProtoBuf;
+
 namespace Minecraft
 {
     class PacketFactory
@@ -35,9 +37,12 @@ namespace Minecraft
                     }
                 case PacketType.ChunkData:
                     {
-                        int byteSize = reader.ReadInt32();
+                        NetChunk netChunk = Serializer.DeserializeWithLengthPrefix<NetChunk>(connection.netStream, PrefixStyle.Base128);
+                        Chunk chunk = netChunk.ExtractChunk();
+                        /*int byteSize = reader.ReadInt32();
                         byte[] bytes = reader.ReadBytes(byteSize);
-                        Chunk chunk = (Chunk)DataConverter.ByteArrayToObject(bytes);
+                        Chunk chunk = (Chunk)DataConverter.ByteArrayToObject(bytes);*/
+                        chunk.tickableBlocks = new System.Collections.Generic.Dictionary<Vector3i, BlockState>();
                         return new ChunkDataPacket(chunk);
                     }
                 case PacketType.ChunkDataRequest:

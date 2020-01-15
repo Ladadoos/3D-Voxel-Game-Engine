@@ -66,9 +66,9 @@ namespace Minecraft
             EnableDepthTest();
             EnableCulling();
 
-            /*Thread meshThread = new Thread(MeshGenerator);
+            Thread meshThread = new Thread(MeshGenerator);
             meshThread.IsBackground = true;
-            meshThread.Start();*/
+            meshThread.Start();
         }
 
         public void SetActiveCamera(Camera camera)
@@ -154,7 +154,7 @@ namespace Minecraft
         {
             while (true)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(5);
 
                 lock (meshLock)
                 {
@@ -172,7 +172,7 @@ namespace Minecraft
                         toProcess.Enqueue(new Test()
                         {
                             rr =renderChunk,
-                            cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone())
+                            cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
                         });
 
                         toRemove = chunk;
@@ -184,12 +184,12 @@ namespace Minecraft
             }
         }
 
-       // private bool firstPass = false;
+        //private bool firstPass = false;
         public void EndFrameUpdate(World world)
         {
             lock (meshLock)
             {
-                Chunk toRemove = null;
+               /* Chunk toRemove = null;
                 foreach (Chunk chunk in toRemeshChunks)
                 {
                     Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
@@ -210,7 +210,7 @@ namespace Minecraft
                     break;
                 }
                 // toRemeshChunks.Clear();
-                toRemeshChunks.Remove(toRemove);
+                toRemeshChunks.Remove(toRemove);*/
 
                 if (toProcess.Count > 0)
                 {

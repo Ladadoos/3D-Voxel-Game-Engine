@@ -16,7 +16,7 @@ namespace Minecraft
         private float secondsPerPosUpdate = 0.05F;
         private float elapsedMsSinceLastPosUpdate;
 
-        public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 100, 0))
+        public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 200, 0))
         {
             this.game = game;
             camera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
@@ -98,7 +98,7 @@ namespace Minecraft
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
             {
                 elapsedMsSinceLastPosUpdate = 0;
-                game.client.WritePacket(new PlayerDataPacket(position, id));
+                //game.client.WritePacket(new PlayerDataPacket(position, id));
             }
         }
 

@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class NetBufferedStream
     {
-        private BufferedStream bufferedStream;
+        public BufferedStream bufferedStream;
 
         public NetBufferedStream(BufferedStream bufferedStream)
         {
