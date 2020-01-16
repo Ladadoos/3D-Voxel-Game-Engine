@@ -67,7 +67,6 @@ namespace Minecraft
 
         private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
-            Console.WriteLine("remove");
             game.server.BroadcastPacket(new RemoveBlockPacket(blockPos));
         }
     }

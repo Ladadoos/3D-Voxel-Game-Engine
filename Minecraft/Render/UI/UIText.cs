@@ -44,7 +44,7 @@ namespace Minecraft
 
         public override void Render(UIShader uiShader)
         {
-            vaoModel.Bind();
+            vaoModel.BindVAO();
             uiShader.LoadTexture(uiShader.location_Texture, 0, font.fontMapTexture.textureId);
             GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.indicesCount);
         }

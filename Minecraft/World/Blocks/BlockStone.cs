@@ -15,7 +15,7 @@
         public override void OnInteract(BlockState blockstate, World world)
         {
             BlockStateStone state = (BlockStateStone)blockstate;
-            //Logger.Info("Interacted with stone at " + state.position);
+            Logger.Info("Interacted with stone");
         }
     }
 }

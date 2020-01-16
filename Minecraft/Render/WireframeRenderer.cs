@@ -53,9 +53,9 @@ namespace Minecraft
 
             Matrix4 transformMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(translation);
             shader.LoadMatrix(shader.location_TransformationMatrix, Matrix4.Identity * transformMatrix);
-            aabbCube.Bind();
+            aabbCube.BindVAO();
             GL.DrawElements(PrimitiveType.Quads, aabbCube.indicesCount, DrawElementsType.UnsignedInt, 0);
-            aabbCube.Unbind();
+            aabbCube.UnbindVAO();
             shader.Stop();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

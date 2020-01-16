@@ -5,9 +5,9 @@ namespace Minecraft
 {
     abstract class Shader
     {
-        public int programID;
-        public int vertexShaderID;
-        public int fragmentShaderID;
+        private int programID;
+        private int vertexShaderID;
+        private int fragmentShaderID;
 
         public Shader(string vertexFile, string fragmentFile)
         {
@@ -109,6 +109,5 @@ namespace Minecraft
 
             return shaderID;
         }
-
     }
 }

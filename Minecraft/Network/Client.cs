@@ -50,20 +50,19 @@ namespace Minecraft
 
                 lock (readPacketLock)
                 {
-                    //try
-                   // {
+                    try
+                    {
                         while (serverConnection.netStream.DataAvailable)
                         {
                             Packet packet = serverConnection.ReadPacket();
                             Logger.Packet("Client received packet " + packet.ToString());
-                            //packet.Process(serverConnection.netHandler);
                             toProcessPackets.Enqueue(packet);
                         }
-                   // } catch (Exception e)
-                    //{
-                    //    Logger.Error("Failed reading packet: " + e.Message);
-                    //    Stop();
-                    //}
+                    } catch (Exception e)
+                    {
+                        Logger.Error("Failed reading packet: " + e.Message);
+                        Stop();
+                    }
                 }
 
                 lock (writePacketLock)
@@ -154,7 +153,7 @@ namespace Minecraft
             if (elapsedTime > timeoutInSeconds)
             {
                 elapsedTime = 0;
-                Logger.Info("Keep alive sent.");
+                Logger.Packet("Keep alive sent.");
                 WritePacket(new PlayerKeepAlivePacket());
             }
         }
@@ -165,10 +164,10 @@ namespace Minecraft
             {
                 return;
             }
+
             Logger.Packet("Client wrote packet " + packet.ToString());
             lock (writePacketLock)
             {
-                //serverConnection.WritePacket(packet);
                 toSendPackets.Enqueue(packet);
             }
         }

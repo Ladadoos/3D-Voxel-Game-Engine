@@ -31,8 +31,6 @@ namespace Minecraft
 
         private Dictionary<Connection, Stopwatch> keepAlives = new Dictionary<Connection, Stopwatch>();
 
-        private Thread packetTransferThread;
-
         public Server(Game game, bool isOpen)
         {
             this.game = game;
@@ -54,16 +52,7 @@ namespace Minecraft
             connectionsThread = new Thread(StartServerAndListenForConnections);
             connectionsThread.IsBackground = true;
             connectionsThread.Start();
-
-            /*packetTransferThread = new Thread(HandlePacketCommunication);
-            packetTransferThread.IsBackground = true;
-            packetTransferThread.Start();*/
         }
-
-       /* private void HandlePacketCommunication()
-        {
-
-        }*/
 
         public void UpdateKeepAliveFor(Connection connection)
         {
@@ -82,8 +71,8 @@ namespace Minecraft
             {
                 if(client.Value.ElapsedMilliseconds >= Client.KeepAliveTimeoutSeconds * 1000)
                 {
-                   // Logger.Warn("Failed to keep connection with " + client.Key.player?.id);
-                   // client.Key.state = ConnectionState.Closed;
+                    Logger.Warn("Failed to keep connection with " + client.Key.player?.id);
+                    client.Key.state = ConnectionState.Closed;
                 }
             }
         }

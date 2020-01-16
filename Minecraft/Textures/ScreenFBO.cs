@@ -5,9 +5,9 @@ namespace Minecraft
 {
     class ScreenFBO
     {
-        private int fbo;
         public int colorTexture { get; private set; }
         public int normalDepthTexture { get; private set; }
+        private int fbo;
         private int renderBuffer;
 
         public ScreenFBO(int screenWidth, int screenHeight)
@@ -21,7 +21,7 @@ namespace Minecraft
             GL.Ext.GenFramebuffers(1, out fbo);
             GL.Ext.BindFramebuffer(FramebufferTarget.FramebufferExt, fbo);
 
-            // create the color buffers
+            // Create the color buffers
             DrawBuffersEnum[] buffers = new DrawBuffersEnum[2];
             for (int i = 0; i < 2; i++)
             {

@@ -5,14 +5,13 @@
         private static readonly string vertexFile = "../../Shaders/EntityShader/vs_entityShader.glsl";
         private static readonly string fragmentFile = "../../Shaders/EntityShader/fs_entityShader.glsl";
 
-        public int location_TextureAtlas;
-        public int location_TransformationMatrix;
-        public int location_ViewMatrix;
-        public int location_ProjectionMatrix;
+        public int location_TextureAtlas { get; private set; }
+        public int location_TransformationMatrix { get; private set; }
+        public int location_ViewMatrix { get; private set; }
+        public int location_ProjectionMatrix { get; private set; }
 
         public EntityShader() : base(vertexFile, fragmentFile)
         {
-
         }
 
         protected override void GetAllUniformLocations()

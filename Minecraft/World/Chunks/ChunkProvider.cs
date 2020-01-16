@@ -10,6 +10,8 @@ namespace Minecraft
         private Game game;
         private World world;
 
+        private int viewDistance = 2;
+
         public ChunkProvider(Game game, World world)
         {
             this.game = game;
@@ -24,7 +26,7 @@ namespace Minecraft
             return outgoingRequests.Contains(chunkPosition);
         }
 
-        public void OnChunkLoaded(Chunk chunk)
+        private void OnChunkLoaded(Chunk chunk)
         {
             Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
             outgoingRequests.Remove(chunkPosition);
@@ -32,7 +34,6 @@ namespace Minecraft
 
         public void CheckForNewChunks(World world)
         {
-            int viewDistance = 1;
             for (int x = -viewDistance; x <= viewDistance; x++)
             {
                 for (int z = -viewDistance; z <= viewDistance; z++)

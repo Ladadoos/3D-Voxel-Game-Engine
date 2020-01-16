@@ -5,13 +5,12 @@
         private static readonly string vertexFile = "../../Shaders/WireframeShader/vs_wireframe.glsl";
         private static readonly string fragmentFile = "../../Shaders/WireframeShader/fs_wireframe.glsl";
 
-        public int location_TransformationMatrix;
-        public int location_ViewMatrix;
-        public int location_ProjectionMatrix;
+        public int location_TransformationMatrix { get; private set; }
+        public int location_ViewMatrix { get; private set; }
+        public int location_ProjectionMatrix { get; private set; }
 
         public WireframeShader() : base(vertexFile, fragmentFile)
         {
-
         }
 
         protected override void GetAllUniformLocations()

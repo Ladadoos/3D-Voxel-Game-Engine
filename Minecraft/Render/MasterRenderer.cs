@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
-using System;
 using System.Threading;
 
 namespace Minecraft
@@ -14,6 +13,12 @@ namespace Minecraft
         public float[] lights;
         public float[] normals;
         public int indicesCount;
+    }
+
+    struct ChunkRemeshLayout
+    {
+        public RenderChunk renderChunk;
+        public ChunkBufferLayout chunkLayout;
     }
 
     class MasterRenderer
@@ -109,13 +114,12 @@ namespace Minecraft
                     {
                         continue;
                     }
-
-                    chunkToRender.Value.hardBlocksModel.Bind();
+                    chunkToRender.Value.hardBlocksModel.BindVAO();
                     basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
                     GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
                 }
             }
-            
+
             entityShader.Start();
             entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
             entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
@@ -123,7 +127,7 @@ namespace Minecraft
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out VAOModel entityMeshModel))
                 {
-                    entityMeshModel.Bind();
+                    entityMeshModel.BindVAO();
                     entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
                     GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
                 }
@@ -142,13 +146,8 @@ namespace Minecraft
             screenQuad.Unbind();
             screenQuad.RenderToScreen();
         }
-
-        struct Test {
-            public RenderChunk rr;
-            public ChunkBufferLayout cbl;
-        }
         
-        private Queue<Test> toProcess = new Queue<Test>();
+        private Queue<ChunkRemeshLayout> toProcess = new Queue<ChunkRemeshLayout>();
         private object meshLock = new object();
         private void MeshGenerator()
         {
@@ -169,97 +168,35 @@ namespace Minecraft
                             toRenderChunks.Add(gridPosition, renderChunk);
                         }
 
-                        toProcess.Enqueue(new Test()
+                        toProcess.Enqueue(new ChunkRemeshLayout()
                         {
-                            rr =renderChunk,
-                            cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
+                            renderChunk = renderChunk,
+                            chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
                         });
 
                         toRemove = chunk;
                         break;
                     }
-                    // toRemeshChunks.Clear();
-                    toRemeshChunks.Remove(toRemove);
+
+                    if(toRemove != null)
+                    {
+                        toRemeshChunks.Remove(toRemove);
+                    }
                 }
             }
         }
 
-        //private bool firstPass = false;
         public void EndFrameUpdate(World world)
         {
             lock (meshLock)
             {
-               /* Chunk toRemove = null;
-                foreach (Chunk chunk in toRemeshChunks)
-                {
-                    Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
-
-                    if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
-                    {
-                        renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
-                        toRenderChunks.Add(gridPosition, renderChunk);
-                    }
-
-                    toProcess.Enqueue(new Test()
-                    {
-                        rr = renderChunk,
-                        cbl = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone())
-                    });
-
-                    toRemove = chunk;
-                    break;
-                }
-                // toRemeshChunks.Clear();
-                toRemeshChunks.Remove(toRemove);*/
-
                 if (toProcess.Count > 0)
                 {
-                    Test t = toProcess.Dequeue();
-                    t.rr.hardBlocksModel?.OnCloseGame();
-                    t.rr.hardBlocksModel = new VAOModel(t.cbl);
+                    ChunkRemeshLayout chunkMesh = toProcess.Dequeue();
+                    chunkMesh.renderChunk.hardBlocksModel?.OnCloseGame();
+                    chunkMesh.renderChunk.hardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
                 }
             }
-
-
-            //var start = DateTime.Now;
-
-            /*foreach (Chunk chunk in toRemeshChunks)
-            {
-                Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
-
-                if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
-                {
-                    renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
-                    toRenderChunks.Add(gridPosition, renderChunk);
-                }
-
-                renderChunk.hardBlocksModel = blocksMeshGenerator.GenerateMeshFor(world, chunk);
-            }*/
-
-            /*var now2 = DateTime.Now - start;
-            if (!firstPass)
-            {
-                Logger.Info("Generating initial meshes took: " + now2);
-            }
-
-            toRemeshChunks.Clear();*/
-            //firstPass = true;
-
-           /* foreach (Chunk chunk in toRemeshChunks)
-            {
-                Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
-
-                if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
-                {
-                    renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
-                    toRenderChunks.Add(gridPosition, renderChunk);
-                }
-
-                renderChunk.hardBlocksModel?.OnCloseGame();
-                renderChunk.hardBlocksModel = blocksMeshGenerator.GenerateMeshFor(game.world, chunk.DeepClone());
-            }
-            toRemeshChunks.Clear();*/
-
             cameraController.Update();
         }
 

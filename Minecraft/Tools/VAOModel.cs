@@ -7,52 +7,52 @@ namespace Minecraft
 {
     class VAOModel
     {
-        public int vaoId { get; private set; }
         public int indicesCount { get; private set; }
-        public List<int> buffers = new List<int>();
+        private int vaoId;
+        private List<int> buffers = new List<int>();
 
         public VAOModel(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {
             this.indicesCount = indicesCount;
             CreateVAO();
-            Bind();
+            BindVAO();
             CreateVBO(3, positions);
             CreateVBO(3, normals);
             CreateVBO(2, textureCoordinates);
             CreateVBO(1, lights);
-            Unbind();
+            UnbindVAO();
         }
 
-        public VAOModel(ChunkBufferLayout cbl)
+        public VAOModel(ChunkBufferLayout chunkLayout)
         {
-            this.indicesCount = cbl.indicesCount;
+            this.indicesCount = chunkLayout.indicesCount;
             CreateVAO();
-            Bind();
-            CreateVBO(3, cbl.positions);
-            CreateVBO(3, cbl.normals);
-            CreateVBO(2, cbl.textureCoordinates);
-            CreateVBO(1, cbl.lights);
-            Unbind();
+            BindVAO();
+            CreateVBO(3, chunkLayout.positions);
+            CreateVBO(3, chunkLayout.normals);
+            CreateVBO(2, chunkLayout.textureCoordinates);
+            CreateVBO(1, chunkLayout.lights);
+            UnbindVAO();
         }
 
         public VAOModel(float[] positions, int[] indices)
         {
             this.indicesCount = indices.Length;
             CreateVAO();
-            Bind();
+            BindVAO();
             CreateVBO(3, positions);
             CreateIBO(indices);
-            Unbind();
+            UnbindVAO();
         }
 
         public VAOModel(float[] positions, float[] textureCoordinates, int indicesCount)
         {
             this.indicesCount = indicesCount;
             CreateVAO();
-            Bind();
+            BindVAO();
             CreateVBO(3, positions);
             CreateVBO(2, textureCoordinates);
-            Unbind();
+            UnbindVAO();
         }
 
         public void OnCloseGame()
@@ -95,12 +95,12 @@ namespace Minecraft
             vaoId = GL.GenVertexArray();
         }
 
-        public void Bind()
+        public void BindVAO()
         {
             GL.BindVertexArray(vaoId);
         }
 
-        public void Unbind()
+        public void UnbindVAO()
         {
             GL.BindVertexArray(0);
         }

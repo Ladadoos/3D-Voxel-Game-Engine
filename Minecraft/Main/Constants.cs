@@ -2,11 +2,7 @@
 {
     class Constants
     {
-
-        /*
-         * General
-         */
-
+        //General
         public const int SECTION_HEIGHT = 16;
         public const float CUBE_SIZE = 1.0F;
         public const float HALF_CUBE_SIZE = CUBE_SIZE / 2.0F;
@@ -14,18 +10,10 @@
         public const int SECTIONS_IN_CHUNKS = 16;
         public const int MAX_BUILD_HEIGHT = SECTIONS_IN_CHUNKS * SECTION_HEIGHT;
 
-        /*
-         * Physics
-         */
-
+        //Physics
         public const float GRAVITY = -7.25F;
 
-        /*
-         * Player
-         */
-
-        public const int PLAYER_RENDER_DISTANCE = 5;
-
+        //Player
         public const float PLAYER_HEIGHT = CUBE_SIZE * 1.75F;
         public const float PLAYER_CAMERA_HEIGHT = CUBE_SIZE * 1.5F;
         public const float PLAYER_WIDTH = HALF_CUBE_SIZE; /** X direction */

@@ -98,7 +98,7 @@ namespace Minecraft
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
             {
                 elapsedMsSinceLastPosUpdate = 0;
-                //game.client.WritePacket(new PlayerDataPacket(position, id));
+                game.client.WritePacket(new PlayerDataPacket(position, id));
             }
         }
 

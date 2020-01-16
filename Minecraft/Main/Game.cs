@@ -46,7 +46,6 @@ namespace Minecraft
                 server.Start(startArgs.ip, startArgs.port);
 
                 world = new WorldClient(this);
-                WorldClient.AddHooks(this, world);
 
                 client = new Client(this);
                 client.ConnectWith(startArgs.ip, startArgs.port);
@@ -64,7 +63,6 @@ namespace Minecraft
                 masterRenderer = new MasterRenderer(this);
 
                 world = new WorldClient(this);
-                WorldClient.AddHooks(this, world);
 
                 client = new Client(this);
                 client.ConnectWith(startArgs.ip, startArgs.port);

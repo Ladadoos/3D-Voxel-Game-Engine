@@ -1,19 +1,10 @@
-﻿using System;
-
-using ProtoBuf;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
-    [ProtoContract]
     class Section
     {  
-        [ProtoMember(1)]
         public byte height;
-        [ProtoMember(2)]
         public BlockState[] blocks = new BlockState[Constants.CHUNK_SIZE * Constants.SECTION_HEIGHT * Constants.CHUNK_SIZE];
-        [ProtoMember(3)]
         public int gridX;
-        [ProtoMember(4)]
         public int gridZ;
 
         public Section(int gridX, int gridZ, byte height)
@@ -22,8 +13,6 @@ namespace Minecraft
             this.gridZ = gridZ;
             this.height = height;
         }
-
-        public Section() { }
 
         public Section DeepCopy()
         {
@@ -47,7 +36,6 @@ namespace Minecraft
             blocks[localX * 16 * 16 + localY * 16 + localZ] = blockstate;
         }
 
-        //Consider optimalization where you completely ignore a section if its fully opaque and surrounding section walls are full opaque
         public void RemoveBlock(int localX, int localY, int localZ)
         {
             blocks[localX * 16 * 16 + localY * 16 + localZ] = null;
@@ -55,7 +43,6 @@ namespace Minecraft
 
         public BlockState GetBlockAt(int localX, int localY, int localZ)
         {
-            //Console.WriteLine(localX + "|" + localY + "|" + localZ + " mult " + (localX * 16 * 16 + localY * 16 + localZ) + " len " + blocks.Length);
             return blocks[localX * 16 * 16 + localY * 16 + localZ];
         }
     }

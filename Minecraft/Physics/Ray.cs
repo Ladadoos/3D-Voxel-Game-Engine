@@ -17,11 +17,7 @@ namespace Minecraft
             directionFrac = new Vector3(1 / this.direction.X, 1 / this.direction.Y, 1 / this.direction.Z);
             distanceToIntersection = float.MaxValue;
         }
-        /// <summary>
-        /// CHANGE AIR TO NULL
-        /// </summary>
-        /// <param name="world"></param>
-        /// <returns></returns>
+
         public RayTraceResult TraceWorld(World world)
         {
             Vector3 position = origin;

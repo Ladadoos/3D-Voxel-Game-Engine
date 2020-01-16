@@ -10,8 +10,7 @@ namespace Minecraft
         private float sideZLight = 1.15F;
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
-        {
-            
+        {           
         }
 
         protected override ChunkBufferLayout GenerateMesh(World world, Chunk chunk)
@@ -56,8 +55,6 @@ namespace Minecraft
 
                             BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
                             AddFacesToMeshFromFront(faces, blockPos, 1);
-
-                           //System.Console.WriteLine(section.height + "-");
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {

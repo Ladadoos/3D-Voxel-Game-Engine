@@ -22,7 +22,6 @@ namespace Minecraft
         }
 
         private PacketFactory packetFactory = new PacketFactory();
-        //private object streamLock = new object();
 
         public delegate void OnStateChanged(Connection connection);
         public event OnStateChanged OnStateChangedHandler;
@@ -41,22 +40,16 @@ namespace Minecraft
                 return;
             }
 
-            //lock (streamLock)
+            packet.WriteToStream(bufferedStream);
+            if (!bufferedStream.FlushToSocket())
             {
-                packet.WriteToStream(bufferedStream);
-                if (!bufferedStream.FlushToSocket())
-                {
-                    state = ConnectionState.Closed;
-                }
+                state = ConnectionState.Closed;
             }
         }
 
         public Packet ReadPacket()
         {
-            //lock (streamLock)
-            {
-                return packetFactory.ReadPacket(this);
-            }
+            return packetFactory.ReadPacket(this);
         }
     }
 

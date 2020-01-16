@@ -9,7 +9,6 @@ namespace Minecraft
 
         public OtherClientPlayer(int id, string playerName) : base(id, playerName, new Vector3(10, 100, 10))
         {
-
         }
 
         public override void Update(float deltaTime, World world)

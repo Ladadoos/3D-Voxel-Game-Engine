@@ -113,7 +113,6 @@ namespace Minecraft
             }
         }
 
-        //UPDATE
         public Vector2 GetChunkPosition(float worldX, float worldZ)
         {
             return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
