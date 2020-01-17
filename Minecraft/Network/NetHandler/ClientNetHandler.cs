@@ -30,7 +30,12 @@ namespace Minecraft
 
         public void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket)
         {
-            game.world.LoadChunk(chunkDataPacket.chunk);
+            game.world.AddPlayerPresenceToChunk(chunkDataPacket.chunk);
+        }
+
+        public void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket)
+        {
+            throw new InvalidOperationException();
         }
 
         public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket)
@@ -67,6 +72,8 @@ namespace Minecraft
             game.player.id = playerJoinAcceptPacket.playerId;
             game.player.playerName = playerJoinAcceptPacket.name;
             playerConnection.state = ConnectionState.Accepted;
+
+            game.world.SpawnEntity(game.player);
         }
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
@@ -74,7 +81,7 @@ namespace Minecraft
             OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId, playerJoinPacket.name);
             UICanvasEntityName playerNameCanvas = new UICanvasEntityName(game, otherPlayer, playerJoinPacket.name);
             game.masterRenderer.AddCanvas(playerNameCanvas);
-            game.world.loadedEntities.Add(playerJoinPacket.playerId, otherPlayer);
+            game.world.SpawnEntity(otherPlayer);
         }
 
         public void ProcessPlayerLeavePacket(PlayerLeavePacket playerLeavePacket)
@@ -86,8 +93,8 @@ namespace Minecraft
             } else
             {
                 Logger.Info("Player " + playerLeavePacket.id + " left for reason " + playerLeavePacket.reason + " with message " + playerLeavePacket.message);
-                game.world.DespawnEntity(playerLeavePacket.id);
-            }           
+            }
+            game.world.DespawnEntity(playerLeavePacket.id);
         }
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
@@ -98,7 +105,7 @@ namespace Minecraft
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException();
         }
     }
 }

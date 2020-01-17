@@ -27,9 +27,11 @@ namespace Minecraft
         {
             Logger.Info("Starting initial chunk generation.");
             DateTime start = DateTime.Now;
-            for (int x = 0; x < 1; x++)
+            // No need for spawn area for now. Note that this needs to be changed with the unloading/loading
+            // mechanism as described in ChunkProvider.cs and the population count of a chunk in World.cs
+            for (int x = 0; x < 0; x++)
             {
-                for (int y = 0; y < 1; y++)
+                for (int y = 0; y < 0; y++)
                 {
                     LoadChunk(GenerateBlocksForChunk(x, y));
                 }
@@ -45,7 +47,7 @@ namespace Minecraft
                 Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
                 if (game.world.chunkProvider.IsChunkRequestOutgoingFor(chunkPosition) || chunkPosition == Vector2.Zero)
                 {
-                    game.world.LoadChunk(chunk);
+                    game.world.AddPlayerPresenceToChunk(chunk);
                 }
             }
         }

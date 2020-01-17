@@ -12,6 +12,8 @@
 
         void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket);
 
+        void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket);
+
         void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket);
 
         void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket);

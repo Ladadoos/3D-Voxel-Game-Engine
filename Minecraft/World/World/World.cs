@@ -18,6 +18,8 @@ namespace Minecraft
         public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
 
+        public Dictionary<Vector2, int> chunkPlayerPopulation = new Dictionary<Vector2, int>();
+
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
@@ -26,6 +28,9 @@ namespace Minecraft
 
         public delegate void OnChunkLoaded(Chunk chunk);
         public event OnChunkLoaded OnChunkLoadedHandler;
+
+        public delegate void OnChunkUnloaded(Chunk chunk);
+        public event OnChunkUnloaded OnChunkUnloadedHandler;
 
         public delegate void OnEntitySpawned(Entity entity);
         public event OnEntitySpawned OnEntitySpawnedHandler;
@@ -60,7 +65,37 @@ namespace Minecraft
             OnEntitySpawnedHandler?.Invoke(entity);
         }
 
-        public void LoadChunk(Chunk chunk)
+        public void AddPlayerPresenceToChunk(Chunk chunk)
+        {
+            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
+            {
+                chunkPlayerPopulation[chunkPos] = population + 1;
+            } else
+            {
+                chunkPlayerPopulation.Add(chunkPos, 1);
+                LoadChunk(chunk);
+            }
+        }
+
+        public bool RemovePlayerPresenceOfChunk(Chunk chunk)
+        {
+            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            if (chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
+            {
+                int newPopulation = population - 1;
+                if(newPopulation == 0)
+                {
+                    chunkPlayerPopulation.Remove(chunkPos);
+                    return UnloadChunk(chunk);
+                }
+                return true;
+            }
+            Logger.Warn("Chunk with negative player population count: " + chunkPos);
+            return false;
+        }
+
+        protected void LoadChunk(Chunk chunk)
         {
             Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
             if (!loadedChunks.ContainsKey(chunkPos))
@@ -71,6 +106,17 @@ namespace Minecraft
             {
                 throw new Exception("Already had chunk data for " + chunkPos);
             }
+        }
+
+        protected bool UnloadChunk(Chunk chunk)
+        {
+            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            if (loadedChunks.Remove(chunkPos))
+            {
+                OnChunkUnloadedHandler?.Invoke(chunk);
+                return true;
+            }
+            return false;
         }
 
         public virtual void Update(float deltaTime)

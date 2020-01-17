@@ -20,9 +20,6 @@ namespace Minecraft
         {
             NetChunk netChunk = new NetChunk(chunk);
             Serializer.SerializeWithLengthPrefix(bufferedStream.bufferedStream, netChunk, PrefixStyle.Base128);
-            /*byte[] bytes = DataConverter.ObjectToByteArray(chunk);
-            bufferedStream.WriteInt32(bytes.Length);
-            bufferedStream.WriteBytes(bytes);*/
         }
     }
 }

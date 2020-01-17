@@ -39,9 +39,6 @@ namespace Minecraft
                     {
                         NetChunk netChunk = Serializer.DeserializeWithLengthPrefix<NetChunk>(connection.netStream, PrefixStyle.Base128);
                         Chunk chunk = netChunk.ExtractChunk();
-                        /*int byteSize = reader.ReadInt32();
-                        byte[] bytes = reader.ReadBytes(byteSize);
-                        Chunk chunk = (Chunk)DataConverter.ByteArrayToObject(bytes);*/
                         chunk.tickableBlocks = new System.Collections.Generic.Dictionary<Vector3i, BlockState>();
                         return new ChunkDataPacket(chunk);
                     }
@@ -50,6 +47,12 @@ namespace Minecraft
                         int gridX = reader.ReadInt32();
                         int gridZ = reader.ReadInt32();
                         return new ChunkDataRequestPacket(gridX, gridZ);
+                    }
+                case PacketType.ChunkUnload:
+                    {
+                        int gridX = reader.ReadInt32();
+                        int gridZ = reader.ReadInt32();
+                        return new ChunkUnloadPacket(gridX, gridZ);
                     }
                 case PacketType.EntityPosition:
                     {

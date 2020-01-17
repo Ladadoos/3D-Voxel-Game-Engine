@@ -222,6 +222,32 @@ namespace Minecraft
             }
         }
 
+        public void OnChunkUnloaded(Chunk chunk)
+        {
+            lock (meshLock)
+            {
+                toRenderChunks.Remove(new Vector2(chunk.gridX, chunk.gridZ));
+                toRemeshChunks.Remove(chunk);
+            }
+
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
+            {
+                MeshChunk(cXNeg);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
+            {
+                MeshChunk(cXPos);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
+            {
+                MeshChunk(cZNeg);
+            }
+            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
+            {
+                MeshChunk(cZPos);
+            }
+        }
+
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
             MeshChunkAndSurroundings(world, chunk, blockPos, newState);

@@ -16,6 +16,11 @@ namespace Minecraft
         public delegate void OnDespawned();
         public event OnDespawned OnDespawnedHandler;
 
+        public delegate void OnChunkChanged(World world, Vector2 gridPos);
+        public event OnChunkChanged OnChunkChangedHandler;
+
+        private Vector2 previousChunkPos = new Vector2(float.MaxValue, float.MaxValue);
+
         public Entity(int id, Vector3 position, EntityType entityType)
         {
             this.id = id;
@@ -49,6 +54,14 @@ namespace Minecraft
         }
 
         /// <summary> Called every tick </summary>
-        public virtual void Tick(float deltaTime, World world) { }
+        public virtual void Tick(float deltaTime, World world)
+        {
+            Vector2 chunkPosition = world.GetChunkPosition(position.X, position.Z);
+            if (previousChunkPos != chunkPosition)
+            {
+                OnChunkChangedHandler?.Invoke(world, chunkPosition);
+            }
+            previousChunkPos = chunkPosition;
+        }
     }
 }

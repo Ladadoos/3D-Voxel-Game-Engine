@@ -35,13 +35,22 @@ namespace Minecraft
             throw new InvalidOperationException();
         }
 
+        public void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket)
+        {
+            Vector2 chunkGridPosition = new Vector2(unloadChunkPacket.gridX, unloadChunkPacket.gridZ);
+            if (game.server.world.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
+            { 
+                game.server.world.RemovePlayerPresenceOfChunk(chunk);
+            }
+        }
+
         public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket packet)
         {
             Vector2 gridPosition = new Vector2(packet.gridX, packet.gridZ);
             if(!game.server.world.loadedChunks.TryGetValue(gridPosition, out Chunk chunk))
             {
                 chunk = game.server.world.GenerateBlocksForChunk(packet.gridX, packet.gridZ);
-                game.server.world.LoadChunk(chunk);
+                game.server.world.AddPlayerPresenceToChunk(chunk);
             }
             if(game.server.isOpen && !game.server.IsHost(playerConnection))
             {

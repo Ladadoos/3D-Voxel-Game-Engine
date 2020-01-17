@@ -98,14 +98,9 @@ namespace Minecraft
                     server.world.Update(elapsedSeconds);
                     server.Update();
                 }
-
                 client.Update(elapsedSeconds);
-
                 input.Update();
-                player.Update(elapsedSeconds, world);
-
                 world.Update(elapsedSeconds);
-
                 masterRenderer.EndFrameUpdate(world);
             }
         }
