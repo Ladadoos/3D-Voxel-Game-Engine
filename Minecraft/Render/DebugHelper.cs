@@ -11,6 +11,7 @@ namespace Minecraft
         private UICanvasDebug debugCanvas;
 
         private bool renderHitboxes;
+        private bool renderChunkBorders;
         private bool displayDebugInfo;
 
         public DebugHelper(Game game, WireframeRenderer wireframeRenderer)
@@ -45,6 +46,9 @@ namespace Minecraft
                     for (int y = -3; y < 3; y++)
                         for (int z = -3; z < 3; z++)
                             game.client.WritePacket(new RemoveBlockPacket(new Vector3i(x, y, z) + new Vector3i(game.player.position)));
+            } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F5))
+            {
+                renderChunkBorders = !renderChunkBorders;
             }
 
             Render();
@@ -66,6 +70,11 @@ namespace Minecraft
                     Vector3 translation = entity.position;
                     wireframeRenderer.RenderWireframeAt(2, translation, scaleVector, new Vector3(offset, offset, offset));
                 }
+            }
+
+            if (renderChunkBorders)
+            {
+                game.masterRenderer.RenderChunkBorders();
             }
         }
     }

@@ -148,6 +148,21 @@ namespace Minecraft
             screenQuad.RenderToScreen();
         }
         
+        public void RenderChunkBorders()
+        {
+            lock (meshLock)
+            {
+                foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
+                {
+                    if (chunkToRender.Value.hardBlocksModel == null) continue;
+
+                    Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
+                    Vector3 max = min + new Vector3(16, 256, 16);
+                    wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16));
+                }
+            }
+        }
+
         private Queue<ChunkRemeshLayout> toProcess = new Queue<ChunkRemeshLayout>();
         private object meshLock = new object();
         private void MeshGenerator()
