@@ -14,8 +14,8 @@ namespace Minecraft
         private int port;
         private ClientSession session;
 
-        public static readonly float KeepAliveTimeoutSeconds = 8;
-        private static readonly float timeoutInSeconds = 5;
+        public static readonly float KeepAliveTimeoutSeconds = 35;
+        private static readonly float timeoutInSeconds = 30;
         private float elapsedTime;
 
         private object writePacketLock = new object();
