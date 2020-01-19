@@ -9,6 +9,7 @@ namespace Minecraft
         public static readonly Block Stone = new BlockStone(2);
         public static readonly Block Flower = new BlockFlower(3);
         public static readonly Block Tnt = new BlockTNT(4);
+        public static readonly Block Grass = new BlockGrass(5);
 
         private static List<Block> registeredBlocks;
 
@@ -20,13 +21,17 @@ namespace Minecraft
                 Dirt,
                 Stone,
                 Flower,
-                Tnt
+                Tnt,
+                Grass
             };
         }
 
         public static Block GetBlockFromIdentifier(int id)
         {
-            if (id < 0 || id >= registeredBlocks.Count) throw new System.Exception("Invalid id: " + id);
+            if (id < 0 || id >= registeredBlocks.Count)
+            {
+                throw new System.Exception("Invalid id: " + id);
+            }
             return registeredBlocks[id];
         }
     }

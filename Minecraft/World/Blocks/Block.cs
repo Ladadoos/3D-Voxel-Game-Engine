@@ -38,20 +38,4 @@ namespace Minecraft
                 new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE));
         }
     }
-
-    class BlockAir : Block
-    {
-        public BlockAir(int id) : base(id) { }
-
-        public override BlockState GetNewDefaultState()
-        {
-            return new BlockStateAir();
-        }
-
-        public override AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
-        {
-            return emptyAABB;
-        }
-    }
-
 }

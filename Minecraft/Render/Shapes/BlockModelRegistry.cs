@@ -20,7 +20,8 @@ namespace Minecraft
                 { Blocks.Dirt, blockModels.Dirt },
                 { Blocks.Stone, blockModels.Stone },
                 { Blocks.Flower, blockModels.Flower },
-                { Blocks.Tnt, blockModels.Tnt }
+                { Blocks.Tnt, blockModels.Tnt },
+                { Blocks.Grass, blockModels.Grass }
             };
             models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }

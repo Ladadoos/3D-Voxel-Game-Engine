@@ -61,22 +61,22 @@ namespace Minecraft
                     {
                         if (Game.randomizer.Next(25) != 1)
                         {
-                            generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                            generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
                         } else
                         {
-                            generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                            generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
                         }
                     } else if (biomeDeterminer < -0.75D)
                     {
-                        generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
                     } else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
                     {
                         forestBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
                     } else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
                     {
                         sandBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, Blocks.Dirt.GetNewDefaultState());
+                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
                     }
 
                     int k = height - 1;
