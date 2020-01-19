@@ -6,13 +6,14 @@ namespace Minecraft
     class ServerNetHandler : INetHandler
     {
         private Game game;
-        private Connection playerConnection;
+        private ServerSession session;
 
-        public ServerNetHandler(Game game, Connection playerConnection)
+        public ServerNetHandler(Game game)
         {
             this.game = game;
-            this.playerConnection = playerConnection;
         }
+
+        public void AssignSession(ServerSession session) => this.session = session;
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockpacket)
         {
@@ -37,31 +38,13 @@ namespace Minecraft
 
         public void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket)
         {
-            Vector2 chunkGridPosition = new Vector2(unloadChunkPacket.gridX, unloadChunkPacket.gridZ);
-            if (game.server.world.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
-            { 
-                game.server.world.RemovePlayerPresenceOfChunk(chunk);
-            }
-        }
-
-        public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket packet)
-        {
-            Vector2 gridPosition = new Vector2(packet.gridX, packet.gridZ);
-            if(!game.server.world.loadedChunks.TryGetValue(gridPosition, out Chunk chunk))
-            {
-                chunk = game.server.world.GenerateBlocksForChunk(packet.gridX, packet.gridZ);
-                game.server.world.AddPlayerPresenceToChunk(chunk);
-            }
-            if(game.server.isOpen && !game.server.IsHost(playerConnection))
-            {
-                playerConnection.WritePacket(new ChunkDataPacket(chunk));
-            }
+            throw new InvalidOperationException();
         }
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
-            playerConnection.player.position = playerDataPacket.position;
-            game.server.BroadcastPacketExceptTo(playerConnection, playerDataPacket);
+            session.player.position = playerDataPacket.position;
+            game.server.BroadcastPacketExceptTo(session, playerDataPacket);
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
@@ -69,26 +52,27 @@ namespace Minecraft
             string playerName = playerJoinRequestPacket.name.Trim();
             if (playerName == string.Empty || playerName == "Player")
             {
-                playerConnection.WritePacket(new PlayerLeavePacket(0, LeaveReason.Banned, "You are not allowed on this server."));
-                playerConnection.state = ConnectionState.Closed;
+                session.WritePacket(new PlayerLeavePacket(0, LeaveReason.Banned, "You are not allowed on this server."));
+                session.state = SessionState.Closed;
                 return;
             }
             int playerId = game.server.world.entityIdTracker.GenerateId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
             ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
-            playerConnection.player = player;
+            session.AssignPlayer(player);
 
             game.server.world.SpawnEntity(player);
-            playerConnection.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId)); // Accept join
-            playerConnection.state = ConnectionState.Accepted;
+            session.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId)); // Accept join
+            session.state = SessionState.Accepted;
+
             //Let all the online players know about the new player
-            game.server.BroadcastPacketExceptTo(playerConnection, new PlayerJoinPacket(serverPlayerName, playerId));
+            game.server.BroadcastPacketExceptTo(session, new PlayerJoinPacket(serverPlayerName, playerId));
 
             //let the new player know about all the already only players
-            foreach (Connection client in game.server.clients)
+            foreach (Session client in game.server.clients)
             {
                 if (client.player == player) continue;
-                playerConnection.WritePacket(new PlayerJoinPacket(client.player.playerName, client.player.id));
+                session.WritePacket(new PlayerJoinPacket(client.player.playerName, client.player.id));
             }
         }
 
@@ -115,7 +99,7 @@ namespace Minecraft
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
         {
-            game.server.UpdateKeepAliveFor(playerConnection);
+            game.server.UpdateKeepAliveFor(session);
         }
     }
 }

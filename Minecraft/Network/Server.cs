@@ -10,7 +10,7 @@ namespace Minecraft
 {
     class Server
     {
-        public List<Connection> clients = new List<Connection>();
+        public List<Session> clients = new List<Session>();
         private Thread connectionsThread;
         private int port;
         private string address;
@@ -23,13 +23,13 @@ namespace Minecraft
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
         public bool isOpen { get; private set; }
 
-        private Connection host;
+        private ServerSession host;
 
         private object newJoinsLock = new object();
         private Queue<TcpClient> joinQueue = new Queue<TcpClient>();
-        private Queue<Connection> toRemoveClients = new Queue<Connection>();
+        private Queue<ServerSession> toRemoveClients = new Queue<ServerSession>();
 
-        private Dictionary<Connection, Stopwatch> keepAlives = new Dictionary<Connection, Stopwatch>();
+        private Dictionary<ServerSession, Stopwatch> keepAlives = new Dictionary<ServerSession, Stopwatch>();
 
         public Server(Game game, bool isOpen)
         {
@@ -37,9 +37,9 @@ namespace Minecraft
             this.isOpen = isOpen;
         }
 
-        public bool IsHost(Connection connection)
+        public bool IsHost(Session session)
         {
-            return connection == host;
+            return session == host;
         }
 
         public void Start(string address, int port)
@@ -54,25 +54,25 @@ namespace Minecraft
             connectionsThread.Start();
         }
 
-        public void UpdateKeepAliveFor(Connection connection)
+        public void UpdateKeepAliveFor(ServerSession session)
         {
-            if(!keepAlives.TryGetValue(connection, out Stopwatch keepAliveWatch))
+            if(!keepAlives.TryGetValue(session, out Stopwatch keepAliveWatch))
             {
                 Logger.Warn("Connection had no keep alive stopwatch assigned to it.");
                 return;
             }
-            Logger.Info("Reset keep alive for " + connection?.player.id);
+            Logger.Info("Reset keep alive for " + session?.player.id);
             keepAliveWatch.Restart();
         }
 
         private void CheckForKeepAlive()
         {
-            foreach(KeyValuePair<Connection, Stopwatch> client in keepAlives)
+            foreach(KeyValuePair<ServerSession, Stopwatch> client in keepAlives)
             {
                 if(client.Value.ElapsedMilliseconds >= Client.KeepAliveTimeoutSeconds * 1000)
                 {
                     Logger.Warn("Failed to keep connection with " + client.Key.player?.id);
-                    client.Key.state = ConnectionState.Closed;
+                    client.Key.state = SessionState.Closed;
                 }
             }
         }
@@ -100,15 +100,16 @@ namespace Minecraft
             Logger.Info("Server closed.");
         }
 
-        private void OnConnectionStateChanged(Connection connection)
+        private void OnSessionStateChanged(Session serverSession)
         {
-            if (connection.state == ConnectionState.Accepted)
+            ServerSession session = (ServerSession)serverSession;
+            if (session.state == SessionState.Accepted)
             {
 
-            } else if (connection.state == ConnectionState.Closed)
+            } else if (session.state == SessionState.Closed)
             {
-                Logger.Info("Connection closed with " + connection?.player.id);
-                toRemoveClients.Enqueue(connection);
+                Logger.Info("Connection closed with " + session?.player.id);
+                toRemoveClients.Enqueue(session);
             }
         }
 
@@ -116,20 +117,20 @@ namespace Minecraft
         {
             while (toRemoveClients.Count > 0)
             {
-                Connection client = toRemoveClients.Dequeue();
-                clients.Remove(client);
+                ServerSession session = toRemoveClients.Dequeue();
+                clients.Remove(session);
                 try
                 {
-                    client.Close();
+                    session.Close();
                 }catch(Exception e)
                 {
-                    Logger.Error("Closing client connection: " + e.Message);
+                    Logger.Error("Closing client connection failed: " + e.Message);
                 }
-                keepAlives.Remove(client);
+                keepAlives.Remove(session);
 
-                if(client.player != null)
+                if(session.player != null)
                 {
-                    world.DespawnEntity(client.player.id);
+                    world.DespawnEntity(session.player.id);
                 }
             }
         }
@@ -148,21 +149,21 @@ namespace Minecraft
                         netStream = stream,
                         reader = new BinaryReader(stream),
                         bufferedStream = new NetBufferedStream(new BufferedStream(stream)),
-                        state = ConnectionState.AwaitingAcceptance
                     };
-                    ServerNetHandler netHandler = new ServerNetHandler(game, clientConnection);
-                    clientConnection.netHandler = netHandler;
-                    clientConnection.OnStateChangedHandler += OnConnectionStateChanged;
+                    ServerNetHandler netHandler = new ServerNetHandler(game);
+                    ServerSession session = new ServerSession(clientConnection, netHandler);
+                    netHandler.AssignSession(session);
+                    session.OnStateChangedHandler += OnSessionStateChanged;
 
                     if (game.mode == RunMode.ClientServer && clients.Count == 0)
                     {
-                        host = clientConnection;
+                        host = session;
                     }
-                    clients.Add(clientConnection);
+                    clients.Add(session);
 
                     Stopwatch timeoutWatch = new Stopwatch();
                     timeoutWatch.Start();
-                    keepAlives.Add(clientConnection, timeoutWatch);
+                    keepAlives.Add(session, timeoutWatch);
                 }
             }
         }
@@ -180,9 +181,9 @@ namespace Minecraft
                 BroadcastPacket(new ChatPacket(input));
             }
 
-            foreach (Connection client in clients)
+            foreach (ServerSession client in clients)
             {
-                if (client.state == ConnectionState.Closed || !client.netStream.DataAvailable)
+                if (client.state == SessionState.Closed || !client.NetDataAvailable())
                 {
                     continue;
                 }
@@ -199,12 +200,12 @@ namespace Minecraft
             clients.ForEach(c => c.WritePacket(packet));
         }
 
-        public void BroadcastPacketExceptTo(Connection connection, Packet packet)
+        public void BroadcastPacketExceptTo(Session session, Packet packet)
         {
             Logger.Packet("Server broadcasting packet [" + packet.GetType() + "]");
-            foreach (Connection client in clients)
+            foreach (Session client in clients)
             {
-                if (client == connection)
+                if (client == session)
                 {
                     continue;
                 }

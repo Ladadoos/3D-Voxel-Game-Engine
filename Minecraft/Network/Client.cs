@@ -8,10 +8,11 @@ namespace Minecraft
 {
     class Client
     {
+        private Game game;
+
         private string host;
         private int port;
-        private Connection serverConnection;
-        private Game game;
+        private ClientSession session;
 
         public static readonly float KeepAliveTimeoutSeconds = 8;
         private static readonly float timeoutInSeconds = 5;
@@ -28,22 +29,22 @@ namespace Minecraft
         {
             this.game = game;
 
-            serverConnection = new Connection() { state = ConnectionState.Started };
-
             packetTransferThread = new Thread(HandlePacketCommunication);
             packetTransferThread.IsBackground = true;
             packetTransferThread.Start();
         }
 
+        public PlayerSettings GetPlayerSettings() => session.playerSettings;
+
         private void HandlePacketCommunication()
         {
-            while (serverConnection.state == ConnectionState.Started) { }
+            while (session == null || session.state == SessionState.Started) { }
 
             while (true)
             {
                 Thread.Sleep(5);
 
-                if (serverConnection.state == ConnectionState.Closed)
+                if (session.state == SessionState.Closed)
                 {
                     break;
                 }
@@ -52,9 +53,9 @@ namespace Minecraft
                 {
                     try
                     {
-                        while (serverConnection.netStream.DataAvailable)
+                        while (session.NetDataAvailable())
                         {
-                            Packet packet = serverConnection.ReadPacket();
+                            Packet packet = session.ReadPacket();
                             Logger.Packet("Client received packet " + packet.ToString());
                             toProcessPackets.Enqueue(packet);
                         }
@@ -69,8 +70,9 @@ namespace Minecraft
                 {
                     while(toSendPackets.Count > 0)
                     {
-                        Packet p = toSendPackets.Dequeue();
-                        serverConnection.WritePacket(p);
+                        Packet toSendPacket = toSendPackets.Dequeue();
+                        Logger.Packet("Client wrote packet " + toSendPacket.ToString());
+                        session.WritePacket(toSendPacket);
                     }
                 }
             }
@@ -94,44 +96,44 @@ namespace Minecraft
             }
 
             NetworkStream netStream = tcpClient.GetStream();
-            serverConnection = new Connection()
+            Connection serverConnection = new Connection()
             {
                 client = tcpClient,
                 netStream = netStream,
                 reader = new BinaryReader(netStream),
                 bufferedStream = new NetBufferedStream(new BufferedStream(netStream)),
-                state = ConnectionState.AwaitingAcceptance
             };
-            ClientNetHandler netHandler = new ClientNetHandler(game, serverConnection);
-            serverConnection.player = game.player;
-            serverConnection.netHandler = netHandler;
-            serverConnection.OnStateChangedHandler += OnConnectionStateChanged;
+            ClientNetHandler netHandler = new ClientNetHandler(game);
+            session = new ClientSession(serverConnection, netHandler);
+            session.AssignPlayer(game.player);
+            session.OnStateChangedHandler += OnStateChangedHandler;      
+            netHandler.AssignSession(session);
 
             Logger.Info("Connected to server IP: " + host + " Port: " + port);
             WritePacket(new PlayerJoinRequestPacket("Player" + new Random().Next(100)));
             return true;
         }
 
-        private void OnConnectionStateChanged(Connection connection)
+        private void OnStateChangedHandler(Session session)
         {
-            if(connection.state == ConnectionState.Accepted)
+            if(session.state == SessionState.Accepted)
             {
                 Logger.Info("Client: server accepted my connection.");
-            } else if (connection.state == ConnectionState.Closed)
+            } else if (session.state == SessionState.Closed)
             {
-                serverConnection.Close();
+                session.Close();
                 Logger.Info("Client: my connection with server closed.");
             }
         }
 
         public void Stop()
         {
-            serverConnection.state = ConnectionState.Closed;
+            session.state = SessionState.Closed;
         }
 
         public void Update(float deltaTime)
         {
-            if (serverConnection.state == ConnectionState.Closed)
+            if (session.state == SessionState.Closed)
             {
                 return;
             }
@@ -142,7 +144,7 @@ namespace Minecraft
             {
                 while (toProcessPackets.Count > 0)
                 {
-                    toProcessPackets.Dequeue().Process(serverConnection.netHandler);
+                    toProcessPackets.Dequeue().Process(session.netHandler);
                 }
             }
         }
@@ -160,12 +162,6 @@ namespace Minecraft
 
         public void WritePacket(Packet packet)
         {
-            if (serverConnection.state == ConnectionState.Closed)
-            {
-                return;
-            }
-
-            Logger.Packet("Client wrote packet " + packet.ToString());
             lock (writePacketLock)
             {
                 toSendPackets.Enqueue(packet);

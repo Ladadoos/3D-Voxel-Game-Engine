@@ -1,17 +1,19 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 
 namespace Minecraft
 {
     class ClientNetHandler : INetHandler
     {
         private Game game;
-        private Connection playerConnection;
+        private ClientSession session;
 
-        public ClientNetHandler(Game game, Connection playerConnection)
+        public ClientNetHandler(Game game)
         {
             this.game = game;
-            this.playerConnection = playerConnection;
         }
+
+        public void AssignSession(ClientSession session) => this.session = session;
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockPacket)
         {
@@ -35,12 +37,13 @@ namespace Minecraft
 
         public void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket)
         {
-            throw new InvalidOperationException();
-        }
-
-        public void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket)
-        {
-            throw new InvalidOperationException();
+            foreach(Vector2 chunkGridPosition in unloadChunkPacket.chunkGridPositions)
+            {
+                if (game.world.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
+                {
+                    game.world.RemovePlayerPresenceOfChunk(chunk);
+                }
+            }
         }
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
@@ -71,7 +74,7 @@ namespace Minecraft
 
             game.player.id = playerJoinAcceptPacket.playerId;
             game.player.playerName = playerJoinAcceptPacket.name;
-            playerConnection.state = ConnectionState.Accepted;
+            session.state = SessionState.Accepted;
 
             game.world.SpawnEntity(game.player);
         }
@@ -89,7 +92,7 @@ namespace Minecraft
             if(playerLeavePacket.id == 0)
             {
                 Logger.Info("You were disconnected for reason: " + playerLeavePacket.reason + " Message: " + playerLeavePacket.message);
-                playerConnection.state = ConnectionState.Closed;
+                session.state = SessionState.Closed;
             } else
             {
                 Logger.Info("Player " + playerLeavePacket.id + " left for reason " + playerLeavePacket.reason + " with message " + playerLeavePacket.message);

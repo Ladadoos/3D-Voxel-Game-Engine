@@ -6,7 +6,6 @@
         PlaceBlock,
         RemoveBlock,
         ChunkData,
-        ChunkDataRequest,
         ChunkUnload,
         EntityPosition,
         PlayerJoinRequest,

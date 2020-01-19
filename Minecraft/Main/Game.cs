@@ -35,7 +35,7 @@ namespace Minecraft
             randomizer = new Random();
             input = new Input();
             averageFpsCounter = new FPSCounter();
-            window.VSync = OpenTK.VSyncMode.On;
+            window.VSync = OpenTK.VSyncMode.Off;
 
             if (mode == RunMode.ClientServer)
             {

@@ -3,6 +3,7 @@ using System;
 using System.IO;
 
 using ProtoBuf;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -42,17 +43,15 @@ namespace Minecraft
                         chunk.tickableBlocks = new System.Collections.Generic.Dictionary<Vector3i, BlockState>();
                         return new ChunkDataPacket(chunk);
                     }
-                case PacketType.ChunkDataRequest:
-                    {
-                        int gridX = reader.ReadInt32();
-                        int gridZ = reader.ReadInt32();
-                        return new ChunkDataRequestPacket(gridX, gridZ);
-                    }
                 case PacketType.ChunkUnload:
                     {
-                        int gridX = reader.ReadInt32();
-                        int gridZ = reader.ReadInt32();
-                        return new ChunkUnloadPacket(gridX, gridZ);
+                        int chunkCount = reader.ReadInt32();
+                        List<Vector2> chunksToUnload = new List<Vector2>();
+                        for(int i = 0; i < chunkCount; i++)
+                        {
+                            chunksToUnload.Add(new Vector2(reader.ReadInt32(), reader.ReadInt32()));
+                        }
+                        return new ChunkUnloadPacket(chunksToUnload);
                     }
                 case PacketType.EntityPosition:
                     {

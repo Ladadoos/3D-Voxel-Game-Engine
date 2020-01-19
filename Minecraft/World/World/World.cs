@@ -26,16 +26,16 @@ namespace Minecraft
         public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState);
         public event OnBlockRemoved OnBlockRemovedHandler;
 
-        public delegate void OnChunkLoaded(Chunk chunk);
+        public delegate void OnChunkLoaded(World world, Chunk chunk);
         public event OnChunkLoaded OnChunkLoadedHandler;
 
-        public delegate void OnChunkUnloaded(Chunk chunk);
+        public delegate void OnChunkUnloaded(World world, Chunk chunk);
         public event OnChunkUnloaded OnChunkUnloadedHandler;
 
-        public delegate void OnEntitySpawned(Entity entity);
+        public delegate void OnEntitySpawned(World world, Entity entity);
         public event OnEntitySpawned OnEntitySpawnedHandler;
 
-        public delegate void OnEntityDespawned(Entity entity);
+        public delegate void OnEntityDespawned(World world, Entity entity);
         public event OnEntityDespawned OnEntityDespawnedHandler;
 
         public World(Game game)
@@ -53,7 +53,7 @@ namespace Minecraft
             if (loadedEntities.Remove(entityId))
             {
                 despawnedEntity.RaiseOnDespawned();
-                OnEntityDespawnedHandler?.Invoke(despawnedEntity);
+                OnEntityDespawnedHandler?.Invoke(this, despawnedEntity);
                 return true;
             }
             return false;
@@ -62,7 +62,7 @@ namespace Minecraft
         public void SpawnEntity(Entity entity)
         {
             loadedEntities.Add(entity.id, entity);
-            OnEntitySpawnedHandler?.Invoke(entity);
+            OnEntitySpawnedHandler?.Invoke(this, entity);
         }
 
         public void AddPlayerPresenceToChunk(Chunk chunk)
@@ -70,7 +70,8 @@ namespace Minecraft
             Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
-                chunkPlayerPopulation[chunkPos] = population + 1;
+                int newPopulation = population + 1;
+                chunkPlayerPopulation[chunkPos] = newPopulation;
             } else
             {
                 chunkPlayerPopulation.Add(chunkPos, 1);
@@ -84,11 +85,12 @@ namespace Minecraft
             if (chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population - 1;
-                if(newPopulation == 0)
+                if(newPopulation <= 0)
                 {
                     chunkPlayerPopulation.Remove(chunkPos);
                     return UnloadChunk(chunk);
                 }
+                chunkPlayerPopulation[chunkPos] = newPopulation;
                 return true;
             }
             Logger.Warn("Chunk with negative player population count: " + chunkPos);
@@ -101,7 +103,7 @@ namespace Minecraft
             if (!loadedChunks.ContainsKey(chunkPos))
             {
                 loadedChunks.Add(chunkPos, chunk);
-                OnChunkLoadedHandler?.Invoke(chunk);
+                OnChunkLoadedHandler?.Invoke(this, chunk);
             } else
             {
                 throw new Exception("Already had chunk data for " + chunkPos);
@@ -113,7 +115,7 @@ namespace Minecraft
             Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
             if (loadedChunks.Remove(chunkPos))
             {
-                OnChunkUnloadedHandler?.Invoke(chunk);
+                OnChunkUnloadedHandler?.Invoke(this, chunk);
                 return true;
             }
             return false;

@@ -15,14 +15,15 @@ namespace Minecraft
         public int indicesCount;
     }
 
-    struct ChunkRemeshLayout
-    {
-        public RenderChunk renderChunk;
-        public ChunkBufferLayout chunkLayout;
-    }
-
     class MasterRenderer
     {
+
+        struct ChunkRemeshLayout
+        {
+            public RenderChunk renderChunk;
+            public ChunkBufferLayout chunkLayout;
+        }
+
         private float colorClearR = 0.57F;
         private float colorClearG = 0.73F;
         private float colorClearB = 1.0F;
@@ -133,11 +134,11 @@ namespace Minecraft
                 }
             }
 
-            playerBlockRenderer.RenderSelection();
-            debugHelper.UpdateAndRender();
             GL.Enable(EnableCap.Blend);
             GL.Disable(EnableCap.CullFace);
             GL.Disable(EnableCap.DepthTest);
+            playerBlockRenderer.RenderSelection();
+            debugHelper.UpdateAndRender();        
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             uiRenderer.Render();
             GL.Disable(EnableCap.Blend);
@@ -200,52 +201,45 @@ namespace Minecraft
             cameraController.Update();
         }
 
-        public void OnChunkLoaded(Chunk chunk)
+        public void OnChunkLoaded(World world, Chunk chunk)
         {
             MeshChunk(chunk);
+            MeshNeighbourChunks(world, chunk);
+        }
 
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
+        private void MeshNeighbourChunks(World world, Chunk chunk, bool cXNegPredicate = true, bool cXPosPredicate = true, 
+            bool cZNegPredicate = true, bool cZPosPredicate = true)
+        {
+            if (cXNegPredicate && 
+                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
             {
                 MeshChunk(cXNeg);
             }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
+            if (cXPosPredicate && 
+                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
             {
                 MeshChunk(cXPos);
             }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
+            if (cZNegPredicate && 
+                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
             {
                 MeshChunk(cZNeg);
             }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
+            if (cZPosPredicate && 
+                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
             {
                 MeshChunk(cZPos);
             }
         }
 
-        public void OnChunkUnloaded(Chunk chunk)
+        public void OnChunkUnloaded(World world, Chunk chunk)
         {
             lock (meshLock)
             {
                 toRenderChunks.Remove(new Vector2(chunk.gridX, chunk.gridZ));
                 toRemeshChunks.Remove(chunk);
             }
-
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
-            {
-                MeshChunk(cXNeg);
-            }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
-            {
-                MeshChunk(cXPos);
-            }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
-            {
-                MeshChunk(cZNeg);
-            }
-            if (game.world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
-            {
-                MeshChunk(cZPos);
-            }
+            MeshNeighbourChunks(world, chunk);
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
@@ -274,23 +268,7 @@ namespace Minecraft
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
             MeshChunk(chunk);
-
-            if (localX == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
-            {
-                MeshChunk(cXNeg);
-            }
-            if (localX == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
-            {
-                MeshChunk(cXPos);
-            }
-            if (localZ == 0 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
-            {
-                MeshChunk(cZNeg);
-            }
-            if (localZ == 15 && world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
-            {
-                MeshChunk(cZPos);
-            }
+            MeshNeighbourChunks(world, chunk, localX == 0, localX == 15, localZ == 0, localZ == 15);
         }
 
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)

@@ -40,19 +40,28 @@ namespace Minecraft
             Logger.Info("Finished generation initial chunks. Took " + now2);
         }
 
-        private void OnChunkLoadedServer(Chunk chunk)
+        private void OnChunkLoadedServer(World world, Chunk chunk)
         {
             if(game.mode == RunMode.ClientServer)
             {
                 Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
-                if (game.world.chunkProvider.IsChunkRequestOutgoingFor(chunkPosition) || chunkPosition == Vector2.Zero)
+                Vector2 playerPosition = GetChunkPosition(game.player.position.X, game.player.position.Z);
+                if (IsGridPositionInViewDistanceOfPlayer(chunkPosition, playerPosition))
                 {
                     game.world.AddPlayerPresenceToChunk(chunk);
                 }
             }
         }
 
-        private void OnEntityDespawnedServer(Entity entity)
+        private bool IsGridPositionInViewDistanceOfPlayer(Vector2 gridPosition, Vector2 playerGridPosition)
+        {
+            float dx = Math.Abs(playerGridPosition.X - gridPosition.X);
+            float dy = Math.Abs(playerGridPosition.Y - gridPosition.Y);
+            float viewDistance = game.client.GetPlayerSettings().viewDistance;
+            return dx <= viewDistance && dy <= viewDistance;
+        }
+
+        private void OnEntityDespawnedServer(World world, Entity entity)
         {
             entityIdTracker.ReleaseId(entity.id);
 

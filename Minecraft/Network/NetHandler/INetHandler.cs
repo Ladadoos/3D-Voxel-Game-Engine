@@ -10,8 +10,6 @@
 
         void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket);
 
-        void ProcessChunkDataRequestPacket(ChunkDataRequestPacket chunkRequestPacket);
-
         void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket);
 
         void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket);
