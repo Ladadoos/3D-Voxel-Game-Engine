@@ -119,6 +119,21 @@ namespace Minecraft
         }
     }
 
+    class BlockModelSand : FullBlockModel
+    {
+        public BlockModelSand(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 1));
+        }
+    }
+
     class BlockModelTNT : FullBlockModel
     {
         public BlockModelTNT(TextureAtlas textureAtlas) : base(textureAtlas) { }

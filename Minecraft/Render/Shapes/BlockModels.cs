@@ -7,6 +7,7 @@
         public readonly BlockModel Flower;
         public readonly BlockModel Tnt;
         public readonly BlockModel Grass;
+        public readonly BlockModel Sand;
 
         public BlockModels(TextureAtlas textureAtlas)
         {
@@ -15,6 +16,7 @@
             Flower = new BlockModelFlower(textureAtlas);
             Tnt = new BlockModelTNT(textureAtlas);
             Grass = new BlockModelGrass(textureAtlas);
+            Sand = new BlockModelSand(textureAtlas);
         }
     }
 }

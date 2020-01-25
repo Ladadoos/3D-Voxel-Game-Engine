@@ -11,6 +11,7 @@ namespace Minecraft
     [ProtoInclude(4, typeof(BlockStateFlower))]
     [ProtoInclude(5, typeof(BlockStateTNT))]
     [ProtoInclude(6, typeof(BlockStateGrass))]
+    [ProtoInclude(7, typeof(BlockStateSand))]
     abstract class BlockState
     {
         public abstract Block GetBlock();

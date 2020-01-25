@@ -10,6 +10,7 @@ namespace Minecraft
         public static readonly Block Flower = new BlockFlower(3);
         public static readonly Block Tnt = new BlockTNT(4);
         public static readonly Block Grass = new BlockGrass(5);
+        public static readonly Block Sand = new BlockSand(6);
 
         private static List<Block> registeredBlocks;
 
@@ -22,7 +23,8 @@ namespace Minecraft
                 Stone,
                 Flower,
                 Tnt,
-                Grass
+                Grass,
+                Sand
             };
         }
 
