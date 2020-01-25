@@ -4,10 +4,10 @@ namespace Minecraft
 {
     class OpaqueMeshGenerator : MeshGenerator
     {
-        private float topLight = 1.35F;
-        private float bottomLight = 0.75F;
+        private float topLight = 1.15F;
+        private float bottomLight = 0.85F;
         private float sideXLight = 1F;
-        private float sideZLight = 1.15F;
+        private float sideZLight = 0.95F;
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {           
