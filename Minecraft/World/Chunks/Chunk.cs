@@ -72,7 +72,7 @@ namespace Minecraft
             {
                 sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
 
-                if (blockstate.GetBlock().isTickable)
+                if (blockstate.GetBlock().isTickable && !tickableBlocks.ContainsKey(blockPos))
                 {
                     tickableBlocks.Add(blockPos, blockstate);
                 }               

@@ -1,105 +1,88 @@
-﻿using LibNoise;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class WorldGenerator
     {
-        private Perlin basePerlinFunction = new Perlin();
-        private double basePerlinDetail = 0.006D; //Smaller means more detail
-        private int basePerlinSeed;
-
-        private Perlin biomePerlinFunction = new Perlin();
-        private double biomePerlinDetail = 0.0045D; //Smaller means larger biomes
-        private int biomePerlinSeed;
-
-        private RockyBiome rockBiome = new RockyBiome();
+        private MountainBiome mountainBiome = new MountainBiome();
         private ForestBiome forestBiome = new ForestBiome();
-        private SandBiome sandBiome = new SandBiome();
+        private DesertBiome desertBiome = new DesertBiome();
 
-        private int seaLevel = 95;
+        private double temperatureDetail = 0.0075D;
+        private Noise2DPerlin temperatureFunction = new Noise2DPerlin();
+
+        private double moistureDetail = 0.0075D;
+        private Noise2DPerlin moistureFunction = new Noise2DPerlin(25555);
+
+        private BiomeProvider biomeProvider;
+
+        private Biome[] registeredBiomes;
+        private const int activeBiomes = 3;
+        private int seaLevel = 50;
 
         public WorldGenerator()
         {
-            basePerlinSeed = Game.randomizer.Next(1000000);
-            biomePerlinSeed = Game.randomizer.Next(1000000);
+            registeredBiomes = new Biome[activeBiomes]
+            {
+                mountainBiome,
+                desertBiome,
+                forestBiome,
+            };
+
+            biomeProvider = new BiomeProvider(registeredBiomes);
         }
 
-        private double GetBasePerlinValueAt(double x, double y)
+        public Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
         {
-            return basePerlinFunction.GetValue(x + basePerlinSeed, 1, y + basePerlinSeed);
-        }
+            Chunk generatedChunk = new Chunk(chunkX, chunkY);
 
-        private double GetBiomePerlinValueAt(double x, double y)
-        {
-            return biomePerlinFunction.GetValue(x + biomePerlinSeed, 1, y + biomePerlinSeed);
-        }
+            double temperatureXOffset = 0;
+            double temperatureYOffset = 0;
+            temperatureYOffset = chunkX * Constants.CHUNK_SIZE * temperatureDetail;
 
-        public Chunk GenerateBlocksForChunkAt(int x, int y)
-        {
-            Chunk generatedChunk = new Chunk(x, y);
-
-            double baseXoffset = 0;
-            double baseYOffset = 0;
-            double biomeXoffset = 0;
-            double biomeYOffset = 0;
-
-            baseYOffset = x * Constants.CHUNK_SIZE * basePerlinDetail;
-            biomeYOffset = x * Constants.CHUNK_SIZE * biomePerlinDetail;
+            double moistureXOffset = 0;
+            double moistureYOffset = 0;
+            moistureYOffset = chunkX * Constants.CHUNK_SIZE * moistureDetail;
 
             for (int i = 0; i < Constants.CHUNK_SIZE; i++)
             {
-                baseXoffset = y * Constants.CHUNK_SIZE * basePerlinDetail;
-                biomeXoffset = y * Constants.CHUNK_SIZE * biomePerlinDetail;
+                temperatureXOffset = chunkY * Constants.CHUNK_SIZE * temperatureDetail;
+                moistureXOffset = chunkY * Constants.CHUNK_SIZE * moistureDetail;
 
                 for (int j = 0; j < Constants.CHUNK_SIZE; j++)
                 {
-                    double basePerlinValue = GetBasePerlinValueAt(baseXoffset, baseYOffset);
-                    int height = seaLevel + System.Math.Abs((int)(basePerlinValue * 32));
+                    double temperature = temperatureFunction.GetValuePositive(temperatureXOffset, temperatureYOffset);
+                    double moisture = moistureFunction.GetValuePositive(moistureXOffset, moistureYOffset);
 
-                    double biomeDeterminer = GetBiomePerlinValueAt(biomeXoffset, biomeYOffset);
-                    if (biomeDeterminer > 0.75D)
+                    WeightedBiome[] biomes = biomeProvider.GetBiomeMemberships(temperature, moisture);
+                    double biomeHeightAddon = 0;
+
+                    WeightedBiome bestBiome = biomes[0];
+                    foreach (WeightedBiome wBiome in biomes)
                     {
-                        if (Game.randomizer.Next(25) != 1)
+                        if (bestBiome.percentage < wBiome.percentage)
                         {
-                            generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
-                        } else
-                        {
-                            generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
+                            bestBiome = wBiome;
                         }
-                    } else if (biomeDeterminer < -0.75D)
+                        biomeHeightAddon += wBiome.percentage * wBiome.biome.OffsetAt(chunkX, chunkY, i, j);
+                    }
+                    int totalHeight = seaLevel + (int)biomeHeightAddon;
+
+                    generatedChunk.AddBlock(i, totalHeight, j, bestBiome.biome.topBlock.GetNewDefaultState());
+                    if (totalHeight > 0)
                     {
-                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
-                    } else if (biomeDeterminer > -0.75D && biomeDeterminer < 0.25D)
-                    {
-                        forestBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
-                    } else if (biomeDeterminer > 0.25D && biomeDeterminer < 0.75D)
-                    {
-                        sandBiome.Decorate(generatedChunk, i, height, j);
-                        generatedChunk.AddBlock(i, height, j, Blocks.Grass.GetNewDefaultState());
+                        for (int k = totalHeight - 1; k > 0; k--)
+                        {
+                            generatedChunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
+                        }
                     }
 
-                    int k = height - 1;
-                    while (k >= 0)
-                    {
-                        int r = Game.randomizer.Next(1000);
-                        if (r == 1)
-                        {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Flower.GetNewDefaultState());
-                        } else
-                        {
-                            generatedChunk.AddBlock(i * 1, k, j * 1, Blocks.Stone.GetNewDefaultState());
-                        }
-
-                        k--;
-                    }
-
-                    baseXoffset += basePerlinDetail;
-                    biomeXoffset += biomePerlinDetail;
+                    temperatureXOffset += temperatureDetail;
+                    moistureXOffset += moistureDetail;
                 }
-                baseYOffset += basePerlinDetail;
-                biomeYOffset += biomePerlinDetail;
+
+                temperatureYOffset += temperatureDetail;
+                moistureYOffset += moistureDetail;
             }
+
             return generatedChunk;
         }
     }
