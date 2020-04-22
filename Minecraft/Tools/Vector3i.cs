@@ -43,6 +43,16 @@ namespace Minecraft
             return new Vector3i(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
         }
 
+        public static bool operator ==(Vector3i a, Vector3i b)
+        {
+            return a.X == b.X && a.Y == b.Y && a.Z == b.Z;
+        }
+
+        public static bool operator !=(Vector3i a, Vector3i b)
+        {
+            return !(a == b);
+        }
+
         public override string ToString()
         {
             return "Vector3i(" + X + "," + Y + "," + Z + ")";

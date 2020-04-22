@@ -33,7 +33,8 @@ namespace Minecraft
             Vector2 chunkPos = game.world.GetChunkPosition(x, z);
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y);
             sb.AppendLine("FPS=" + game.currentFps + " AVG FPS= " + game.averageFpsCounter.GetAverageFPS());
-
+            sb.AppendLine("Block=" + game.player.mouseOverObject?.blockstateHit?.ToString());
+            sb.AppendLine("IsServer=" + game.isServer);
             debugText.text = sb.ToString();
         }
     }

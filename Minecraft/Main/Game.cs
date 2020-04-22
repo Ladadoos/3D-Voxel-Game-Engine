@@ -16,6 +16,7 @@ namespace Minecraft
         public Client client { get; private set; }
         public WorldClient world { get; private set; }
         public Server server { get; private set; }
+        public bool isServer { get; private set; }
         public RunMode mode { get; private set; }
         public float currentFps;
 
@@ -25,6 +26,8 @@ namespace Minecraft
         {
             this.mode = startArgs.runMode;
             this.startArgs = startArgs;
+
+            isServer = mode == RunMode.ClientServer || mode == RunMode.Server;
         }
 
         public void OnStartGame(GameWindow window)
@@ -44,13 +47,12 @@ namespace Minecraft
 
                 server = new Server(this, true);
                 server.Start(startArgs.ip, startArgs.port);
+                server.world.GenerateSpawnArea();
 
                 world = new WorldClient(this);
 
                 client = new Client(this);
                 client.ConnectWith(startArgs.ip, startArgs.port);
-
-                server.world.GenerateSpawnArea();
             } else if(mode == RunMode.Server)
             {
                 server = new Server(this, true);
@@ -83,6 +85,7 @@ namespace Minecraft
         public void OnUpdateGame(double deltaTime)
         {
             float elapsedSeconds = (float)deltaTime;
+            elapsedSeconds = elapsedSeconds <= 0 ? 0.0001f : elapsedSeconds;
 
             averageFpsCounter.IncrementFrameCounter();
             averageFpsCounter.AddElapsedTime(deltaTime);

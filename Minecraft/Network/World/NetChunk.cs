@@ -9,8 +9,10 @@ namespace Minecraft
         [ProtoMember(1)]
         public Dictionary<int, NetSection> sections = new Dictionary<int, NetSection>();
         [ProtoMember(2)]
-        public int gridX;
+        public Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
         [ProtoMember(3)]
+        public int gridX;
+        [ProtoMember(4)]
         public int gridZ;
 
         public Chunk ExtractChunk()
@@ -21,6 +23,7 @@ namespace Minecraft
             {
                 chunk.sections[section.Key] = section.Value.ExtractSection(gridX, gridZ);
             }
+            chunk.tickableBlocks = tickableBlocks;
             return chunk;
         }
 
@@ -36,6 +39,7 @@ namespace Minecraft
                     sections.Add(i, new NetSection(section));
                 }
             }
+            tickableBlocks = chunk.tickableBlocks;
         }
     }
 }

@@ -27,5 +27,10 @@ namespace Minecraft
         }
 
         public virtual void FromStream(BinaryReader reader) { }
+
+        public override string ToString()
+        {
+            return GetType().ToString();
+        }
     }
 }

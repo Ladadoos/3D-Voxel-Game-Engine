@@ -51,6 +51,13 @@ namespace Minecraft
             bufferedStream.Write(messageBytes, 0, messageBytes.Length);
         }
 
+        public void WriteVector3i(Vector3i value)
+        {
+            WriteInt32(value.X);
+            WriteInt32(value.Y);
+            WriteInt32(value.Z);
+        }
+
         public void WriteBytes(byte[] value)
         {
             bufferedStream.Write(value, 0, value.Length);

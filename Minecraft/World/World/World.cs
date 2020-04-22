@@ -106,7 +106,7 @@ namespace Minecraft
                 OnChunkLoadedHandler?.Invoke(this, chunk);
             } else
             {
-                throw new Exception("Already had chunk data for " + chunkPos);
+                throw new Exception("World " + GetType() + " already had chunk data for " + chunkPos);
             }
         }
 
@@ -147,8 +147,6 @@ namespace Minecraft
             elapsedMillisecondsSinceLastTick += deltaTime;
             if (elapsedMillisecondsSinceLastTick > secondsPerTick)
             {
-                elapsedMillisecondsSinceLastTick = 0;
-
                 foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
                 {
                     loadedChunk.Value.Tick(this, elapsedMillisecondsSinceLastTick);
@@ -156,8 +154,10 @@ namespace Minecraft
 
                 foreach (Entity entity in loadedEntities.Values)
                 {
-                    entity.Tick(deltaTime, this);
+                    entity.Tick(elapsedMillisecondsSinceLastTick, this);
                 }
+
+                elapsedMillisecondsSinceLastTick = 0;
             }
         }
 

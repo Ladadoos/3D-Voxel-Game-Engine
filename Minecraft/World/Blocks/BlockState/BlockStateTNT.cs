@@ -12,6 +12,8 @@ namespace Minecraft
         public bool triggeredByTnt;
         [ProtoMember(3)]
         public bool triggered;
+        [ProtoMember(4)]
+        public Vector3i blockPos;
 
         public override Block GetBlock()
         {
@@ -32,6 +34,11 @@ namespace Minecraft
             elapsedSecondsSinceTrigger = reader.ReadSingle();
             triggeredByTnt = reader.ReadBoolean();
             triggered = reader.ReadBoolean();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + " dt_trigger=" + elapsedSecondsSinceTrigger + " triggered=" + triggered + " triggered_by_tnt=" + triggeredByTnt;
         }
     }
 }

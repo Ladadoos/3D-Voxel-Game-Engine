@@ -16,9 +16,7 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteFloat(blockPos.X);
-            bufferedStream.WriteFloat(blockPos.Y);
-            bufferedStream.WriteFloat(blockPos.Z);
+            bufferedStream.WriteVector3i(blockPos);
         }
     }
 }

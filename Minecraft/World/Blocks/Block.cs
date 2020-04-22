@@ -16,7 +16,7 @@ namespace Minecraft
 
         public abstract BlockState GetNewDefaultState();
 
-        public virtual void OnInteract(BlockState blockstate, World world) { }
+        public virtual void OnInteract(BlockState blockstate, Vector3i blockPos, World world) { }
 
         public virtual bool CanAddBlockAt(World world, Vector3i blockPos)
         {

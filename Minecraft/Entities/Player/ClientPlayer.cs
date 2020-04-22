@@ -50,8 +50,8 @@ namespace Minecraft
         public override void Update(float deltaTime, World world)
         {
             UpdateKeyboardInput();
-            ApplyVelocityAndCheckCollision(deltaTime, game.world);
-            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(game.world);
+            ApplyVelocityAndCheckCollision(deltaTime, world);
+            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(world);
 
             Vector3 cameraPosition = position;
             cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
@@ -63,18 +63,18 @@ namespace Minecraft
             {
                 if (isCrouching)
                 {
-                    if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    if (selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
                     {
                         BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
                         game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
                     }
                 } else
                 {
-                    BlockState state = game.world.GetBlockAt(mouseOverObject.intersectedBlockPos);
+                    BlockState state = world.GetBlockAt(mouseOverObject.intersectedBlockPos);
                     if (state.GetBlock().isInteractable)
                     {
                         game.client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.intersectedBlockPos));
-                    }else if (selectedBlock.GetBlock().CanAddBlockAt(game.world, mouseOverObject.blockPlacePosition))
+                    }else if (selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
                     {
                         BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
                         game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
@@ -83,7 +83,7 @@ namespace Minecraft
             }
             if (Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
-                selectedBlock = game.world.GetBlockAt(mouseOverObject.intersectedBlockPos);
+                selectedBlock = world.GetBlockAt(mouseOverObject.intersectedBlockPos);
             }
             if (Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
             {

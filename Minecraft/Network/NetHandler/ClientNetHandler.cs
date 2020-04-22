@@ -102,8 +102,9 @@ namespace Minecraft
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            BlockState state = game.world.GetBlockAt(playerInteractionPacket.blockPos);
-            state.GetBlock().OnInteract(state, game.world);
+            Vector3i blockPos = playerInteractionPacket.blockPos;
+            BlockState state = game.world.GetBlockAt(blockPos);
+            state.GetBlock().OnInteract(state, blockPos, game.world);
         }
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)

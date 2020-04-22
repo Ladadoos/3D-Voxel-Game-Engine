@@ -22,7 +22,6 @@ namespace Minecraft
             {
                 return;
             }
-
             blockTnt.elapsedSecondsSinceTrigger += deltaTime;
             if ((blockTnt.elapsedSecondsSinceTrigger > 2 && !blockTnt.triggeredByTnt)
                 || (blockTnt.elapsedSecondsSinceTrigger > 0.2F && blockTnt.triggeredByTnt))
@@ -31,16 +30,18 @@ namespace Minecraft
             }
         }
 
-        public override void OnInteract(BlockState blockstate, World world)
+        public override void OnInteract(BlockState blockstate, Vector3i blockPos, World world)
         {
-            ((BlockStateTNT)blockstate).triggered = true;
+            BlockStateTNT blockTnt = (BlockStateTNT)blockstate;
+            blockTnt.triggered = true;
+            blockTnt.blockPos = blockPos;
         }
 
-        private void Explode(BlockState blockstate, World world)
+        private void Explode(BlockStateTNT blockstate, World world)
         {
-            List<BlockState> explosives = new List<BlockState>();
+            List<BlockStateTNT> explosives = new List<BlockStateTNT>();
 
-            /*for (int x = -4; x <= 4; x++)
+            for (int x = -4; x <= 4; x++)
             {
                 for (int y = -4; y <= 4; y++)
                 {
@@ -51,23 +52,30 @@ namespace Minecraft
                             continue;
                         }
 
-                        Vector3 target = blockstate.position + new Vector3(x, y, z);
+                        Vector3i target = blockstate.blockPos + new Vector3i(x, y, z);
                         BlockState state = world.GetBlockAt(target);
-                        if (state is BlockStateTNT && blockstate.position != target)
+                        if(state.GetBlock() == Blocks.Air)
                         {
-                            explosives.Add(state);
+                            continue;
+                        }
+
+                        if (state is BlockStateTNT && blockstate.blockPos != target)
+                        {
+                            BlockStateTNT tntBlock = (BlockStateTNT)state;
+                            tntBlock.blockPos = target;
+                            explosives.Add(tntBlock);
                         } else
                         {
                             world.QueueToRemoveBlockAt(target);
                         }
                     }
                 }
-            }*/
+            }
 
-            foreach (BlockState state in explosives)
+            foreach (BlockStateTNT state in explosives)
             {
-                ((BlockStateTNT)state).triggeredByTnt = true;
-                state.GetBlock().OnInteract(state, world);
+                state.triggeredByTnt = true;
+                state.GetBlock().OnInteract(state, state.blockPos, world);
             }
         }
     }
