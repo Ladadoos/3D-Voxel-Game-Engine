@@ -16,7 +16,7 @@
 
         private Biome[] registeredBiomes;
         private const int activeBiomes = 3;
-        private int seaLevel = 50;
+        private int seaLevel = 100;
 
         public WorldGenerator()
         {

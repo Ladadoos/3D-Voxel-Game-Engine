@@ -2,7 +2,7 @@
 { 
     class BlockDirt : Block
     {
-        public BlockDirt(int id) : base(id) { }
+        public BlockDirt(ushort id) : base(id) { }
 
         public override BlockState GetNewDefaultState()
         {

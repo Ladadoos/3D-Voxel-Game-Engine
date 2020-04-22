@@ -13,6 +13,14 @@
     {
       "Id": "eec7f234-8144-48e3-abc4-dde1ab085c4c",
       "Command": "mode=client ip=127.0.0.1 port=50000"
+    },
+    {
+      "Id": "21d753bc-acac-4315-9661-e129446bea33",
+      "Command": " start Minecraft.exe ('mode=clientserver','ip=127.0.0.1', 'port=50000')"
+    },
+    {
+      "Id": "95cd71ae-57ca-4610-a1e6-a3c6827fcf87",
+      "Command": " start Minecraft.exe ('mode=client','ip=127.0.0.1', 'port=50000')"
     }
   ]
 }

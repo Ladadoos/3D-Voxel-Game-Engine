@@ -2,7 +2,7 @@
 {
     class BlockSand : Block
     {
-        public BlockSand(int id) : base(id)
+        public BlockSand(ushort id) : base(id)
         {
         }
 

@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class NetBufferedStream
     {
-        public BufferedStream bufferedStream;
+        private BufferedStream bufferedStream;
 
         public NetBufferedStream(BufferedStream bufferedStream)
         {
@@ -18,36 +18,52 @@ namespace Minecraft
             {
                 bufferedStream.Flush();
                 return true;
-            }catch(Exception e)
+            } catch(Exception e)
             {
                 Logger.Error("Flushing failed: " + e.Message);
                 return false;
             }
         }
 
-        public void WriteInt32(int value)
+        public unsafe void WriteInt32(int value)
         {
-            byte[] bytes = DataConverter.Int32ToBytes(value);
-            bufferedStream.Write(bytes, 0, bytes.Length);
+            byte* pValue = (byte*)&value;
+            bufferedStream.WriteByte(pValue[0]);
+            bufferedStream.WriteByte(pValue[1]);
+            bufferedStream.WriteByte(pValue[2]);
+            bufferedStream.WriteByte(pValue[3]);
         }
 
         public void WriteFloat(float value)
         {
-            byte[] bytes = DataConverter.FloatToBytes(value);
+            //GetBytes(*(int*)&value)
+            byte[] bytes = BitConverter.GetBytes(value);
             bufferedStream.Write(bytes, 0, bytes.Length);
         }
 
-        public void WriteBool(bool value)
+        public unsafe void WriteBool(bool value)
         {
-            byte[] boolByte = new byte[] { value ? (byte)1 : (byte)0 };
-            bufferedStream.Write(boolByte, 0, 1);
+            bufferedStream.WriteByte(((byte*)&value)[0]);
+        }
+
+        public unsafe void WriteInt16(short value)
+        {
+            byte* pValue = (byte*)&value;
+            bufferedStream.WriteByte(pValue[0]);
+            bufferedStream.WriteByte(pValue[1]);
+        }
+
+        public unsafe void WriteUInt16(ushort value)
+        {
+            byte* pValue = (byte*)&value;
+            bufferedStream.WriteByte(pValue[0]);
+            bufferedStream.WriteByte(pValue[1]);
         }
 
         public void WriteUtf8String(string value)
         {
             byte[] messageBytes = DataConverter.StringUtf8ToBytes(value);
-            byte[] byteCount = DataConverter.Int32ToBytes(messageBytes.Length);
-            bufferedStream.Write(byteCount, 0, byteCount.Length);
+            WriteInt32(messageBytes.Length);
             bufferedStream.Write(messageBytes, 0, messageBytes.Length);
         }
 

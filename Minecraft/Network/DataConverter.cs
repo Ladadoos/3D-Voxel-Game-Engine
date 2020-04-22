@@ -19,36 +19,36 @@ namespace Minecraft
             return utf8.GetString(bytes);
         }
 
-        public static byte[] Int32ToBytes(int value)
+        public static ushort BytesToUInt16(byte[] bytes, int source)
         {
-            return BitConverter.GetBytes(value);
+            //Little endian
+            return (ushort)(bytes[source] | (bytes[source + 1] << 8));
         }
 
-        public static byte[] FloatToBytes(float value)
+        public static int BytesToInt32(byte[] bytes, int source)
         {
-            return BitConverter.GetBytes(value);
+            //Little endian
+            return (ushort)(bytes[source] | (bytes[source + 1] << 8) | (bytes[source + 1] << 16) | (bytes[source + 1] << 24));
         }
 
-        public static object ByteArrayToObject(byte[] byteArray)
+        public static unsafe float BytesToFloat(byte[] bytes, int source)
         {
-            using (var memStream = new MemoryStream())
-            {
-                var binForm = new BinaryFormatter();
-                memStream.Write(byteArray, 0, byteArray.Length);
-                memStream.Seek(0, SeekOrigin.Begin);
-                var obj = binForm.Deserialize(memStream);
-                return obj;
-            }
+            //Little endian
+            int value = BytesToInt32(bytes, source);
+            return *(float*)&value;
         }
 
-        public static byte[] ObjectToByteArray(object obj)
+        public static bool BytesToBool(byte[] bytes, int source)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (var ms = new MemoryStream())
-            {
-                bf.Serialize(ms, obj);
-                return ms.ToArray();
-            }
+            return bytes[source] == 0 ? false : true;
+        }
+
+        public static Vector3i BytesToVector3i(byte[] bytes, int source)
+        {
+            int x = BytesToInt32(bytes, source);
+            int y = BytesToInt32(bytes, source + 4);
+            int z = BytesToInt32(bytes, source + 8);
+            return new Vector3i(x, y, z);
         }
     }
 }

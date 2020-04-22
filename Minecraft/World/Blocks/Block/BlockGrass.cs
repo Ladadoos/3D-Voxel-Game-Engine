@@ -2,7 +2,7 @@
 {
     class BlockGrass : Block
     {
-        public BlockGrass(int id) : base(id) { }
+        public BlockGrass(ushort id) : base(id) { }
 
         public override BlockState GetNewDefaultState()
         {

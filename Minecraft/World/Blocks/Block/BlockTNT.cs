@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class BlockTNT : Block
     {
-        public BlockTNT(int id) : base(id)
+        public BlockTNT(ushort id) : base(id)
         {
             isTickable = true;
             isInteractable = true;

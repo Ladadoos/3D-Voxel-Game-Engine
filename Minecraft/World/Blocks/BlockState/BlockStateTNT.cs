@@ -1,18 +1,12 @@
-﻿using ProtoBuf;
-using System.IO;
+﻿using System.IO;
 
 namespace Minecraft
 {
-    [ProtoContract(SkipConstructor = true)]
     class BlockStateTNT : BlockState
     {
-        [ProtoMember(1)]
         public float elapsedSecondsSinceTrigger;
-        [ProtoMember(2)]
         public bool triggeredByTnt;
-        [ProtoMember(3)]
         public bool triggered;
-        [ProtoMember(4)]
         public Vector3i blockPos;
 
         public override Block GetBlock()
@@ -34,6 +28,18 @@ namespace Minecraft
             elapsedSecondsSinceTrigger = reader.ReadSingle();
             triggeredByTnt = reader.ReadBoolean();
             triggered = reader.ReadBoolean();
+        }
+
+        public override int ByteSize()
+        {
+            return 4 + 1 + 1 + 12;
+        }
+
+        public override void ExtractFromByteStream(byte[] bytes, int source)
+        {
+            elapsedSecondsSinceTrigger = DataConverter.BytesToFloat(bytes, source);
+            triggeredByTnt = DataConverter.BytesToBool(bytes, source + 1);
+            triggered = DataConverter.BytesToBool(bytes, source + 2);
         }
 
         public override string ToString()

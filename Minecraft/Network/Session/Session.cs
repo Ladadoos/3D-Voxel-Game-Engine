@@ -31,7 +31,7 @@
 
             playerSettings = new PlayerSettings
             {
-                viewDistance = 4
+                viewDistance = 2
             };
             state = SessionState.AwaitingAcceptance;
         }

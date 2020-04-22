@@ -1,17 +1,11 @@
 ﻿using OpenTK;
 
-using ProtoBuf;
-
 namespace Minecraft
 {
-    [ProtoContract]
     struct Vector3i
     {
-        [ProtoMember(1)]
         public int X;
-        [ProtoMember(2)]
         public int Y;
-        [ProtoMember(3)]
         public int Z;
 
         public Vector3i(int X, int Y, int Z)

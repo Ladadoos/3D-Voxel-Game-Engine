@@ -4,12 +4,12 @@ namespace Minecraft
 {
     abstract class Block
     {
-        public int id { get; private set; }
+        public ushort id { get; private set; }
         public bool isTickable { get; protected set; }
         public bool isInteractable { get; protected set; }
         protected readonly AxisAlignedBox[] emptyAABB = new AxisAlignedBox[0];
 
-        public Block(int id)
+        public Block(ushort id)
         {
             this.id = id;
         }

@@ -18,9 +18,7 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(blockPos.X);
-            bufferedStream.WriteInt32(blockPos.Y);
-            bufferedStream.WriteInt32(blockPos.Z);
+            bufferedStream.WriteVector3i(blockPos);
             blockState.ToStream(bufferedStream);
         }
 

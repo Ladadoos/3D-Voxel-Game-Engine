@@ -1,8 +1,5 @@
-﻿using ProtoBuf;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
-    [ProtoContract(SkipConstructor = true)]
     class BlockStateSand : BlockState
     {
         public override Block GetBlock()

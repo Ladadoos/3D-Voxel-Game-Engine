@@ -2,7 +2,7 @@
 {
     class BlockFlower : Block
     {
-        public BlockFlower(int id) : base(id) { }
+        public BlockFlower(ushort id) : base(id) { }
 
         public override BlockState GetNewDefaultState()
         {

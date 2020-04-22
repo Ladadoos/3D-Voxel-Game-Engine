@@ -2,7 +2,7 @@
 {
     class BlockAir : Block
     {
-        public BlockAir(int id) : base(id) { }
+        public BlockAir(ushort id) : base(id) { }
 
         public override BlockState GetNewDefaultState()
         {

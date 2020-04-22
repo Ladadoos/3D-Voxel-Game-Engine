@@ -2,7 +2,7 @@
 {
     class BlockStone : Block
     {
-        public BlockStone(int id) : base(id)
+        public BlockStone(ushort id) : base(id)
         {
             isInteractable = true;
         }

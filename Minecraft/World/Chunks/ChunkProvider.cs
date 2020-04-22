@@ -63,7 +63,7 @@ namespace Minecraft
                     }
                     world.AddPlayerPresenceToChunk(chunk);
 
-                    if (world.game.server.isOpen)
+                    if(world.game.server.isOpen && !world.game.server.IsHost(session))
                     {
                         session.WritePacket(new ChunkDataPacket(chunk));
                     }
