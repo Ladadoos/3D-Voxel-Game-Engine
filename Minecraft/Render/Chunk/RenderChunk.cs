@@ -14,11 +14,11 @@ namespace Minecraft
             gridPosition = new Vector2(gridPositionX, gridPositionZ);
         }
 
-        public void OnCloseGame()
+        public void CleanUp()
         {
             if(hardBlocksModel != null)
             {
-                hardBlocksModel.OnCloseGame();
+                hardBlocksModel.CleanUp();
             }
         }
     }

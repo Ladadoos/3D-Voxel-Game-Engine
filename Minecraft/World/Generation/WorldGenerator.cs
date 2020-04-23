@@ -52,11 +52,11 @@
                     double temperature = temperatureFunction.GetValuePositive(temperatureXOffset, temperatureYOffset);
                     double moisture = moistureFunction.GetValuePositive(moistureXOffset, moistureYOffset);
 
-                    WeightedBiome[] biomes = biomeProvider.GetBiomeMemberships(temperature, moisture);
+                    BiomeMembership[] biomes = biomeProvider.GetBiomeMemberships(temperature, moisture);
                     double biomeHeightAddon = 0;
 
-                    WeightedBiome bestBiome = biomes[0];
-                    foreach (WeightedBiome wBiome in biomes)
+                    BiomeMembership bestBiome = biomes[0];
+                    foreach (BiomeMembership wBiome in biomes)
                     {
                         if (bestBiome.percentage < wBiome.percentage)
                         {

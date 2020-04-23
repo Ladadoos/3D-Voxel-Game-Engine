@@ -5,7 +5,8 @@ namespace Minecraft
 {
     class AxisAlignedBox
     {
-        public Vector3 min, max;
+        public Vector3 min { get; private set; }
+        public Vector3 max { get; private set; }
 
         public AxisAlignedBox(Vector3 min, Vector3 max)
         {

@@ -69,9 +69,9 @@ namespace Minecraft
             RenderWireframeAt(lineWidth, translation, scale);
         }
 
-        public void OnCloseGame()
+        public void CleanUp()
         {
-            aabbCube.OnCloseGame();
+            aabbCube.CleanUp();
         }
     }
 }

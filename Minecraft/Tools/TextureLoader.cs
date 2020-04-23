@@ -10,7 +10,7 @@ namespace Minecraft
     {
         private static List<int> textures = new List<int>();
 
-        public static void OnCloseGame()
+        public static void CleanUp()
         {
             foreach (int texture in textures)
             {

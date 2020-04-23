@@ -56,7 +56,7 @@ namespace Minecraft
                 session.state = SessionState.Closed;
                 return;
             }
-            int playerId = game.server.world.entityIdTracker.GenerateId();
+            int playerId = game.server.world.GenerateEntityId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
             ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
             session.AssignPlayer(player);

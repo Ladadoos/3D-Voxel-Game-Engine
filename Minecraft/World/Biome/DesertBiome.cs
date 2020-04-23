@@ -2,7 +2,7 @@
 {
     class DesertBiome : Biome
     {
-        private Noise2DPerlinOctave noiseOctave = new Noise2DPerlinOctave(4);
+        private Noise2DPerlinOctave noiseOctave = new Noise2DPerlinOctave(1);
         private double terrainDetail = 0.0005D;
         private double heightVariation = 16;
 

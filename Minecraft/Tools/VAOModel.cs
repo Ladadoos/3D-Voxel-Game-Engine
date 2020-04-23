@@ -55,7 +55,7 @@ namespace Minecraft
             UnbindVAO();
         }
 
-        public void OnCloseGame()
+        public void CleanUp()
         {
             foreach (int buffer in buffers)
             {

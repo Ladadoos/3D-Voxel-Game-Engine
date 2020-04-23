@@ -8,8 +8,7 @@ namespace Minecraft
         public GameWindow window { get; private set; }
 
         public static Input input { get; private set; }
-        public static Random randomizer { get; private set; }
-
+    
         public MasterRenderer masterRenderer { get; private set; }
         public ClientPlayer player { get; private set; }
         public FPSCounter averageFpsCounter { get; private set; }
@@ -18,7 +17,7 @@ namespace Minecraft
         public Server server { get; private set; }
         public bool isServer { get; private set; }
         public RunMode mode { get; private set; }
-        public float currentFps;
+        public float currentFps { get; private set; }
 
         private StartArgs startArgs;
 
@@ -33,12 +32,12 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.window = window;
+            window.VSync = OpenTK.VSyncMode.Off;
+            window.CursorVisible = false;
 
             Blocks.RegisterBlocks();
-            randomizer = new Random();
             input = new Input();
             averageFpsCounter = new FPSCounter();
-            window.VSync = OpenTK.VSyncMode.Off;
 
             if (mode == RunMode.ClientServer)
             {
@@ -58,8 +57,6 @@ namespace Minecraft
                 server = new Server(this, true);
                 server.Start(startArgs.ip, startArgs.port);
                 server.world.GenerateSpawnArea();
-
-                window.VSync = OpenTK.VSyncMode.On;
             } else{
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);
@@ -73,9 +70,9 @@ namespace Minecraft
 
         public void OnCloseGame()
         {
-            if (mode == RunMode.ClientServer)
+            if (mode != RunMode.Server)
             {
-                masterRenderer.OnCloseGame();
+                masterRenderer.CleanUp();
             } else
             {
 
@@ -84,6 +81,8 @@ namespace Minecraft
 
         public void OnUpdateGame(double deltaTime)
         {
+            currentFps = (int)(1.0F / deltaTime);
+
             float elapsedSeconds = (float)deltaTime;
             elapsedSeconds = elapsedSeconds <= 0 ? 0.0001f : elapsedSeconds;
 

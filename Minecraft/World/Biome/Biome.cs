@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     abstract class Biome
     {

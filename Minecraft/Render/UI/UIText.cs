@@ -38,7 +38,7 @@ namespace Minecraft
             float[] vertices = meshBuilder.GetVerticesForText(this);
             float[] textures = meshBuilder.GetTexturesForText(this);
             int indicesCount = vertices.Length / 3;
-            vaoModel?.OnCloseGame();
+            vaoModel?.CleanUp();
             vaoModel = new VAOModel(vertices, textures, indicesCount);
         }
 

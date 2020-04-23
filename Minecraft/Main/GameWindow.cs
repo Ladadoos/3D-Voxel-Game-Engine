@@ -41,9 +41,6 @@ namespace Minecraft
 
         protected override void OnLoad(EventArgs e)
         {
-            CursorVisible = false;
-            VSync = VSyncMode.Off;
-
             game.OnStartGame(this);
         }
 
@@ -53,8 +50,6 @@ namespace Minecraft
             {
                 Exit();
             }
-
-            game.currentFps = (int)(1f / e.Time);
             game.OnUpdateGame(e.Time);
         }
 

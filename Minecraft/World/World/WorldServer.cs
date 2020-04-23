@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class WorldServer : World
     {
-        public EntityIdTracker entityIdTracker = new EntityIdTracker();
+        private EntityIdTracker entityIdTracker = new EntityIdTracker();
         private WorldGenerator worldGenerator;
 
         public WorldServer(Game game) : base(game)
@@ -22,6 +22,8 @@ namespace Minecraft
         {
             return worldGenerator.GenerateBlocksForChunkAt(gridX, gridZ);
         }
+
+        public int GenerateEntityId() => entityIdTracker.GenerateId();
 
         public void GenerateSpawnArea()
         {

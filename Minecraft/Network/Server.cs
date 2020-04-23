@@ -86,6 +86,7 @@ namespace Minecraft
             isRunning = true;
             while (isRunning)
             {
+                Thread.Sleep(100);
                 TcpClient client = tcpServer.AcceptTcpClient();
                 lock (newJoinsLock)
                 {

@@ -209,7 +209,7 @@ namespace Minecraft
                 if (toProcess.Count > 0)
                 {
                     ChunkRemeshLayout chunkMesh = toProcess.Dequeue();
-                    chunkMesh.renderChunk.hardBlocksModel?.OnCloseGame();
+                    chunkMesh.renderChunk.hardBlocksModel?.CleanUp();
                     chunkMesh.renderChunk.hardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
                 }
             }
@@ -301,15 +301,15 @@ namespace Minecraft
             entityShader.Stop();
         }
 
-        public void OnCloseGame()
+        public void CleanUp()
         {
-            basicShader.OnCloseGame();
-            TextureLoader.OnCloseGame();
-            wireframeRenderer.OnCloseGame();
+            basicShader.CleanUp();
+            TextureLoader.CleanUp();
+            wireframeRenderer.CleanUp();
 
             foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
-                chunkToRender.Value.OnCloseGame();
+                chunkToRender.Value.CleanUp();
             }
         }
 

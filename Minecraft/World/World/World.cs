@@ -47,7 +47,7 @@ namespace Minecraft
         {
             if(!loadedEntities.TryGetValue(entityId, out Entity despawnedEntity))
             {
-                return false;
+                throw new Exception("Despawning unit that is not alive with ID " + entityId);
             }
 
             if (loadedEntities.Remove(entityId))
@@ -130,12 +130,10 @@ namespace Minecraft
 
             Tick(deltaTime);
 
-            foreach(Vector3i toRemoveBlock in toRemoveBlocks)
+            while(toRemoveBlocks.Count > 0)
             {
-                RemoveBlockAt(toRemoveBlock);
+                RemoveBlockAt(toRemoveBlocks.Dequeue());
             }
-            toRemoveBlocks.Clear();
-
             while(toRemoveEntities.Count > 0)
             {
                 loadedEntities.Remove(toRemoveEntities.Dequeue().id);
@@ -149,7 +147,7 @@ namespace Minecraft
             {
                 foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
                 {
-                    loadedChunk.Value.Tick(this, elapsedMillisecondsSinceLastTick);
+                    loadedChunk.Value.Tick(elapsedMillisecondsSinceLastTick, this);
                 }
 
                 foreach (Entity entity in loadedEntities.Values)

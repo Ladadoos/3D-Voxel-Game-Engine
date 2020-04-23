@@ -30,16 +30,13 @@ namespace Minecraft
             triggered = reader.ReadBoolean();
         }
 
-        public override int ByteSize()
-        {
-            return 4 + 1 + 1 + 12;
-        }
-
+        public override int PayloadSize() => 4 + 1 + 1;
+ 
         public override void ExtractFromByteStream(byte[] bytes, int source)
         {
             elapsedSecondsSinceTrigger = DataConverter.BytesToFloat(bytes, source);
-            triggeredByTnt = DataConverter.BytesToBool(bytes, source + 1);
-            triggered = DataConverter.BytesToBool(bytes, source + 2);
+            triggeredByTnt = DataConverter.BytesToBool(bytes, source + 4);
+            triggered = DataConverter.BytesToBool(bytes, source + 5);
         }
 
         public override string ToString()

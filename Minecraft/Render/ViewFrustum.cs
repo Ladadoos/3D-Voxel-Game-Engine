@@ -6,7 +6,7 @@ namespace Minecraft
     class ViewFrustum
     {
         //Implementation: https://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
-        //Does not work perfectly. Should be looked at later.
+        //TODO Aspect ratio does not work perfectly. Should be looked at later.
 
         struct FrustumPlane
         {

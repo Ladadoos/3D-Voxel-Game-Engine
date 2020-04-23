@@ -4,11 +4,11 @@ namespace Minecraft
 {
     class Ray
     {
-        public Vector3 origin;
-        public Vector3 direction;
-        public float distanceToIntersection;
+        public Vector3 origin { get; private set; }
+        public Vector3 direction { get; private set; }
+        public float distanceToIntersection { get; private set; }
 
-        public Vector3 directionFrac;
+        public Vector3 directionFrac { get; private set; }
 
         public Ray(Vector3 origin, Vector3 direction)
         {

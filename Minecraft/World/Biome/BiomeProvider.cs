@@ -2,45 +2,41 @@
 
 namespace Minecraft
 {
-    struct WeightedBiome
-    {
-        public double percentage;
-        public Biome biome;
-    };
-
     class BiomeProvider
     {
         private double[] temperatureCache;
+        private BiomeMembership[] biomeMembershipCache;
         private Biome[] registeredBiomes;
 
         public BiomeProvider(Biome[] registeredBiomes)
         {
             this.registeredBiomes = registeredBiomes;
             temperatureCache = new double[registeredBiomes.Length];
+            biomeMembershipCache = new BiomeMembership[registeredBiomes.Length];
         }
 
-        public WeightedBiome[] GetBiomeMemberships(double temperature, double moisture)
+        public BiomeMembership[] GetBiomeMemberships(double temperature, double moisture)
         {
             double sum = 0;
             for (int i = 0; i < registeredBiomes.Length; i++)
             {
                 double dtTemp = (Math.Abs(registeredBiomes[i].temperature - temperature) / temperature);
                 double dtMoist = (Math.Abs(registeredBiomes[i].moisture - moisture) / moisture);
-                double dt = 1 / (Maths.Pow((dtTemp + dtMoist), 3));
+                double sumDt = dtTemp + dtMoist;
+                double dt = 1 / (sumDt * sumDt * sumDt);
                 temperatureCache[i] = dt;
                 sum += dt;
             }
 
-            WeightedBiome[] weightedBiomes = new WeightedBiome[registeredBiomes.Length];
             for (int i = 0; i < registeredBiomes.Length; i++)
             {
-                weightedBiomes[i] = new WeightedBiome()
+                biomeMembershipCache[i] = new BiomeMembership()
                 {
                     percentage = temperatureCache[i] / sum,
                     biome = registeredBiomes[i]
                 };
             }
-            return weightedBiomes;
+            return biomeMembershipCache;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace Minecraft
 
         public void AdjustToWindowSize(int screenWidth, int screenHeight)
         {
-            OnCloseGame();
+            CleanUp();
             CreateFBO(screenWidth, screenHeight);
         }
 
@@ -77,7 +77,7 @@ namespace Minecraft
             GL.Ext.BindFramebuffer(FramebufferTarget.FramebufferExt, 0);
         }
 
-        public void OnCloseGame()
+        public void CleanUp()
         {
             GL.DeleteTexture(colorTexture);
             GL.DeleteTexture(normalDepthTexture);

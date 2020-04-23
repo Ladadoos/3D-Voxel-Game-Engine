@@ -2,6 +2,11 @@
 
 namespace Minecraft
 {
+    public enum LogLevel
+    {
+        Packet, Info, Warn, Error
+    };
+
     class Logger
     {
         private static LogLevel logLevel = LogLevel.Packet;
@@ -48,9 +53,4 @@ namespace Minecraft
             }
         }
     }
-
-    public enum LogLevel
-    {
-        Packet, Info, Warn, Error
-    };
 }

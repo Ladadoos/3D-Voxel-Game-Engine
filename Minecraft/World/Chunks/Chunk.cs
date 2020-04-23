@@ -4,8 +4,8 @@ namespace Minecraft
 {
     class Chunk
     {
-        public Dictionary<Vector3i, BlockState> tickableBlocks = new Dictionary<Vector3i, BlockState>();
-        public Section[] sections = new Section[Constants.SECTIONS_IN_CHUNKS];
+        public Dictionary<Vector3i, BlockState> tickableBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
+        public Section[] sections { get; set; } = new Section[Constants.SECTIONS_IN_CHUNKS];
         public int gridX { get; private set; }
         public int gridZ { get; private set; }
 
@@ -15,26 +15,7 @@ namespace Minecraft
             this.gridZ = gridZ;
         }
 
-        public Chunk DeepClone()
-        {
-            Chunk newChunk = new Chunk(gridX, gridZ);
-            Section[] newSections = new Section[Constants.SECTIONS_IN_CHUNKS];
-
-            for (int i = 0; i < 16; i++)
-            {
-                newSections[i] = sections[i]?.DeepCopy();
-                if (newSections[i] != null)
-                {
-                    newSections[i].gridX = gridX;
-                    newSections[i].gridZ = gridZ;
-                }
-
-            }
-            newChunk.sections = newSections;
-            return newChunk;
-        }
-
-        public void Tick(World world, float deltaTime)
+        public void Tick(float deltaTime, World world)
         {
             foreach(BlockState state in tickableBlocks.Values)
             {

@@ -41,20 +41,6 @@ namespace Minecraft
             return (float)(angle * (180.0 / Math.PI));
         }
 
-        public static double Pow(double num, int exp)
-        {
-            double result = 1.0;
-            while (exp > 0)
-            {
-                if (exp % 2 == 1)
-                    result *= num;
-                exp >>= 1;
-                num *= num;
-            }
-
-            return result;
-        }
-
         public static Vector3 Lerp(Vector3 from, Vector3 to, float t)
         {
             return from + (to - from) * t;

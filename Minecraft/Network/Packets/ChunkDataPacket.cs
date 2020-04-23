@@ -68,12 +68,10 @@
                         for(int z = 0; z < 16; z++)
                         {
                             BlockState state = section.GetBlockAt(x, y, z);
-                            if(state == null)
+                            size += 2;
+                            if(state != null)
                             {
-                                size += 2;
-                            } else
-                            {
-                                size += state.ByteSize();
+                                size += state.PayloadSize();
                             }
                         }
                     }
