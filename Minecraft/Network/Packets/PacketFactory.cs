@@ -45,6 +45,7 @@ namespace Minecraft
                         chunk.sections = new Section[Constants.SECTIONS_IN_CHUNKS];
                         
                         byte[] chunkBytes = reader.ReadBytes(totalSize);
+                        
                         int pos = 0;
                         for(int i = 0; i < 16; i++)
                         {
@@ -60,13 +61,15 @@ namespace Minecraft
                                         for(int z = 0; z < 16; z++)
                                         {        
                                             ushort blockId = DataConverter.BytesToUInt16(chunkBytes, pos);
-                                            
                                             if(blockId != 0)
                                             {
                                                 BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
                                                 pos += blockState.ByteSize();
                                                 blockState.ExtractFromByteStream(chunkBytes, pos);
                                                 section.AddBlock(x, y, z, blockState);
+                                            } else
+                                            {
+                                                pos += 2;
                                             }
                                         }
                                     }
