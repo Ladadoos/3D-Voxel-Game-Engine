@@ -1,5 +1,29 @@
-﻿namespace Minecraft
+﻿using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+namespace Minecraft
 {
+    struct GenerateChunkRequest
+    {
+        public Vector2 gridPosition;
+        public World world;
+        public Action<GenerateChunkOutput> callback;
+    }
+
+    struct GenerateChunkOutput
+    {
+        public Chunk chunk;
+        public World world;
+    }
+
+    struct GenerateChunkRequestOutgoing
+    {
+        public Vector2 gridPosition;
+        public World world;
+    }
+
     class WorldGenerator
     {
         private MountainBiome mountainBiome = new MountainBiome();
@@ -8,7 +32,7 @@
 
         private double temperatureDetail = 0.0075D;
         private Noise2DPerlin temperatureFunction = new Noise2DPerlin();
-
+         
         private double moistureDetail = 0.0075D;
         private Noise2DPerlin moistureFunction = new Noise2DPerlin(25555);
 
@@ -17,6 +41,11 @@
         private Biome[] registeredBiomes;
         private const int activeBiomes = 3;
         private int seaLevel = 100;
+
+        private object generationLock = new object();
+        private Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();
+        private Queue<GenerateChunkRequest> chunkGenerationOrder = new Queue<GenerateChunkRequest>();
+        private Thread terrainGeneratorThread;
 
         public WorldGenerator()
         {
@@ -28,9 +57,75 @@
             };
 
             biomeProvider = new BiomeProvider(registeredBiomes);
+
+            terrainGeneratorThread = new Thread(ChunkGeneratorThread);
+            terrainGeneratorThread.IsBackground = true;
+            terrainGeneratorThread.Start();
         }
 
-        public Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
+        public void AddChunkGenerationRequest(GenerateChunkRequest request)
+        {
+            lock(generationLock)
+            {
+                var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
+                if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> requests))
+                {
+                    requests.Add(request);
+                } else
+                {
+                    chunkGenerationRequests.Add(tuple, new List<GenerateChunkRequest>() { request });
+                }
+                chunkGenerationOrder.Enqueue(request);
+            }
+        }
+
+        private void ChunkGeneratorThread()
+        {
+            List<Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>> generationOutput = new List<Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>>();
+
+            while(true)
+            {
+                Thread.Sleep(5);
+
+                bool generated = false;             
+                lock(generationLock)
+                {
+                    if(chunkGenerationOrder.Count > 0)
+                    {
+                        GenerateChunkRequest request = chunkGenerationOrder.Dequeue();
+
+                        var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
+                        if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> allRequests))
+                        {
+                            Chunk chunk = GenerateBlocksForChunkAt((int)request.gridPosition.X, (int)request.gridPosition.Y);
+
+                            foreach(var awaitingRequest in allRequests)
+                            {
+                                GenerateChunkOutput answer = new GenerateChunkOutput()
+                                {
+                                    chunk = chunk,
+                                    world = request.world
+                                };
+                                generationOutput.Add(new Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>(answer, awaitingRequest.callback));
+                            }
+                            chunkGenerationRequests.Remove(tuple);
+                            generated = true;
+                        }
+                    }
+                }
+
+                if(generated)
+                {
+                    foreach(var outputEntry in generationOutput)
+                    {
+                        outputEntry.Item2.Invoke(outputEntry.Item1);
+                    }
+                    generationOutput.Clear();
+                }
+            }
+        }
+
+        private Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
         {
             Chunk generatedChunk = new Chunk(chunkX, chunkY);
 

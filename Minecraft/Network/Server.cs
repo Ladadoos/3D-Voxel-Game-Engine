@@ -184,7 +184,14 @@ namespace Minecraft
 
             foreach (ServerSession client in clients)
             {
-                if (client.state == SessionState.Closed || !client.NetDataAvailable())
+                if (client.state == SessionState.Closed)
+                {
+                    continue;
+                }
+
+                client.Update();
+
+                if(!client.NetDataAvailable())
                 {
                     continue;
                 }

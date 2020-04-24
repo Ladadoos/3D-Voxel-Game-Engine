@@ -9,5 +9,10 @@
         {
             chunkProvider = new ChunkProvider(this, playerSettings);
         }
+
+        public void Update()
+        {
+            chunkProvider.Update();
+        }
     }
 }

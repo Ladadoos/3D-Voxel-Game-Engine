@@ -1,5 +1,4 @@
-﻿using System;
-using OpenTK.Graphics.OpenGL;
+﻿using OpenTK.Graphics.OpenGL;
 
 namespace Minecraft
 {
@@ -46,7 +45,6 @@ namespace Minecraft
 
                 server = new Server(this, true);
                 server.Start(startArgs.ip, startArgs.port);
-                server.world.GenerateSpawnArea();
 
                 world = new WorldClient(this);
 
@@ -56,7 +54,6 @@ namespace Minecraft
             {
                 server = new Server(this, true);
                 server.Start(startArgs.ip, startArgs.port);
-                server.world.GenerateSpawnArea();
             } else{
                 player = new ClientPlayer(this);
                 masterRenderer = new MasterRenderer(this);

@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 using System.Collections.Generic;
 
 namespace Minecraft
@@ -8,6 +9,10 @@ namespace Minecraft
         private ServerSession session;
         private PlayerSettings playerSettings;
         private HashSet<Vector2> currentlyVisibleChunks = new HashSet<Vector2>();
+
+        private object chunkRetrievalLock = new object();
+        private Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();
+        private HashSet<GenerateChunkRequestOutgoing> outgoingChunkRequests = new HashSet<GenerateChunkRequestOutgoing>(); 
 
         public ChunkProvider(ServerSession session, PlayerSettings playerSettings)
         {
@@ -30,7 +35,7 @@ namespace Minecraft
         private void OnPlayerChunkChanged(World world, Vector2 playerGridPos)
         {
             HashSet<Vector2> newVisibleChunks = GetCurrentlyVisibleChunks(playerGridPos);
-            LoadNewlyVisibleChunks(world, newVisibleChunks);
+            RequestToLoadNewlyVisibleChunks(world, newVisibleChunks);
             UnloadNoLongerVisibleChunks(world, newVisibleChunks);
             currentlyVisibleChunks = newVisibleChunks;
         }
@@ -51,22 +56,62 @@ namespace Minecraft
             return visibleChunks;
         }
 
-        private void LoadNewlyVisibleChunks(World world, HashSet<Vector2> newVisibleChunks)
+        private void RequestToLoadNewlyVisibleChunks(World world, HashSet<Vector2> newVisibleChunks)
         {
             foreach (Vector2 newChunkGridPos in newVisibleChunks)
             {
                 if (!currentlyVisibleChunks.Contains(newChunkGridPos))
                 {
-                    if (!world.loadedChunks.TryGetValue(newChunkGridPos, out Chunk chunk))
+                    if(!world.loadedChunks.TryGetValue(newChunkGridPos, out Chunk chunk))
                     {
-                        chunk = ((WorldServer)world).GenerateBlocksForChunk((int)newChunkGridPos.X, (int)newChunkGridPos.Y);
-                    }
-                    world.AddPlayerPresenceToChunk(chunk);
+                        GenerateChunkRequestOutgoing request = new GenerateChunkRequestOutgoing
+                        {
+                            world = world,
+                            gridPosition = newChunkGridPos
+                        };
 
-                    if(world.game.server.isOpen && !world.game.server.IsHost(session))
+                        bool requested = false;
+                        lock(chunkRetrievalLock)
+                        {
+                            if(!outgoingChunkRequests.Contains(request))
+                            {
+                                outgoingChunkRequests.Add(request);
+                                requested = true;
+                            }
+                        }
+
+                        if(requested)
+                        {
+                            ((WorldServer)world).RequestGenerationOfChunk(newChunkGridPos, ChunkRetrievedCallback);
+                        }
+                    } else
                     {
-                        session.WritePacket(new ChunkDataPacket(chunk));
+                        world.AddPlayerPresenceToChunk(chunk);
+                        if(world.game.server.isOpen)
+                        {
+                            session.WritePacket(new ChunkDataPacket(chunk));
+                        }
                     }
+                }
+            }
+        }
+
+        private void ChunkRetrievedCallback(GenerateChunkOutput answer)
+        {
+            lock(chunkRetrievalLock)
+            {
+                receivedChunkData.Enqueue(answer);
+
+                Vector2 chunkPosition = new Vector2(answer.chunk.gridX, answer.chunk.gridZ);
+                GenerateChunkRequestOutgoing request = new GenerateChunkRequestOutgoing
+                {
+                    world = answer.world,
+                    gridPosition = chunkPosition
+                };
+
+                if(!outgoingChunkRequests.Remove(request))
+                {
+                    throw new InvalidOperationException("Removing entry for an outgoing request that isn't present!");
                 }
             }
         }
@@ -81,15 +126,42 @@ namespace Minecraft
                     if (world.loadedChunks.TryGetValue(prevChunkGridPos, out Chunk chunk))
                     {
                         world.RemovePlayerPresenceOfChunk(chunk);
-                    } else
-                    {
-                        Logger.Error("This should never happen");
                     }
                     toUnloadChunks.Add(prevChunkGridPos);
                 }
             }
 
             session.WritePacket(new ChunkUnloadPacket(toUnloadChunks));
+        }
+
+        public void Update()
+        {
+            bool hasEntry = false;
+            GenerateChunkOutput outputEntry = new GenerateChunkOutput();
+            lock(chunkRetrievalLock)
+            {
+                if(receivedChunkData.Count > 0)
+                {
+                    outputEntry = receivedChunkData.Dequeue();
+                    hasEntry = true;
+                }
+            }
+
+            if(hasEntry)
+            {
+                World world = outputEntry.world;
+                Chunk chunk = outputEntry.chunk;
+
+                Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
+                if(currentlyVisibleChunks.Contains(chunkPosition))
+                {
+                    world.AddPlayerPresenceToChunk(chunk);
+                    if(world.game.server.isOpen)
+                    {
+                        session.WritePacket(new ChunkDataPacket(chunk));
+                    }
+                }
+            }
         }
     }
 }
