@@ -307,9 +307,12 @@ namespace Minecraft
             TextureLoader.CleanUp();
             wireframeRenderer.CleanUp();
 
-            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
+            lock(meshLock)
             {
-                chunkToRender.Value.CleanUp();
+                foreach(KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
+                {
+                    chunkToRender.Value.CleanUp();
+                }
             }
         }
 
