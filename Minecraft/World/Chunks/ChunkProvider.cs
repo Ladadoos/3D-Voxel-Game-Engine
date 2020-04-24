@@ -44,13 +44,26 @@ namespace Minecraft
         {
             HashSet<Vector2> visibleChunks = new HashSet<Vector2>();
 
-            int viewDistance = playerSettings.viewDistance;
-            for (int x = -viewDistance; x <= viewDistance; x++)
+            int dist = playerSettings.viewDistance;
+            int x = 0;
+            int z = 0;
+            int dx = 0;
+            int dy = -1;
+            int t = dist;
+            for(int i = 0; i < dist * dist; i++)
             {
-                for (int z = -viewDistance; z <= viewDistance; z++)
+                if(-dist/2 < x && x <= dist / 2 && -dist/2 < z && z <= dist/2)
                 {
                     visibleChunks.Add(playerGridPosition + new Vector2(x, z));
                 }
+                if(x == z || (x < 0 && x == -z) || (x > 0 && x == 1 - z))
+                {
+                    t = dx;
+                    dx = -dy;
+                    dy = t;
+                }
+                x += dx;
+                z += dy;
             }
 
             return visibleChunks;
