@@ -34,11 +34,9 @@ namespace Minecraft
             bufferedStream.WriteByte(pValue[3]);
         }
 
-        public void WriteFloat(float value)
+        public unsafe void WriteFloat(float value)
         {
-            //GetBytes(*(int*)&value)
-            byte[] bytes = BitConverter.GetBytes(value);
-            bufferedStream.Write(bytes, 0, bytes.Length);
+            WriteInt32(*(int*)&value);
         }
 
         public unsafe void WriteBool(bool value)
