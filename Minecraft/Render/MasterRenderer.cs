@@ -17,7 +17,6 @@ namespace Minecraft
 
     class MasterRenderer
     {
-
         struct ChunkRemeshLayout
         {
             public RenderChunk renderChunk;
@@ -73,7 +72,7 @@ namespace Minecraft
             EnableDepthTest();
             EnableCulling();
 
-            Thread meshThread = new Thread(MeshGenerator);
+            Thread meshThread = new Thread(MeshGeneratorThread);
             meshThread.IsBackground = true;
             meshThread.Start();
         }
@@ -86,7 +85,7 @@ namespace Minecraft
             }
             camera.OnProjectionChangedHandler += OnPlayerCameraProjectionChanged;
             cameraController.ControlCamera(camera);
-            UploadProjectionMatrix();
+            UploadActiveCameraProjectionMatrix();
         }
 
         public Camera GetActiveCamera() => cameraController.camera;
@@ -165,9 +164,9 @@ namespace Minecraft
             }
         }
 
-        private Queue<ChunkRemeshLayout> toProcess = new Queue<ChunkRemeshLayout>();
+        private Queue<ChunkRemeshLayout> avaiableChunkMeshes = new Queue<ChunkRemeshLayout>();
         private object meshLock = new object();
-        private void MeshGenerator()
+        private void MeshGeneratorThread()
         {
             while (true)
             {
@@ -175,7 +174,7 @@ namespace Minecraft
 
                 lock (meshLock)
                 {
-                    Chunk toRemove = null;
+                    Chunk remeshedChunk = null;
                     foreach (Chunk chunk in toRemeshChunks)
                     {
                         Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
@@ -186,19 +185,19 @@ namespace Minecraft
                             toRenderChunks.Add(gridPosition, renderChunk);
                         }
 
-                        toProcess.Enqueue(new ChunkRemeshLayout()
+                        avaiableChunkMeshes.Enqueue(new ChunkRemeshLayout()
                         {
                             renderChunk = renderChunk,
                             chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
                         });
 
-                        toRemove = chunk;
+                        remeshedChunk = chunk;
                         break;
                     }
 
-                    if(toRemove != null)
+                    if(remeshedChunk != null)
                     {
-                        toRemeshChunks.Remove(toRemove);
+                        toRemeshChunks.Remove(remeshedChunk);
                     }
                 }
             }
@@ -206,16 +205,29 @@ namespace Minecraft
 
         public void EndFrameUpdate(World world)
         {
-            lock (meshLock)
+            RemeshChunkIfMeshAvailable();
+            cameraController.Update();
+        }
+
+        private void RemeshChunkIfMeshAvailable()
+        {
+            bool foundChunkToRemesh = false;
+            ChunkRemeshLayout chunkMesh = new ChunkRemeshLayout();
+
+            lock(meshLock)
             {
-                if (toProcess.Count > 0)
+                if(avaiableChunkMeshes.Count > 0)
                 {
-                    ChunkRemeshLayout chunkMesh = toProcess.Dequeue();
-                    chunkMesh.renderChunk.hardBlocksModel?.CleanUp();
-                    chunkMesh.renderChunk.hardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+                    chunkMesh = avaiableChunkMeshes.Dequeue();
+                    foundChunkToRemesh = true;
                 }
             }
-            cameraController.Update();
+
+            if(foundChunkToRemesh)
+            {
+                chunkMesh.renderChunk.hardBlocksModel?.CleanUp();
+                chunkMesh.renderChunk.hardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+            }
         }
 
         public void OnChunkLoaded(World world, Chunk chunk)
@@ -291,15 +303,15 @@ namespace Minecraft
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)
         {
             screenQuad.AdjustToWindowSize(pInfo.windowWidth, pInfo.windowHeight);
-            UploadProjectionMatrix();
+            UploadActiveCameraProjectionMatrix();
         }
 
-        private void UploadProjectionMatrix()
+        private void UploadActiveCameraProjectionMatrix()
         {
             basicShader.Start();
-            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
+            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, GetActiveCamera().currentProjectionMatrix);
             entityShader.Start();
-            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
+            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, GetActiveCamera().currentProjectionMatrix);
             entityShader.Stop();
         }
 
