@@ -17,9 +17,9 @@ namespace Minecraft
 
         public void Tick(float deltaTime, World world)
         {
-            foreach(BlockState state in tickableBlocks.Values)
+            foreach(KeyValuePair<Vector3i, BlockState> kp in tickableBlocks)
             {
-                state.GetBlock().OnTick(state, world, deltaTime);
+                kp.Value.GetBlock().OnTick(kp.Value, world, kp.Key, deltaTime);
             }
         }
 

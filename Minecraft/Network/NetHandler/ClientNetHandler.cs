@@ -17,7 +17,7 @@ namespace Minecraft
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockPacket)
         {
-            game.world.AddBlockToWorld(placedBlockPacket.blockPos, placedBlockPacket.blockState);
+            game.world.QueueToAddBlockAt(placedBlockPacket.blockPos, placedBlockPacket.blockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)

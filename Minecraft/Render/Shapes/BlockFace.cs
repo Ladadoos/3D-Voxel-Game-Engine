@@ -203,4 +203,15 @@ namespace Minecraft
             uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(12, 0));
         }
     }
+
+    class BlockModelSugarCane : ScissorModel
+    {
+        public BlockModelSugarCane(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(9, 4));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(9, 4));
+        }
+    }
 }

@@ -15,7 +15,7 @@ namespace Minecraft
             return new BlockStateTNT();
         }
 
-        public override void OnTick(BlockState blockstate, World world, float deltaTime)
+        public override void OnTick(BlockState blockstate, World world, Vector3i blockPos, float deltaTime)
         {
             BlockStateTNT blockTnt = (BlockStateTNT)blockstate;
             if (!blockTnt.triggered)

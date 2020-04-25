@@ -11,7 +11,7 @@ namespace Minecraft
         public Camera camera;
         public RayTraceResult mouseOverObject { get; private set; }
 
-        private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
+        private BlockState selectedBlock = Blocks.SugarCane.GetNewDefaultState();
 
         private float secondsPerPosUpdate = 1F;
         private float elapsedMsSinceLastPosUpdate;

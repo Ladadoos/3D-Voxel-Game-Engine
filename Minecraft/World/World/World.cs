@@ -13,6 +13,7 @@ namespace Minecraft
         private float elapsedMillisecondsSinceLastTick;
 
         private Queue<Vector3i> toRemoveBlocks = new Queue<Vector3i>();
+        private Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
         private Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
         public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
@@ -134,6 +135,11 @@ namespace Minecraft
             {
                 RemoveBlockAt(toRemoveBlocks.Dequeue());
             }
+            while(toAddBlocks.Count > 0)
+            {
+                var toAddBlock = toAddBlocks.Dequeue();
+                AddBlockToWorld(toAddBlock.Item1, toAddBlock.Item2);
+            }
             while(toRemoveEntities.Count > 0)
             {
                 loadedEntities.Remove(toRemoveEntities.Dequeue().id);
@@ -169,6 +175,11 @@ namespace Minecraft
             toRemoveBlocks.Enqueue(blockPos);
         }
 
+        public void QueueToAddBlockAt(Vector3i blockPos, BlockState block)
+        {
+            toAddBlocks.Enqueue(new Tuple<Vector3i, BlockState>(blockPos, block));
+        }
+
         private bool RemoveBlockAt(Vector3i blockPos)
         {
             if (IsOutsideBuildHeight(blockPos.Y))
@@ -189,6 +200,7 @@ namespace Minecraft
             int worldY = blockPos.Y;
 
             BlockState oldState = GetBlockAt(blockPos);
+            oldState.GetBlock().OnDestroyed(oldState, this, blockPos);
             BlockState air = Blocks.Air.GetNewDefaultState();
             chunk.AddBlock(localX, worldY, localZ, air);
             air.GetBlock().OnAdded(air, this);
@@ -196,7 +208,7 @@ namespace Minecraft
             return true;
         }
 
-        public bool AddBlockToWorld(Vector3i blockPos, BlockState newBlockState)
+        private bool AddBlockToWorld(Vector3i blockPos, BlockState newBlockState)
         {
             BlockState oldState = GetBlockAt(blockPos);
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
