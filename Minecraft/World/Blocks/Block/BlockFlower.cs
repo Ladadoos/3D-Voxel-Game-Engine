@@ -16,7 +16,8 @@
 
         public override bool CanAddBlockAt(World world, Vector3i blockPos)
         {
-            return world.GetBlockAt(blockPos.Down()).GetBlock() == Blocks.Dirt;
+            Block block = world.GetBlockAt(blockPos.Down()).GetBlock();
+            return block == Blocks.Dirt || block == Blocks.Grass;
         }
     }
 }
