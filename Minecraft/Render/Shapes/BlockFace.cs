@@ -31,7 +31,7 @@ namespace Minecraft
 
         public virtual bool IsOpaqueOnSide(Direction direction)
         {
-            switch (direction)
+            switch(direction)
             {
                 case Direction.Back: return back;
                 case Direction.Right: return right;
@@ -59,6 +59,8 @@ namespace Minecraft
 
         protected float[] uvBack, uvRight, uvFront, uvLeft, uvTop, uvBottom;
 
+        protected float[] illumination = new float[4] { 1, 1, 1, 1 };
+
         public FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
@@ -73,8 +75,7 @@ namespace Minecraft
 
         public override BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state)
         {
-            float[] illumination = new float[4] { 1, 1, 1, 1 };
-            switch (direction)
+            switch(direction)
             {
                 case Direction.Back: return new BlockFace[] { new BlockFace(backFace, uvBack, illumination) };
                 case Direction.Right: return new BlockFace[] { new BlockFace(rightFace, uvRight, illumination) };
@@ -171,6 +172,8 @@ namespace Minecraft
 
         protected float[] uvBladeOne, uvBladeTwo;
 
+        protected float[] illumination = new float[4] { 1, 1, 1, 1 };
+
         public ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
@@ -178,7 +181,6 @@ namespace Minecraft
 
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
         {
-            float[] illumination = new float[4] { 1, 1, 1, 1 };
             return new BlockFace[] {
                 new BlockFace(bladeOneFace, uvBladeOne, illumination),
                 new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
@@ -212,6 +214,53 @@ namespace Minecraft
         {
             uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(9, 4));
             uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(9, 4));
+        }
+    }
+
+    class BlockModelWheat : ScissorModel
+    {
+        private float[] uvBladeOneHalfMaturity;
+        private float[] uvBladeTwoHalfMaturity;
+
+        private float[] uvBladeOneFullMaturity;
+        private float[] uvBladeTwoFullMaturity;
+
+        public BlockModelWheat(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(8, 5));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(8, 5));
+
+            uvBladeOneHalfMaturity = textureAtlas.GetTextureCoords(new Vector2(11, 5));
+            uvBladeTwoHalfMaturity = textureAtlas.GetTextureCoords(new Vector2(11, 5));
+
+            uvBladeOneFullMaturity = textureAtlas.GetTextureCoords(new Vector2(15, 5));
+            uvBladeTwoFullMaturity = textureAtlas.GetTextureCoords(new Vector2(15, 5));
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
+        {
+            BlockStateWheat wheat = (BlockStateWheat)state;
+
+            switch(wheat.maturity)
+            {
+                case 1:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOneHalfMaturity, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwoHalfMaturity, illumination)
+                        };
+                case 2:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOneFullMaturity, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwoFullMaturity, illumination)
+                        };
+                default:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOne, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
+                        };
+            }
         }
     }
 }

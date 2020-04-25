@@ -23,7 +23,8 @@ namespace Minecraft
                 { Blocks.Tnt, blockModels.Tnt },
                 { Blocks.Grass, blockModels.Grass },
                 { Blocks.Sand, blockModels.Sand },
-                { Blocks.SugarCane, blockModels.SugarCane }
+                { Blocks.SugarCane, blockModels.SugarCane },
+                { Blocks.Wheat, blockModels.Wheat }
             };
             models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }
