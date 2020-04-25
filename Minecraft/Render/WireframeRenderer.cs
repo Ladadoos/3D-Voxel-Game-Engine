@@ -6,12 +6,12 @@ namespace Minecraft
     class WireframeRenderer
     {
         private WireframeShader shader = new WireframeShader();
-        private Camera camera;
         private VAOModel aabbCube;
+        private MasterRenderer renderer;
 
-        public WireframeRenderer(Camera camera)
+        public WireframeRenderer(MasterRenderer renderer)
         {
-            this.camera = camera;
+            this.renderer = renderer;
             CreateDefaultAABBCube();
         }
 
@@ -47,9 +47,11 @@ namespace Minecraft
             GL.LineWidth(lineWidth);
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
+            Camera activeCamera = renderer.GetActiveCamera();
+
             shader.Start();
-            shader.LoadMatrix(shader.location_ViewMatrix, camera.currentViewMatrix);
-            shader.LoadMatrix(shader.location_ProjectionMatrix, camera.currentProjectionMatrix);
+            shader.LoadMatrix(shader.location_ViewMatrix, activeCamera.currentViewMatrix);
+            shader.LoadMatrix(shader.location_ProjectionMatrix, activeCamera.currentProjectionMatrix);
 
             Matrix4 transformMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(translation);
             shader.LoadMatrix(shader.location_TransformationMatrix, Matrix4.Identity * transformMatrix);

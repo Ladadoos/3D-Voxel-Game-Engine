@@ -53,6 +53,7 @@ namespace Minecraft
             basicShader = new ShaderBasic();
             entityShader = new EntityShader();
             cameraController = new CameraController(game.window);
+
             SetActiveCamera(game.player.camera);
 
             int textureAtlasId = TextureLoader.LoadTexture("../../Resources/texturePack.png");
@@ -61,7 +62,7 @@ namespace Minecraft
             blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
-            wireframeRenderer = new WireframeRenderer(cameraController.camera);
+            wireframeRenderer = new WireframeRenderer(this);
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
@@ -88,6 +89,7 @@ namespace Minecraft
             UploadProjectionMatrix();
         }
 
+        public Camera GetActiveCamera() => cameraController.camera;
         public void AddCanvas(UICanvas canvas) => uiRenderer.AddCanvas(canvas);
         public void RemoveCanvas(UICanvas canvas) => uiRenderer.RemoveCanvas(canvas);
         public Font GetFont(FontType type) => uiRenderer.GetFont(type);

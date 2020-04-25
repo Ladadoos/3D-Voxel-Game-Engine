@@ -10,6 +10,9 @@ namespace Minecraft
 
         private UICanvasDebug debugCanvas;
 
+        private Camera debugCamera;
+
+        private bool renderFromPlayerCamera;
         private bool renderHitboxes;
         private bool renderChunkBorders;
         private bool displayDebugInfo;
@@ -18,6 +21,8 @@ namespace Minecraft
         {
             this.wireframeRenderer = wireframeRenderer;
             this.game = game;
+
+            debugCamera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
         }
 
         public void UpdateAndRender()
@@ -49,6 +54,19 @@ namespace Minecraft
             } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F5))
             {
                 renderChunkBorders = !renderChunkBorders;
+            } else if(Game.input.OnKeyPress(OpenTK.Input.Key.F6))
+            {
+                renderFromPlayerCamera = !renderFromPlayerCamera;
+
+                if(!renderFromPlayerCamera)
+                {
+                    debugCamera.SetPosition(game.player.position + new Vector3(0, 100, 0));
+                    debugCamera.SetYawAndPitch(0, (float)(-Math.PI / 2));
+                    game.masterRenderer.SetActiveCamera(debugCamera);
+                } else
+                {
+                    game.masterRenderer.SetActiveCamera(game.player.camera);
+                }
             }
 
             Render();
