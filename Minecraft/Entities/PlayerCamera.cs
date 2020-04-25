@@ -1,6 +1,0 @@
-﻿namespace Minecraft
-{
-    class PlayerCamera
-    {
-    }
-}
