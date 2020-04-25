@@ -29,7 +29,7 @@
                 caneState.elapsedTimeSinceLastGrowth = 0;
 
                 BlockState blockAbove = world.GetBlockAt(blockPos.Up());
-                if(blockAbove != null || blockAbove.GetBlock() == Blocks.Air)
+                if(blockAbove != null && blockAbove.GetBlock() == Blocks.Air)
                 {
                     if(GetSugarCaneLength(world, blockPos) < maxLength)
                     {
