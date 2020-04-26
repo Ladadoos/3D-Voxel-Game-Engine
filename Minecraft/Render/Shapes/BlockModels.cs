@@ -10,6 +10,7 @@
         public readonly BlockModel Sand;
         public readonly BlockModel SugarCane;
         public readonly BlockModel Wheat;
+        public readonly BlockModel Sandstone;
 
         public BlockModels(TextureAtlas textureAtlas)
         {
@@ -21,6 +22,7 @@
             Sand = new BlockModelSand(textureAtlas);
             SugarCane = new BlockModelSugarCane(textureAtlas);
             Wheat = new BlockModelWheat(textureAtlas);
+            Sandstone = new BlockModelSandstone(textureAtlas);
         }
     }
 }

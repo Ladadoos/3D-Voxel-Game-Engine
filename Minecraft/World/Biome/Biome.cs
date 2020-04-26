@@ -3,6 +3,7 @@
     abstract class Biome
     {
         public Block topBlock { get; protected set; }
+        public Block gradiantBlock { get; protected set; }
         public int baseHeight { get; protected set; }
 
         public double temperature { get; protected set; }

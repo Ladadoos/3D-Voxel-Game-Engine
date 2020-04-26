@@ -162,12 +162,15 @@ namespace Minecraft
                     int totalHeight = seaLevel + (int)biomeHeightAddon;
 
                     generatedChunk.AddBlock(i, totalHeight, j, bestBiome.biome.topBlock.GetNewDefaultState());
-                    if (totalHeight > 0)
+                    for (int k = totalHeight - 1; k >= totalHeight - 3; k--)
                     {
-                        for (int k = totalHeight - 1; k > 0; k--)
-                        {
-                            generatedChunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
-                        }
+                        generatedChunk.AddBlock(i, k, j, bestBiome.biome.gradiantBlock.GetNewDefaultState());
+                    }
+
+                    totalHeight -= 3;
+                    for (int k = totalHeight - 1; k > 0; k--)
+                    {
+                        generatedChunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
                     }
 
                     temperatureXOffset += temperatureDetail;

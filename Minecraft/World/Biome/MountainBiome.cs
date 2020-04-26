@@ -12,6 +12,7 @@
             temperature = 0.9D;
             moisture = 0.5D;
             topBlock = Blocks.Stone;
+            gradiantBlock = Blocks.Stone;
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)

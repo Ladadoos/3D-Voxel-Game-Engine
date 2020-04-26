@@ -13,6 +13,7 @@ namespace Minecraft
         public static readonly Block Sand = new BlockSand(7);
         public static readonly Block SugarCane = new BlockSugarCane(8);
         public static readonly Block Wheat = new BlockWheat(9);
+        public static readonly Block SandStone = new BlockSandstone(10);
 
         private static List<Block> registeredBlocks;
 
@@ -28,7 +29,8 @@ namespace Minecraft
                 Grass,
                 Sand,
                 SugarCane,
-                Wheat
+                Wheat,
+                SandStone
             };
         }
 

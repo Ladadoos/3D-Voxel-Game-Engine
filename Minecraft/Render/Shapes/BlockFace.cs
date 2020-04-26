@@ -165,6 +165,21 @@ namespace Minecraft
         }
     }
 
+    class BlockModelSandstone : FullBlockModel
+    {
+        public BlockModelSandstone(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(0, 12));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(0, 12));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(0, 12));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(0, 12));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(0, 11));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(0, 13));
+        }
+    }
+
     abstract class ScissorModel : BlockModel
     {
         protected Vector3[] bladeOneFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1) };
