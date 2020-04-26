@@ -51,5 +51,18 @@
             Block block = world.GetBlockAt(blockPos.Down()).GetBlock();
             return block == Blocks.Grass;
         }
+
+        public override void OnNotify(BlockState blockState, BlockState sourceBlockState, World world, Vector3i blockpos, Vector3i sourceBlockPos)
+        {
+            if(!(world is WorldServer))
+            {
+                return;
+            }
+
+            if(sourceBlockPos == blockpos.Down() && world.GetBlockAt(sourceBlockPos).GetBlock() == Blocks.Air)
+            {
+                world.QueueToRemoveBlockAt(blockpos);
+            }
+        }
     }
 }

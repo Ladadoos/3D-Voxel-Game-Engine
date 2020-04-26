@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -25,9 +26,17 @@ namespace Minecraft
 
         public virtual void OnTick(BlockState blockState, World world, Vector3i blockPos, float deltaTime) { }
 
-        public virtual void OnAdd(BlockState blockstate, World world) { }
+        public virtual void OnAdd(BlockState blockState, World world, Vector3i blockPos)
+        {
+            NotifyNeighbours(blockState, world, blockPos);
+        }
 
-        public virtual void OnDestroy(BlockState blockState, World world, Vector3i blockPos) { }
+        public virtual void OnDestroy(BlockState blockState, World world, Vector3i blockPos)
+        {
+            NotifyNeighbours(blockState, world, blockPos);
+        }
+
+        public virtual void OnNotify(BlockState blockState, BlockState sourceBlockState, World world, Vector3i blockpos, Vector3i sourceBlockPos) { }
 
         public virtual AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
@@ -38,6 +47,15 @@ namespace Minecraft
         {
             return new AxisAlignedBox(new Vector3(blockPos.X, blockPos.Y, blockPos.Z),
                 new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE));
+        }
+
+        protected void NotifyNeighbours(BlockState blockState, World world, Vector3i blockPos)
+        {
+            foreach(Vector3i neighbourPos in blockPos.GetSurroundingPositions())
+            {
+                BlockState state = world.GetBlockAt(neighbourPos);
+                state?.GetBlock().OnNotify(state, blockState, world, neighbourPos, blockPos);
+            }
         }
     }
 }

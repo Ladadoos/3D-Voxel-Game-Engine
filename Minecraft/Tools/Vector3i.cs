@@ -4,6 +4,11 @@ namespace Minecraft
 {
     struct Vector3i
     {
+        public readonly static Vector3i NorthBasis = new Vector3i(1, 0, 0);
+        public readonly static Vector3i SouthBasis = new Vector3i(-1, 0, 0);
+        public readonly static Vector3i EastBasis = new Vector3i(0, 0, 1);
+        public readonly static Vector3i WestBasis = new Vector3i(0, 0, -1);
+
         public int X;
         public int Y;
         public int Z;
@@ -61,5 +66,37 @@ namespace Minecraft
         {
             return new Vector3i(X, Y - 1, Z);
         }
+
+        public Vector3i East()
+        {
+            return this + EastBasis;
+        }
+
+        public Vector3i West()
+        {
+            return this + WestBasis;
+        }
+
+        public Vector3i North()
+        {
+            return this + NorthBasis;
+        }
+
+        public Vector3i South()
+        {
+            return this + SouthBasis;
+        }
+
+        public Vector3i[] GetSurroundingPositions()
+        {
+            Vector3i[] surroundings = new Vector3i[6];
+            surroundings[0] = North();
+            surroundings[1] = South();
+            surroundings[2] = East();
+            surroundings[3] = West();
+            surroundings[4] = Up();
+            surroundings[5] = Down();
+            return surroundings;
+        } 
     }
 }
