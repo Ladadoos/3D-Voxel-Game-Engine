@@ -25,9 +25,9 @@ namespace Minecraft
 
         public virtual void OnTick(BlockState blockState, World world, Vector3i blockPos, float deltaTime) { }
 
-        public virtual void OnAdded(BlockState blockstate, World world) { }
+        public virtual void OnAdd(BlockState blockstate, World world) { }
 
-        public virtual void OnDestroyed(BlockState blockState, World world, Vector3i blockPos) { }
+        public virtual void OnDestroy(BlockState blockState, World world, Vector3i blockPos) { }
 
         public virtual AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {

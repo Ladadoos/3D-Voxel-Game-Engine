@@ -200,10 +200,10 @@ namespace Minecraft
             int worldY = blockPos.Y;
 
             BlockState oldState = GetBlockAt(blockPos);
-            oldState.GetBlock().OnDestroyed(oldState, this, blockPos);
+            oldState.GetBlock().OnDestroy(oldState, this, blockPos);
             BlockState air = Blocks.Air.GetNewDefaultState();
             chunk.AddBlock(localX, worldY, localZ, air);
-            air.GetBlock().OnAdded(air, this);
+            air.GetBlock().OnAdd(air, this);
             OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState);
             return true;
         }
@@ -254,7 +254,7 @@ namespace Minecraft
             int localZ = blockPos.Z & 15;
             int worldY = blockPos.Y;
             chunk.AddBlock(localX, worldY, localZ, newBlockState);
-            newBlockState.GetBlock().OnAdded(newBlockState, this);
+            newBlockState.GetBlock().OnAdd(newBlockState, this);
             OnBlockPlacedHandler?.Invoke(this, chunk, blockPos, oldState, newBlockState);
 
             return true;

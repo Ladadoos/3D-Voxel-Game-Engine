@@ -50,7 +50,7 @@
             return length;
         }
 
-        public override void OnDestroyed(BlockState blockState, World world, Vector3i blockPos)
+        public override void OnDestroy(BlockState blockState, World world, Vector3i blockPos)
         {
             if(!(world is WorldServer))
             {
