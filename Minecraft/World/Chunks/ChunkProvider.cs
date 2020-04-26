@@ -8,7 +8,7 @@ namespace Minecraft
     {
         private ServerSession session;
         private PlayerSettings playerSettings;
-        private HashSet<Vector2> currentlyVisibleChunks = new HashSet<Vector2>();
+        public HashSet<Vector2> currentlyVisibleChunks { get; private set;} = new HashSet<Vector2>();
 
         private object chunkRetrievalLock = new object();
         private Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();

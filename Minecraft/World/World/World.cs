@@ -165,7 +165,7 @@ namespace Minecraft
             }
         }
 
-        public Vector2 GetChunkPosition(float worldX, float worldZ)
+        public static Vector2 GetChunkPosition(float worldX, float worldZ)
         {
             return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
         }

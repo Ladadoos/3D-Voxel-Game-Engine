@@ -10,7 +10,7 @@ namespace Minecraft
 {
     class Server
     {
-        public List<Session> clients = new List<Session>();
+        public List<ServerSession> clients { get; private set; } = new List<ServerSession>();
         private Thread connectionsThread;
         private int port;
         private string address;
@@ -218,16 +218,6 @@ namespace Minecraft
                     continue;
                 }
                 client.WritePacket(packet);
-            }
-        }
-
-        public void BroadcastPacketExceptToHost(Packet packet)
-        {
-            Logger.Packet("Server broadcasting packet [" + packet.GetType() + "]");
-            for (int i = clients.Count - 1; i >= 0; i--)
-            {
-                if (clients[i] == host) continue;
-                clients[i].WritePacket(packet);
             }
         }
 

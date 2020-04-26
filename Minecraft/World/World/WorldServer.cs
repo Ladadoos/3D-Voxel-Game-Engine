@@ -41,12 +41,24 @@ namespace Minecraft
 
         private void OnBlockPlacedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
-            game.server.BroadcastPacket(new PlaceBlockPacket(newState, blockPos));
+            foreach(ServerSession session in world.game.server.clients)
+            {
+                if(session.IsBlockPositionInViewRange(blockPos))
+                {
+                    session.WritePacket(new PlaceBlockPacket(newState, blockPos));
+                }
+            }           
         }
 
         private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
-            game.server.BroadcastPacket(new RemoveBlockPacket(blockPos));
+            foreach(ServerSession session in world.game.server.clients)
+            {
+                if(session.IsBlockPositionInViewRange(blockPos))
+                {
+                    session.WritePacket(new RemoveBlockPacket(blockPos));
+                }
+            }
         }
     }
 }

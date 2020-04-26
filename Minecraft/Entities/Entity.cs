@@ -56,7 +56,7 @@ namespace Minecraft
         /// <summary> Called every tick </summary>
         public virtual void Tick(float deltaTime, World world)
         {
-            Vector2 chunkPosition = world.GetChunkPosition(position.X, position.Z);
+            Vector2 chunkPosition = World.GetChunkPosition(position.X, position.Z);
             if (previousChunkPos != chunkPosition)
             {
                 OnChunkChangedHandler?.Invoke(world, chunkPosition);

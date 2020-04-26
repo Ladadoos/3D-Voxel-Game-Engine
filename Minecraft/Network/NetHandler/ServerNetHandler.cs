@@ -96,7 +96,14 @@ namespace Minecraft
             Vector3i blockPos = playerInteractionPacket.blockPos;
             BlockState state = game.server.world.GetBlockAt(blockPos);
             state.GetBlock().OnInteract(state, blockPos, game.server.world);
-            game.server.BroadcastPacket(playerInteractionPacket);
+
+            foreach(ServerSession session in game.server.clients)
+            {
+                if(session.IsBlockPositionInViewRange(blockPos))
+                {
+                    session.WritePacket(playerInteractionPacket);
+                }
+            }
         }
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
