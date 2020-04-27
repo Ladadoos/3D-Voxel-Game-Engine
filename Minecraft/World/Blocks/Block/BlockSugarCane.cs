@@ -15,6 +15,11 @@
             return new BlockStateSugarCane();
         }
 
+        public override AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
+        {
+            return emptyAABB;
+        }
+
         public override void OnTick(BlockState blockState, World world, Vector3i blockPos, float deltaTime)
         {
             if(!(world is WorldServer))
