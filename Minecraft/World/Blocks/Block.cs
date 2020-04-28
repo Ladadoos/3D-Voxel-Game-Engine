@@ -37,6 +37,11 @@ namespace Minecraft
 
         public virtual void OnNotify(BlockState blockState, BlockState sourceBlockState, World world, Vector3i blockpos, Vector3i sourceBlockPos) { }
 
+        public virtual AxisAlignedBox[] GetSelectionBox(BlockState state, Vector3i blockPos)
+        {
+            return new AxisAlignedBox[] { GetFullBlockCollision(blockPos) };
+        }
+
         public virtual AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
             return new AxisAlignedBox[] { GetFullBlockCollision(blockPos) };

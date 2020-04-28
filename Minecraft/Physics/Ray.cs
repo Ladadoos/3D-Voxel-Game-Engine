@@ -38,9 +38,19 @@ namespace Minecraft
                 return null;
             }
 
-            Vector3i gridPosition = new Vector3i(position);
-            AxisAlignedBox hitAABB = Block.GetFullBlockCollision(gridPosition);
-            float dist = hitAABB.Intersects(this);
+            Vector3i blockPos = new Vector3i(position);
+            AxisAlignedBox[] hitAABBs = hitBlockState.GetBlock().GetSelectionBox(hitBlockState, blockPos);
+            AxisAlignedBox hitAABB = null;
+            float dist = float.MaxValue;
+            foreach(AxisAlignedBox aabb in hitAABBs)
+            {
+                float hitDist = aabb.Intersects(this);
+                if(hitDist < dist)
+                {
+                    dist = hitDist;
+                    hitAABB = aabb;
+                }
+            }
             if (dist == float.MaxValue)
             {
                 return null;
@@ -48,7 +58,7 @@ namespace Minecraft
             this.distanceToIntersection = dist;
             Vector3 exactIntersection = origin + direction * distanceToIntersection;
             Vector3 normalAtIntersection = hitAABB.GetNormalAtIntersectionPoint(exactIntersection);
-            return new RayTraceResult(hitAABB, normalAtIntersection, exactIntersection, hitBlockState, gridPosition);
+            return new RayTraceResult(normalAtIntersection, exactIntersection, hitBlockState, blockPos);
         }
     }
 }

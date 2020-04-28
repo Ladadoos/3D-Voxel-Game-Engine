@@ -4,8 +4,6 @@ namespace Minecraft
 {
     class RayTraceResult
     {
-        /// <summary> The AABB of the block the ray hit </summary>
-        public AxisAlignedBox aabbHit { get; private set; }  
         /// <summary> The normal of the intersection point with the block (what side it hit) </summary>
         public Vector3 normalAtHit { get; private set; }
         /// <summary> The exact intersection point </summary>
@@ -17,9 +15,8 @@ namespace Minecraft
         /// <summary> The grid position of the block the ray intersected </summary>
         public Vector3i intersectedBlockPos { get; private set; }
 
-        public RayTraceResult(AxisAlignedBox aabbHit, Vector3 normalAtHit, Vector3 intersectedPoint, BlockState blockstateHit, Vector3i blockStatePos)
+        public RayTraceResult(Vector3 normalAtHit, Vector3 intersectedPoint, BlockState blockstateHit, Vector3i blockStatePos)
         {
-            this.aabbHit = aabbHit;
             this.normalAtHit = normalAtHit;
             this.intersectedPoint = intersectedPoint;
             this.blockstateHit = blockstateHit;

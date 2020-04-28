@@ -1,4 +1,6 @@
-﻿namespace Minecraft
+﻿using OpenTK;
+
+namespace Minecraft
 {
     class BlockFlower : Block
     {
@@ -7,6 +9,15 @@
         public override BlockState GetNewDefaultState()
         {
             return new BlockStateFlower();
+        }
+
+        public override AxisAlignedBox[] GetSelectionBox(BlockState state, Vector3i blockPos)
+        {
+            return new AxisAlignedBox[] {
+                new AxisAlignedBox(
+                    new Vector3(blockPos.X, blockPos.Y, blockPos.Z) + new Vector3(0.25F, 0, 0.25F),
+                    new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE) - new Vector3(0.25F, 0.25f, 0.25F))
+            };
         }
 
         public override AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
