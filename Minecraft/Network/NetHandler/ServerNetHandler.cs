@@ -24,7 +24,7 @@ namespace Minecraft
         {
             foreach(Vector3i blockPos in removeBlockPacket.blockPositions)
             {
-                game.world.QueueToRemoveBlockAt(blockPos);
+                game.server.world.QueueToRemoveBlockAt(blockPos);
             }
         }
 
