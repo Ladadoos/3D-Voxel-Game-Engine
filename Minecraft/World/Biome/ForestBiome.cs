@@ -13,6 +13,7 @@
             moisture = 0.9D;
             topBlock = Blocks.Grass;
             gradiantBlock = Blocks.Dirt;
+            decorator = new ForestDecorator();
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)

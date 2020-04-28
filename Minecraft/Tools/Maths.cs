@@ -45,5 +45,12 @@ namespace Minecraft
         {
             return from + (to - from) * t;
         }
+
+        public static float ConvertRange(float oldMin, float oldMax, float newMin, float newMax, float oldValue)
+        {
+            float oldRange = oldMax - oldMin;
+            float newRange = newMax - newMin;
+            return (((oldValue - oldMin) * newRange) / oldRange) + newMin;
+        }
     }
 }

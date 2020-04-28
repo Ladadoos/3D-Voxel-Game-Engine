@@ -23,6 +23,7 @@ namespace Minecraft
         protected TextureAtlas textureAtlas;
         protected readonly BlockFace[] emptyArray = new BlockFace[0];
         protected bool back, right, front, left, top, bottom;
+        public bool doubleSided { get; protected set; }
 
         public BlockModel(TextureAtlas textureAtlas)
         {
@@ -43,13 +44,13 @@ namespace Minecraft
             }
         }
 
-        public abstract BlockFace[] GetAlwaysVisibleFaces(BlockState state);
-        public abstract BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state);
+        public abstract BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos);
+        public abstract BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction);
     }
 
     abstract class FullBlockModel : BlockModel
     {
-        //Counter clock-wise starting bottom-left if facing the face from the front
+        //Counter clock-wise starting bottom-left-back if facing the face from the front
         protected Vector3[] backFace = new Vector3[] { new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 0) };
         protected Vector3[] rightFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 1, 1) };
         protected Vector3[] frontFace = new Vector3[] { new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(1, 1, 1), new Vector3(0, 1, 1) };
@@ -68,12 +69,12 @@ namespace Minecraft
             back = true; right = true; front = true; left = true; top = true; bottom = true;
         }
 
-        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
         {
             return emptyArray;
         }
 
-        public override BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state)
+        public override BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction)
         {
             switch(direction)
             {
@@ -180,6 +181,94 @@ namespace Minecraft
         }
     }
 
+    class BlockModelOakLog : FullBlockModel
+    {
+        public BlockModelOakLog(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(4, 1));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(4, 1));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(4, 1));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(4, 1));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(5, 1));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(5, 1));
+        }
+    }
+
+    class BlockModelOakLeaves : FullBlockModel
+    {
+        public BlockModelOakLeaves(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(5, 3));
+        }
+    }
+
+    class BlockModelGravel : FullBlockModel
+    {
+        public BlockModelGravel(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(3, 1));
+        }
+    }
+
+    class BlockModelCactus : FullBlockModel
+    {
+        public BlockModelCactus(TextureAtlas textureAtlas) : base(textureAtlas)
+        {
+            float dt = 0.0625f;
+            float dtx = 0.9375f;
+            backFace = new Vector3[] { new Vector3(1, 0, dt), new Vector3(0, 0, dt), new Vector3(0, 1, dt), new Vector3(1, 1, dt) };
+            rightFace = new Vector3[] { new Vector3(dtx, 0, 1), new Vector3(dtx, 0, 0), new Vector3(dtx, 1, 0), new Vector3(dtx, 1, 1) };
+            frontFace = new Vector3[] { new Vector3(0, 0, dtx), new Vector3(1, 0, dtx), new Vector3(1, 1, dtx), new Vector3(0, 1, dtx) };
+            leftFace = new Vector3[] { new Vector3(dt, 0, 0), new Vector3(dt, 0, 1), new Vector3(dt, 1, 1), new Vector3(dt, 1, 0) };
+
+            back = false; right = false; front = false; left = false; top = false; bottom = false;
+            doubleSided = true;
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
+        {
+            return new BlockFace[] {
+                new BlockFace(backFace, uvBack, illumination),
+                new BlockFace(rightFace, uvRight, illumination),
+                new BlockFace(frontFace, uvFront, illumination),
+                new BlockFace(leftFace, uvLeft, illumination),
+                new BlockFace(topFace, uvTop, illumination),
+                new BlockFace(bottomFace, uvBottom, illumination)
+            };
+        }
+
+        public override BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction)
+        {
+            return emptyArray;
+        }
+
+        protected override void SetStandardUVs()
+        {
+            uvBack = textureAtlas.GetTextureCoords(new Vector2(6, 4));
+            uvRight = textureAtlas.GetTextureCoords(new Vector2(6, 4));
+            uvFront = textureAtlas.GetTextureCoords(new Vector2(6, 4));
+            uvLeft = textureAtlas.GetTextureCoords(new Vector2(6, 4));
+            uvTop = textureAtlas.GetTextureCoords(new Vector2(5, 4));
+            uvBottom = textureAtlas.GetTextureCoords(new Vector2(7, 4));
+        }
+    }
+
     abstract class ScissorModel : BlockModel
     {
         protected Vector3[] bladeOneFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1) };
@@ -192,9 +281,10 @@ namespace Minecraft
         public ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
+            doubleSided = true;
         }
 
-        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
         {
             return new BlockFace[] {
                 new BlockFace(bladeOneFace, uvBladeOne, illumination),
@@ -202,7 +292,7 @@ namespace Minecraft
             };
         }
 
-        public override BlockFace[] GetPartialVisibleFaces(Direction direction, BlockState state)
+        public override BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction)
         {
             return emptyArray;
         }
@@ -254,7 +344,7 @@ namespace Minecraft
             uvBladeTwoFullMaturity = textureAtlas.GetTextureCoords(new Vector2(15, 5));
         }
 
-        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state)
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
         {
             BlockStateWheat wheat = (BlockStateWheat)state;
 
@@ -276,6 +366,61 @@ namespace Minecraft
                             new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
                         };
             }
+        }
+    }
+
+    class BlockModelGrassBlade : ScissorModel
+    {
+        private Noise3DPerlin perlin = new Noise3DPerlin(150);
+
+        public BlockModelGrassBlade(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(7, 2));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(7, 2));
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
+        {
+            float rawOffset = (float)perlin.GetValue(blockPos.X * 0.75f, blockPos.Y * 0.75f, blockPos.Z * 0.75f);
+
+            float offset = rawOffset / 7;
+            Vector3 offsetVec = new Vector3(offset, 0, offset);
+
+            float sizeOffset = Maths.ConvertRange(-1, 1, 0.75f, 1, rawOffset);
+            Vector3 scaleVec = new Vector3(sizeOffset, sizeOffset, sizeOffset);
+
+            Vector3[] bladeOneFaceCopy = new Vector3[bladeOneFace.Length];
+            bladeOneFace.CopyTo(bladeOneFaceCopy, 0);
+
+            Vector3[] bladeTwoFaceCopy = new Vector3[bladeTwoFace.Length];
+            bladeTwoFace.CopyTo(bladeTwoFaceCopy, 0);
+
+            for(int i = 0; i < bladeOneFaceCopy.Length; i++)
+            {
+                bladeOneFaceCopy[i] = bladeOneFaceCopy[i] * scaleVec + offsetVec;
+            }
+            for(int i = 0; i < bladeTwoFaceCopy.Length; i++)
+            {
+                bladeTwoFaceCopy[i] = bladeTwoFaceCopy[i] * scaleVec + offsetVec;
+            }
+
+            return new BlockFace[] {
+                new BlockFace(bladeOneFaceCopy, uvBladeOne, illumination),
+                new BlockFace(bladeTwoFaceCopy, uvBladeTwo, illumination)
+            };
+        }
+    }
+
+    class BlockModelDeadBush : ScissorModel
+    {
+        public BlockModelDeadBush(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(7, 3));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(7, 3));
         }
     }
 }

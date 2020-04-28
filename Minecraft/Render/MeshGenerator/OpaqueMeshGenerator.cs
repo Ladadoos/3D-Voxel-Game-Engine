@@ -45,40 +45,40 @@ namespace Minecraft
                                 throw new System.Exception("Could not find model for: " + state.GetBlock().GetType());
                             }
 
-                            Vector3 blockPos = new Vector3(localX, sectionLocalY + sectionHeight * 16, localZ);
-                            if (blockModel is ScissorModel)
+                            Vector3i localChunkBlockPos = new Vector3i(localX, sectionLocalY + sectionHeight * 16, localZ);
+                            Vector3i globalBlockPos = new Vector3i(localX + chunk.gridX * 16, sectionLocalY + sectionHeight * 16, localZ + chunk.gridZ * 16);
+
+                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, globalBlockPos);
+                            if (blockModel.doubleSided)
                             {
-                                BlockFace[] cullFaces = blockModel.GetAlwaysVisibleFaces(state);
-                                AddFacesToMeshDualSided(cullFaces, blockPos, 1);
+                                AddFacesToMeshDualSided(faces, localChunkBlockPos, 1);
                                 continue;
                             }
-
-                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state);
-                            AddFacesToMeshFromFront(faces, blockPos, 1);
+                            AddFacesToMeshFromFront(faces, localChunkBlockPos, 1);
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Right, state, blockPos, blockModel, sideZLight);
+                                BuildMeshForSide(Direction.Right, state, localChunkBlockPos, globalBlockPos, blockModel, sideZLight);
                             }
                             if (ShouldAddWestFaceOfBlock(cXNeg, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Left, state, blockPos, blockModel, sideXLight);
+                                BuildMeshForSide(Direction.Left, state, localChunkBlockPos, globalBlockPos, blockModel, sideXLight);
                             }
                             if (ShouldAddSouthFaceOfBlock(cZNeg, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Back, state, blockPos, blockModel, sideXLight);
+                                BuildMeshForSide(Direction.Back, state, localChunkBlockPos, globalBlockPos, blockModel, sideXLight);
                             }
                             if (ShouldAddNorthFaceOfBlock(cZPos, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Front, state, blockPos, blockModel, sideZLight);
+                                BuildMeshForSide(Direction.Front, state, localChunkBlockPos, globalBlockPos, blockModel, sideZLight);
                             }
                             if (ShouldAddTopFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Top, state, blockPos, blockModel, topLight);
+                                BuildMeshForSide(Direction.Top, state, localChunkBlockPos, globalBlockPos, blockModel, topLight);
                             }
                             if (ShouldAddBottomFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Bottom, state, blockPos, blockModel, bottomLight);
+                                BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, globalBlockPos, blockModel, bottomLight);
                             }
                         }
                     }
@@ -95,10 +95,10 @@ namespace Minecraft
             };                   
         }
 
-        private void BuildMeshForSide(Direction blockSide, BlockState state, Vector3 blockPos, BlockModel model, float lightValue)
+        private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, float lightValue)
         {
-            BlockFace[] faces = model.GetPartialVisibleFaces(blockSide, state);
-            AddFacesToMeshFromFront(faces, blockPos, lightValue);
+            BlockFace[] faces = model.GetPartialVisibleFaces(state, globalPos, direction);
+            AddFacesToMeshFromFront(faces, chunkLocalPos, lightValue);
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)

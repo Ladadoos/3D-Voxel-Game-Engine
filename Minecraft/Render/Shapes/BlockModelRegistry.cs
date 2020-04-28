@@ -25,7 +25,13 @@ namespace Minecraft
                 { Blocks.Sand, blockModels.Sand },
                 { Blocks.SugarCane, blockModels.SugarCane },
                 { Blocks.Wheat, blockModels.Wheat },
-                { Blocks.SandStone, blockModels.Sandstone }
+                { Blocks.SandStone, blockModels.Sandstone },
+                { Blocks.GrassBlade, blockModels.GrassBlade },
+                { Blocks.DeadBush, blockModels.DeadBush },
+                { Blocks.Cactus, blockModels.Cactus },
+                { Blocks.OakLog, blockModels.OakLog },
+                { Blocks.OakLeaves, blockModels.OakLeaves },
+                { Blocks.Gravel, blockModels.Gravel }
             };
             models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }

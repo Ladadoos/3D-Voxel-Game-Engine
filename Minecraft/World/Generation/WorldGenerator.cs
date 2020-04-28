@@ -127,7 +127,7 @@ namespace Minecraft
 
         private Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
         {
-            Chunk generatedChunk = new Chunk(chunkX, chunkY);
+            Chunk chunk = new Chunk(chunkX, chunkY);
 
             double temperatureXOffset = 0;
             double temperatureYOffset = 0;
@@ -137,12 +137,12 @@ namespace Minecraft
             double moistureYOffset = 0;
             moistureYOffset = chunkX * Constants.CHUNK_SIZE * moistureDetail;
 
-            for (int i = 0; i < Constants.CHUNK_SIZE; i++)
+            for (int localX = 0; localX < Constants.CHUNK_SIZE; localX++)
             {
                 temperatureXOffset = chunkY * Constants.CHUNK_SIZE * temperatureDetail;
                 moistureXOffset = chunkY * Constants.CHUNK_SIZE * moistureDetail;
 
-                for (int j = 0; j < Constants.CHUNK_SIZE; j++)
+                for (int localZ = 0; localZ < Constants.CHUNK_SIZE; localZ++)
                 {
                     double temperature = temperatureFunction.GetValuePositive(temperatureXOffset, temperatureYOffset);
                     double moisture = moistureFunction.GetValuePositive(moistureXOffset, moistureYOffset);
@@ -157,21 +157,24 @@ namespace Minecraft
                         {
                             bestBiome = wBiome;
                         }
-                        biomeHeightAddon += wBiome.percentage * wBiome.biome.OffsetAt(chunkX, chunkY, i, j);
+                        biomeHeightAddon += wBiome.percentage * wBiome.biome.OffsetAt(chunkX, chunkY, localX, localZ);
                     }
-                    int totalHeight = seaLevel + (int)biomeHeightAddon;
+                    int worldY = seaLevel + (int)biomeHeightAddon;
 
-                    generatedChunk.AddBlock(i, totalHeight, j, bestBiome.biome.topBlock.GetNewDefaultState());
-                    for (int k = totalHeight - 1; k >= totalHeight - 3; k--)
+                    chunk.AddBlock(localX, worldY, localZ, bestBiome.biome.topBlock.GetNewDefaultState());
+                    for (int k = worldY - 1; k >= worldY - 3; k--)
                     {
-                        generatedChunk.AddBlock(i, k, j, bestBiome.biome.gradiantBlock.GetNewDefaultState());
+                        chunk.AddBlock(localX, k, localZ, bestBiome.biome.gradiantBlock.GetNewDefaultState());
                     }
 
-                    totalHeight -= 3;
-                    for (int k = totalHeight - 1; k > 0; k--)
+                    worldY -= 3;
+                    for (int k = worldY - 1; k > 0; k--)
                     {
-                        generatedChunk.AddBlock(i, k, j, Blocks.Stone.GetNewDefaultState());
+                        chunk.AddBlock(localX, k, localZ, Blocks.Stone.GetNewDefaultState());
                     }
+
+                    worldY += 4;
+                    bestBiome.biome.decorator.Decorate(chunk, worldY, localX, localZ);
 
                     temperatureXOffset += temperatureDetail;
                     moistureXOffset += moistureDetail;
@@ -181,7 +184,7 @@ namespace Minecraft
                 moistureYOffset += moistureDetail;
             }
 
-            return generatedChunk;
+            return chunk;
         }
     }
 }

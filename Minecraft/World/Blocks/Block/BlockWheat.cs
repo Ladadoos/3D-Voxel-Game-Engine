@@ -28,7 +28,6 @@
                 return;
             }
 
-
             originalWheat.elapsedTimeSinceLastGrowth += deltaTime;
             if(originalWheat.elapsedTimeSinceLastGrowth >= secondsToGrow)
             {

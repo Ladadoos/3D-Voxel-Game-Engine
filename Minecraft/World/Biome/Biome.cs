@@ -5,6 +5,7 @@
         public Block topBlock { get; protected set; }
         public Block gradiantBlock { get; protected set; }
         public int baseHeight { get; protected set; }
+        public IDecorator decorator { get; protected set; }
 
         public double temperature { get; protected set; }
         public double moisture { get; protected set; }

@@ -13,6 +13,7 @@
             moisture = 0.1D;
             topBlock = Blocks.Sand;
             gradiantBlock = Blocks.SandStone;
+            decorator = new BarrenDecorator();
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)
