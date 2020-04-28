@@ -276,9 +276,12 @@ namespace Minecraft
             MeshChunkAndSurroundings(world, chunk, blockPos, newState);
         }
 
-        public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
+        public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount)
         {
-            MeshChunkAndSurroundings(world, chunk, blockPos, oldState);
+            if(chainPos == chainCount)
+            {
+                MeshChunkAndSurroundings(world, chunk, blockPos, oldState);
+            }
         }
 
         private void MeshChunk(Chunk chunk)

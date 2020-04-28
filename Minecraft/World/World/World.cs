@@ -12,7 +12,7 @@ namespace Minecraft
         private float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
 
-        private Queue<Vector3i> toRemoveBlocks = new Queue<Vector3i>();
+        private Queue<List<Vector3i>> toRemoveBlocks = new Queue<List<Vector3i>>();
         private Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
         private Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
@@ -24,7 +24,7 @@ namespace Minecraft
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
-        public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState);
+        public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount);
         public event OnBlockRemoved OnBlockRemovedHandler;
 
         public delegate void OnChunkLoaded(World world, Chunk chunk);
@@ -133,7 +133,11 @@ namespace Minecraft
 
             while(toRemoveBlocks.Count > 0)
             {
-                RemoveBlockAt(toRemoveBlocks.Dequeue());
+                List<Vector3i> blocks = toRemoveBlocks.Dequeue();
+                for(int i = 0; i < blocks.Count; i++)
+                {
+                    RemoveBlockAt(blocks[i], i + 1, blocks.Count);
+                }
             }
             while(toAddBlocks.Count > 0)
             {
@@ -172,7 +176,12 @@ namespace Minecraft
 
         public void QueueToRemoveBlockAt(Vector3i blockPos)
         {
-            toRemoveBlocks.Enqueue(blockPos);
+            toRemoveBlocks.Enqueue(new List<Vector3i>() { blockPos });
+        }
+
+        public void QueueToRemoveBlocksAt(List<Vector3i> blockPositions)
+        {
+            toRemoveBlocks.Enqueue(blockPositions);
         }
 
         public void QueueToAddBlockAt(Vector3i blockPos, BlockState block)
@@ -180,7 +189,7 @@ namespace Minecraft
             toAddBlocks.Enqueue(new Tuple<Vector3i, BlockState>(blockPos, block));
         }
 
-        private bool RemoveBlockAt(Vector3i blockPos)
+        private bool RemoveBlockAt(Vector3i blockPos, int chainPos, int chainCount)
         {
             if (IsOutsideBuildHeight(blockPos.Y))
             {
@@ -204,7 +213,7 @@ namespace Minecraft
             chunk.AddBlock(localX, worldY, localZ, air);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
             air.GetBlock().OnAdd(air, this, blockPos);
-            OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState);
+            OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState, chainPos, chainCount);
             return true;
         }
 

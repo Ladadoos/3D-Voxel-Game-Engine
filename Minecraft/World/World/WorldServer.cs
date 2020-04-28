@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -7,6 +8,8 @@ namespace Minecraft
     {
         private EntityIdTracker entityIdTracker = new EntityIdTracker();
         private WorldGenerator worldGenerator;
+
+        private List<Vector3i> blockRemovalBuffer = new List<Vector3i>();
 
         public WorldServer(Game game) : base(game)
         {
@@ -50,14 +53,21 @@ namespace Minecraft
             }           
         }
 
-        private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
+        private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount)
         {
-            foreach(ServerSession session in world.game.server.clients)
+            blockRemovalBuffer.Add(blockPos);
+
+            if(chainPos == chainCount)
             {
-                if(session.IsBlockPositionInViewRange(blockPos))
+                RemoveBlockPacket packet = new RemoveBlockPacket(blockRemovalBuffer.ToArray());
+                foreach(ServerSession session in world.game.server.clients)
                 {
-                    session.WritePacket(new RemoveBlockPacket(blockPos));
+                    if(session.IsBlockPositionInViewRange(blockPos))
+                    {
+                        session.WritePacket(packet);
+                    }
                 }
+                blockRemovalBuffer.Clear();
             }
         }
     }
