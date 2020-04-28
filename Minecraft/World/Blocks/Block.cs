@@ -35,7 +35,7 @@ namespace Minecraft
             NotifyNeighbours(blockState, world, blockPos);
         }
 
-        public virtual void OnNotify(BlockState blockState, BlockState sourceBlockState, World world, Vector3i blockpos, Vector3i sourceBlockPos) { }
+        public virtual void OnNotify(BlockState blockState, BlockState sourceBlockState, World world, Vector3i blockPos, Vector3i sourceBlockPos) { }
 
         public virtual AxisAlignedBox[] GetSelectionBox(BlockState state, Vector3i blockPos)
         {

@@ -17,6 +17,11 @@ namespace Minecraft
 
         public override void OnTick(BlockState blockstate, World world, Vector3i blockPos, float deltaTime)
         {
+            if(!(world is WorldServer))
+            {
+                return;
+            }
+
             BlockStateTNT blockTnt = (BlockStateTNT)blockstate;
             if (!blockTnt.triggered)
             {
