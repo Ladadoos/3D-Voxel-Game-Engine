@@ -1,0 +1,159 @@
+﻿using OpenTK;
+
+namespace Minecraft
+{
+    abstract class ScissorModel : BlockModel
+    {
+        protected Vector3[] bladeOneFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1) };
+        protected Vector3[] bladeTwoFace = new Vector3[] { new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1), new Vector3(1, 1, 0) };
+
+        protected float[] uvBladeOne, uvBladeTwo;
+
+        protected float[] illumination = new float[4] { 1, 1, 1, 1 };
+
+        public ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
+        {
+            SetStandardUVs();
+            doubleSided = true;
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
+        {
+            return new BlockFace[] {
+                new BlockFace(bladeOneFace, uvBladeOne, illumination),
+                new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
+            };
+        }
+
+        public override BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction)
+        {
+            return emptyArray;
+        }
+
+        protected abstract void SetStandardUVs();
+    }
+
+    class BlockModelFlower : ScissorModel
+    {
+        public BlockModelFlower(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(12, 0));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(12, 0));
+        }
+    }
+
+    class BlockModelSugarCane : ScissorModel
+    {
+        public BlockModelSugarCane(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(9, 4));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(9, 4));
+        }
+    }
+
+    class BlockModelWheat : ScissorModel
+    {
+        private float[] uvBladeOneHalfMaturity;
+        private float[] uvBladeTwoHalfMaturity;
+
+        private float[] uvBladeOneFullMaturity;
+        private float[] uvBladeTwoFullMaturity;
+
+        public BlockModelWheat(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(8, 5));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(8, 5));
+
+            uvBladeOneHalfMaturity = textureAtlas.GetTextureCoords(new Vector2(11, 5));
+            uvBladeTwoHalfMaturity = textureAtlas.GetTextureCoords(new Vector2(11, 5));
+
+            uvBladeOneFullMaturity = textureAtlas.GetTextureCoords(new Vector2(15, 5));
+            uvBladeTwoFullMaturity = textureAtlas.GetTextureCoords(new Vector2(15, 5));
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
+        {
+            BlockStateWheat wheat = (BlockStateWheat)state;
+
+            switch(wheat.maturity)
+            {
+                case 1:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOneHalfMaturity, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwoHalfMaturity, illumination)
+                        };
+                case 2:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOneFullMaturity, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwoFullMaturity, illumination)
+                        };
+                default:
+                    return new BlockFace[] {
+                            new BlockFace(bladeOneFace, uvBladeOne, illumination),
+                            new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
+                        };
+            }
+        }
+    }
+
+    class BlockModelGrassBlade : ScissorModel
+    {
+        private Noise3DPerlin perlin = new Noise3DPerlin(150);
+
+        public BlockModelGrassBlade(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(7, 2));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(7, 2));
+        }
+
+        public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
+        {
+            float rawOffset = (float)perlin.GetValue(blockPos.X * 0.75f, blockPos.Y * 0.75f, blockPos.Z * 0.75f);
+
+            float offset = rawOffset / 7;
+            Vector3 offsetVec = new Vector3(offset, 0, offset);
+
+            float sizeOffset = Maths.ConvertRange(-1, 1, 0.75f, 1, rawOffset);
+            Vector3 scaleVec = new Vector3(sizeOffset, sizeOffset, sizeOffset);
+
+            Vector3[] bladeOneFaceCopy = new Vector3[bladeOneFace.Length];
+            bladeOneFace.CopyTo(bladeOneFaceCopy, 0);
+
+            Vector3[] bladeTwoFaceCopy = new Vector3[bladeTwoFace.Length];
+            bladeTwoFace.CopyTo(bladeTwoFaceCopy, 0);
+
+            for(int i = 0; i < bladeOneFaceCopy.Length; i++)
+            {
+                bladeOneFaceCopy[i] = bladeOneFaceCopy[i] * scaleVec + offsetVec;
+            }
+            for(int i = 0; i < bladeTwoFaceCopy.Length; i++)
+            {
+                bladeTwoFaceCopy[i] = bladeTwoFaceCopy[i] * scaleVec + offsetVec;
+            }
+
+            return new BlockFace[] {
+                new BlockFace(bladeOneFaceCopy, uvBladeOne, illumination),
+                new BlockFace(bladeTwoFaceCopy, uvBladeTwo, illumination)
+            };
+        }
+    }
+
+    class BlockModelDeadBush : ScissorModel
+    {
+        public BlockModelDeadBush(TextureAtlas textureAtlas) : base(textureAtlas) { }
+
+        protected override void SetStandardUVs()
+        {
+            uvBladeOne = textureAtlas.GetTextureCoords(new Vector2(7, 3));
+            uvBladeTwo = textureAtlas.GetTextureCoords(new Vector2(7, 3));
+        }
+    }
+}

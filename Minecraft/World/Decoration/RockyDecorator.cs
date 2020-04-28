@@ -1,7 +1,4 @@
-﻿
-using System;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class RockyDecorator : IDecorator
     {
