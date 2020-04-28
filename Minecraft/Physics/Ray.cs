@@ -38,7 +38,8 @@ namespace Minecraft
                 return null;
             }
 
-            AxisAlignedBox hitAABB = Block.GetFullBlockCollision(new Vector3i(position));
+            Vector3i gridPosition = new Vector3i(position);
+            AxisAlignedBox hitAABB = Block.GetFullBlockCollision(gridPosition);
             float dist = hitAABB.Intersects(this);
             if (dist == float.MaxValue)
             {
@@ -47,7 +48,7 @@ namespace Minecraft
             this.distanceToIntersection = dist;
             Vector3 exactIntersection = origin + direction * distanceToIntersection;
             Vector3 normalAtIntersection = hitAABB.GetNormalAtIntersectionPoint(exactIntersection);
-            return new RayTraceResult(hitAABB, normalAtIntersection, exactIntersection, hitBlockState, new Vector3i(position));
+            return new RayTraceResult(hitAABB, normalAtIntersection, exactIntersection, hitBlockState, gridPosition);
         }
     }
 }
