@@ -22,7 +22,10 @@ namespace Minecraft
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            game.server.world.QueueToRemoveBlockAt(removeBlockPacket.blockPos);
+            foreach(Vector3i blockPos in removeBlockPacket.blockPositions)
+            {
+                game.world.QueueToRemoveBlockAt(blockPos);
+            }
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)

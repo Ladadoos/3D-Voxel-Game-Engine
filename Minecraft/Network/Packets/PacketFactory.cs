@@ -32,8 +32,13 @@ namespace Minecraft
                     }
                 case PacketType.RemoveBlock:
                     {
-                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
-                        return new RemoveBlockPacket(blockPos);
+                        int blockCount = reader.ReadInt32();
+                        Vector3i[] blockPositions = new Vector3i[blockCount];
+                        for(int i = 0; i < blockCount; i++)
+                        {
+                            blockPositions[i] = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());                             
+                        }
+                        return new RemoveBlockPacket(blockPositions);
                     }
                 case PacketType.ChunkData:
                     {

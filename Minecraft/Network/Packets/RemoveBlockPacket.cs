@@ -2,11 +2,19 @@
 {
     class RemoveBlockPacket : Packet
     {
-        public Vector3i blockPos { get; private set; }
+        public int blockCount { get; private set; }
+        public Vector3i[] blockPositions { get; private set; }
+
+        public RemoveBlockPacket(Vector3i[] blockPositions) : base(PacketType.RemoveBlock)
+        {
+            this.blockPositions = blockPositions;
+            this.blockCount = blockPositions.Length;
+        }
 
         public RemoveBlockPacket(Vector3i blockPos) : base(PacketType.RemoveBlock)
         {
-            this.blockPos = blockPos;
+            this.blockPositions = new Vector3i[]{ blockPos };
+            this.blockCount = 1;
         }
 
         public override void Process(INetHandler netHandler)
@@ -16,9 +24,11 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(blockPos.X);
-            bufferedStream.WriteInt32(blockPos.Y);
-            bufferedStream.WriteInt32(blockPos.Z);
+            bufferedStream.WriteInt32(blockCount);
+            foreach(Vector3i blockPos in blockPositions)
+            {
+                bufferedStream.WriteVector3i(blockPos);
+            }
         }
     }
 }

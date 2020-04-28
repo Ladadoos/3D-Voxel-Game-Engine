@@ -47,10 +47,13 @@ namespace Minecraft
                 Logger.Info("Manual garbage collected.");
             } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F4))
             {
-                for (int x = -3; x < 3; x++)
-                    for (int y = -3; y < 3; y++)
-                        for (int z = -3; z < 3; z++)
-                            game.client.WritePacket(new RemoveBlockPacket(new Vector3i(x, y, z) + new Vector3i(game.player.position)));
+                Vector3i[] blockPositions = new Vector3i[7 * 7 * 7];
+                int i = 0;
+                for(int x = -3; x < 3; x++)
+                    for(int y = -3; y < 3; y++)
+                        for(int z = -3; z < 3; z++)
+                            blockPositions[i++] = new Vector3i(x, y, z) + new Vector3i(game.player.position);
+                 game.client.WritePacket(new RemoveBlockPacket(blockPositions));
             } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F5))
             {
                 renderChunkBorders = !renderChunkBorders;
