@@ -11,7 +11,7 @@ namespace Minecraft
 
         protected bool isFlying = true;
         protected bool isInCreativeMode = true;
-        protected bool doCollisionDetection = false;
+        protected bool doCollisionDetection = true;
         protected bool isInAir = true;
         protected bool isCrouching = false;
         protected bool isRunning = false;
