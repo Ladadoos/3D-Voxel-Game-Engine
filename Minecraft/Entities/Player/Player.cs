@@ -168,15 +168,12 @@ namespace Minecraft
         {
             Dictionary<Vector3i, BlockState> collidables = new Dictionary<Vector3i, BlockState>();
 
-            int intX = (int)position.X;
-            int intY = (int)position.Y;
-            int intZ = (int)position.Z;
-
-            for (int worldX = intX - 1; worldX <= intX + 1; worldX++)
+            Vector3i pos = new Vector3i(position);
+            for (int worldX = pos.X - 1; worldX <= pos.X + 1; worldX++)
             {
-                for (int worldY = intY - 1; worldY <= intY + Math.Ceiling(Constants.PLAYER_HEIGHT); worldY++)
+                for (int worldY = pos.Y - 1; worldY <= pos.Y + Math.Ceiling(Constants.PLAYER_HEIGHT); worldY++)
                 {
-                    for (int worldZ = intZ - 1; worldZ <= intZ + 1; worldZ++)
+                    for (int worldZ = pos.Z - 1; worldZ <= pos.Z + 1; worldZ++)
                     {
                         Vector3i blockPos = new Vector3i(worldX, worldY, worldZ);
                         BlockState blockstate = world.GetBlockAt(blockPos);

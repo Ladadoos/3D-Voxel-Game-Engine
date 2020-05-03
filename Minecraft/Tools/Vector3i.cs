@@ -20,11 +20,20 @@ namespace Minecraft
             this.Z = Z;
         }
 
-        public Vector3i(Vector3 vector3f)
+        public Vector3i(Vector3 vector3f, bool snapToGrid = true)
         {
-            X = (int)vector3f.X;
-            Y = (int)vector3f.Y;
-            Z = (int)vector3f.Z;
+            if(snapToGrid)
+            {
+                X = vector3f.X < 0 ? (int)(vector3f.X - 1) : (int)(vector3f.X);
+                Y = vector3f.Y < 0 ? (int)(vector3f.Y - 1) : (int)(vector3f.Y);
+                Z = vector3f.Z < 0 ? (int)(vector3f.Z - 1) : (int)(vector3f.Z);
+            } else
+            {
+                X = (int)vector3f.X;
+                Y = (int)vector3f.Y;
+                Z = (int)vector3f.Z;
+            }
+
         }
 
         public Vector3 ToFloat()

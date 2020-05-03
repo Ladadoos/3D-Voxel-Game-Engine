@@ -21,7 +21,7 @@ namespace Minecraft
             this.intersectedPoint = intersectedPoint;
             this.blockstateHit = blockstateHit;
             this.intersectedBlockPos = blockStatePos;
-            this.blockPlacePosition = blockStatePos + new Vector3i(normalAtHit);
+            this.blockPlacePosition = blockStatePos + new Vector3i(normalAtHit, false);
         }
     }
 }
