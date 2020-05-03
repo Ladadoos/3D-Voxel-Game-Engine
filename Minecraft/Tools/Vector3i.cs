@@ -33,7 +33,6 @@ namespace Minecraft
                 Y = (int)vector3f.Y;
                 Z = (int)vector3f.Z;
             }
-
         }
 
         public Vector3 ToFloat()

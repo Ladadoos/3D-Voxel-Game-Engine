@@ -33,7 +33,7 @@ namespace Minecraft
                 }
             }
 
-            if (hitBlockState == null)
+            if (hitBlockState == null || (hitBlockState != null && hitBlockState.GetBlock() == Blocks.Air))
             {
                 return null;
             }
