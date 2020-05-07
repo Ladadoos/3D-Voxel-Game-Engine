@@ -1,6 +1,6 @@
 ﻿namespace Minecraft
 {
-    class Constants
+    static class Constants
     {
         //General
         public const int SECTION_HEIGHT = 16;

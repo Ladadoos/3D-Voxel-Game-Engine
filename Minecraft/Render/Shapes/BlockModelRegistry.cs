@@ -5,7 +5,7 @@ namespace Minecraft
     class BlockModelRegistry
     {
         public ReadOnlyDictionary<Block, BlockModel> models;
-        private BlockModels blockModels;
+        private readonly BlockModels blockModels;
 
         public BlockModelRegistry(TextureAtlas textureAtlas)
         {

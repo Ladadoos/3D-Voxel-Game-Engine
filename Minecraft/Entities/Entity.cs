@@ -21,7 +21,7 @@ namespace Minecraft
 
         private Vector2 previousChunkPos = new Vector2(float.MaxValue, float.MaxValue);
 
-        public Entity(int id, Vector3 position, EntityType entityType)
+        protected Entity(int id, Vector3 position, EntityType entityType)
         {
             this.id = id;
             this.position = position;

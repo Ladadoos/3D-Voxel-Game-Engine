@@ -5,9 +5,9 @@ namespace Minecraft
 {
     class UICanvasEntityName : UICanvas
     {
-        private Game game;
-        private ClientPlayer myPlayer;
-        private Entity otherEntity;
+        private readonly Game game;
+        private readonly ClientPlayer myPlayer;
+        private readonly Entity otherEntity;
 
         public UICanvasEntityName(Game game, Entity otherEntity, string text) :
             base(otherEntity.position + new Vector3(0, 1, 0), Vector3.Zero, 800, 450, RenderSpace.World)

@@ -53,10 +53,6 @@ namespace Minecraft
             {
                 throw new System.Exception("Invalid id: " + id);
             }
-            if(id == 0)
-            {
-                //System.Console.WriteLine("got air" );
-            }
             return registeredBlocks[id];
         }
     }

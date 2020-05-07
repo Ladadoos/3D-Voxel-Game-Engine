@@ -28,7 +28,7 @@ namespace Minecraft
         protected delegate void OnToggleCrouching(bool isCrouching);
         protected event OnToggleCrouching OnToggleCrouchingHandler;
 
-        public Player(int id, string playerName, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
+        protected Player(int id, string playerName, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
         {
             this.playerName = playerName;
             jumpStopWatch.Start();

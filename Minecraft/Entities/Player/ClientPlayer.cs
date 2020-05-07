@@ -6,14 +6,14 @@ namespace Minecraft
 {
     class ClientPlayer : Player
     {
-        private Game game;
+        private readonly Game game;
 
         public Camera camera;
         public RayTraceResult mouseOverObject { get; private set; }
 
         private BlockState selectedBlock = Blocks.SugarCane.GetNewDefaultState();
 
-        private float secondsPerPosUpdate = 1F;
+        private const float secondsPerPosUpdate = 1F;
         private float elapsedMsSinceLastPosUpdate;
 
         public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 200, 0))
@@ -47,17 +47,22 @@ namespace Minecraft
             }
         }
 
+        private void UpdateCameraPosition()
+        {
+            Vector3 cameraPosition = position;
+            cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
+            cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
+            cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
+            camera.SetPosition(cameraPosition);
+        }
+
         public override void Update(float deltaTime, World world)
         {
             UpdateKeyboardInput();
             ApplyVelocityAndCheckCollision(deltaTime, world);
             mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(world);
 
-            Vector3 cameraPosition = position;
-            cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
-            cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
-            cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
-            camera.SetPosition(cameraPosition);
+            UpdateCameraPosition();
 
             if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused && mouseOverObject != null)
             {

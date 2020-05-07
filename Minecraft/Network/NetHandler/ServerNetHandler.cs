@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class ServerNetHandler : INetHandler
     {
-        private Game game;
+        private readonly Game game;
         private ServerSession session;
 
         public ServerNetHandler(Game game)
@@ -15,9 +15,9 @@ namespace Minecraft
 
         public void AssignSession(ServerSession session) => this.session = session;
 
-        public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockpacket)
+        public void ProcessPlaceBlockPacket(PlaceBlockPacket placeBlockpacket)
         {
-            game.server.world.QueueToAddBlockAt(placedBlockpacket.blockPos, placedBlockpacket.blockState);
+            game.server.world.QueueToAddBlockAt(placeBlockpacket.blockPos, placeBlockpacket.blockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
@@ -100,11 +100,11 @@ namespace Minecraft
             BlockState state = game.server.world.GetBlockAt(blockPos);
             state.GetBlock().OnInteract(state, blockPos, game.server.world);
 
-            foreach(ServerSession session in game.server.clients)
+            foreach(ServerSession clientSession in game.server.clients)
             {
-                if(session.IsBlockPositionInViewRange(blockPos))
+                if(clientSession.IsBlockPositionInViewRange(blockPos))
                 {
-                    session.WritePacket(playerInteractionPacket);
+                    clientSession.WritePacket(playerInteractionPacket);
                 }
             }
         }

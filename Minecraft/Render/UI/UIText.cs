@@ -24,7 +24,7 @@ namespace Minecraft
         public Font font { get; private set; }
         public Vector2 scale { get; private set; }
 
-        private TextMeshBuilder meshBuilder = new TextMeshBuilder();
+        private readonly TextMeshBuilder meshBuilder = new TextMeshBuilder();
 
         public UIText(UICanvas parentCanvas, Font font, Vector2 position, Vector2 scale, string text) : base(parentCanvas, position)
         {

@@ -11,9 +11,9 @@ namespace Minecraft
         protected List<float> normals = new List<float>();
         protected int indicesCount;
 
-        protected BlockModelRegistry blockModelRegistry;
+        protected readonly BlockModelRegistry blockModelRegistry;
 
-        public MeshGenerator(BlockModelRegistry blockModelRegistry)
+        protected MeshGenerator(BlockModelRegistry blockModelRegistry)
         {
             this.blockModelRegistry = blockModelRegistry;
         }

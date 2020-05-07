@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class BarrenDecorator : IDecorator
     {
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         public void Decorate(Chunk chunk, int worldY, int localX, int localZ)
         {

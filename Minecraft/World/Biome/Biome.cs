@@ -10,7 +10,7 @@
         public double temperature { get; protected set; }
         public double moisture { get; protected set; }
 
-        public Biome()
+        protected Biome()
         {
             DefineProperties();
         }

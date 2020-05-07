@@ -20,7 +20,7 @@ namespace Minecraft
         }
 
         private float nearWidth, nearHeight, farWidth, farHeight;
-        private FrustumPlane[] frustumPlanes = new FrustumPlane[6];
+        private readonly FrustumPlane[] frustumPlanes = new FrustumPlane[6];
 
         public ViewFrustum(ProjectionMatrixInfo projectionInfo)
         {
@@ -29,7 +29,7 @@ namespace Minecraft
 
         private void CalculateNearFarWidthHeight(ProjectionMatrixInfo pInfo)
         {
-            float aspectRatio = pInfo.windowWidth / pInfo.windowHeight;
+            float aspectRatio = pInfo.windowWidth / (float)pInfo.windowHeight;
             float extension = 2;
             float tan = (float)Math.Tan(pInfo.fieldOfView * 0.5) * extension;
             nearHeight = tan * pInfo.distanceNearPlane;

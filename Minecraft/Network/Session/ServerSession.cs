@@ -2,7 +2,7 @@
 {
     class ServerSession : Session
     {
-        private ChunkProvider chunkProvider;
+        private readonly ChunkProvider chunkProvider;
 
         public ServerSession(Connection connection, INetHandler netHandler)
             : base(connection, netHandler)

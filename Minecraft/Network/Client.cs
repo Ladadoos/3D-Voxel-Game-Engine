@@ -8,22 +8,21 @@ namespace Minecraft
 {
     class Client
     {
-        private Game game;
+        private readonly Game game;
 
         private string host;
         private int port;
         private ClientSession session;
 
-        public static readonly float KeepAliveTimeoutSeconds = 35;
-        private static readonly float timeoutInSeconds = 30;
+        public const float KeepAliveTimeoutSeconds = 35;
+        private const float timeoutInSeconds = 30;
         private float elapsedTime;
 
-        private object writePacketLock = new object();
-        private object readPacketLock = new object();
-        private Queue<Packet> toSendPackets = new Queue<Packet>();
-        private Queue<Packet> toProcessPackets = new Queue<Packet>();
-
-        private Thread packetTransferThread;
+        private readonly object  writePacketLock = new object();
+        private readonly object readPacketLock = new object();
+        private readonly Queue<Packet> toSendPackets = new Queue<Packet>();
+        private readonly Queue<Packet> toProcessPackets = new Queue<Packet>();
+        private readonly Thread packetTransferThread;
 
         public Client(Game game)
         {
@@ -38,7 +37,10 @@ namespace Minecraft
 
         private void HandlePacketCommunication()
         {
-            while (session == null || session.state == SessionState.Started) { }
+            while(session == null || session.state == SessionState.Started)
+            {
+                Thread.Sleep(5);
+            }
 
             while (true)
             {

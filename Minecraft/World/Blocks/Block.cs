@@ -9,7 +9,7 @@ namespace Minecraft
         public bool isInteractable { get; protected set; }
         protected readonly AxisAlignedBox[] emptyAABB = new AxisAlignedBox[0];
 
-        public Block(ushort id)
+        protected Block(ushort id)
         {
             this.id = id;
         }

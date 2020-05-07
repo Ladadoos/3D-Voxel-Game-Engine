@@ -4,8 +4,8 @@ namespace Minecraft
 {
     class ForestDecorator : IDecorator
     {
-        private Random random = new Random();
-        private OakTreeGenerator oakTreeGen = new OakTreeGenerator();
+        private readonly Random random = new Random();
+        private readonly OakTreeGenerator oakTreeGen = new OakTreeGenerator();
 
         public void Decorate(Chunk chunk, int worldY, int localX, int localZ)
         {

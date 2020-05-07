@@ -2,9 +2,9 @@
 {
     class MountainBiome : Biome
     {
-        private Noise2DPerlin noiseOctave = new Noise2DPerlin();
-        private double terrainDetail = 0.005D;
-        private double heightVariation = 64;
+        private readonly Noise2DPerlin noiseOctave = new Noise2DPerlin();
+        private const double terrainDetail = 0.005D;
+        private const double heightVariation = 64;
 
         protected override void DefineProperties()
         {

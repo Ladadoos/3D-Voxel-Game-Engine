@@ -12,7 +12,7 @@ namespace Minecraft
 
         public ViewFrustum viewFrustum { get; private set; }
 
-        private ProjectionMatrixInfo defaultProjection;
+        private readonly ProjectionMatrixInfo defaultProjection;
         public ProjectionMatrixInfo currentProjection { get; private set; }
         public Matrix4 currentProjectionMatrix { get; private set; }
         public Matrix4 currentViewMatrix { get; private set; }

@@ -5,8 +5,8 @@ namespace Minecraft
 {
     class EntityIdTracker
     {
-        private HashSet<int> entityIdsTaken = new HashSet<int>();
-        private Random random = new Random();
+        private readonly HashSet<int> entityIdsTaken = new HashSet<int>();
+        private readonly Random random = new Random();
 
         public int GenerateId()
         {

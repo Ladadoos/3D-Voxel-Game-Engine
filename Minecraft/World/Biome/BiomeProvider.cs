@@ -4,9 +4,9 @@ namespace Minecraft
 {
     class BiomeProvider
     {
-        private double[] temperatureCache;
-        private BiomeMembership[] biomeMembershipCache;
-        private Biome[] registeredBiomes;
+        private readonly double[] temperatureCache;
+        private readonly BiomeMembership[] biomeMembershipCache;
+        private readonly Biome[] registeredBiomes;
 
         public BiomeProvider(Biome[] registeredBiomes)
         {

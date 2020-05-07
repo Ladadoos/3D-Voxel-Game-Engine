@@ -8,13 +8,12 @@ namespace Minecraft
     class CameraController
     {
         public Camera camera { get; private set; }
-        private GameWindow window;
-        private Vector2 lastMousePos;
+        private readonly GameWindow window;
+        private Vector2 lastMousePos = new Vector2();
 
         public CameraController(GameWindow window)
         {
             this.window = window;
-            lastMousePos = new Vector2();
         }
 
         public void Update()

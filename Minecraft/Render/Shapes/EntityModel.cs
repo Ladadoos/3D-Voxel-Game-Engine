@@ -4,10 +4,10 @@ namespace Minecraft
 {
     abstract class EntityModel
     {
-        protected TextureAtlas textureAtlas;
+        protected readonly TextureAtlas textureAtlas;
         public BlockFace[] entityFaces { get; protected set; }
 
-        public EntityModel(TextureAtlas textureAtlas)
+        protected EntityModel(TextureAtlas textureAtlas)
         {
             this.textureAtlas = textureAtlas;
         }

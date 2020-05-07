@@ -4,7 +4,7 @@
     {
         public Player player { get; private set; }
         public INetHandler netHandler { get; private set; }
-        private Connection connection;
+        private readonly Connection connection;
         public PlayerSettings playerSettings { get; private set; }
 
         public delegate void OnStateChanged(Session session);
@@ -23,7 +23,7 @@
         public delegate void OnPlayerAssigned();
         public event OnPlayerAssigned OnPlayerAssignedHandler;
 
-        public Session(Connection connection, INetHandler netHandler)
+        protected Session(Connection connection, INetHandler netHandler)
         {
             this.connection = connection;
             this.netHandler = netHandler;

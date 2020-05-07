@@ -23,28 +23,32 @@ namespace Minecraft
             public ChunkBufferLayout chunkLayout;
         }
 
-        private float colorClearR = 0.57F;
-        private float colorClearG = 0.73F;
-        private float colorClearB = 1.0F;
+        private const float colorClearR = 0.57F;
+        private const float colorClearG = 0.73F;
+        private const float colorClearB = 1.0F;
 
-        private ShaderBasic basicShader;
-        private EntityShader entityShader;
-        private CameraController cameraController;
-        private WireframeRenderer wireframeRenderer;
-        private DebugHelper debugHelper;
-        private PlayerHoverBlockRenderer playerBlockRenderer;
-        private TextureAtlas textureAtlas;
-        private BlockModelRegistry blockModelRegistry;
-        private EntityMeshRegistry entityMeshRegistry;
-        private ScreenQuad screenQuad;
-        private UIRenderer uiRenderer;
-        private UICanvasIngame ingameCanvas;
+        private readonly ShaderBasic basicShader;
+        private readonly EntityShader entityShader;
+        private readonly CameraController cameraController;
+        private readonly WireframeRenderer wireframeRenderer;
+        private readonly DebugHelper debugHelper;
+        private readonly PlayerHoverBlockRenderer playerBlockRenderer;
+        private readonly TextureAtlas textureAtlas;
+        private readonly BlockModelRegistry blockModelRegistry;
+        private readonly EntityMeshRegistry entityMeshRegistry;
+        private readonly ScreenQuad screenQuad;
+        private readonly UIRenderer uiRenderer;
+        private readonly UICanvasIngame ingameCanvas;
 
-        private Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
-        private HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
-        private OpaqueMeshGenerator blocksMeshGenerator;
+        private readonly Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
+        private readonly HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
+        private readonly OpaqueMeshGenerator blocksMeshGenerator;
 
-        private Game game;
+        private readonly Queue<ChunkRemeshLayout> availableChunkMeshes = new Queue<ChunkRemeshLayout>();
+        private readonly object meshLock = new object();
+        private readonly Thread meshGenerationThread;
+
+        private readonly Game game;
 
         public MasterRenderer(Game game)
         {
@@ -62,6 +66,10 @@ namespace Minecraft
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(this);
+            if(wireframeRenderer == null)
+                System.Console.WriteLine("ok");
+            if(game == null)
+                System.Console.WriteLine("ok1");
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
@@ -72,9 +80,9 @@ namespace Minecraft
             EnableDepthTest();
             EnableCulling();
 
-            Thread meshThread = new Thread(MeshGeneratorThread);
-            meshThread.IsBackground = true;
-            meshThread.Start();
+            meshGenerationThread = new Thread(MeshGeneratorThread);
+            meshGenerationThread.IsBackground = true;
+            meshGenerationThread.Start();
         }
 
         public void SetActiveCamera(Camera camera)
@@ -158,14 +166,11 @@ namespace Minecraft
                     if (chunkToRender.Value.hardBlocksModel == null) continue;
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                    Vector3 max = min + new Vector3(16, 256, 16);
                     wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16));
                 }
             }
         }
 
-        private Queue<ChunkRemeshLayout> avaiableChunkMeshes = new Queue<ChunkRemeshLayout>();
-        private object meshLock = new object();
         private void MeshGeneratorThread()
         {
             while (true)
@@ -185,7 +190,7 @@ namespace Minecraft
                             toRenderChunks.Add(gridPosition, renderChunk);
                         }
 
-                        avaiableChunkMeshes.Enqueue(new ChunkRemeshLayout()
+                        availableChunkMeshes.Enqueue(new ChunkRemeshLayout()
                         {
                             renderChunk = renderChunk,
                             chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
@@ -216,9 +221,9 @@ namespace Minecraft
 
             lock(meshLock)
             {
-                if(avaiableChunkMeshes.Count > 0)
+                if(availableChunkMeshes.Count > 0)
                 {
-                    chunkMesh = avaiableChunkMeshes.Dequeue();
+                    chunkMesh = availableChunkMeshes.Dequeue();
                     foundChunkToRemesh = true;
                 }
             }

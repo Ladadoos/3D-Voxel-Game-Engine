@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class OakTreeGenerator : ITreeGenerator
     {
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         public void GenerateTreeAt(Chunk chunk, int localX, int worldY, int localZ)
         {

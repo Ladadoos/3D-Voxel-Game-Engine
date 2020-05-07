@@ -6,11 +6,11 @@ namespace Minecraft
 {
     class UIRenderer
     {
-        private Dictionary<RenderSpace, List<UICanvas>> canvasses = new Dictionary<RenderSpace, List<UICanvas>>();
-        private CameraController cameraController;
-        private GameWindow window;
-        private UIShader uiShader;
-        private FontRegistry fontRegistry = new FontRegistry();
+        private readonly Dictionary<RenderSpace, List<UICanvas>> canvasses = new Dictionary<RenderSpace, List<UICanvas>>();
+        private readonly CameraController cameraController;
+        private readonly GameWindow window;
+        private readonly UIShader uiShader;
+        private readonly FontRegistry fontRegistry = new FontRegistry();
       
         public UIRenderer(GameWindow window, CameraController cameraController)
         {

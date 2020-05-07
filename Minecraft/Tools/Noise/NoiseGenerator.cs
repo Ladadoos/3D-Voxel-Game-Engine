@@ -6,13 +6,13 @@ namespace Minecraft
     {
         public int seed { get; private set; }
 
-        public NoiseGenerator()
+        protected NoiseGenerator()
         {
             Random random = new Random();
             seed = random.Next(10000);
         }
 
-        public NoiseGenerator(int seed)
+        protected NoiseGenerator(int seed)
         {
             this.seed = seed;
         }

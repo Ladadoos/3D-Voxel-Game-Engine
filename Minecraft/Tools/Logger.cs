@@ -7,7 +7,7 @@ namespace Minecraft
         Packet, Info, Warn, Error
     };
 
-    class Logger
+    static class Logger
     {
         private static LogLevel logLevel = LogLevel.Packet;
 

@@ -10,7 +10,7 @@ namespace Minecraft
 {
     sealed class GameWindow : OpenTK.GameWindow
     {
-        private Game game;
+        private readonly Game game;
 
         public GameWindow(StartArgs startArgs) : base(720, 480, GraphicsMode.Default, "Minecraft OpenGL", GameWindowFlags.Default, DisplayDevice.Default, 3, 0, GraphicsContextFlags.ForwardCompatible)
         {

@@ -6,7 +6,6 @@ namespace Minecraft
     class UICanvasDebug : UICanvas
     {
         private Game game;
-
         private UIText debugText;
 
         public UICanvasDebug(Game game) : 

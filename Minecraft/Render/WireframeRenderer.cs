@@ -5,9 +5,9 @@ namespace Minecraft
 {
     class WireframeRenderer
     {
-        private WireframeShader shader = new WireframeShader();
+        private readonly WireframeShader shader = new WireframeShader();
+        private readonly MasterRenderer renderer;
         private VAOModel aabbCube;
-        private MasterRenderer renderer;
 
         public WireframeRenderer(MasterRenderer renderer)
         {

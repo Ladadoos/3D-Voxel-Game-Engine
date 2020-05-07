@@ -4,10 +4,10 @@ namespace Minecraft
 {
     class OpaqueMeshGenerator : MeshGenerator
     {
-        private float topLight = 1.15F;
-        private float bottomLight = 0.85F;
-        private float sideXLight = 1F;
-        private float sideZLight = 0.95F;
+        private const float topLight = 1.15F;
+        private const float bottomLight = 0.85F;
+        private const float sideXLight = 1F;
+        private const float sideZLight = 0.95F;
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {           
@@ -108,7 +108,7 @@ namespace Minecraft
                 if (westChunk == null)
                     return true;
 
-                Section westSection = westSection = westChunk.sections[currentSection.height];
+                Section westSection = westChunk.sections[currentSection.height];
                 if (westSection == null)
                     return true;
 
@@ -137,7 +137,7 @@ namespace Minecraft
                 if (eastChunk == null)
                     return true;
 
-                Section eastSection = eastSection = eastChunk.sections[currentSection.height];
+                Section eastSection = eastChunk.sections[currentSection.height];
                 if (eastSection == null)
                     return true;
 
@@ -166,7 +166,7 @@ namespace Minecraft
                 if (northChunk == null)
                     return true;
 
-                Section northSection = northSection = northChunk.sections[currentSection.height];
+                Section northSection = northChunk.sections[currentSection.height];
                 if (northSection == null)
                     return true;
 
@@ -195,7 +195,7 @@ namespace Minecraft
                 if (southChunk == null)
                     return true;
 
-                Section southSection = southSection = southChunk.sections[currentSection.height];
+                Section southSection = southChunk.sections[currentSection.height];
                 if (southSection == null)
                     return true;
 

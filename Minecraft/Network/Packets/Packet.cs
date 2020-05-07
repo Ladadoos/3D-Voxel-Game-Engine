@@ -4,7 +4,7 @@
     {
         protected PacketType type;
 
-        public Packet(PacketType type)
+        protected Packet(PacketType type)
         {
             this.type = type;
         }

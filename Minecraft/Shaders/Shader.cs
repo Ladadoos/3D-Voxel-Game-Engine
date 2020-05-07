@@ -5,11 +5,11 @@ namespace Minecraft
 {
     abstract class Shader
     {
-        private int programID;
-        private int vertexShaderID;
-        private int fragmentShaderID;
+        private readonly int programID;
+        private readonly int vertexShaderID;
+        private readonly int fragmentShaderID;
 
-        public Shader(string vertexFile, string fragmentFile)
+        protected Shader(string vertexFile, string fragmentFile)
         {
             vertexShaderID = LoadShader(vertexFile, ShaderType.VertexShader);
             fragmentShaderID = LoadShader(fragmentFile, ShaderType.FragmentShader);

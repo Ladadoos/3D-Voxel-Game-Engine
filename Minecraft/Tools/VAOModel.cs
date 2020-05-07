@@ -9,7 +9,7 @@ namespace Minecraft
     {
         public int indicesCount { get; private set; }
         private int vaoId;
-        private List<int> buffers = new List<int>();
+        private readonly List<int> buffers = new List<int>();
 
         public VAOModel(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {

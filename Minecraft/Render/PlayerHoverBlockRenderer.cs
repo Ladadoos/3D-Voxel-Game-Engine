@@ -4,8 +4,8 @@ namespace Minecraft
 {
     class PlayerHoverBlockRenderer
     {
-        private WireframeRenderer wireframeRenderer;
-        private ClientPlayer player;
+        private readonly WireframeRenderer wireframeRenderer;
+        private readonly ClientPlayer player;
 
         public PlayerHoverBlockRenderer(WireframeRenderer wireframeRenderer, ClientPlayer player)
         {

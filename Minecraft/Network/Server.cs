@@ -18,18 +18,17 @@ namespace Minecraft
         private bool isRunning;
 
         public WorldServer world { get; private set; }
-        private Game game;
+        private readonly Game game;
 
         /// <summary> Returns true if the server is open to more connections than the host. </summary>
         public bool isOpen { get; private set; }
 
         private ServerSession host;
 
-        private object newJoinsLock = new object();
-        private Queue<TcpClient> joinQueue = new Queue<TcpClient>();
-        private Queue<ServerSession> toRemoveClients = new Queue<ServerSession>();
-
-        private Dictionary<ServerSession, Stopwatch> keepAlives = new Dictionary<ServerSession, Stopwatch>();
+        private readonly object newJoinsLock = new object();
+        private readonly Queue<TcpClient> joinQueue = new Queue<TcpClient>();
+        private readonly Queue<ServerSession> toRemoveClients = new Queue<ServerSession>();
+        private readonly Dictionary<ServerSession, Stopwatch> keepAlives = new Dictionary<ServerSession, Stopwatch>();
 
         public Server(Game game, bool isOpen)
         {
@@ -104,10 +103,7 @@ namespace Minecraft
         private void OnSessionStateChanged(Session serverSession)
         {
             ServerSession session = (ServerSession)serverSession;
-            if (session.state == SessionState.Accepted)
-            {
-
-            } else if (session.state == SessionState.Closed)
+            if (session.state == SessionState.Closed)
             {
                 Logger.Info("Connection closed with " + session?.player.id);
                 toRemoveClients.Enqueue(session);

@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class Noise2DPerlin : NoiseGenerator
     {
-        private Perlin perlin = new Perlin();
+        private readonly Perlin perlin = new Perlin();
 
         public Noise2DPerlin(int seed) : base(seed)
         {

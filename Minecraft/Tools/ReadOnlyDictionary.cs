@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        private IDictionary<TKey, TValue> dictionary;
+        private readonly IDictionary<TKey, TValue> dictionary;
 
         public ReadOnlyDictionary(IDictionary<TKey, TValue> backingDict)
         {

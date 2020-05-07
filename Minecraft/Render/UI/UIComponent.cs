@@ -8,7 +8,7 @@ namespace Minecraft
         public Vector2 pixelPositionInCanvas { get; private set; }
         protected VAOModel vaoModel;
 
-        public UIComponent(UICanvas parentCanvas, Vector2 pixelPositionInCanvas)
+        protected UIComponent(UICanvas parentCanvas, Vector2 pixelPositionInCanvas)
         {
             this.parentCanvas = parentCanvas;
             this.pixelPositionInCanvas = pixelPositionInCanvas;

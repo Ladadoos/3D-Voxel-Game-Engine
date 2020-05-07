@@ -5,7 +5,7 @@ namespace Minecraft
     class OtherClientPlayer : Player
     {
         public Vector3 serverPosition;
-        private float positionLerpSmoothFactor = 20;
+        private const float positionLerpSmoothFactor = 20;
 
         public OtherClientPlayer(int id, string playerName) : base(id, playerName, new Vector3(10, 100, 10))
         {

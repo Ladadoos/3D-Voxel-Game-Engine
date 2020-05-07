@@ -5,12 +5,10 @@ namespace Minecraft
 {
     class DebugHelper
     {
-        private WireframeRenderer wireframeRenderer;
-        private Game game;
-
+        private readonly WireframeRenderer wireframeRenderer;
+        private readonly Game game;
+        private readonly Camera debugCamera;
         private UICanvasDebug debugCanvas;
-
-        private Camera debugCamera;
 
         private bool renderFromPlayerCamera;
         private bool renderHitboxes;

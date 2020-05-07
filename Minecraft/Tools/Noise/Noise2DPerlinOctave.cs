@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class Noise2DPerlinOctave : NoiseGenerator
     {
-        private int octaves;
+        private readonly int octaves;
         private Perlin[] perlins;
 
         public Noise2DPerlinOctave(int octaves, int seed) : base(seed)

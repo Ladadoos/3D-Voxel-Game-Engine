@@ -4,8 +4,8 @@ namespace Minecraft
 {
     class Noise3DPerlin
     {
-        private Perlin perlin = new Perlin();
-        private int seed;
+        private readonly Perlin perlin = new Perlin();
+        private readonly int seed;
 
         public Noise3DPerlin(int seed)
         {

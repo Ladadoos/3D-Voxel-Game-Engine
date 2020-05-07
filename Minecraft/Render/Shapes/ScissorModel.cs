@@ -11,7 +11,7 @@ namespace Minecraft
 
         protected float[] illumination = new float[4] { 1, 1, 1, 1 };
 
-        public ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
+        protected ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
             doubleSided = true;
@@ -104,7 +104,7 @@ namespace Minecraft
 
     class BlockModelGrassBlade : ScissorModel
     {
-        private Noise3DPerlin perlin = new Noise3DPerlin(150);
+        private readonly Noise3DPerlin perlin = new Noise3DPerlin(150);
 
         public BlockModelGrassBlade(TextureAtlas textureAtlas) : base(textureAtlas) { }
 

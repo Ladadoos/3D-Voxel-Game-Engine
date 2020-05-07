@@ -5,11 +5,11 @@ namespace Minecraft
 {
     class ScreenQuad
     {
-        private ScreenFBO fbo;
-        private PostRenderShader shader;
+        private readonly ScreenFBO fbo;
+        private readonly PostRenderShader shader;
 
-        private int vao, vbo;
-        private float[] quadVertices = { 
+        private readonly int vao, vbo;
+        private readonly float[] quadVertices = { 
                 // positions   // texCoords
             -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,

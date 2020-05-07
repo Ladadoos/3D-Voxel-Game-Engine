@@ -3,7 +3,7 @@ using System;
 
 namespace Minecraft
 {
-    class Maths
+    static class Maths
     {
         public static Matrix4 CreateTransformationMatrix(Vector3 translation,
                                                         float rx = 0, float ry = 0, float rz = 0,

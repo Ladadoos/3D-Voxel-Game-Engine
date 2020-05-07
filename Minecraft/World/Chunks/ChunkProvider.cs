@@ -6,13 +6,13 @@ namespace Minecraft
 {
     class ChunkProvider
     {
-        private ServerSession session;
-        private PlayerSettings playerSettings;
+        private readonly ServerSession session;
+        private readonly PlayerSettings playerSettings;
         public HashSet<Vector2> currentlyVisibleChunks { get; private set;} = new HashSet<Vector2>();
 
-        private object chunkRetrievalLock = new object();
-        private Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();
-        private HashSet<GenerateChunkRequestOutgoing> outgoingChunkRequests = new HashSet<GenerateChunkRequestOutgoing>(); 
+        private readonly object chunkRetrievalLock = new object();
+        private readonly Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();
+        private readonly HashSet<GenerateChunkRequestOutgoing> outgoingChunkRequests = new HashSet<GenerateChunkRequestOutgoing>(); 
 
         public ChunkProvider(ServerSession session, PlayerSettings playerSettings)
         {

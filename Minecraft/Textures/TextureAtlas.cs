@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class TextureAtlas : Texture
     {
-        private float cellUVSize;
+        private readonly float cellUVSize;
 
         public TextureAtlas(int textureId, int atlasSizeInPixels, int atlasCellSizeInPixels) : base(textureId, atlasSizeInPixels, atlasSizeInPixels)
         {

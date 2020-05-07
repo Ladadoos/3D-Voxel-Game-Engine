@@ -16,7 +16,7 @@ namespace Minecraft
 
         protected float[] illumination = new float[4] { 1, 1, 1, 1 };
 
-        public FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
+        protected FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
 

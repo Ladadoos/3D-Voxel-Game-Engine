@@ -5,7 +5,7 @@ namespace Minecraft
     class EntityModelRegistry
     {
         public ReadOnlyDictionary<EntityType, EntityModel> models;
-        private EntityModels entityModels;
+        private readonly EntityModels entityModels;
 
         public EntityModelRegistry(TextureAtlas textureAtlas)
         {

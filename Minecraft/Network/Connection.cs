@@ -9,7 +9,7 @@ namespace Minecraft
         public NetworkStream netStream;
         public BinaryReader reader;
         public NetBufferedStream bufferedStream;
-        private PacketFactory packetFactory = new PacketFactory();
+        private readonly PacketFactory packetFactory = new PacketFactory();
 
         public void Close()
         {       

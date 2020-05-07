@@ -14,10 +14,5 @@ namespace Minecraft
             UIImage cursor = new UIImage(this, new Vector2(midX - 10, midY - 10), new Vector2(20, 20), cursorTexture);
             AddComponentToRender(cursor);
         }
-
-        public override void Update()
-        {
-            
-        }
     }
 }

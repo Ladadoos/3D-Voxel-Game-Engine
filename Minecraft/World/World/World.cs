@@ -7,14 +7,14 @@ namespace Minecraft
 {
     abstract class World
     {
-        public Game game;
+        public readonly Game game;
 
-        private float secondsPerTick = 0.05F;
+        private const float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
 
-        private Queue<List<Vector3i>> toRemoveBlocks = new Queue<List<Vector3i>>();
-        private Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
-        private Queue<Entity> toRemoveEntities = new Queue<Entity>();
+        private readonly Queue<List<Vector3i>> toRemoveBlocks = new Queue<List<Vector3i>>();
+        private readonly Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
+        private readonly Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
         public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
         public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
@@ -39,7 +39,7 @@ namespace Minecraft
         public delegate void OnEntityDespawned(World world, Entity entity);
         public event OnEntityDespawned OnEntityDespawnedHandler;
 
-        public World(Game game)
+        protected World(Game game)
         {
             this.game = game;
         }

@@ -5,7 +5,7 @@ namespace Minecraft
 {
     class ClientNetHandler : INetHandler
     {
-        private Game game;
+        private readonly Game game;
         private ClientSession session;
 
         public ClientNetHandler(Game game)
@@ -15,9 +15,9 @@ namespace Minecraft
 
         public void AssignSession(ClientSession session) => this.session = session;
 
-        public void ProcessPlaceBlockPacket(PlaceBlockPacket placedBlockPacket)
+        public void ProcessPlaceBlockPacket(PlaceBlockPacket placeBlockPacket)
         {
-            game.world.QueueToAddBlockAt(placedBlockPacket.blockPos, placedBlockPacket.blockState);
+            game.world.QueueToAddBlockAt(placeBlockPacket.blockPos, placeBlockPacket.blockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)

@@ -26,26 +26,26 @@ namespace Minecraft
 
     class WorldGenerator
     {
-        private MountainBiome mountainBiome = new MountainBiome();
-        private ForestBiome forestBiome = new ForestBiome();
-        private DesertBiome desertBiome = new DesertBiome();
+        private readonly MountainBiome mountainBiome = new MountainBiome();
+        private readonly ForestBiome forestBiome = new ForestBiome();
+        private readonly  DesertBiome desertBiome = new DesertBiome();
 
-        private double temperatureDetail = 0.0075D;
-        private Noise2DPerlin temperatureFunction = new Noise2DPerlin();
+        private const double temperatureDetail = 0.0075D;
+        private readonly Noise2DPerlin temperatureFunction = new Noise2DPerlin();
          
-        private double moistureDetail = 0.0075D;
-        private Noise2DPerlin moistureFunction = new Noise2DPerlin(25555);
+        private const double moistureDetail = 0.0075D;
+        private readonly Noise2DPerlin moistureFunction = new Noise2DPerlin(25555);
 
-        private BiomeProvider biomeProvider;
+        private readonly BiomeProvider biomeProvider;
 
-        private Biome[] registeredBiomes;
+        private readonly Biome[] registeredBiomes;
         private const int activeBiomes = 3;
         private int seaLevel = 100;
 
-        private object generationLock = new object();
-        private Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();
-        private Queue<GenerateChunkRequest> chunkGenerationOrder = new Queue<GenerateChunkRequest>();
-        private Thread terrainGeneratorThread;
+        private readonly object generationLock = new object();
+        private readonly Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();
+        private readonly Queue<GenerateChunkRequest> chunkGenerationOrder = new Queue<GenerateChunkRequest>();
+        private readonly Thread terrainGeneratorThread;
 
         public WorldGenerator()
         {

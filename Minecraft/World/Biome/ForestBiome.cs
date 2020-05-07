@@ -2,9 +2,9 @@
 {
     class ForestBiome : Biome
     {
-        private Noise2DPerlin noisePerlin = new Noise2DPerlin();
-        private double terrainDetail = 0.005D;
-        private double heightVariation = 32;
+        private readonly Noise2DPerlin noisePerlin = new Noise2DPerlin();
+        private const double terrainDetail = 0.005D;
+        private const double heightVariation = 32;
 
         protected override void DefineProperties()
         {

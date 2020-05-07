@@ -70,9 +70,6 @@ namespace Minecraft
             if (mode != RunMode.Server)
             {
                 masterRenderer.CleanUp();
-            } else
-            {
-
             }
         }
 
@@ -120,9 +117,6 @@ namespace Minecraft
             if (mode != RunMode.Server)
             {
                 player.camera.SetWindowSize(newWidth, newHeight);
-            } else
-            {
-
             }
         }
     }

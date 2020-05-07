@@ -2,8 +2,8 @@
 {
     class RockyDecorator : IDecorator
     {
-        private Noise3DPerlin perlin = new Noise3DPerlin(123123);
-        private OakTreeGenerator oakTreeGen = new OakTreeGenerator();
+        private readonly Noise3DPerlin perlin = new Noise3DPerlin(123123);
+        private readonly OakTreeGenerator oakTreeGen = new OakTreeGenerator();
 
         public void Decorate(Chunk chunk, int worldY, int localX, int localZ)
         {

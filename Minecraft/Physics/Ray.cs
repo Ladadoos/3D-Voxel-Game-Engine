@@ -51,7 +51,7 @@ namespace Minecraft
                     hitAABB = aabb;
                 }
             }
-            if (dist == float.MaxValue)
+            if (dist == float.MaxValue || hitAABB == null)
             {
                 return null;
             }

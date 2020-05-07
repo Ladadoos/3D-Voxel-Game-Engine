@@ -11,8 +11,8 @@ namespace Minecraft
         public Vector3 position { get; protected set; }
         public Vector3 rotation { get; protected set; }
 
-        private HashSet<UIComponent> components = new HashSet<UIComponent>();
-        private HashSet<UIComponent> toCleanComponents = new HashSet<UIComponent>();
+        private readonly HashSet<UIComponent> components = new HashSet<UIComponent>();
+        private readonly HashSet<UIComponent> toCleanComponents = new HashSet<UIComponent>();
 
         public UICanvas(Vector3 position, Vector3 rotation, int pixelWidth, int pixelHeight, RenderSpace renderSpace)
         {
