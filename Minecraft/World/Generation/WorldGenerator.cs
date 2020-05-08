@@ -168,7 +168,7 @@ namespace Minecraft
                     }
 
                     worldY -= 3;
-                    for (int k = worldY - 1; k > 0; k--)
+                    for (int k = worldY - 1; k >= 0; k--)
                     {
                         chunk.AddBlock(localX, k, localZ, Blocks.Stone.GetNewDefaultState());
                     }
