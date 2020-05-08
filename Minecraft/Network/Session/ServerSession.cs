@@ -7,7 +7,7 @@
         public ServerSession(Connection connection, INetHandler netHandler)
             : base(connection, netHandler)
         {
-            chunkProvider = new ChunkProvider(this, playerSettings);
+            chunkProvider = new ChunkProvider(this);
         }
 
         public bool IsBlockPositionInViewRange(Vector3i blockPos)

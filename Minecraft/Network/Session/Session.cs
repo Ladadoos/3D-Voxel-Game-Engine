@@ -2,6 +2,11 @@
 {
     abstract class Session
     {
+        private readonly PlayerSettings DefaultPlayerSettings = new PlayerSettings
+        {
+            viewDistance = 2
+        };
+
         public Player player { get; private set; }
         public INetHandler netHandler { get; private set; }
         private readonly Connection connection;
@@ -29,10 +34,7 @@
             this.netHandler = netHandler;
             this.player = player;
 
-            playerSettings = new PlayerSettings
-            {
-                viewDistance = 2
-            };
+            playerSettings = DefaultPlayerSettings;
             state = SessionState.AwaitingAcceptance;
         }
 

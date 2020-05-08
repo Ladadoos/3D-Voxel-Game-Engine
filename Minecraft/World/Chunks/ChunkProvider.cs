@@ -7,17 +7,15 @@ namespace Minecraft
     class ChunkProvider
     {
         private readonly ServerSession session;
-        private readonly PlayerSettings playerSettings;
         public HashSet<Vector2> currentlyVisibleChunks { get; private set;} = new HashSet<Vector2>();
 
         private readonly object chunkRetrievalLock = new object();
         private readonly Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();
         private readonly HashSet<GenerateChunkRequestOutgoing> outgoingChunkRequests = new HashSet<GenerateChunkRequestOutgoing>(); 
 
-        public ChunkProvider(ServerSession session, PlayerSettings playerSettings)
+        public ChunkProvider(ServerSession session)
         {
             this.session = session;
-            this.playerSettings = playerSettings;
 
             session.OnPlayerAssignedHandler += OnPlayerAssigned;
         }
@@ -44,7 +42,12 @@ namespace Minecraft
         {
             HashSet<Vector2> visibleChunks = new HashSet<Vector2>();
 
-            int dist = playerSettings.viewDistance;
+            //The visible chunks are the chunks in a square with sides (view distance) * 2 + 1
+            //where the center chunk is where the player is at
+            int dist = session.playerSettings.viewDistance;
+            dist *= 2;
+            dist = dist + 1;
+
             int x = 0;
             int z = 0;
             int dx = 0;
@@ -52,7 +55,8 @@ namespace Minecraft
             int t = dist;
             for(int i = 0; i < dist * dist; i++)
             {
-                if(-dist/2 < x && x <= dist / 2 && -dist/2 < z && z <= dist/2)
+                float halfDist = dist / 2.0F;
+                if(-halfDist < x && x <= halfDist && -halfDist < z && z <= halfDist)
                 {
                     visibleChunks.Add(playerGridPosition + new Vector2(x, z));
                 }
