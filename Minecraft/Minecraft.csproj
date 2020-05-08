@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4C081D35-2B24-4A62-84DC-D0F6A871EF9A}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Minecraft</RootNamespace>
+    <AssemblyName>Minecraft</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="LibNoise, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\LibNoise.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Entities\Camera.cs" />
+    <Compile Include="Entities\CameraController.cs" />
+    <Compile Include="Entities\Dummy.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Entities\EntityType.cs" />
+    <Compile Include="Entities\Player\OtherClientPlayer.cs" />
+    <Compile Include="Entities\Player\Player.cs" />
+    <Compile Include="Entities\Player\ClientPlayer.cs" />
+    <Compile Include="Entities\Player\PlayerSettings.cs" />
+    <Compile Include="Entities\Player\ServerPlayer.cs" />
+    <Compile Include="Main\FPSCounter.cs" />
+    <Compile Include="Main\Game.cs" />
+    <Compile Include="Main\GameWindow.cs" />
+    <Compile Include="Main\Program.cs" />
+    <Compile Include="Main\StartArgs.cs" />
+    <Compile Include="Network\Client.cs" />
+    <Compile Include="Network\Connection.cs" />
+    <Compile Include="Network\DataConverter.cs" />
+    <Compile Include="Network\NetBufferedStream.cs" />
+    <Compile Include="Network\NetHandler\ClientNetHandler.cs" />
+    <Compile Include="Network\NetHandler\INetHandler.cs" />
+    <Compile Include="Network\NetHandler\ServerNetHandler.cs" />
+    <Compile Include="Network\Packets\ChunkDataPacket.cs" />
+    <Compile Include="Network\Packets\ChunkUnloadPacket.cs" />
+    <Compile Include="Network\Packets\PlaceBlockPacket.cs" />
+    <Compile Include="Network\Packets\PlayerBlockInteractionPacket.cs" />
+    <Compile Include="Network\Packets\PlayerDataPacket.cs" />
+    <Compile Include="Network\Packets\PlayerJoinAcceptPacket.cs" />
+    <Compile Include="Network\Packets\PlayerJoinPacket.cs" />
+    <Compile Include="Network\Packets\PlayerJoinRequestPacket.cs" />
+    <Compile Include="Network\Packets\ChatPacket.cs" />
+    <Compile Include="Network\Packets\PlayerKeepAlivePacket.cs" />
+    <Compile Include="Network\Packets\PlayerLeavePacket.cs" />
+    <Compile Include="Network\Packets\RemoveBlockPacket.cs" />
+    <Compile Include="Network\RunMode.cs" />
+    <Compile Include="Network\Packets\Packet.cs" />
+    <Compile Include="Network\Packets\PacketFactory.cs" />
+    <Compile Include="Network\Packets\PacketType.cs" />
+    <Compile Include="Network\SessionState.cs" />
+    <Compile Include="Network\Session\ServerSession.cs" />
+    <Compile Include="Network\Session\Session.cs" />
+    <Compile Include="Network\Session\ClientSession.cs" />
+    <Compile Include="Physics\AxisAlignedBox.cs" />
+    <Compile Include="Physics\Ray.cs" />
+    <Compile Include="Physics\RayTraceResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Render\MasterRenderer.cs" />
+    <Compile Include="Render\MeshGenerator\EntityMeshGenerator.cs" />
+    <Compile Include="Render\MeshGenerator\MeshGenerator.cs" />
+    <Compile Include="Render\PlayerHoverBlockRenderer.cs" />
+    <Compile Include="Render\ProjectionMatrixInfo.cs" />
+    <Compile Include="Render\Chunk\RenderChunk.cs" />
+    <Compile Include="Render\Shapes\BlockFace.cs" />
+    <Compile Include="Render\Shapes\BlockModel.cs" />
+    <Compile Include="Render\Shapes\BlockModelRegistry.cs" />
+    <Compile Include="Render\Shapes\BlockModels.cs" />
+    <Compile Include="Render\Shapes\EntityMeshRegistry.cs" />
+    <Compile Include="Render\Shapes\EntityModel.cs" />
+    <Compile Include="Render\Shapes\EntityModelRegistry.cs" />
+    <Compile Include="Render\Shapes\EntityModels.cs" />
+    <Compile Include="Render\Shapes\FullBlockModel.cs" />
+    <Compile Include="Render\Shapes\ScissorModel.cs" />
+    <Compile Include="Render\UI\Character.cs" />
+    <Compile Include="Render\UI\CharacterBuilder.cs" />
+    <Compile Include="Render\UI\Font.cs" />
+    <Compile Include="Render\UI\FontRegistry.cs" />
+    <Compile Include="Render\UI\FontType.cs" />
+    <Compile Include="Render\UI\Presets\UICanvasDebug.cs" />
+    <Compile Include="Render\UI\Presets\UICanvasEntityName.cs" />
+    <Compile Include="Render\UI\Presets\UICanvasIngame.cs" />
+    <Compile Include="Render\UI\TextMeshBuilder.cs" />
+    <Compile Include="Render\UI\UIComponent.cs" />
+    <Compile Include="Render\UI\UICanvas.cs" />
+    <Compile Include="Render\UI\UIImage.cs" />
+    <Compile Include="Render\UI\UIRenderer.cs" />
+    <Compile Include="Render\UI\UIText.cs" />
+    <Compile Include="Render\UI\RenderSpace.cs" />
+    <Compile Include="Render\ViewFrustum.cs" />
+    <Compile Include="Render\WireframeRenderer.cs" />
+    <Compile Include="Network\Server.cs" />
+    <Compile Include="Shaders\UIShader\UIShader.cs" />
+    <Compile Include="Shaders\EntityShader\EntityShader.cs" />
+    <Compile Include="Shaders\PostRenderShader\PostRenderShader.cs" />
+    <Compile Include="Shaders\WireframeShader\WireframeShader.cs" />
+    <Compile Include="Shaders\Shader.cs" />
+    <Compile Include="Shaders\BasicShader\ShaderBasic.cs" />
+    <Compile Include="Textures\ScreenFBO.cs" />
+    <Compile Include="Textures\ScreenQuad.cs" />
+    <Compile Include="Textures\Texture.cs" />
+    <Compile Include="Textures\TextureAtlas.cs" />
+    <Compile Include="Render\DebugHelper.cs" />
+    <Compile Include="Tools\Input.cs" />
+    <Compile Include="Tools\Noise\Noise3DPerlin.cs" />
+    <Compile Include="Tools\ReadOnlyDictionary.cs" />
+    <Compile Include="Tools\TextureLoader.cs" />
+    <Compile Include="Tools\Logger.cs" />
+    <Compile Include="Tools\Maths.cs" />
+    <Compile Include="Tools\Vector3i.cs" />
+    <Compile Include="World\Biome\Biome.cs" />
+    <Compile Include="World\Biome\BiomeMembership.cs" />
+    <Compile Include="World\Biome\BiomeProvider.cs" />
+    <Compile Include="Tools\Noise\Noise2DPerlin.cs" />
+    <Compile Include="Tools\Noise\Noise2DPerlinOctave.cs" />
+    <Compile Include="Tools\Noise\NoiseGenerator.cs" />
+    <Compile Include="World\Biome\ForestBiome.cs" />
+    <Compile Include="World\Biome\MountainBiome.cs" />
+    <Compile Include="World\Biome\DesertBiome.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateAir.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateCactus.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateDeadBush.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateDirt.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateFlower.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateGrass.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateGrassBlade.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateGravel.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateOakLeaves.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateOakLog.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateSand.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateSandstone.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateStone.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateTNT.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateSugarCane.cs" />
+    <Compile Include="World\Blocks\BlockState\BlockStateWheat.cs" />
+    <Compile Include="World\Blocks\Block\BlockAir.cs" />
+    <Compile Include="World\Blocks\Block\BlockCactus.cs" />
+    <Compile Include="World\Blocks\Block\BlockDeadBush.cs" />
+    <Compile Include="World\Blocks\Block\BlockGrassBlade.cs" />
+    <Compile Include="World\Blocks\Block\BlockGravel.cs" />
+    <Compile Include="World\Blocks\Block\BlockOakLeaves.cs" />
+    <Compile Include="World\Blocks\Block\BlockOakLog.cs" />
+    <Compile Include="World\Blocks\Block\BlockSand.cs" />
+    <Compile Include="World\Blocks\Block\BlockSandstone.cs" />
+    <Compile Include="World\Blocks\Block\BlockStone.cs" />
+    <Compile Include="World\Blocks\Block.cs" />
+    <Compile Include="World\Blocks\Blocks.cs" />
+    <Compile Include="World\Blocks\BlockState.cs" />
+    <Compile Include="World\Blocks\Block\BlockDirt.cs" />
+    <Compile Include="World\Blocks\Block\BlockFlower.cs" />
+    <Compile Include="World\Blocks\Block\BlockGrass.cs" />
+    <Compile Include="World\Blocks\Block\BlockSugarCane.cs" />
+    <Compile Include="World\Blocks\Block\BlockTNT.cs" />
+    <Compile Include="World\Blocks\Block\BlockWheat.cs" />
+    <Compile Include="World\Blocks\Direction.cs" />
+    <Compile Include="Tools\VAOModel.cs" />
+    <Compile Include="World\Chunks\Chunk.cs" />
+    <Compile Include="Render\MeshGenerator\OpaqueMeshGenerator.cs" />
+    <Compile Include="Main\Constants.cs" />
+    <Compile Include="World\Chunks\ChunkProvider.cs" />
+    <Compile Include="World\Decoration\BarrenDecorator.cs" />
+    <Compile Include="World\Decoration\EmptyDecorator.cs" />
+    <Compile Include="World\Decoration\ForestDecorator.cs" />
+    <Compile Include="World\Decoration\IDecorator.cs" />
+    <Compile Include="World\Decoration\RockyDecorator.cs" />
+    <Compile Include="World\Trees\ITreeGenerator.cs" />
+    <Compile Include="World\Sections\Section.cs" />
+    <Compile Include="World\Trees\OakTreeGenerator.cs" />
+    <Compile Include="World\World\EntityIdTracker.cs" />
+    <Compile Include="World\World\World.cs" />
+    <Compile Include="World\Generation\WorldGenerator.cs" />
+    <Compile Include="World\World\WorldClient.cs" />
+    <Compile Include="World\World\WorldServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="Shaders\UIShader\fs_uiShader.glsl" />
+    <None Include="Shaders\UIShader\vs_uiShader.glsl" />
+    <None Include="Shaders\EntityShader\fs_entityShader.glsl" />
+    <None Include="Shaders\EntityShader\vs_entityShader.glsl" />
+    <None Include="Shaders\PostRenderShader\fs_postRender.glsl" />
+    <None Include="Shaders\PostRenderShader\vs_postRender.glsl" />
+    <None Include="Shaders\WireframeShader\fs_wireframe.glsl" />
+    <None Include="Shaders\WireframeShader\vs_wireframe.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\texturePack.png" />
+    <Content Include="Resources\texturePack2.png" />
+    <Content Include="Resources\texturePack3.png" />
+    <None Include="Shaders\BasicShader\fragmentShader.glsl" />
+    <None Include="Shaders\BasicShader\vertexShader.glsl" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
