@@ -24,6 +24,8 @@ Features that could be added/looked at:
 - Add support to generate large(r) structures like villages.
 - Add ambient occlusion.
 - Add basic mob spawning and AI.
+- Add caves.
+- Add items and a survival mode.
 
 ![](Images/demo1.gif)
 ![](Images/demo2.gif)
