@@ -5,8 +5,7 @@ namespace Minecraft
 {
     class ViewFrustum
     {
-        //Implementation: https://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
-        //TODO Aspect ratio does not work perfectly. Should be looked at later.
+        //Implementation based on: https://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
 
         struct FrustumPlane
         {
@@ -30,8 +29,8 @@ namespace Minecraft
         private void CalculateNearFarWidthHeight(ProjectionMatrixInfo pInfo)
         {
             float aspectRatio = pInfo.windowWidth / (float)pInfo.windowHeight;
-            float extension = 2;
-            float tan = (float)Math.Tan(pInfo.fieldOfView * 0.5) * extension;
+            const float extesion = 2;
+            float tan = (float)Math.Tan(pInfo.fieldOfView * 0.5F) * extesion;
             nearHeight = tan * pInfo.distanceNearPlane;
             nearWidth = nearHeight * aspectRatio;
             farHeight = tan * pInfo.distanceFarPlane;

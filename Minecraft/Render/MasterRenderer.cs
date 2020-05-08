@@ -66,10 +66,6 @@ namespace Minecraft
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.window);
             wireframeRenderer = new WireframeRenderer(this);
-            if(wireframeRenderer == null)
-                System.Console.WriteLine("ok");
-            if(game == null)
-                System.Console.WriteLine("ok1");
             debugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
 
