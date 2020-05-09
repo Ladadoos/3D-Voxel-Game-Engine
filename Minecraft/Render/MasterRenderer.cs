@@ -106,7 +106,7 @@ namespace Minecraft
 
             basicShader.Start();
             basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
+            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
 
             lock (meshLock)
             {
@@ -116,7 +116,7 @@ namespace Minecraft
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                     Vector3 max = min + new Vector3(16, 256, 16);
-                    if (!cameraController.camera.viewFrustum.IsAABBInFrustum(new AxisAlignedBox(min, max)))
+                    if (!cameraController.camera.IsAABBInViewFrustum(new AxisAlignedBox(min, max)))
                     {
                         continue;
                     }
@@ -128,7 +128,7 @@ namespace Minecraft
 
             entityShader.Start();
             entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
+            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
             foreach (Entity entity in world.loadedEntities.Values)
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out VAOModel entityMeshModel))
@@ -313,9 +313,9 @@ namespace Minecraft
         private void UploadActiveCameraProjectionMatrix()
         {
             basicShader.Start();
-            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, GetActiveCamera().currentProjectionMatrix);
+            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
             entityShader.Start();
-            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, GetActiveCamera().currentProjectionMatrix);
+            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
             entityShader.Stop();
         }
 

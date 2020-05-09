@@ -46,8 +46,8 @@ namespace Minecraft
             delta.X = delta.X * Constants.PLAYER_MOUSE_SENSIVITY;
             delta.Y = delta.Y * Constants.PLAYER_MOUSE_SENSIVITY;
 
-            float newPitch = (camera.pitch + delta.X) % ((float)Math.PI * 2.0F);
-            float newYaw = Math.Max(Math.Min(camera.yaw + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
+            float newPitch = (camera.Pitch + delta.X) % ((float)Math.PI * 2.0F);
+            float newYaw = Math.Max(Math.Min(camera.Yaw + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
             camera.SetYawAndPitch(newPitch, newYaw);
         }
     }

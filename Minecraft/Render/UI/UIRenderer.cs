@@ -75,8 +75,8 @@ namespace Minecraft
                     uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, Matrix4.Identity);
                 } else
                 {
-                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, cameraController.camera.currentViewMatrix);
-                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, cameraController.camera.currentProjectionMatrix);
+                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
+                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, cameraController.camera.CurrentProjectionMatrix);
                 }
 
                 spaceCanvasses.Value.ForEach(canvas => canvas.Render(uiShader));

@@ -4,18 +4,18 @@ namespace Minecraft
 {
     class Camera
     {
-        public Vector3 position { get; private set; }
-        public Vector3 forward { get; private set; }
-        public Vector3 right { get; private set; }
-        public float pitch { get; private set; }
-        public float yaw { get; private set; }
+        public Vector3 Position { get; private set; }
+        public Vector3 Forward { get; private set; }
+        public Vector3 Right { get; private set; }
+        public float Pitch { get; private set; }
+        public float Yaw { get; private set; }
 
-        public ViewFrustum viewFrustum { get; private set; }
+        private ViewFrustum viewFrustum;
 
         private readonly ProjectionMatrixInfo defaultProjection;
-        public ProjectionMatrixInfo currentProjection { get; private set; }
-        public Matrix4 currentProjectionMatrix { get; private set; }
-        public Matrix4 currentViewMatrix { get; private set; }
+        public ProjectionMatrixInfo CurrentProjection { get; private set; }
+        public Matrix4 CurrentProjectionMatrix { get; private set; }
+        public Matrix4 CurrentViewMatrix { get; private set; }
 
         public delegate void OnProjectionChanged(ProjectionMatrixInfo info);
         public event OnProjectionChanged OnProjectionChangedHandler;
@@ -23,21 +23,26 @@ namespace Minecraft
         public Camera(ProjectionMatrixInfo projectionInfo)
         {
             defaultProjection = projectionInfo.ShallowCopy();
-            currentProjection = projectionInfo;
-            currentProjectionMatrix = CreateProjectionMatrix();
+            CurrentProjection = projectionInfo;
+            CurrentProjectionMatrix = CreateProjectionMatrix();
 
-            position = new Vector3();
-            forward = new Vector3();
+            Position = new Vector3();
+            Forward = new Vector3();
             viewFrustum = new ViewFrustum(projectionInfo);
+        }
+
+        public bool IsAABBInViewFrustum(AxisAlignedBox aabb)
+        {
+            return viewFrustum.IsAABBInFrustum(aabb);
         }
 
         public void SetFieldOfView(float fieldOfView)
         {
-            if (currentProjection.fieldOfView != fieldOfView)
+            if (CurrentProjection.fieldOfView != fieldOfView)
             {
-                currentProjection.fieldOfView = fieldOfView;
-                currentProjectionMatrix = CreateProjectionMatrix();
-                OnProjectionChangedHandler?.Invoke(currentProjection);
+                CurrentProjection.fieldOfView = fieldOfView;
+                CurrentProjectionMatrix = CreateProjectionMatrix();
+                OnProjectionChangedHandler?.Invoke(CurrentProjection);
             }
         }
 
@@ -48,45 +53,45 @@ namespace Minecraft
 
         public void SetWindowSize(int width, int height)
         {
-            currentProjection.windowHeight = height;
-            currentProjection.windowWidth = width;
-            currentProjectionMatrix = CreateProjectionMatrix();
-            OnProjectionChangedHandler?.Invoke(currentProjection);
+            CurrentProjection.windowHeight = height;
+            CurrentProjection.windowWidth = width;
+            CurrentProjectionMatrix = CreateProjectionMatrix();
+            OnProjectionChangedHandler?.Invoke(CurrentProjection);
         }
 
         private Matrix4 CreateProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(
-                currentProjection.fieldOfView,
-                currentProjection.windowWidth / (float)currentProjection.windowHeight,
-                currentProjection.distanceNearPlane,
-                currentProjection.distanceFarPlane);
+                CurrentProjection.fieldOfView,
+                CurrentProjection.windowWidth / (float)CurrentProjection.windowHeight,
+                CurrentProjection.distanceNearPlane,
+                CurrentProjection.distanceFarPlane);
         }
 
         private Matrix4 CreateViewMatrix()
         {
-            Vector3 lookAt = Maths.CreateLookAtVector(yaw, pitch);
-            return Matrix4.LookAt(position, position + lookAt, Vector3.UnitY);
+            Vector3 lookAt = Maths.CreateLookAtVector(Yaw, Pitch);
+            return Matrix4.LookAt(Position, Position + lookAt, Vector3.UnitY);
         }
 
         public void SetPosition(Vector3 position)
         {
-            this.position = position;
+            this.Position = position;
         }
 
         public void SetYawAndPitch(float pitch, float yaw)
         {
-            this.pitch = pitch;
-            this.yaw = yaw;
+            this.Pitch = pitch;
+            this.Yaw = yaw;
 
-            forward = Maths.CreateLookAtVector(yaw, pitch);
-            right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, forward));
+            Forward = Maths.CreateLookAtVector(yaw, pitch);
+            Right = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, Forward));
         }
 
         public void Update()
         {
             viewFrustum.UpdateFrustumPoints(this);
-            currentViewMatrix = CreateViewMatrix();
+            CurrentViewMatrix = CreateViewMatrix();
         }
     }
 }

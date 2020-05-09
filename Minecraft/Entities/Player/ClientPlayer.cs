@@ -61,7 +61,7 @@ namespace Minecraft
             acceleration = Vector3.Zero;
             UpdateKeyboardInput();
             ApplyVelocityAndCheckCollision(deltaTime, world);
-            mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(world);
+            mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world);
 
             UpdateCameraPosition();
 
@@ -85,9 +85,9 @@ namespace Minecraft
                 game.client.WritePacket(new RemoveBlockPacket(mouseOverObject.intersectedBlockPos));
             }
 
-            realForward = camera.forward;
-            moveForward = new Vector3((float)Math.Sin(camera.pitch), 0, (float)Math.Cos(camera.pitch));
-            right = camera.right;
+            realForward = camera.Forward;
+            moveForward = new Vector3((float)Math.Sin(camera.Pitch), 0, (float)Math.Cos(camera.Pitch));
+            right = camera.Right;
 
             elapsedMsSinceLastPosUpdate += deltaTime;
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
