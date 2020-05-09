@@ -7,7 +7,8 @@ namespace Minecraft
 {
     class CameraController
     {
-        public Camera camera { get; private set; }
+        public Camera Camera { get; private set; }
+
         private readonly GameWindow window;
         private Vector2 lastMousePos = new Vector2();
 
@@ -18,7 +19,7 @@ namespace Minecraft
 
         public void Update()
         {
-            camera.Update();
+            Camera.Update();
             if (!window.Focused)
             {
                 return;
@@ -29,7 +30,7 @@ namespace Minecraft
 
         public void ControlCamera(Camera camera)
         {
-            this.camera = camera;
+            this.Camera = camera;
         }
 
         private void ResetCursorToWindowCenter()
@@ -46,9 +47,9 @@ namespace Minecraft
             delta.X = delta.X * Constants.PLAYER_MOUSE_SENSIVITY;
             delta.Y = delta.Y * Constants.PLAYER_MOUSE_SENSIVITY;
 
-            float newPitch = (camera.Pitch + delta.X) % ((float)Math.PI * 2.0F);
-            float newYaw = Math.Max(Math.Min(camera.Yaw + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
-            camera.SetYawAndPitch(newPitch, newYaw);
+            float newPitch = (Camera.Pitch + delta.X) % ((float)Math.PI * 2.0F);
+            float newYaw = Math.Max(Math.Min(Camera.Yaw + delta.Y, (float)Math.PI / 2.0F - 0.1F), (float)-Math.PI / 2.0F + 0.1F);
+            Camera.SetYawAndPitch(newPitch, newYaw);
         }
     }
 }

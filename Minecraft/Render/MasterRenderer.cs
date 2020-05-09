@@ -83,16 +83,16 @@ namespace Minecraft
 
         public void SetActiveCamera(Camera camera)
         {
-            if (cameraController.camera != null)
+            if (cameraController.Camera != null)
             {
-                cameraController.camera.OnProjectionChangedHandler -= OnPlayerCameraProjectionChanged;
+                cameraController.Camera.OnProjectionChangedHandler -= OnPlayerCameraProjectionChanged;
             }
             camera.OnProjectionChangedHandler += OnPlayerCameraProjectionChanged;
             cameraController.ControlCamera(camera);
             UploadActiveCameraProjectionMatrix();
         }
 
-        public Camera GetActiveCamera() => cameraController.camera;
+        public Camera GetActiveCamera() => cameraController.Camera;
         public void AddCanvas(UICanvas canvas) => uiRenderer.AddCanvas(canvas);
         public void RemoveCanvas(UICanvas canvas) => uiRenderer.RemoveCanvas(canvas);
         public Font GetFont(FontType type) => uiRenderer.GetFont(type);
@@ -106,7 +106,7 @@ namespace Minecraft
 
             basicShader.Start();
             basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
+            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
 
             lock (meshLock)
             {
@@ -116,7 +116,7 @@ namespace Minecraft
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                     Vector3 max = min + new Vector3(16, 256, 16);
-                    if (!cameraController.camera.IsAABBInViewFrustum(new AxisAlignedBox(min, max)))
+                    if (!cameraController.Camera.IsAABBInViewFrustum(new AxisAlignedBox(min, max)))
                     {
                         continue;
                     }
@@ -128,7 +128,7 @@ namespace Minecraft
 
             entityShader.Start();
             entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
+            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
             foreach (Entity entity in world.loadedEntities.Values)
             {
                 if (entityMeshRegistry.models.TryGetValue(entity.entityType, out VAOModel entityMeshModel))

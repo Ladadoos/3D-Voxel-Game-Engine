@@ -23,7 +23,7 @@ namespace Minecraft
                 canvasses.Add(renderSpace, new List<UICanvas>());
             }
 
-            cameraController.camera.OnProjectionChangedHandler += OnCameraProjectionChanged;
+            cameraController.Camera.OnProjectionChangedHandler += OnCameraProjectionChanged;
         }
 
         private void OnCameraProjectionChanged(ProjectionMatrixInfo projecInfo)
@@ -75,8 +75,8 @@ namespace Minecraft
                     uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, Matrix4.Identity);
                 } else
                 {
-                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, cameraController.camera.CurrentViewMatrix);
-                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, cameraController.camera.CurrentProjectionMatrix);
+                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
+                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, cameraController.Camera.CurrentProjectionMatrix);
                 }
 
                 spaceCanvasses.Value.ForEach(canvas => canvas.Render(uiShader));
