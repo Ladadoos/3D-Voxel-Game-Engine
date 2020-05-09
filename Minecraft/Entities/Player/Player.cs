@@ -47,13 +47,13 @@ namespace Minecraft
             Vector3 offset = new Vector3();
             offset += x * right;
             offset += z * moveForward;
-            velocity += offset;
+            acceleration += offset;
         }
 
         ///<summary> Moves vertical relative to world up vector. </summary>
         protected void MovePlayerVertically(float y)
         {
-            velocity.Y += y;
+            acceleration.Y += y;
         }
 
         protected void TryApplyGravity(double deltaTime)
@@ -138,7 +138,8 @@ namespace Minecraft
             {
                 blocks = GetCollisionDetectionBlocks(world);
             }
-                
+
+            velocity.X += acceleration.X * deltaTime;
             position.X += velocity.X * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
@@ -146,6 +147,7 @@ namespace Minecraft
                 DoXAxisCollisionDetection(blocks);
             }
 
+            velocity.Y += acceleration.Y * deltaTime;
             position.Y += velocity.Y * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
@@ -153,6 +155,7 @@ namespace Minecraft
                 DoYAxisCollisionDetection(blocks);
             }
 
+            velocity.Z += acceleration.Z * deltaTime;
             position.Z += velocity.Z * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
@@ -160,7 +163,8 @@ namespace Minecraft
                 DoZAxisCollisionDetection(blocks);
             }
 
-            velocity *= Constants.PLAYER_STOP_FORCE_MULTIPLIER;
+            float friction = -10F;
+            velocity += friction * velocity * deltaTime;
         }
 
         /// <summary> Returns all blocks around the players position used for collision detection </summary>

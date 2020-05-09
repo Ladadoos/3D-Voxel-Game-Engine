@@ -9,6 +9,7 @@ namespace Minecraft
 
         public Vector3 position;
         public Vector3 velocity;
+        public Vector3 acceleration;
         public AxisAlignedBox hitbox { get; protected set; }
 
         protected float width, height, length;
@@ -26,6 +27,7 @@ namespace Minecraft
             this.id = id;
             this.position = position;
             this.velocity = Vector3.Zero;
+            this.acceleration = Vector3.Zero;
             this.entityType = entityType;
             SetInitialDimensions();
             InitialAxisAlignedBox();

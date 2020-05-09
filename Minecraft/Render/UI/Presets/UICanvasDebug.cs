@@ -29,6 +29,10 @@ namespace Minecraft
             float vy = game.player.velocity.Y;
             float vz = game.player.velocity.Z;
             sb.AppendLine("Velocity X=" + vx.ToString("0.000") + " Y=" + vy.ToString("0.000") + " Z=" + vz.ToString("0.000"));
+            float ax = game.player.acceleration.X;
+            float ay = game.player.acceleration.Y;
+            float az = game.player.velocity.Z;
+            sb.AppendLine("Acceleration X=" + ax.ToString("0.000") + " Y=" + ay.ToString("0.000") + " Z=" + az.ToString("0.000"));
             Vector2 chunkPos = World.GetChunkPosition(x, z);
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y);
             sb.AppendLine("FPS=" + game.currentFps + " AVG FPS= " + game.averageFpsCounter.GetAverageFPS());

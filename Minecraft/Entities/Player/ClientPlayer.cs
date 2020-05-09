@@ -13,7 +13,7 @@ namespace Minecraft
 
         private BlockState selectedBlock = Blocks.SugarCane.GetNewDefaultState();
 
-        private const float secondsPerPosUpdate = 1F;
+        private const float secondsPerPosUpdate = 0.05F;
         private float elapsedMsSinceLastPosUpdate;
 
         public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 200, 0))
@@ -27,7 +27,7 @@ namespace Minecraft
 
         private void OnRunningToggle(bool isRunning)
         {
-            if (isRunning)
+            if(isRunning)
             {
                 camera.SetFieldOfView(1.65F);
             } else
@@ -38,7 +38,7 @@ namespace Minecraft
 
         private void OnCrouchingToggle(bool isCrouching)
         {
-            if (isCrouching)
+            if(isCrouching)
             {
                 camera.SetFieldOfView(1.45F);
             } else
@@ -58,39 +58,29 @@ namespace Minecraft
 
         public override void Update(float deltaTime, World world)
         {
+            acceleration = Vector3.Zero;
             UpdateKeyboardInput();
             ApplyVelocityAndCheckCollision(deltaTime, world);
             mouseOverObject = new Ray(camera.position, camera.forward).TraceWorld(world);
 
             UpdateCameraPosition();
 
-            if (Game.input.OnMousePress(MouseButton.Right) && game.window.Focused && mouseOverObject != null)
+            if(Game.input.OnMousePress(MouseButton.Right) && game.window.Focused && mouseOverObject != null)
             {
-                if (isCrouching)
+                if(!isCrouching && world.GetBlockAt(mouseOverObject.intersectedBlockPos).GetBlock().isInteractable)
                 {
-                    if (selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
-                    {
-                        BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                        game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
-                    }
-                } else
+                    game.client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.intersectedBlockPos));
+                } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
                 {
-                    BlockState state = world.GetBlockAt(mouseOverObject.intersectedBlockPos);
-                    if (state.GetBlock().isInteractable)
-                    {
-                        game.client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.intersectedBlockPos));
-                    }else if (selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
-                    {
-                        BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                        game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
-                    }
+                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                    game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
                 }
             }
-            if (Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
+            if(Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
                 selectedBlock = world.GetBlockAt(mouseOverObject.intersectedBlockPos);
             }
-            if (Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
+            if(Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
             {
                 game.client.WritePacket(new RemoveBlockPacket(mouseOverObject.intersectedBlockPos));
             }
@@ -122,37 +112,37 @@ namespace Minecraft
             bool inputToFly = wFocused && Game.input.OnKeyPress(Key.Space);
 
             //Prioritize crouching over running
-            if (inputToRun && !inputToCrouch)
+            if(inputToRun && !inputToCrouch)
             {
                 TryStartRunning();
-            } else if (inputToCrouch)
+            } else if(inputToCrouch)
             {
                 TryStartCrouching();
-            } else if (!inputToCrouch)
+            } else if(!inputToCrouch)
             {
                 TryStopCrouching();
             }
 
-            if (!inputToMoveForward || inputToMoveBack)
+            if(!inputToMoveForward || inputToMoveBack)
             {
                 TryStopRunning();
             }
 
-            if (isInAir && !isFlying)
+            if(isInAir && !isFlying)
             {
                 speedMultiplier *= Constants.PLAYER_IN_AIR_SLOWDOWN;
             }
-            if (isFlying)
+            if(isFlying)
             {
                 speedMultiplier *= Constants.PLAYER_FLYING_MULTIPLIER;
             }
 
-            if (isRunning)
+            if(isRunning)
             {
                 speedMultiplier *= Constants.PLAYER_SPRINT_MULTIPLIER;
-            } else if (isCrouching)
+            } else if(isCrouching)
             {
-                if (isFlying)
+                if(isFlying)
                 {
                     MovePlayerVertically(-speedMultiplier);
                 } else
@@ -161,9 +151,9 @@ namespace Minecraft
                 }
             }
 
-            if (inputToJump)
+            if(inputToJump)
             {
-                if (isFlying)
+                if(isFlying)
                 {
                     MovePlayerVertically(speedMultiplier);
                 } else
@@ -172,24 +162,24 @@ namespace Minecraft
                 }
             }
 
-            if (inputToFly)
+            if(inputToFly)
             {
                 TryToggleFlying();
             }
 
-            if (inputToMoveForward)
+            if(inputToMoveForward)
             {
                 MovePlayerHorizontally(0, speedMultiplier);
             }
-            if (inputToMoveBack)
+            if(inputToMoveBack)
             {
                 MovePlayerHorizontally(0, -speedMultiplier);
             }
-            if (inputToMoveRight)
+            if(inputToMoveRight)
             {
                 MovePlayerHorizontally(-speedMultiplier, 0);
             }
-            if (inputToMoveLeft)
+            if(inputToMoveLeft)
             {
                 MovePlayerHorizontally(speedMultiplier, 0);
             }
