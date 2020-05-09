@@ -77,6 +77,7 @@ namespace Minecraft
 
             game.player.id = playerJoinAcceptPacket.playerId;
             game.player.playerName = playerJoinAcceptPacket.name;
+            game.player.position = playerJoinAcceptPacket.spawnPosition;
             session.state = SessionState.Accepted;
 
             game.world.SpawnEntity(game.player);

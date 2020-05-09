@@ -28,11 +28,11 @@ namespace Minecraft
     {
         private readonly MountainBiome mountainBiome = new MountainBiome();
         private readonly ForestBiome forestBiome = new ForestBiome();
-        private readonly  DesertBiome desertBiome = new DesertBiome();
+        private readonly DesertBiome desertBiome = new DesertBiome();
 
         private const double temperatureDetail = 0.0075D;
         private readonly Noise2DPerlin temperatureFunction = new Noise2DPerlin();
-         
+
         private const double moistureDetail = 0.0075D;
         private readonly Noise2DPerlin moistureFunction = new Noise2DPerlin(25555);
 
@@ -40,7 +40,7 @@ namespace Minecraft
 
         private readonly Biome[] registeredBiomes;
         private const int activeBiomes = 3;
-        private int seaLevel = 100;
+        public readonly int SeaLevel = 100;
 
         private readonly object generationLock = new object();
         private readonly Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();
@@ -125,7 +125,7 @@ namespace Minecraft
             }
         }
 
-        private Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
+        public Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
         {
             Chunk chunk = new Chunk(chunkX, chunkY);
 
@@ -159,7 +159,7 @@ namespace Minecraft
                         }
                         biomeHeightAddon += wBiome.percentage * wBiome.biome.OffsetAt(chunkX, chunkY, localX, localZ);
                     }
-                    int worldY = seaLevel + (int)biomeHeightAddon;
+                    int worldY = SeaLevel + (int)biomeHeightAddon;
 
                     chunk.AddBlock(localX, worldY, localZ, bestBiome.biome.topBlock.GetNewDefaultState());
                     for (int k = worldY - 1; k >= worldY - 3; k--)

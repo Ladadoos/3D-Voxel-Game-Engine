@@ -131,6 +131,13 @@ namespace Minecraft
 
             Tick(deltaTime);
 
+            ClearBlockRemoveBuffer();
+            ClearBlockAddBuffer();
+            ClearEntityRemoveBuffer();
+        }
+
+        protected void ClearBlockRemoveBuffer()
+        {
             while(toRemoveBlocks.Count > 0)
             {
                 List<Vector3i> blocks = toRemoveBlocks.Dequeue();
@@ -139,11 +146,19 @@ namespace Minecraft
                     RemoveBlockAt(blocks[i], i + 1, blocks.Count);
                 }
             }
+        }
+
+        protected void ClearBlockAddBuffer()
+        {
             while(toAddBlocks.Count > 0)
             {
                 var toAddBlock = toAddBlocks.Dequeue();
                 AddBlockToWorld(toAddBlock.Item1, toAddBlock.Item2);
             }
+        }
+
+        protected void ClearEntityRemoveBuffer()
+        {
             while(toRemoveEntities.Count > 0)
             {
                 loadedEntities.Remove(toRemoveEntities.Dequeue().id);

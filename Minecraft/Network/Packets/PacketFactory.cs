@@ -108,7 +108,8 @@ namespace Minecraft
                     {
                         int playerId = reader.ReadInt32();
                         string playerName = ReadUtf8String(reader);
-                        return new PlayerJoinAcceptPacket(playerName, playerId);
+                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        return new PlayerJoinAcceptPacket(playerName, playerId, position);
                     }
                 case PacketType.PlayerJoin:
                     {
