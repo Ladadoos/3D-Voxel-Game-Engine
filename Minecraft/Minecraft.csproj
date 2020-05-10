@@ -88,6 +88,8 @@
     <Compile Include="Entities\Player\ClientPlayer.cs" />
     <Compile Include="Entities\Player\PlayerSettings.cs" />
     <Compile Include="Entities\Player\ServerPlayer.cs" />
+    <Compile Include="IO\BufferedDataStream.cs" />
+    <Compile Include="IO\DataConverter.cs" />
     <Compile Include="Main\FPSCounter.cs" />
     <Compile Include="Main\Game.cs" />
     <Compile Include="Main\GameWindow.cs" />
@@ -95,8 +97,6 @@
     <Compile Include="Main\StartArgs.cs" />
     <Compile Include="Network\Client.cs" />
     <Compile Include="Network\Connection.cs" />
-    <Compile Include="Network\DataConverter.cs" />
-    <Compile Include="Network\NetBufferedStream.cs" />
     <Compile Include="Network\NetHandler\ClientNetHandler.cs" />
     <Compile Include="Network\NetHandler\INetHandler.cs" />
     <Compile Include="Network\NetHandler\ServerNetHandler.cs" />
@@ -258,9 +258,7 @@
     <None Include="Shaders\BasicShader\fragmentShader.glsl" />
     <None Include="Shaders\BasicShader\vertexShader.glsl" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IO\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
