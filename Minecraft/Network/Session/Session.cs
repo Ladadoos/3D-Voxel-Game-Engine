@@ -4,26 +4,26 @@
     {
         private readonly PlayerSettings DefaultPlayerSettings = new PlayerSettings
         {
-            viewDistance = 2
+            ViewDistance = 2
         };
 
-        public Player player { get; private set; }
-        public INetHandler netHandler { get; private set; }
+        public Player Player { get; private set; }
+        public INetHandler NetHandler { get; private set; }
+        public PlayerSettings PlayerSettings { get; private set; }
         private readonly Connection connection;
-        public PlayerSettings playerSettings { get; private set; }
 
-        public delegate void OnStateChanged(Session session);
-        public event OnStateChanged OnStateChangedHandler;
-
-        private SessionState _state;
-        public SessionState state {
-            get { return _state; }
+        private SessionState state;
+        public SessionState State {
+            get { return state; }
             set {
-                if (_state == value) return;
-                _state = value;
+                if (state == value) return;
+                state = value;
                 OnStateChangedHandler?.Invoke(this);
             }
         }
+
+        public delegate void OnStateChanged(Session session);
+        public event OnStateChanged OnStateChangedHandler;
 
         public delegate void OnPlayerAssigned();
         public event OnPlayerAssigned OnPlayerAssignedHandler;
@@ -31,24 +31,24 @@
         protected Session(Connection connection, INetHandler netHandler)
         {
             this.connection = connection;
-            this.netHandler = netHandler;
-            this.player = player;
+            NetHandler = netHandler;
+            Player = Player;
 
-            playerSettings = DefaultPlayerSettings;
-            state = SessionState.AwaitingAcceptance;
+            PlayerSettings = DefaultPlayerSettings;
+            State = SessionState.AwaitingAcceptance;
         }
 
         public void AssignPlayer(Player player)
         {
-            this.player = player;
+            Player = player;
             OnPlayerAssignedHandler?.Invoke();
         }
 
-        public bool NetDataAvailable() => connection.netStream.DataAvailable;
+        public bool NetDataAvailable() => connection.NetStream.DataAvailable;
 
         public bool WritePacket(Packet packet)
         {
-            if (state == SessionState.Closed)
+            if (State == SessionState.Closed)
             {
                 Logger.Error("Trying to send packet " + packet.GetType() + " while connection closed");
                 return false;
@@ -56,7 +56,7 @@
 
             if (!connection.WritePacket(packet))
             {
-                state = SessionState.Closed;
+                State = SessionState.Closed;
                 return false;
             }
             return true;

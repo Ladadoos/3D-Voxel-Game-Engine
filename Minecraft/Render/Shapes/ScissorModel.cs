@@ -14,7 +14,7 @@ namespace Minecraft
         protected ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
-            doubleSided = true;
+            DoubleSidedFaces = true;
         }
 
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)

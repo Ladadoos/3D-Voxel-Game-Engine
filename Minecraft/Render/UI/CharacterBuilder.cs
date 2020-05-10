@@ -32,34 +32,34 @@ namespace Minecraft
 
                     if (attribute == "id")
                     {
-                        charc.id = value;
+                        charc.ID = value;
                     } else if (attribute == "x")
                     {
-                        charc.xTextureMin = (float)value / fontTexture.pixelWidth;
+                        charc.XTextureMin = (float)value / fontTexture.PixelWidth;
                     } else if (attribute == "y")
                     {
-                        charc.yTextureMin = (float)value / fontTexture.pixelHeight;
+                        charc.YTextureMin = (float)value / fontTexture.PixelHeight;
                     }else if(attribute == "width")
                     {
-                        charc.xTextureOffset = (float)value / fontTexture.pixelWidth;
-                        charc.width = value;
+                        charc.XTextureOffset = (float)value / fontTexture.PixelWidth;
+                        charc.Width = value;
                     }else if(attribute == "height")
                     {
-                        charc.yTextureOffset = (float)value / fontTexture.pixelHeight;
-                        charc.height = value;
+                        charc.YTextureOffset = (float)value / fontTexture.PixelHeight;
+                        charc.Height = value;
                     }else if(attribute == "xoffset")
                     {
-                        charc.xOffset = value;
+                        charc.XOffset = value;
                     }else if(attribute == "yoffset")
                     {
-                        charc.yOffset = value;
+                        charc.YOffset = value;
                     } else if(attribute == "xadvance")
                     {
-                        charc.xAdvance = value;
+                        charc.XAdvance = value;
                     }
                 }
 
-                fontChars.Add(charc.id, charc);
+                fontChars.Add(charc.ID, charc);
             }
 
             return fontChars;

@@ -5,22 +5,22 @@ namespace Minecraft
 {
     class Connection
     {
-        public TcpClient client;
-        public NetworkStream netStream;
-        public BinaryReader reader;
-        public NetBufferedStream bufferedStream;
+        public TcpClient Client { get; set; }
+        public NetworkStream NetStream { get; set; }
+        public BinaryReader Reader { get; set; }
+        public NetBufferedStream Writer { get; set; }
         private readonly PacketFactory packetFactory = new PacketFactory();
 
         public void Close()
         {       
-            netStream.Close();
-            client.Close();
+            NetStream.Close();
+            Client.Close();
         }
 
         public bool WritePacket(Packet packet)
         {
-            packet.WriteToStream(bufferedStream);
-            return bufferedStream.FlushToSocket();
+            packet.WriteToStream(Writer);
+            return Writer.FlushToSocket();
         }
 
         public Packet ReadPacket()

@@ -5,38 +5,38 @@ namespace Minecraft
 {
     class UICanvas
     {
-        public RenderSpace renderSpace { get; protected set; }
-        public int pixelWidth { get; private set; }
-        public int pixelHeight { get; private set; }
-        public Vector3 position { get; protected set; }
-        public Vector3 rotation { get; protected set; }
+        public RenderSpace RenderSpace { get; protected set; }
+        public int PixelWidth { get; private set; }
+        public int PixelHeight { get; private set; }
+        public Vector3 Position { get; protected set; }
+        public Vector3 Rotation { get; protected set; }
 
         private readonly HashSet<UIComponent> components = new HashSet<UIComponent>();
         private readonly HashSet<UIComponent> toCleanComponents = new HashSet<UIComponent>();
 
         public UICanvas(Vector3 position, Vector3 rotation, int pixelWidth, int pixelHeight, RenderSpace renderSpace)
         {
-            this.position = position;
-            this.rotation = rotation;
-            this.pixelWidth = pixelWidth;
-            this.pixelHeight = pixelHeight;
-            this.renderSpace = renderSpace;
+            Position = position;
+            Rotation = rotation;
+            PixelWidth = pixelWidth;
+            PixelHeight = pixelHeight;
+            RenderSpace = renderSpace;
         }
 
         public void SetDimensions(int pixelWidth, int pixelHeight)
         {
-            this.pixelWidth = pixelWidth;
-            this.pixelHeight = pixelHeight;
+            PixelWidth = pixelWidth;
+            PixelHeight = pixelHeight;
         }
 
         public void Render(UIShader uiShader)
         {
             Matrix4 transformationMatrix = Matrix4.Identity;
-            if(renderSpace == RenderSpace.World)
+            if(RenderSpace == RenderSpace.World)
             {
-                transformationMatrix = Maths.CreateRotationAndTranslationMatrix(position, rotation);
+                transformationMatrix = Maths.CreateRotationAndTranslationMatrix(Position, Rotation);
             }
-            uiShader.LoadMatrix(uiShader.location_TransformationMatrix, transformationMatrix);
+            uiShader.LoadMatrix(uiShader.Location_TransformationMatrix, transformationMatrix);
 
             foreach (UIComponent component in components)
             {

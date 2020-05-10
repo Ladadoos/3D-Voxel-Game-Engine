@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class BlockModelRegistry
     {
-        public ReadOnlyDictionary<Block, BlockModel> models;
+        public ReadOnlyDictionary<Block, BlockModel> Models { get; private set; }
         private readonly BlockModels blockModels;
 
         public BlockModelRegistry(TextureAtlas textureAtlas)
@@ -33,7 +33,7 @@ namespace Minecraft
                 { Blocks.OakLeaves, blockModels.OakLeaves },
                 { Blocks.Gravel, blockModels.Gravel }
             };
-            models = new ReadOnlyDictionary<Block, BlockModel>(registry);
+            Models = new ReadOnlyDictionary<Block, BlockModel>(registry);
         }
     }
 }

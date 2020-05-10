@@ -4,10 +4,10 @@
     {
         public WorldClient(Game game) : base(game)
         {
-            OnBlockPlacedHandler += game.masterRenderer.OnBlockPlaced;
-            OnBlockRemovedHandler += game.masterRenderer.OnBlockRemoved;
-            OnChunkLoadedHandler += game.masterRenderer.OnChunkLoaded;
-            OnChunkUnloadedHandler += game.masterRenderer.OnChunkUnloaded;
+            OnBlockPlacedHandler += game.MasterRenderer.OnBlockPlaced;
+            OnBlockRemovedHandler += game.MasterRenderer.OnBlockRemoved;
+            OnChunkLoadedHandler += game.MasterRenderer.OnChunkLoaded;
+            OnChunkUnloadedHandler += game.MasterRenderer.OnChunkUnloaded;
         }
     }
 }

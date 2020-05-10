@@ -50,13 +50,13 @@ namespace Minecraft
             Camera activeCamera = renderer.GetActiveCamera();
 
             shader.Start();
-            shader.LoadMatrix(shader.location_ViewMatrix, activeCamera.CurrentViewMatrix);
-            shader.LoadMatrix(shader.location_ProjectionMatrix, activeCamera.CurrentProjectionMatrix);
+            shader.LoadMatrix(shader.Location_ViewMatrix, activeCamera.CurrentViewMatrix);
+            shader.LoadMatrix(shader.Location_ProjectionMatrix, activeCamera.CurrentProjectionMatrix);
 
             Matrix4 transformMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(translation);
-            shader.LoadMatrix(shader.location_TransformationMatrix, Matrix4.Identity * transformMatrix);
+            shader.LoadMatrix(shader.Location_TransformationMatrix, Matrix4.Identity * transformMatrix);
             aabbCube.BindVAO();
-            GL.DrawElements(PrimitiveType.Quads, aabbCube.indicesCount, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(PrimitiveType.Quads, aabbCube.IndicesCount, DrawElementsType.UnsignedInt, 0);
             aabbCube.UnbindVAO();
             shader.Stop();
 

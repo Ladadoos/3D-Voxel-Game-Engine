@@ -5,9 +5,9 @@ namespace Minecraft
 {
     struct StartArgs
     {
-        public RunMode runMode;
-        public string ip;
-        public int port;
+        public RunMode RunMode;
+        public string IP;
+        public int Port;
     }
 
     class ArgsParser
@@ -24,9 +24,9 @@ namespace Minecraft
 
             return new StartArgs()
             {
-                runMode = GetRunMode(argsDic),
-                ip = GetIp(argsDic),
-                port = GetPort(argsDic)
+                RunMode = GetRunMode(argsDic),
+                IP = GetIp(argsDic),
+                Port = GetPort(argsDic)
             };
         }
 

@@ -192,7 +192,7 @@ namespace Minecraft
             leftFace = new Vector3[] { new Vector3(dt, 0, 0), new Vector3(dt, 0, 1), new Vector3(dt, 1, 1), new Vector3(dt, 1, 0) };
 
             back = false; right = false; front = false; left = false; top = false; bottom = false;
-            doubleSided = true;
+            DoubleSidedFaces = true;
         }
 
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)

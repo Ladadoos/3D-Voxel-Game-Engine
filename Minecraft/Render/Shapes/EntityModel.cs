@@ -5,7 +5,7 @@ namespace Minecraft
     abstract class EntityModel
     {
         protected readonly TextureAtlas textureAtlas;
-        public BlockFace[] entityFaces { get; protected set; }
+        public BlockFace[] EntityFaces { get; protected set; }
 
         protected EntityModel(TextureAtlas textureAtlas)
         {
@@ -33,7 +33,7 @@ namespace Minecraft
             float[] uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 12));
             float[] uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 12));
 
-            entityFaces = new BlockFace[] { new BlockFace(backFace, uvBack, illumination),
+            EntityFaces = new BlockFace[] { new BlockFace(backFace, uvBack, illumination),
                 new BlockFace(rightFace, uvRight, illumination),
                 new BlockFace(frontFace, uvFront, illumination),
                 new BlockFace(leftFace, uvLeft, illumination),

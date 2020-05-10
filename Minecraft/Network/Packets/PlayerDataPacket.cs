@@ -4,13 +4,13 @@ namespace Minecraft
 {
     class PlayerDataPacket : Packet
     {
-        public Vector3 position { get; private set; }
-        public int entityId { get; private set; }
+        public Vector3 Position { get; private set; }
+        public int EntityID { get; private set; }
 
         public PlayerDataPacket(Vector3 position, int entityId) : base(PacketType.EntityPosition)
         {
-            this.position = position;
-            this.entityId = entityId;
+            Position = position;
+            EntityID = entityId;
         }
 
         public override void Process(INetHandler netHandler)
@@ -20,10 +20,8 @@ namespace Minecraft
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(entityId);
-            bufferedStream.WriteFloat(position.X);
-            bufferedStream.WriteFloat(position.Y);
-            bufferedStream.WriteFloat(position.Z);
+            bufferedStream.WriteInt32(EntityID);
+            bufferedStream.WriteVector3(Position);
         }
     }
 }

@@ -2,11 +2,11 @@
 {
     class ChunkDataPacket : Packet
     {
-        public Chunk chunk { get; private set; }
+        public Chunk Chunk { get; private set; }
 
         public ChunkDataPacket(Chunk chunk) : base(PacketType.ChunkData)
         {     
-            this.chunk = chunk;
+            Chunk = chunk;
         }
 
         public override void Process(INetHandler netHandler)
@@ -16,13 +16,13 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(chunk.gridX);
-            bufferedStream.WriteInt32(chunk.gridZ);
+            bufferedStream.WriteInt32(Chunk.GridX);
+            bufferedStream.WriteInt32(Chunk.GridZ);
             bufferedStream.WriteInt32(GetChunkPayloadByteSize());
 
-            for(int i = 0; i < 16; i++)
+            for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
             {
-                Section section = chunk.sections[i];
+                Section section = Chunk.Sections[i];
                 if(section == null)
                 {
                     bufferedStream.WriteBool(false);
@@ -53,9 +53,9 @@
         private int GetChunkPayloadByteSize()
         {
             int size = 0;
-            for(int i = 0; i < 16; i++)
+            for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
             {
-                Section section = chunk.sections[i];
+                Section section = Chunk.Sections[i];
                 size++;
                 if(section == null)
                 {

@@ -4,14 +4,14 @@ namespace Minecraft
 {
     abstract class UIComponent
     {
-        public UICanvas parentCanvas { get; private set; }
-        public Vector2 pixelPositionInCanvas { get; private set; }
+        public UICanvas ParentCanvas { get; private set; }
+        public Vector2 PixelPositionInCanvas { get; private set; }
         protected VAOModel vaoModel;
 
         protected UIComponent(UICanvas parentCanvas, Vector2 pixelPositionInCanvas)
         {
-            this.parentCanvas = parentCanvas;
-            this.pixelPositionInCanvas = pixelPositionInCanvas;
+            ParentCanvas = parentCanvas;
+            PixelPositionInCanvas = pixelPositionInCanvas;
         }
 
         public abstract void Clean();

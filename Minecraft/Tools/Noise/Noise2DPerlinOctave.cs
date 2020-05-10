@@ -34,7 +34,7 @@ namespace Minecraft
             double oct = 1;
             for(int i = 0; i < octaves; i++)
             {
-                sum += oct * perlins[i].GetValue(i * x + seed, 1, i * y + seed);
+                sum += oct * perlins[i].GetValue(i * x + Seed, 1, i * y + Seed);
                 oct /= 2;
             }
             return sum;

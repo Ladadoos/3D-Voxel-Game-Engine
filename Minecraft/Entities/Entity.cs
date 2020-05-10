@@ -4,13 +4,13 @@ namespace Minecraft
 {
     abstract class Entity
     {
-        public int id;
-        public EntityType entityType { get; private set; }
+        public int ID { get; set; }
+        public EntityType EntityType { get; private set; }
 
-        public Vector3 position;
-        public Vector3 velocity;
-        public Vector3 acceleration;
-        public AxisAlignedBox hitbox { get; protected set; }
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public Vector3 Acceleration;
+        public AxisAlignedBox Hitbox { get; protected set; }
 
         protected float width, height, length;
 
@@ -24,11 +24,11 @@ namespace Minecraft
 
         protected Entity(int id, Vector3 position, EntityType entityType)
         {
-            this.id = id;
-            this.position = position;
-            this.velocity = Vector3.Zero;
-            this.acceleration = Vector3.Zero;
-            this.entityType = entityType;
+            ID = id;
+            Position = position;
+            Velocity = Vector3.Zero;
+            Acceleration = Vector3.Zero;
+            EntityType = entityType;
             SetInitialDimensions();
             InitialAxisAlignedBox();
         }
@@ -39,14 +39,14 @@ namespace Minecraft
 
         private void InitialAxisAlignedBox()
         {
-            Vector3 max = new Vector3(position.X + width, position.Y + height, position.Z + length);
-            hitbox = new AxisAlignedBox(position, max);
+            Vector3 max = new Vector3(Position.X + width, Position.Y + height, Position.Z + length);
+            Hitbox = new AxisAlignedBox(Position, max);
         }
 
         protected void UpdateAxisAlignedBox()
         {
-            Vector3 max = new Vector3(position.X + width, position.Y + height, position.Z + length);
-            hitbox.SetDimensions(position, max);
+            Vector3 max = new Vector3(Position.X + width, Position.Y + height, Position.Z + length);
+            Hitbox.SetDimensions(Position, max);
         }
 
         /// <summary> Called as often as possible </summary>
@@ -58,7 +58,7 @@ namespace Minecraft
         /// <summary> Called every tick </summary>
         public virtual void Tick(float deltaTime, World world)
         {
-            Vector2 chunkPosition = World.GetChunkPosition(position.X, position.Z);
+            Vector2 chunkPosition = World.GetChunkPosition(Position.X, Position.Z);
             if (previousChunkPos != chunkPosition)
             {
                 OnChunkChangedHandler?.Invoke(world, chunkPosition);

@@ -2,13 +2,12 @@
 {
     abstract class Biome
     {
-        public Block topBlock { get; protected set; }
-        public Block gradiantBlock { get; protected set; }
-        public int baseHeight { get; protected set; }
-        public IDecorator decorator { get; protected set; }
-
-        public double temperature { get; protected set; }
-        public double moisture { get; protected set; }
+        public Block TopBlock { get; protected set; }
+        public Block GradiantBlock { get; protected set; }
+        public int BaseHeight { get; protected set; }
+        public IDecorator Decorator { get; protected set; }
+        public double Temeprature { get; protected set; }
+        public double Moisture { get; protected set; }
 
         protected Biome()
         {

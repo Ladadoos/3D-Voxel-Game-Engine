@@ -113,17 +113,17 @@ namespace Minecraft
 
         private void OnEntityDespawnedServer(World world, Entity entity)
         {
-            entityIdTracker.ReleaseId(entity.id);
+            entityIdTracker.ReleaseId(entity.ID);
 
             if(entity is ServerPlayer)
             {
-                game.server.BroadcastPacket(new PlayerLeavePacket(entity.id, LeaveReason.Leave, "disconnect"));
+                game.Server.BroadcastPacket(new PlayerLeavePacket(entity.ID, LeaveReason.Leave, "disconnect"));
             }
         }
 
         private void OnBlockPlacedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
-            foreach(ServerSession session in world.game.server.clients)
+            foreach(ServerSession session in world.game.Server.ConnectedClients)
             {
                 if(session.IsBlockPositionInViewRange(blockPos))
                 {
@@ -139,7 +139,7 @@ namespace Minecraft
             if(chainPos == chainCount)
             {
                 RemoveBlockPacket packet = new RemoveBlockPacket(blockRemovalBuffer.ToArray());
-                foreach(ServerSession session in world.game.server.clients)
+                foreach(ServerSession session in world.game.Server.ConnectedClients)
                 {
                     if(session.IsBlockPositionInViewRange(blockPos))
                     {

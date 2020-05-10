@@ -2,11 +2,11 @@
 {
     class PlayerJoinRequestPacket : Packet
     {
-        public string name { get; private set; }
+        public string Name { get; private set; }
 
         public PlayerJoinRequestPacket(string name) : base(PacketType.PlayerJoinRequest)
         {
-            this.name = name;
+            Name = name;
         }
 
         public override void Process(INetHandler netHandler)
@@ -16,7 +16,7 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteUtf8String(name);
+            bufferedStream.WriteUtf8String(Name);
         }
     }
 }

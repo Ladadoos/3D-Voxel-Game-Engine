@@ -17,21 +17,21 @@ namespace Minecraft
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placeBlockpacket)
         {
-            game.server.world.QueueToAddBlockAt(placeBlockpacket.blockPos, placeBlockpacket.blockState);
+            game.Server.World.QueueToAddBlockAt(placeBlockpacket.BlockPos, placeBlockpacket.BlockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            foreach(Vector3i blockPos in removeBlockPacket.blockPositions)
+            foreach(Vector3i blockPos in removeBlockPacket.BlockPositions)
             {
-                game.server.world.QueueToRemoveBlockAt(blockPos);
+                game.Server.World.QueueToRemoveBlockAt(blockPos);
             }
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)
         {
-            Logger.Info("Server received message " + chatPacket.message);
-            game.server.BroadcastPacket(chatPacket);
+            Logger.Info("Server received message " + chatPacket.Message);
+            game.Server.BroadcastPacket(chatPacket);
         }
 
         public void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket)
@@ -46,37 +46,38 @@ namespace Minecraft
 
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
-            session.player.position = playerDataPacket.position;
-            game.server.BroadcastPacketExceptTo(session, playerDataPacket);
+            session.Player.Position = playerDataPacket.Position;
+            game.Server.BroadcastPacketExceptTo(session, playerDataPacket);
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
         {
-            string playerName = playerJoinRequestPacket.name.Trim();
+            string playerName = playerJoinRequestPacket.Name.Trim();
             if (playerName == string.Empty || playerName == "Player")
             {
                 session.WritePacket(new PlayerLeavePacket(0, LeaveReason.Banned, "You are not allowed on this server."));
-                session.state = SessionState.Closed;
+                session.State = SessionState.Closed;
                 return;
             }
-            int playerId = game.server.world.GenerateEntityId();
+
+            int playerId = game.Server.World.GenerateEntityId();
             string serverPlayerName = "server_" + playerName + "_id_" + playerId;
             ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
             session.AssignPlayer(player);
 
-            game.server.world.SpawnEntity(player);
-            Vector3 spawnPosition = game.server.world.GenerateAndGetValidSpawn();
+            game.Server.World.SpawnEntity(player);
+            Vector3 spawnPosition = game.Server.World.GenerateAndGetValidSpawn();
             session.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId, spawnPosition)); // Accept join
-            session.state = SessionState.Accepted;
+            session.State = SessionState.Accepted;
 
             //Let all the online players know about the new player
-            game.server.BroadcastPacketExceptTo(session, new PlayerJoinPacket(serverPlayerName, playerId));
+            game.Server.BroadcastPacketExceptTo(session, new PlayerJoinPacket(serverPlayerName, playerId));
 
             //let the new player know about all the already only players
-            foreach (Session client in game.server.clients)
+            foreach (Session client in game.Server.ConnectedClients)
             {
-                if (client.player == player) continue;
-                session.WritePacket(new PlayerJoinPacket(client.player.playerName, client.player.id));
+                if (client.Player == player) continue;
+                session.WritePacket(new PlayerJoinPacket(client.Player.Name, client.Player.ID));
             }
         }
 
@@ -97,11 +98,11 @@ namespace Minecraft
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            Vector3i blockPos = playerInteractionPacket.blockPos;
-            BlockState state = game.server.world.GetBlockAt(blockPos);
-            state.GetBlock().OnInteract(state, blockPos, game.server.world);
+            Vector3i blockPos = playerInteractionPacket.BlockPos;
+            BlockState state = game.Server.World.GetBlockAt(blockPos);
+            state.GetBlock().OnInteract(state, blockPos, game.Server.World);
 
-            foreach(ServerSession clientSession in game.server.clients)
+            foreach(ServerSession clientSession in game.Server.ConnectedClients)
             {
                 if(clientSession.IsBlockPositionInViewRange(blockPos))
                 {
@@ -112,7 +113,7 @@ namespace Minecraft
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)
         {
-            game.server.UpdateKeepAliveFor(session);
+            game.Server.UpdateKeepAliveFor(session);
         }
     }
 }

@@ -17,34 +17,34 @@ namespace Minecraft
 
         public void ProcessPlaceBlockPacket(PlaceBlockPacket placeBlockPacket)
         {
-            game.world.QueueToAddBlockAt(placeBlockPacket.blockPos, placeBlockPacket.blockState);
+            game.World.QueueToAddBlockAt(placeBlockPacket.BlockPos, placeBlockPacket.BlockState);
         }
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            foreach(Vector3i blockPos in removeBlockPacket.blockPositions)
+            foreach(Vector3i blockPos in removeBlockPacket.BlockPositions)
             {
-                game.world.QueueToRemoveBlockAt(blockPos);
+                game.World.QueueToRemoveBlockAt(blockPos);
             }
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)
         {
-            Logger.Info("Client received message " + chatPacket.message);
+            Logger.Info("Client received message " + chatPacket.Message);
         }
 
         public void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket)
         {
-            game.world.AddPlayerPresenceToChunk(chunkDataPacket.chunk);
+            game.World.AddPlayerPresenceToChunk(chunkDataPacket.Chunk);
         }
 
         public void ProcessChunkUnloadPacket(ChunkUnloadPacket unloadChunkPacket)
         {
-            foreach(Vector2 chunkGridPosition in unloadChunkPacket.chunkGridPositions)
+            foreach(Vector2 chunkGridPosition in unloadChunkPacket.ChunkGridPositions)
             {
-                if (game.world.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
+                if (game.World.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
                 {
-                    game.world.RemovePlayerPresenceOfChunk(chunk);
+                    game.World.RemovePlayerPresenceOfChunk(chunk);
                 }
             }
         }
@@ -52,9 +52,9 @@ namespace Minecraft
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             Logger.Info(playerDataPacket.ToString());
-            if(!game.world.loadedEntities.TryGetValue(playerDataPacket.entityId, out Entity player))
+            if(!game.World.loadedEntities.TryGetValue(playerDataPacket.EntityID, out Entity player))
             {
-                Logger.Error("Received positional data for unregistered player " + playerDataPacket.entityId);
+                Logger.Error("Received positional data for unregistered player " + playerDataPacket.EntityID);
                 return;
             }
             if(!(player is OtherClientPlayer))
@@ -63,7 +63,7 @@ namespace Minecraft
                 return;
             }
             OtherClientPlayer otherPlayer = (OtherClientPlayer)player;
-            otherPlayer.serverPosition = playerDataPacket.position;
+            otherPlayer.ServerPosition = playerDataPacket.Position;
         }
 
         public void ProcessJoinRequestPacket(PlayerJoinRequestPacket playerJoinRequestPacket)
@@ -73,42 +73,42 @@ namespace Minecraft
 
         public void ProcessJoinAcceptPacket(PlayerJoinAcceptPacket playerJoinAcceptPacket)
         {
-            Logger.Info("You: " + playerJoinAcceptPacket.name + " connected.");
+            Logger.Info("You: " + playerJoinAcceptPacket.Name + " connected.");
 
-            game.player.id = playerJoinAcceptPacket.playerId;
-            game.player.playerName = playerJoinAcceptPacket.name;
-            game.player.position = playerJoinAcceptPacket.spawnPosition;
-            session.state = SessionState.Accepted;
+            game.ClientPlayer.ID = playerJoinAcceptPacket.PlayerID;
+            game.ClientPlayer.Name = playerJoinAcceptPacket.Name;
+            game.ClientPlayer.Position = playerJoinAcceptPacket.SpawnPosition;
+            session.State = SessionState.Accepted;
 
-            game.world.SpawnEntity(game.player);
+            game.World.SpawnEntity(game.ClientPlayer);
         }
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
         {
-            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.playerId, playerJoinPacket.name);
-            UICanvasEntityName playerNameCanvas = new UICanvasEntityName(game, otherPlayer, playerJoinPacket.name);
-            game.masterRenderer.AddCanvas(playerNameCanvas);
-            game.world.SpawnEntity(otherPlayer);
+            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.PlayerID, playerJoinPacket.Name);
+            UICanvasEntityName playerNameCanvas = new UICanvasEntityName(game, otherPlayer, playerJoinPacket.Name);
+            game.MasterRenderer.AddCanvas(playerNameCanvas);
+            game.World.SpawnEntity(otherPlayer);
         }
 
         public void ProcessPlayerLeavePacket(PlayerLeavePacket playerLeavePacket)
         {
-            if(playerLeavePacket.id == 0)
+            if(playerLeavePacket.ID == 0)
             {
-                Logger.Info("You were disconnected for reason: " + playerLeavePacket.reason + " Message: " + playerLeavePacket.message);
-                session.state = SessionState.Closed;
+                Logger.Info("You were disconnected for reason: " + playerLeavePacket.Reason + " Message: " + playerLeavePacket.Message);
+                session.State = SessionState.Closed;
             } else
             {
-                Logger.Info("Player " + playerLeavePacket.id + " left for reason " + playerLeavePacket.reason + " with message " + playerLeavePacket.message);
+                Logger.Info("Player " + playerLeavePacket.ID + " left for reason " + playerLeavePacket.Reason + " with message " + playerLeavePacket.Message);
             }
-            game.world.DespawnEntity(playerLeavePacket.id);
+            game.World.DespawnEntity(playerLeavePacket.ID);
         }
 
         public void ProcessPlayerBlockInteractionpacket(PlayerBlockInteractionPacket playerInteractionPacket)
         {
-            Vector3i blockPos = playerInteractionPacket.blockPos;
-            BlockState state = game.world.GetBlockAt(blockPos);
-            state.GetBlock().OnInteract(state, blockPos, game.world);
+            Vector3i blockPos = playerInteractionPacket.BlockPos;
+            BlockState state = game.World.GetBlockAt(blockPos);
+            state.GetBlock().OnInteract(state, blockPos, game.World);
         }
 
         public void ProcessPlayerKeepAlivePacket(PlayerKeepAlivePacket keepAlivePacket)

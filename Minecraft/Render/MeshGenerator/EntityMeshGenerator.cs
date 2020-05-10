@@ -29,14 +29,14 @@ namespace Minecraft
 
         public VAOModel GenerateMeshFor(EntityModel entityModel)
         {
-            foreach (BlockFace face in entityModel.entityFaces)
+            foreach (BlockFace face in entityModel.EntityFaces)
             {
-                foreach (float uv in face.textureCoords)
+                foreach (float uv in face.TextureCoords)
                 {
                     textureUVs.Add(uv);
                 }
 
-                foreach (Vector3 modelSpacePosition in face.positions)
+                foreach (Vector3 modelSpacePosition in face.Positions)
                 {
                     vertexPositions.Add(modelSpacePosition.X);
                     vertexPositions.Add(modelSpacePosition.Y);
@@ -44,16 +44,16 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                foreach(float illumination in face.illumination)
+                foreach(float illumination in face.Illumination)
                 {
                     illumations.Add(illumination);
                 }
                 
                 for (int i = 0; i < 4; i++)
                 {
-                    normals.Add(face.normal.X);
-                    normals.Add(face.normal.Y);
-                    normals.Add(face.normal.Z);
+                    normals.Add(face.Normal.X);
+                    normals.Add(face.Normal.Y);
+                    normals.Add(face.Normal.Z);
                 }
             }
 

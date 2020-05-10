@@ -10,7 +10,7 @@ namespace Minecraft
     {
         public Packet ReadPacket(Connection connection)
         {
-            BinaryReader reader = connection.reader;
+            BinaryReader reader = connection.Reader;
 
             int packetType = reader.ReadInt32();
             PacketType type = (PacketType)packetType;
@@ -51,7 +51,7 @@ namespace Minecraft
                         byte[] chunkBytes = reader.ReadBytes(totalSize);
                         
                         int pos = 0;
-                        for(int i = 0; i < 16; i++)
+                        for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
                         {
                             Section section = new Section(gridX, gridY, (byte)i);
                             byte isSectionEmpty = chunkBytes[pos];
@@ -71,14 +71,14 @@ namespace Minecraft
                                                 BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();        
                                                 blockState.ExtractFromByteStream(chunkBytes, pos);
                                                 pos += blockState.PayloadSize();
-                                                section.AddBlock(x, y, z, blockState);
+                                                section.AddBlockAt(x, y, z, blockState);
                                             }
                                         }
                                     }
                                 }
                             }
 
-                            chunk.sections[i] = section;
+                            chunk.Sections[i] = section;
                         }
 
                         return new ChunkDataPacket(chunk);

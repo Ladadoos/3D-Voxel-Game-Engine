@@ -5,10 +5,10 @@
         private static readonly string vertexFile = "../../Shaders/BasicShader/vertexShader.glsl";
         private static readonly string fragmentFile = "../../Shaders/BasicShader/fragmentShader.glsl";
 
-        public int location_TextureAtlas { get; private set; }
-        public int location_TransformationMatrix { get; private set; }
-        public int location_ViewMatrix { get; private set; }
-        public int location_ProjectionMatrix { get; private set; }
+        public int Location_TextureAtlas { get; private set; }
+        public int Location_TransformationMatrix { get; private set; }
+        public int Location_ViewMatrix { get; private set; }
+        public int Location_ProjectionMatrix { get; private set; }
 
         public ShaderBasic() : base(vertexFile, fragmentFile)
         {
@@ -16,10 +16,10 @@
 
         protected override void GetAllUniformLocations()
         {
-            location_TextureAtlas = GetUniformLocation("textureAtlas");
-            location_TransformationMatrix = GetUniformLocation("transformationMatrix");
-            location_ViewMatrix = GetUniformLocation("viewMatrix");
-            location_ProjectionMatrix = GetUniformLocation("projectionMatrix");
+            Location_TextureAtlas = GetUniformLocation("textureAtlas");
+            Location_TransformationMatrix = GetUniformLocation("transformationMatrix");
+            Location_ViewMatrix = GetUniformLocation("viewMatrix");
+            Location_ProjectionMatrix = GetUniformLocation("projectionMatrix");
         }
 
         protected override void BindAttributes()

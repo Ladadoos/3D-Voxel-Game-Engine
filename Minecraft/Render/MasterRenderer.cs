@@ -55,21 +55,21 @@ namespace Minecraft
             this.game = game;
             basicShader = new ShaderBasic();
             entityShader = new EntityShader();
-            cameraController = new CameraController(game.window);
+            cameraController = new CameraController(game.Window);
 
-            SetActiveCamera(game.player.camera);
+            SetActiveCamera(game.ClientPlayer.camera);
 
             int textureAtlasId = TextureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
             blockModelRegistry = new BlockModelRegistry(textureAtlas);
             blocksMeshGenerator = new OpaqueMeshGenerator(blockModelRegistry);
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
-            screenQuad = new ScreenQuad(game.window);
+            screenQuad = new ScreenQuad(game.Window);
             wireframeRenderer = new WireframeRenderer(this);
             debugHelper = new DebugHelper(game, wireframeRenderer);
-            playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.player);
+            playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.ClientPlayer);
 
-            uiRenderer = new UIRenderer(game.window, cameraController);
+            uiRenderer = new UIRenderer(game.Window, cameraController);
             ingameCanvas = new UICanvasIngame(game);
             AddCanvas(ingameCanvas);
 
@@ -105,14 +105,14 @@ namespace Minecraft
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             basicShader.Start();
-            basicShader.LoadTexture(basicShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            basicShader.LoadMatrix(basicShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
+            basicShader.LoadTexture(basicShader.Location_TextureAtlas, 0, textureAtlas.ID);
+            basicShader.LoadMatrix(basicShader.Location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
 
             lock (meshLock)
             {
                 foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
                 {
-                    if (chunkToRender.Value.hardBlocksModel == null) continue;
+                    if (chunkToRender.Value.HardBlocksModel == null) continue;
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                     Vector3 max = min + new Vector3(16, 256, 16);
@@ -120,22 +120,22 @@ namespace Minecraft
                     {
                         continue;
                     }
-                    chunkToRender.Value.hardBlocksModel.BindVAO();
-                    basicShader.LoadMatrix(basicShader.location_TransformationMatrix, chunkToRender.Value.transformationMatrix);
-                    GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.hardBlocksModel.indicesCount);
+                    chunkToRender.Value.HardBlocksModel.BindVAO();
+                    basicShader.LoadMatrix(basicShader.Location_TransformationMatrix, chunkToRender.Value.TransformationMatrix);
+                    GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.HardBlocksModel.IndicesCount);
                 }
             }
 
             entityShader.Start();
-            entityShader.LoadTexture(entityShader.location_TextureAtlas, 0, textureAtlas.textureId);
-            entityShader.LoadMatrix(entityShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
+            entityShader.LoadTexture(entityShader.Location_TextureAtlas, 0, textureAtlas.ID);
+            entityShader.LoadMatrix(entityShader.Location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
             foreach (Entity entity in world.loadedEntities.Values)
             {
-                if (entityMeshRegistry.models.TryGetValue(entity.entityType, out VAOModel entityMeshModel))
+                if (entityMeshRegistry.Models.TryGetValue(entity.EntityType, out VAOModel entityMeshModel))
                 {
                     entityMeshModel.BindVAO();
-                    entityShader.LoadMatrix(entityShader.location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.position));
-                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.indicesCount);
+                    entityShader.LoadMatrix(entityShader.Location_TransformationMatrix, Matrix4.Identity * Matrix4.CreateTranslation(entity.Position));
+                    GL.DrawArrays(PrimitiveType.Quads, 0, entityMeshModel.IndicesCount);
                 }
             }
 
@@ -159,7 +159,7 @@ namespace Minecraft
             {
                 foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
                 {
-                    if (chunkToRender.Value.hardBlocksModel == null) continue;
+                    if (chunkToRender.Value.HardBlocksModel == null) continue;
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                     wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16));
@@ -178,18 +178,18 @@ namespace Minecraft
                     Chunk remeshedChunk = null;
                     foreach (Chunk chunk in toRemeshChunks)
                     {
-                        Vector2 gridPosition = new Vector2(chunk.gridX, chunk.gridZ);
+                        Vector2 gridPosition = new Vector2(chunk.GridX, chunk.GridZ);
 
                         if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
                         {
-                            renderChunk = new RenderChunk(chunk.gridX, chunk.gridZ);
+                            renderChunk = new RenderChunk(chunk.GridX, chunk.GridZ);
                             toRenderChunks.Add(gridPosition, renderChunk);
                         }
 
                         availableChunkMeshes.Enqueue(new ChunkRemeshLayout()
                         {
                             renderChunk = renderChunk,
-                            chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.world, chunk)
+                            chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.World, chunk)
                         });
 
                         remeshedChunk = chunk;
@@ -226,8 +226,8 @@ namespace Minecraft
 
             if(foundChunkToRemesh)
             {
-                chunkMesh.renderChunk.hardBlocksModel?.CleanUp();
-                chunkMesh.renderChunk.hardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+                chunkMesh.renderChunk.HardBlocksModel?.CleanUp();
+                chunkMesh.renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
             }
         }
 
@@ -241,22 +241,22 @@ namespace Minecraft
             bool cZNegPredicate = true, bool cZPosPredicate = true)
         {
             if (cXNegPredicate && 
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX - 1, chunk.gridZ), out Chunk cXNeg))
+                world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
             {
                 MeshChunk(cXNeg);
             }
             if (cXPosPredicate && 
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX + 1, chunk.gridZ), out Chunk cXPos))
+                world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
             {
                 MeshChunk(cXPos);
             }
             if (cZNegPredicate && 
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ - 1), out Chunk cZNeg))
+                world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
             {
                 MeshChunk(cZNeg);
             }
             if (cZPosPredicate && 
-                world.loadedChunks.TryGetValue(new Vector2(chunk.gridX, chunk.gridZ + 1), out Chunk cZPos))
+                world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
             {
                 MeshChunk(cZPos);
             }
@@ -266,7 +266,7 @@ namespace Minecraft
         {
             lock (meshLock)
             {
-                toRenderChunks.Remove(new Vector2(chunk.gridX, chunk.gridZ));
+                toRenderChunks.Remove(new Vector2(chunk.GridX, chunk.GridZ));
                 toRemeshChunks.Remove(chunk);
             }
             MeshNeighbourChunks(world, chunk);
@@ -306,16 +306,16 @@ namespace Minecraft
 
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)
         {
-            screenQuad.AdjustToWindowSize(pInfo.windowWidth, pInfo.windowHeight);
+            screenQuad.AdjustToWindowSize(pInfo.WindowPixelWidth, pInfo.WindowPixelHeight);
             UploadActiveCameraProjectionMatrix();
         }
 
         private void UploadActiveCameraProjectionMatrix()
         {
             basicShader.Start();
-            basicShader.LoadMatrix(basicShader.location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
+            basicShader.LoadMatrix(basicShader.Location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
             entityShader.Start();
-            entityShader.LoadMatrix(entityShader.location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
+            entityShader.LoadMatrix(entityShader.Location_ProjectionMatrix, GetActiveCamera().CurrentProjectionMatrix);
             entityShader.Stop();
         }
 

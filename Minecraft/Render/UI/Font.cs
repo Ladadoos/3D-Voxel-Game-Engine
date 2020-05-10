@@ -4,18 +4,18 @@ namespace Minecraft
 {
     class Font
     {
-        public Texture fontMapTexture { get; private set; }
-        public int desiredPixelLineHeight { get; private set; }
-        public ReadOnlyDictionary<int, Character> fontChars;
+        public Texture FontMapTexture { get; private set; }
+        public int DesiredPixelLineHeight { get; private set; }
+        public ReadOnlyDictionary<int, Character> FontChars { get; private set; }
 
         public Font(string fontFilePath, string fontMapFilePath, int fontMapWidth, int fontMapHeight)
         {
             int fontMapTextureid = TextureLoader.LoadTexture(fontMapFilePath);
-            fontMapTexture = new Texture(fontMapTextureid, fontMapWidth, fontMapHeight);
+            FontMapTexture = new Texture(fontMapTextureid, fontMapWidth, fontMapHeight);
 
             CharacterBuilder charBuilder = new CharacterBuilder();
-            fontChars = new ReadOnlyDictionary<int, Character>(charBuilder.BuildFont(fontMapTexture, fontFilePath));
-            desiredPixelLineHeight = fontChars.Aggregate((l, r) => l.Value.height > r.Value.height ? l : r).Value.height;
+            FontChars = new ReadOnlyDictionary<int, Character>(charBuilder.BuildFont(FontMapTexture, fontFilePath));
+            DesiredPixelLineHeight = FontChars.Aggregate((l, r) => l.Value.Height > r.Value.Height ? l : r).Value.Height;
         }
     }
 }

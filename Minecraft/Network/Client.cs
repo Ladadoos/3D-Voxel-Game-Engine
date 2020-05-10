@@ -33,11 +33,11 @@ namespace Minecraft
             packetTransferThread.Start();
         }
 
-        public PlayerSettings GetPlayerSettings() => session.playerSettings;
+        public PlayerSettings GetPlayerSettings() => session.PlayerSettings;
 
         private void HandlePacketCommunication()
         {
-            while(session == null || session.state == SessionState.Started)
+            while(session == null || session.State == SessionState.Started)
             {
                 Thread.Sleep(5);
             }
@@ -46,7 +46,7 @@ namespace Minecraft
             {
                 Thread.Sleep(5);
 
-                if (session.state == SessionState.Closed)
+                if (session.State == SessionState.Closed)
                 {
                     break;
                 }
@@ -100,14 +100,14 @@ namespace Minecraft
             NetworkStream netStream = tcpClient.GetStream();
             Connection serverConnection = new Connection()
             {
-                client = tcpClient,
-                netStream = netStream,
-                reader = new BinaryReader(netStream),
-                bufferedStream = new NetBufferedStream(new BufferedStream(netStream)),
+                Client = tcpClient,
+                NetStream = netStream,
+                Reader = new BinaryReader(netStream),
+                Writer = new NetBufferedStream(new BufferedStream(netStream)),
             };
             ClientNetHandler netHandler = new ClientNetHandler(game);
             session = new ClientSession(serverConnection, netHandler);
-            session.AssignPlayer(game.player);
+            session.AssignPlayer(game.ClientPlayer);
             session.OnStateChangedHandler += OnStateChangedHandler;      
             netHandler.AssignSession(session);
 
@@ -118,10 +118,10 @@ namespace Minecraft
 
         private void OnStateChangedHandler(Session session)
         {
-            if(session.state == SessionState.Accepted)
+            if(session.State == SessionState.Accepted)
             {
                 Logger.Info("Client: server accepted my connection.");
-            } else if (session.state == SessionState.Closed)
+            } else if (session.State == SessionState.Closed)
             {
                 session.Close();
                 Logger.Info("Client: my connection with server closed.");
@@ -130,12 +130,12 @@ namespace Minecraft
 
         public void Stop()
         {
-            session.state = SessionState.Closed;
+            session.State = SessionState.Closed;
         }
 
         public void Update(float deltaTime)
         {
-            if (session.state == SessionState.Closed)
+            if (session.State == SessionState.Closed)
             {
                 return;
             }
@@ -146,7 +146,7 @@ namespace Minecraft
             {
                 while (toProcessPackets.Count > 0)
                 {
-                    toProcessPackets.Dequeue().Process(session.netHandler);
+                    toProcessPackets.Dequeue().Process(session.NetHandler);
                 }
             }
         }

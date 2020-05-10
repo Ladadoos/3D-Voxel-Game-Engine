@@ -16,10 +16,10 @@ namespace Minecraft
         private readonly Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
         private readonly Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
-        public Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
-        public Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
+        public Dictionary<int, Entity> loadedEntities { get; private set; } = new Dictionary<int, Entity>();
+        public Dictionary<Vector2, Chunk> loadedChunks { get; private set; } = new Dictionary<Vector2, Chunk>();
 
-        public Dictionary<Vector2, int> chunkPlayerPopulation = new Dictionary<Vector2, int>();
+        public Dictionary<Vector2, int> chunkPlayerPopulation { get; private set; } = new Dictionary<Vector2, int>();
 
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
@@ -62,13 +62,13 @@ namespace Minecraft
 
         public void SpawnEntity(Entity entity)
         {
-            loadedEntities.Add(entity.id, entity);
+            loadedEntities.Add(entity.ID, entity);
             OnEntitySpawnedHandler?.Invoke(this, entity);
         }
 
         public void AddPlayerPresenceToChunk(Chunk chunk)
         {
-            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            Vector2 chunkPos = new Vector2(chunk.GridX, chunk.GridZ);
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population + 1;
@@ -82,7 +82,7 @@ namespace Minecraft
 
         public bool RemovePlayerPresenceOfChunk(Chunk chunk)
         {
-            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            Vector2 chunkPos = new Vector2(chunk.GridX, chunk.GridZ);
             if (chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population - 1;
@@ -100,7 +100,7 @@ namespace Minecraft
 
         protected void LoadChunk(Chunk chunk)
         {
-            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            Vector2 chunkPos = new Vector2(chunk.GridX, chunk.GridZ);
             if (!loadedChunks.ContainsKey(chunkPos))
             {
                 loadedChunks.Add(chunkPos, chunk);
@@ -113,7 +113,7 @@ namespace Minecraft
 
         protected bool UnloadChunk(Chunk chunk)
         {
-            Vector2 chunkPos = new Vector2(chunk.gridX, chunk.gridZ);
+            Vector2 chunkPos = new Vector2(chunk.GridX, chunk.GridZ);
             if (loadedChunks.Remove(chunkPos))
             {
                 OnChunkUnloadedHandler?.Invoke(this, chunk);
@@ -161,27 +161,29 @@ namespace Minecraft
         {
             while(toRemoveEntities.Count > 0)
             {
-                loadedEntities.Remove(toRemoveEntities.Dequeue().id);
+                loadedEntities.Remove(toRemoveEntities.Dequeue().ID);
             }
         }
 
         private void Tick(float deltaTime)
         {
             elapsedMillisecondsSinceLastTick += deltaTime;
-            if (elapsedMillisecondsSinceLastTick > secondsPerTick)
+            if (elapsedMillisecondsSinceLastTick < secondsPerTick)
             {
-                foreach (KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
-                {
-                    loadedChunk.Value.Tick(elapsedMillisecondsSinceLastTick, this);
-                }
-
-                foreach (Entity entity in loadedEntities.Values)
-                {
-                    entity.Tick(elapsedMillisecondsSinceLastTick, this);
-                }
-
-                elapsedMillisecondsSinceLastTick = 0;
+                return;
             }
+
+            foreach(KeyValuePair<Vector2, Chunk> loadedChunk in loadedChunks)
+            {
+                loadedChunk.Value.Tick(elapsedMillisecondsSinceLastTick, this);
+            }
+
+            foreach(Entity entity in loadedEntities.Values)
+            {
+                entity.Tick(elapsedMillisecondsSinceLastTick, this);
+            }
+
+            elapsedMillisecondsSinceLastTick = 0;
         }
 
         public static Vector2 GetChunkPosition(float worldX, float worldZ)
@@ -266,7 +268,7 @@ namespace Minecraft
 
                 foreach(Entity entity in loadedEntities.Values)
                 {
-                    if (newBlockState.GetBlock().GetCollisionBox(newBlockState, blockPos).Any(aabb => entity.hitbox.Intersects(aabb)))
+                    if (newBlockState.GetBlock().GetCollisionBox(newBlockState, blockPos).Any(aabb => entity.Hitbox.Intersects(aabb)))
                     {
                         Console.WriteLine("Block tried to placed was in player");
                         return false;
@@ -286,7 +288,7 @@ namespace Minecraft
 
         public bool IsOutsideBuildHeight(int worldY)
         {
-            return worldY < 0 || worldY >= Constants.SECTIONS_IN_CHUNKS * Constants.SECTION_HEIGHT;
+            return worldY < 0 || worldY >= Constants.MAX_BUILD_HEIGHT;
         }
         
         public BlockState GetBlockAt(Vector3i blockPos)
@@ -302,8 +304,8 @@ namespace Minecraft
                 return Blocks.Air.GetNewDefaultState();
             }
 
-            int sectionHeight = blockPos.Y / Constants.SECTION_HEIGHT;
-            if(chunk.sections[sectionHeight] == null)
+            int sectionHeight = blockPos.Y / 16;
+            if(chunk.Sections[sectionHeight] == null)
             {
                 return Blocks.Air.GetNewDefaultState(); 
             }
@@ -312,7 +314,7 @@ namespace Minecraft
             int localY = blockPos.Y & 15;
             int localZ = blockPos.Z & 15;
 
-            BlockState blockType = chunk.sections[sectionHeight].GetBlockAt(localX, localY, localZ);
+            BlockState blockType = chunk.Sections[sectionHeight].GetBlockAt(localX, localY, localZ);
             if (blockType == null)
             {
                 return Blocks.Air.GetNewDefaultState(); 

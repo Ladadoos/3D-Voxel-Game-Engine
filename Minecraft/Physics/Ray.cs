@@ -4,24 +4,23 @@ namespace Minecraft
 {
     class Ray
     {
-        public Vector3 origin { get; private set; }
-        public Vector3 direction { get; private set; }
-        public float distanceToIntersection { get; private set; }
-
-        public Vector3 directionFrac { get; private set; }
+        public Vector3 Origin { get; private set; }
+        public Vector3 Direction { get; private set; }
+        public Vector3 DirectionFrac { get; private set; }
+        public float DistanceToIntersection { get; private set; }
 
         public Ray(Vector3 origin, Vector3 direction)
         {
-            this.origin = origin;
-            this.direction = direction.Normalized();
-            directionFrac = new Vector3(1 / this.direction.X, 1 / this.direction.Y, 1 / this.direction.Z);
-            distanceToIntersection = float.MaxValue;
+            Origin = origin;
+            Direction = direction.Normalized();
+            DirectionFrac = new Vector3(1 / Direction.X, 1 / Direction.Y, 1 / Direction.Z);
+            DistanceToIntersection = float.MaxValue;
         }
 
         public RayTraceResult TraceWorld(World world)
         {
-            Vector3 position = origin;
-            Vector3 offset = direction / 50;
+            Vector3 position = Origin;
+            Vector3 offset = Direction / 50;
             BlockState hitBlockState = null;
             for (int i = 0; i < 200; i++)
             {
@@ -55,8 +54,8 @@ namespace Minecraft
             {
                 return null;
             }
-            this.distanceToIntersection = dist;
-            Vector3 exactIntersection = origin + direction * distanceToIntersection;
+            DistanceToIntersection = dist;
+            Vector3 exactIntersection = Origin + Direction * DistanceToIntersection;
             Vector3 normalAtIntersection = hitAABB.GetNormalAtIntersectionPoint(exactIntersection);
             return new RayTraceResult(normalAtIntersection, exactIntersection, hitBlockState, blockPos);
         }

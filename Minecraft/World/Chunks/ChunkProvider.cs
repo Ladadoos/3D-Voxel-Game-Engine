@@ -7,7 +7,7 @@ namespace Minecraft
     class ChunkProvider
     {
         private readonly ServerSession session;
-        public HashSet<Vector2> currentlyVisibleChunks { get; private set;} = new HashSet<Vector2>();
+        public HashSet<Vector2> CurrentlyVisibleChunks { get; private set;} = new HashSet<Vector2>();
 
         private readonly object chunkRetrievalLock = new object();
         private readonly Queue<GenerateChunkOutput> receivedChunkData = new Queue<GenerateChunkOutput>();
@@ -22,12 +22,12 @@ namespace Minecraft
 
         ~ChunkProvider()
         {
-            session.player.OnChunkChangedHandler -= OnPlayerChunkChanged;
+            session.Player.OnChunkChangedHandler -= OnPlayerChunkChanged;
         }
 
         private void OnPlayerAssigned()
         {
-            session.player.OnChunkChangedHandler += OnPlayerChunkChanged;
+            session.Player.OnChunkChangedHandler += OnPlayerChunkChanged;
         }
 
         private void OnPlayerChunkChanged(World world, Vector2 playerGridPos)
@@ -35,7 +35,7 @@ namespace Minecraft
             HashSet<Vector2> newVisibleChunks = GetCurrentlyVisibleChunks(playerGridPos);
             RequestToLoadNewlyVisibleChunks(world, newVisibleChunks);
             UnloadNoLongerVisibleChunks(world, newVisibleChunks);
-            currentlyVisibleChunks = newVisibleChunks;
+            CurrentlyVisibleChunks = newVisibleChunks;
         }
 
         private HashSet<Vector2> GetCurrentlyVisibleChunks(Vector2 playerGridPosition)
@@ -44,7 +44,7 @@ namespace Minecraft
 
             //The visible chunks are the chunks in a square with sides (view distance) * 2 + 1
             //where the center chunk is where the player is at
-            int dist = session.playerSettings.viewDistance;
+            int dist = session.PlayerSettings.ViewDistance;
             dist *= 2;
             dist = dist + 1;
 
@@ -77,7 +77,7 @@ namespace Minecraft
         {
             foreach (Vector2 newChunkGridPos in newVisibleChunks)
             {
-                if (!currentlyVisibleChunks.Contains(newChunkGridPos))
+                if (!CurrentlyVisibleChunks.Contains(newChunkGridPos))
                 {
                     if(!world.loadedChunks.TryGetValue(newChunkGridPos, out Chunk chunk))
                     {
@@ -104,7 +104,7 @@ namespace Minecraft
                     } else
                     {
                         world.AddPlayerPresenceToChunk(chunk);
-                        if(world.game.server.isOpen)
+                        if(world.game.Server.IsOpenToPublic)
                         {
                             session.WritePacket(new ChunkDataPacket(chunk));
                         }
@@ -119,7 +119,7 @@ namespace Minecraft
             {
                 receivedChunkData.Enqueue(answer);
 
-                Vector2 chunkPosition = new Vector2(answer.chunk.gridX, answer.chunk.gridZ);
+                Vector2 chunkPosition = new Vector2(answer.chunk.GridX, answer.chunk.GridZ);
                 GenerateChunkRequestOutgoing request = new GenerateChunkRequestOutgoing
                 {
                     world = answer.world,
@@ -136,7 +136,7 @@ namespace Minecraft
         private void UnloadNoLongerVisibleChunks(World world, HashSet<Vector2> newVisibleChunks)
         {
             List<Vector2> toUnloadChunks = new List<Vector2>();
-            foreach (Vector2 prevChunkGridPos in currentlyVisibleChunks)
+            foreach (Vector2 prevChunkGridPos in CurrentlyVisibleChunks)
             {
                 if (!newVisibleChunks.Contains(prevChunkGridPos))
                 {
@@ -169,11 +169,11 @@ namespace Minecraft
                 World world = outputEntry.world;
                 Chunk chunk = outputEntry.chunk;
 
-                Vector2 chunkPosition = new Vector2(chunk.gridX, chunk.gridZ);
-                if(currentlyVisibleChunks.Contains(chunkPosition))
+                Vector2 chunkPosition = new Vector2(chunk.GridX, chunk.GridZ);
+                if(CurrentlyVisibleChunks.Contains(chunkPosition))
                 {
                     world.AddPlayerPresenceToChunk(chunk);
-                    if(world.game.server.isOpen)
+                    if(world.game.Server.IsOpenToPublic)
                     {
                         session.WritePacket(new ChunkDataPacket(chunk));
                     }

@@ -8,19 +8,20 @@
 
         protected override void DefineProperties()
         {
-            baseHeight = 0;
-            temperature = 0.5D;
-            moisture = 0.1D;
-            topBlock = Blocks.Sand;
-            gradiantBlock = Blocks.SandStone;
-            decorator = new BarrenDecorator();
+            BaseHeight = 0;
+            Temeprature = 0.5D;
+            Moisture = 0.1D;
+            TopBlock = Blocks.Sand;
+            GradiantBlock = Blocks.SandStone;
+            Decorator = new BarrenDecorator();
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)
         {
-            double dy = cx * Constants.CHUNK_SIZE * terrainDetail + x * terrainDetail;
-            double dx = cy * Constants.CHUNK_SIZE * terrainDetail + y * terrainDetail;
-            return baseHeight + noiseOctave.GetValuePositive(dx, dy) * heightVariation;
+            double chunkDim = 16; 
+            double dy = cx * chunkDim * terrainDetail + x * terrainDetail;
+            double dx = cy * chunkDim * terrainDetail + y * terrainDetail;
+            return BaseHeight + noiseOctave.GetValuePositive(dx, dy) * heightVariation;
         }
     }
 }

@@ -2,16 +2,16 @@
 {
     class ChatPacket : Packet
     {
-        public string message { get; private set; }
+        public string Message { get; private set; }
 
         public ChatPacket(string message) : base(PacketType.Chat)
         {
-            this.message = message;
+            Message = message;
         }
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteUtf8String(message);
+            bufferedStream.WriteUtf8String(Message);
         }
 
         public override void Process(INetHandler netHandler)

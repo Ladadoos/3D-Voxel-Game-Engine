@@ -2,15 +2,15 @@
 {
     class PlayerLeavePacket : Packet
     {
-        public int id { get; private set; }
-        public LeaveReason reason { get; private set; }
-        public string message { get; private set; }
+        public int ID { get; private set; }
+        public LeaveReason Reason { get; private set; }
+        public string Message { get; private set; }
 
         public PlayerLeavePacket(int id, LeaveReason reason, string message) : base(PacketType.PlayerLeave)
         {
-            this.id = id;
-            this.reason = reason;
-            this.message = message;
+            ID = id;
+            Reason = reason;
+            Message = message;
         }
 
         public override void Process(INetHandler netHandler)
@@ -20,9 +20,9 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(id);
-            bufferedStream.WriteInt32((int)reason);
-            bufferedStream.WriteUtf8String(message);
+            bufferedStream.WriteInt32(ID);
+            bufferedStream.WriteInt32((int)Reason);
+            bufferedStream.WriteUtf8String(Message);
         }
     }
 

@@ -2,11 +2,11 @@
 {
     class PlayerBlockInteractionPacket : Packet
     {
-        public Vector3i blockPos { get; private set; }
+        public Vector3i BlockPos { get; private set; }
 
         public PlayerBlockInteractionPacket(Vector3i blockPos) : base(PacketType.PlayerBlockInteraction)
         {
-            this.blockPos = blockPos;
+            BlockPos = blockPos;
         }
 
         public override void Process(INetHandler netHandler)
@@ -16,7 +16,7 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteVector3i(blockPos);
+            bufferedStream.WriteVector3i(BlockPos);
         }
     }
 }

@@ -5,32 +5,32 @@ namespace Minecraft
 {
     class UIText : UIComponent
     {
-        private string _text;
-        public string text {
+        private string text;
+        public string Text {
             get {
-                return _text;
+                return text;
             }
             set {
-                if(_text == value)
+                if(text == value)
                 {
                     return;
                 }
 
-                _text = value;
-                parentCanvas.AddComponentToClean(this);
+                text = value;
+                ParentCanvas.AddComponentToClean(this);
             }
         }
 
-        public Font font { get; private set; }
-        public Vector2 scale { get; private set; }
+        public Font Font { get; private set; }
+        public Vector2 Scale { get; private set; }
 
         private readonly TextMeshBuilder meshBuilder = new TextMeshBuilder();
 
         public UIText(UICanvas parentCanvas, Font font, Vector2 position, Vector2 scale, string text) : base(parentCanvas, position)
         {
-            this.font = font;
-            this.text = text;
-            this.scale = scale;
+            Font = font;
+            Text = text;
+            Scale = scale;
         }
 
         public override void Clean()
@@ -45,8 +45,8 @@ namespace Minecraft
         public override void Render(UIShader uiShader)
         {
             vaoModel.BindVAO();
-            uiShader.LoadTexture(uiShader.location_Texture, 0, font.fontMapTexture.textureId);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.indicesCount);
+            uiShader.LoadTexture(uiShader.Location_Texture, 0, Font.FontMapTexture.ID);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.IndicesCount);
         }
     }
 }

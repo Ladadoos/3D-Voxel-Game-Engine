@@ -2,13 +2,13 @@
 {
     class PlaceBlockPacket : Packet
     {
-        public BlockState blockState { get; private set; }
-        public Vector3i blockPos { get; private set; }
+        public BlockState BlockState { get; private set; }
+        public Vector3i BlockPos { get; private set; }
 
         public PlaceBlockPacket(BlockState blockState, Vector3i blockPos) : base(PacketType.PlaceBlock)
         {
-            this.blockState = blockState;
-            this.blockPos = blockPos;
+            BlockState = blockState;
+            BlockPos = blockPos;
         }
 
         public override void Process(INetHandler netHandler)
@@ -18,13 +18,13 @@
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteVector3i(blockPos);
-            blockState.ToStream(bufferedStream);
+            bufferedStream.WriteVector3i(BlockPos);
+            BlockState.ToStream(bufferedStream);
         }
 
         public override string ToString()
         {
-            return "[" + GetType() + "] -> " + blockState.GetBlock().GetType() + " at " + blockPos;
+            return "[" + GetType() + "] -> " + BlockState.GetBlock().GetType() + " at " + BlockPos;
         }
     }
 }

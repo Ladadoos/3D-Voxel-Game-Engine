@@ -20,53 +20,60 @@ namespace Minecraft
             this.wireframeRenderer = wireframeRenderer;
             this.game = game;
 
-            debugCamera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
+            debugCamera = new Camera(new ProjectionMatrixInfo
+            {
+                DistanceNearPlane = 0.1F,
+                DistanceFarPlane = 1000F,
+                FieldOfView = 1.5F,
+                WindowPixelWidth = game.Window.Width,
+                WindowPixelHeight = game.Window.Height
+            });
         }
 
         public void UpdateAndRender()
         {
-            if (Game.input.OnKeyPress(OpenTK.Input.Key.F1))
+            if (Game.Input.OnKeyPress(OpenTK.Input.Key.F1))
             {
                 renderHitboxes = !renderHitboxes;
-            }else if (Game.input.OnKeyPress(OpenTK.Input.Key.F2) && game.mode != RunMode.Server)
+            }else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F2) && game.RunMode != RunMode.Server)
             {
                 displayDebugInfo = !displayDebugInfo;
                 if (displayDebugInfo)
                 {
                     debugCanvas = new UICanvasDebug(game);
-                    game.masterRenderer.AddCanvas(debugCanvas);
+                    game.MasterRenderer.AddCanvas(debugCanvas);
                 } else
                 {
-                    game.masterRenderer.RemoveCanvas(debugCanvas);
+                    game.MasterRenderer.RemoveCanvas(debugCanvas);
                 }
-            }else if (Game.input.OnKeyPress(OpenTK.Input.Key.F3))
+            }else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F3))
             {
                 GC.Collect();
                 Logger.Info("Manual garbage collected.");
-            } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F4))
+            } else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F4))
             {
                 Vector3i[] blockPositions = new Vector3i[7 * 7 * 7];
                 int i = 0;
                 for(int x = -3; x < 3; x++)
                     for(int y = -3; y < 3; y++)
                         for(int z = -3; z < 3; z++)
-                            blockPositions[i++] = new Vector3i(x, y, z) + new Vector3i(game.player.position);
-                 game.client.WritePacket(new RemoveBlockPacket(blockPositions));
-            } else if (Game.input.OnKeyPress(OpenTK.Input.Key.F5))
+                            blockPositions[i++] = new Vector3i(x, y, z) + new Vector3i(game.ClientPlayer.Position);
+                 game.Client.WritePacket(new RemoveBlockPacket(blockPositions));
+            } else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F5))
             {
                 renderChunkBorders = !renderChunkBorders;
-            } else if(Game.input.OnKeyPress(OpenTK.Input.Key.F6))
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F6))
             {
                 renderFromPlayerCamera = !renderFromPlayerCamera;
 
                 if(!renderFromPlayerCamera)
                 {
-                    debugCamera.SetPosition(game.player.position + new Vector3(0, 100, 0));
+                    debugCamera.SetPosition(game.ClientPlayer.Position + new Vector3(0, 100, 0));
                     debugCamera.SetYawAndPitch(0, (float)(-Math.PI / 2));
-                    game.masterRenderer.SetActiveCamera(debugCamera);
+                    game.MasterRenderer.SetActiveCamera(debugCamera);
                 } else
                 {
-                    game.masterRenderer.SetActiveCamera(game.player.camera);
+                    game.MasterRenderer.SetActiveCamera(game.ClientPlayer.camera);
                 }
             }
 
@@ -77,23 +84,23 @@ namespace Minecraft
         {
             if (renderHitboxes)
             {
-                foreach(Entity entity in game.world.loadedEntities.Values)
+                foreach(Entity entity in game.World.loadedEntities.Values)
                 {
-                    AxisAlignedBox aabb = entity.hitbox;
-                    float width = Math.Abs(aabb.max.X - aabb.min.X);
-                    float length = Math.Abs(aabb.max.Z - aabb.min.Z);
-                    float height = Math.Abs(aabb.max.Y - aabb.min.Y);
+                    AxisAlignedBox aabb = entity.Hitbox;
+                    float width = Math.Abs(aabb.Max.X - aabb.Min.X);
+                    float length = Math.Abs(aabb.Max.Z - aabb.Min.Z);
+                    float height = Math.Abs(aabb.Max.Y - aabb.Min.Y);
 
                     float offset = 0.001f;
                     Vector3 scaleVector = new Vector3(width, height, length);
-                    Vector3 translation = entity.position;
+                    Vector3 translation = entity.Position;
                     wireframeRenderer.RenderWireframeAt(2, translation, scaleVector, new Vector3(offset, offset, offset));
                 }
             }
 
             if (renderChunkBorders)
             {
-                game.masterRenderer.RenderChunkBorders();
+                game.MasterRenderer.RenderChunkBorders();
             }
         }
     }

@@ -8,19 +8,20 @@
 
         protected override void DefineProperties()
         {
-            baseHeight = 8;
-            temperature = 0.9D;
-            moisture = 0.5D;
-            topBlock = Blocks.Stone;
-            gradiantBlock = Blocks.Stone;
-            decorator = new RockyDecorator();
+            BaseHeight = 8;
+            Temeprature = 0.9D;
+            Moisture = 0.5D;
+            TopBlock = Blocks.Stone;
+            GradiantBlock = Blocks.Stone;
+            Decorator = new RockyDecorator();
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)
         {
-            double dy = cx * Constants.CHUNK_SIZE * terrainDetail + x * terrainDetail;
-            double dx = cy * Constants.CHUNK_SIZE * terrainDetail + y * terrainDetail;
-            return baseHeight + noiseOctave.GetValuePositive(dx, dy) * heightVariation;
+            double chunkDim = 16; 
+            double dy = cx * chunkDim * terrainDetail + x * terrainDetail;
+            double dx = cy * chunkDim * terrainDetail + y * terrainDetail;
+            return BaseHeight + noiseOctave.GetValuePositive(dx, dy) * heightVariation;
         }
     }
 }

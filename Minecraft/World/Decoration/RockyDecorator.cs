@@ -7,8 +7,8 @@
 
         public void Decorate(Chunk chunk, int worldY, int localX, int localZ)
         {
-            int worldX = chunk.gridX * 16 + localX;
-            int worldZ = chunk.gridZ * 16 + localZ;
+            int worldX = chunk.GridX * 16 + localX;
+            int worldZ = chunk.GridZ * 16 + localZ;
 
             double perl = perlin.GetValue(worldX * 0.0075f, worldY * 0.0075f, worldZ * 0.0075f);
             if(perl < -0.75f)

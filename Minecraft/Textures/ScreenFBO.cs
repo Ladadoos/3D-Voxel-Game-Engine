@@ -5,8 +5,8 @@ namespace Minecraft
 {
     class ScreenFBO
     {
-        public int colorTexture { get; private set; }
-        public int normalDepthTexture { get; private set; }
+        public int ColorTextureID { get; private set; }
+        public int NormalDepthTextureID { get; private set; }
         private int fbo;
         private int renderBuffer;
 
@@ -30,24 +30,24 @@ namespace Minecraft
             GL.DrawBuffers(2, buffers);
 
             // Create and bind color texture
-            colorTexture = GL.Ext.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, colorTexture);
+            ColorTextureID = GL.Ext.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, ColorTextureID);
             // Set some color texture Settings
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, screenWidth, screenHeight, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             // Attach color texture to FBO
-            GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, colorTexture, 0);
+            GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, ColorTextureID, 0);
 
             // Create and bind color texture
-            normalDepthTexture = GL.Ext.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, normalDepthTexture);
+            NormalDepthTextureID = GL.Ext.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, NormalDepthTextureID);
             // Set some color texture Settings
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, screenWidth, screenHeight, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             // Attach color texture to FBO
-            GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, normalDepthTexture, 0);
+            GL.Ext.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, NormalDepthTextureID, 0);
 
             // Create render buffer object and bind it
             GL.Ext.GenRenderbuffers(1, out renderBuffer);
@@ -79,8 +79,8 @@ namespace Minecraft
 
         public void CleanUp()
         {
-            GL.DeleteTexture(colorTexture);
-            GL.DeleteTexture(normalDepthTexture);
+            GL.DeleteTexture(ColorTextureID);
+            GL.DeleteTexture(NormalDepthTextureID);
             GL.DeleteRenderbuffer(renderBuffer);
             GL.DeleteFramebuffer(fbo);
         }

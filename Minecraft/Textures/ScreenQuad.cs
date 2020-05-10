@@ -39,8 +39,8 @@ namespace Minecraft
         public void RenderToScreen()
         {
             shader.Start();
-            shader.LoadTexture(shader.location_colorTexture, 0, fbo.colorTexture);
-            shader.LoadTexture(shader.location_normalDepthTexture, 1, fbo.normalDepthTexture);
+            shader.LoadTexture(shader.Location_ColorTexture, 0, fbo.ColorTextureID);
+            shader.LoadTexture(shader.Location_NormalDepthTexture, 1, fbo.NormalDepthTextureID);
             GL.BindVertexArray(vao);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
             shader.Stop();

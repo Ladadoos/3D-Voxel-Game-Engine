@@ -2,15 +2,15 @@
 {
     struct Character
     {
-        public int id;
-        public float xTextureMin;
-        public float xTextureOffset;
-        public float yTextureMin;
-        public float yTextureOffset;
-        public int xOffset;
-        public int yOffset;
-        public int width;
-        public int height;
-        public int xAdvance;
+        public int ID;
+        public float XTextureMin;
+        public float XTextureOffset;
+        public float YTextureMin;
+        public float YTextureOffset;
+        public int XOffset;
+        public int YOffset;
+        public int Width;
+        public int Height;
+        public int XAdvance;
     }
 }

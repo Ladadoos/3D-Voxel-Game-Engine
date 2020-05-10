@@ -50,7 +50,7 @@ namespace Minecraft
         public static AxisAlignedBox GetFullBlockCollision(Vector3i blockPos)
         {
             return new AxisAlignedBox(new Vector3(blockPos.X, blockPos.Y, blockPos.Z),
-                new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE));
+                new Vector3(blockPos.X + Constants.CUBE_DIM, blockPos.Y + Constants.CUBE_DIM, blockPos.Z + Constants.CUBE_DIM));
         }
 
         protected void NotifyNeighbours(BlockState blockState, World world, Vector3i blockPos)

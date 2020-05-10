@@ -4,16 +4,16 @@ namespace Minecraft
 {
     class PlayerJoinAcceptPacket : Packet
     {
-        public string name { get; private set; }
-        public int playerId { get; private set; }
-        public Vector3 spawnPosition { get; private set; }
+        public string Name { get; private set; }
+        public int PlayerID { get; private set; }
+        public Vector3 SpawnPosition { get; private set; }
 
         public PlayerJoinAcceptPacket(string name, int playerId, Vector3 spawnPosition)
             : base(PacketType.PlayerJoinAccept)
         {
-            this.name = name;
-            this.playerId = playerId;
-            this.spawnPosition = spawnPosition;
+            Name = name;
+            PlayerID = playerId;
+            SpawnPosition = spawnPosition;
         }
 
         public override void Process(INetHandler netHandler)
@@ -23,11 +23,9 @@ namespace Minecraft
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(playerId);
-            bufferedStream.WriteUtf8String(name);
-            bufferedStream.WriteFloat(spawnPosition.X);
-            bufferedStream.WriteFloat(spawnPosition.Y);
-            bufferedStream.WriteFloat(spawnPosition.Z);
+            bufferedStream.WriteInt32(PlayerID);
+            bufferedStream.WriteUtf8String(Name);
+            bufferedStream.WriteVector3(SpawnPosition);
         }
     }
 }

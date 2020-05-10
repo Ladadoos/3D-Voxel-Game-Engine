@@ -20,8 +20,8 @@ namespace Minecraft
             double sum = 0;
             for (int i = 0; i < registeredBiomes.Length; i++)
             {
-                double dtTemp = (Math.Abs(registeredBiomes[i].temperature - temperature) / temperature);
-                double dtMoist = (Math.Abs(registeredBiomes[i].moisture - moisture) / moisture);
+                double dtTemp = (Math.Abs(registeredBiomes[i].Temeprature - temperature) / temperature);
+                double dtMoist = (Math.Abs(registeredBiomes[i].Moisture - moisture) / moisture);
                 double sumDt = dtTemp + dtMoist;
                 double dt = 1 / (sumDt * sumDt * sumDt);
                 temperatureCache[i] = dt;
@@ -32,8 +32,8 @@ namespace Minecraft
             {
                 biomeMembershipCache[i] = new BiomeMembership()
                 {
-                    percentage = temperatureCache[i] / sum,
-                    biome = registeredBiomes[i]
+                    Percentage = temperatureCache[i] / sum,
+                    Biome = registeredBiomes[i]
                 };
             }
             return biomeMembershipCache;

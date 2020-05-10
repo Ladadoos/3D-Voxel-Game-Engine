@@ -16,7 +16,7 @@ namespace Minecraft
         
         public override double GetValuePure(double x, double y)
         {
-            return perlin.GetValue(x + seed, 1, y + seed);
+            return perlin.GetValue(x + Seed, 1, y + Seed);
         }
     }
 }

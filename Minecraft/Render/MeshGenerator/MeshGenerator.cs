@@ -40,12 +40,12 @@ namespace Minecraft
         {
             foreach (BlockFace face in toAddFaces)
             {
-                foreach (float uv in face.textureCoords)
+                foreach (float uv in face.TextureCoords)
                 {
                     textureUVs.Add(uv);
                 }
 
-                foreach (Vector3 modelSpacePosition in face.positions)
+                foreach (Vector3 modelSpacePosition in face.Positions)
                 {
                     Vector3 world = modelSpacePosition.Plus(blockPos);
                     vertexPositions.Add(world.X);
@@ -54,16 +54,16 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                foreach(float illum in face.illumination)
+                foreach(float illum in face.Illumination)
                 {
                     illuminations.Add(illum * globalIllumination);
                 }
 
                 for(int i = 0; i < 4; i++)
                 {
-                    normals.Add(face.normal.X);
-                    normals.Add(face.normal.Y);
-                    normals.Add(face.normal.Z);
+                    normals.Add(face.Normal.X);
+                    normals.Add(face.Normal.Y);
+                    normals.Add(face.Normal.Z);
                 }
             }
         }
@@ -72,38 +72,38 @@ namespace Minecraft
         {
             foreach (BlockFace face in toAddFaces)
             {
-                for (int i = 0; i < face.textureCoords.Length; i += 4)
+                for (int i = 0; i < face.TextureCoords.Length; i += 4)
                 {
-                    textureUVs.Add(face.textureCoords[i + 2]);
-                    textureUVs.Add(face.textureCoords[i + 3]);
-                    textureUVs.Add(face.textureCoords[i]);
-                    textureUVs.Add(face.textureCoords[i + 1]);
+                    textureUVs.Add(face.TextureCoords[i + 2]);
+                    textureUVs.Add(face.TextureCoords[i + 3]);
+                    textureUVs.Add(face.TextureCoords[i]);
+                    textureUVs.Add(face.TextureCoords[i + 1]);
                 }
 
-                for (int i = 0; i < face.positions.Length; i += 2)
+                for (int i = 0; i < face.Positions.Length; i += 2)
                 {
-                    Vector3 world = face.positions[i + 1].Plus(blockPos);
+                    Vector3 world = face.Positions[i + 1].Plus(blockPos);
                     vertexPositions.Add(world.X);
                     vertexPositions.Add(world.Y);
                     vertexPositions.Add(world.Z);
 
-                    world = face.positions[i].Plus(blockPos);
+                    world = face.Positions[i].Plus(blockPos);
                     vertexPositions.Add(world.X);
                     vertexPositions.Add(world.Y);
                     vertexPositions.Add(world.Z);
                 }
 
                 indicesCount += 4;
-                foreach (float illum in face.illumination)
+                foreach (float illum in face.Illumination)
                 {
                     illuminations.Add(illum * globalIllumination);
                 }
 
                 for (int i = 0; i < 4; i++)
                 {
-                    normals.Add(face.normal.X);
-                    normals.Add(face.normal.Y);
-                    normals.Add(face.normal.Z);
+                    normals.Add(face.Normal.X);
+                    normals.Add(face.Normal.Y);
+                    normals.Add(face.Normal.Z);
                 }
             }
         }

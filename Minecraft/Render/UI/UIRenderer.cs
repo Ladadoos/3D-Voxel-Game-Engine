@@ -30,7 +30,7 @@ namespace Minecraft
         {
             if(canvasses.TryGetValue(RenderSpace.Screen, out List<UICanvas> screenCanvasses))
             {
-                screenCanvasses.ForEach(canvas => canvas.SetDimensions(projecInfo.windowWidth, projecInfo.windowHeight));
+                screenCanvasses.ForEach(canvas => canvas.SetDimensions(projecInfo.WindowPixelWidth, projecInfo.WindowPixelHeight));
             }
         }
 
@@ -38,18 +38,18 @@ namespace Minecraft
 
         public void AddCanvas(UICanvas canvas)
         {
-            if(!canvasses.TryGetValue(canvas.renderSpace, out List<UICanvas> spaceCanvasses))
+            if(!canvasses.TryGetValue(canvas.RenderSpace, out List<UICanvas> spaceCanvasses))
             {
-                Logger.Error("Failed to add canvas of type " + canvas.renderSpace);
+                Logger.Error("Failed to add canvas of type " + canvas.RenderSpace);
             }
             spaceCanvasses.Add(canvas);
         }
 
         public void RemoveCanvas(UICanvas canvas)
         {
-            if (!canvasses.TryGetValue(canvas.renderSpace, out List<UICanvas> spaceCanvasses))
+            if (!canvasses.TryGetValue(canvas.RenderSpace, out List<UICanvas> spaceCanvasses))
             {
-                Logger.Error("Failed to remove canvas of type " + canvas.renderSpace);
+                Logger.Error("Failed to remove canvas of type " + canvas.RenderSpace);
             }
             spaceCanvasses.Remove(canvas);
         }
@@ -71,12 +71,12 @@ namespace Minecraft
             {
                 if(spaceCanvasses.Key == RenderSpace.Screen)
                 {
-                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, Matrix4.Identity);
-                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, Matrix4.Identity);
+                    uiShader.LoadMatrix(uiShader.Location_ViewMatrix, Matrix4.Identity);
+                    uiShader.LoadMatrix(uiShader.Location_ProjectionMatrix, Matrix4.Identity);
                 } else
                 {
-                    uiShader.LoadMatrix(uiShader.location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
-                    uiShader.LoadMatrix(uiShader.location_ProjectionMatrix, cameraController.Camera.CurrentProjectionMatrix);
+                    uiShader.LoadMatrix(uiShader.Location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
+                    uiShader.LoadMatrix(uiShader.Location_ProjectionMatrix, cameraController.Camera.CurrentProjectionMatrix);
                 }
 
                 spaceCanvasses.Value.ForEach(canvas => canvas.Render(uiShader));

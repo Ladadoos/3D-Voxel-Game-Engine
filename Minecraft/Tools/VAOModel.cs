@@ -7,13 +7,13 @@ namespace Minecraft
 {
     class VAOModel
     {
-        public int indicesCount { get; private set; }
+        public int IndicesCount { get; private set; }
         private int vaoId;
         private readonly List<int> buffers = new List<int>();
 
         public VAOModel(float[] positions, float[] textureCoordinates, float[] lights, float[] normals, int indicesCount)
         {
-            this.indicesCount = indicesCount;
+            IndicesCount = indicesCount;
             CreateVAO();
             BindVAO();
             CreateVBO(3, positions);
@@ -25,7 +25,7 @@ namespace Minecraft
 
         public VAOModel(ChunkBufferLayout chunkLayout)
         {
-            this.indicesCount = chunkLayout.indicesCount;
+            IndicesCount = chunkLayout.indicesCount;
             CreateVAO();
             BindVAO();
             CreateVBO(3, chunkLayout.positions);
@@ -37,7 +37,7 @@ namespace Minecraft
 
         public VAOModel(float[] positions, int[] indices)
         {
-            this.indicesCount = indices.Length;
+            IndicesCount = indices.Length;
             CreateVAO();
             BindVAO();
             CreateVBO(3, positions);
@@ -47,7 +47,7 @@ namespace Minecraft
 
         public VAOModel(float[] positions, float[] textureCoordinates, int indicesCount)
         {
-            this.indicesCount = indicesCount;
+            IndicesCount = indicesCount;
             CreateVAO();
             BindVAO();
             CreateVBO(3, positions);

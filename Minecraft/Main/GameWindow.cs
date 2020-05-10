@@ -17,7 +17,7 @@ namespace Minecraft
             Logger.Info("OpenGL version: " + GL.GetString(StringName.Version));
             game = new Game(startArgs);
 
-            if(startArgs.runMode == RunMode.Server)
+            if(startArgs.RunMode == RunMode.Server)
             {
                 Width = 10;
                 Height = 10;
@@ -46,7 +46,7 @@ namespace Minecraft
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if(Game.input.OnKeyPress(Key.Escape))
+            if(Game.Input.OnKeyPress(Key.Escape))
             {
                 Exit();
             }

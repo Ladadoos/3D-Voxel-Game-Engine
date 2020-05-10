@@ -8,19 +8,20 @@
 
         protected override void DefineProperties()
         {
-            baseHeight = 0;
-            temperature = 0.1D;
-            moisture = 0.9D;
-            topBlock = Blocks.Grass;
-            gradiantBlock = Blocks.Dirt;
-            decorator = new ForestDecorator();
+            BaseHeight = 0;
+            Temeprature = 0.1D;
+            Moisture = 0.9D;
+            TopBlock = Blocks.Grass;
+            GradiantBlock = Blocks.Dirt;
+            Decorator = new ForestDecorator();
         }
 
         public override double OffsetAt(int cx, int cy, int x, int y)
         {
-            double dy = cx * Constants.CHUNK_SIZE * terrainDetail + x * terrainDetail;
-            double dx = cy * Constants.CHUNK_SIZE * terrainDetail + y * terrainDetail;
-            return baseHeight + noisePerlin.GetValuePositive(dx, dy) * heightVariation;
+            double chunkDim = 16;
+            double dy = cx * chunkDim * terrainDetail + x * terrainDetail;
+            double dx = cy * chunkDim * terrainDetail + y * terrainDetail;
+            return BaseHeight + noisePerlin.GetValuePositive(dx, dy) * heightVariation;
         }
     }
 }

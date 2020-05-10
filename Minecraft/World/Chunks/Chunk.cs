@@ -4,20 +4,20 @@ namespace Minecraft
 {
     class Chunk
     {
-        public Dictionary<Vector3i, BlockState> tickableBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
-        public Section[] sections { get; set; } = new Section[Constants.SECTIONS_IN_CHUNKS];
-        public int gridX { get; private set; }
-        public int gridZ { get; private set; }
+        public Dictionary<Vector3i, BlockState> TickableBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
+        public Section[] Sections { get; set; } = new Section[Constants.NUM_SECTIONS_IN_CHUNKS];
+        public int GridX { get; private set; }
+        public int GridZ { get; private set; }
 
         public Chunk(int gridX, int gridZ)
         {
-            this.gridX = gridX;
-            this.gridZ = gridZ;
+            GridX = gridX;
+            GridZ = gridZ;
         }
 
         public void Tick(float deltaTime, World world)
         {
-            foreach(KeyValuePair<Vector3i, BlockState> kp in tickableBlocks)
+            foreach(KeyValuePair<Vector3i, BlockState> kp in TickableBlocks)
             {
                 kp.Value.GetBlock().OnTick(kp.Value, world, kp.Key, deltaTime);
             }
@@ -33,29 +33,29 @@ namespace Minecraft
                 worldY = Constants.MAX_BUILD_HEIGHT - 1;
             }
 
-            int sectionHeight = worldY / Constants.SECTION_HEIGHT;
-            if(sections[sectionHeight] == null)
+            int sectionHeight = worldY / 16;
+            if(Sections[sectionHeight] == null)
             {
-                sections[sectionHeight] = new Section(gridX, gridZ, (byte)sectionHeight);
+                Sections[sectionHeight] = new Section(GridX, GridZ, (byte)sectionHeight);
             }
 
-            Vector3i blockPos = new Vector3i(localX + gridX * 16, worldY, localZ + gridZ * 16);
-            int sectionLocalY = worldY - sectionHeight * Constants.SECTION_HEIGHT;
+            Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
+            int sectionLocalY = worldY - sectionHeight * 16;
             if(blockstate.GetBlock() == Blocks.Air)
             {
-                sections[sectionHeight].RemoveBlock(localX, sectionLocalY, localZ);
-                if(tickableBlocks.TryGetValue(blockPos, out BlockState tickable))
+                Sections[sectionHeight].RemoveBlockAt(localX, sectionLocalY, localZ);
+                if(TickableBlocks.TryGetValue(blockPos, out BlockState tickable))
                 {
-                    tickableBlocks.Remove(blockPos);
+                    TickableBlocks.Remove(blockPos);
                 }
             }
             else
             {
-                sections[sectionHeight].AddBlock(localX, sectionLocalY, localZ, blockstate);
+                Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
 
-                if (blockstate.GetBlock().isTickable && !tickableBlocks.ContainsKey(blockPos))
+                if (blockstate.GetBlock().isTickable && !TickableBlocks.ContainsKey(blockPos))
                 {
-                    tickableBlocks.Add(blockPos, blockstate);
+                    TickableBlocks.Add(blockPos, blockstate);
                 }               
             }         
         }

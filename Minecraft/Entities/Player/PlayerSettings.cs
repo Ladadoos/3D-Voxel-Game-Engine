@@ -2,6 +2,6 @@
 {
     struct PlayerSettings
     {
-        public int viewDistance;
+        public int ViewDistance;
     }
 }

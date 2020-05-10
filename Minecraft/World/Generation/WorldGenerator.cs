@@ -129,20 +129,22 @@ namespace Minecraft
         {
             Chunk chunk = new Chunk(chunkX, chunkY);
 
+            const float chunkDim = 16;
+
             double temperatureXOffset = 0;
             double temperatureYOffset = 0;
-            temperatureYOffset = chunkX * Constants.CHUNK_SIZE * temperatureDetail;
+            temperatureYOffset = chunkX * chunkDim * temperatureDetail;
 
             double moistureXOffset = 0;
             double moistureYOffset = 0;
-            moistureYOffset = chunkX * Constants.CHUNK_SIZE * moistureDetail;
+            moistureYOffset = chunkX * chunkDim * moistureDetail;
 
-            for (int localX = 0; localX < Constants.CHUNK_SIZE; localX++)
+            for (int localX = 0; localX < chunkDim; localX++)
             {
-                temperatureXOffset = chunkY * Constants.CHUNK_SIZE * temperatureDetail;
-                moistureXOffset = chunkY * Constants.CHUNK_SIZE * moistureDetail;
+                temperatureXOffset = chunkY * chunkDim * temperatureDetail;
+                moistureXOffset = chunkY * chunkDim * moistureDetail;
 
-                for (int localZ = 0; localZ < Constants.CHUNK_SIZE; localZ++)
+                for (int localZ = 0; localZ < chunkDim; localZ++)
                 {
                     double temperature = temperatureFunction.GetValuePositive(temperatureXOffset, temperatureYOffset);
                     double moisture = moistureFunction.GetValuePositive(moistureXOffset, moistureYOffset);
@@ -153,18 +155,18 @@ namespace Minecraft
                     BiomeMembership bestBiome = biomes[0];
                     foreach (BiomeMembership wBiome in biomes)
                     {
-                        if (bestBiome.percentage < wBiome.percentage)
+                        if (bestBiome.Percentage < wBiome.Percentage)
                         {
                             bestBiome = wBiome;
                         }
-                        biomeHeightAddon += wBiome.percentage * wBiome.biome.OffsetAt(chunkX, chunkY, localX, localZ);
+                        biomeHeightAddon += wBiome.Percentage * wBiome.Biome.OffsetAt(chunkX, chunkY, localX, localZ);
                     }
                     int worldY = SeaLevel + (int)biomeHeightAddon;
 
-                    chunk.AddBlock(localX, worldY, localZ, bestBiome.biome.topBlock.GetNewDefaultState());
+                    chunk.AddBlock(localX, worldY, localZ, bestBiome.Biome.TopBlock.GetNewDefaultState());
                     for (int k = worldY - 1; k >= worldY - 3; k--)
                     {
-                        chunk.AddBlock(localX, k, localZ, bestBiome.biome.gradiantBlock.GetNewDefaultState());
+                        chunk.AddBlock(localX, k, localZ, bestBiome.Biome.GradiantBlock.GetNewDefaultState());
                     }
 
                     worldY -= 3;
@@ -174,7 +176,7 @@ namespace Minecraft
                     }
 
                     worldY += 4;
-                    bestBiome.biome.decorator.Decorate(chunk, worldY, localX, localZ);
+                    bestBiome.Biome.Decorator.Decorate(chunk, worldY, localX, localZ);
 
                     temperatureXOffset += temperatureDetail;
                     moistureXOffset += moistureDetail;

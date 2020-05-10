@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class EntityModelRegistry
     {
-        public ReadOnlyDictionary<EntityType, EntityModel> models;
+        public ReadOnlyDictionary<EntityType, EntityModel> Models { get; private set; }
         private readonly EntityModels entityModels;
 
         public EntityModelRegistry(TextureAtlas textureAtlas)
@@ -20,7 +20,7 @@ namespace Minecraft
                 { EntityType.Dummy, entityModels.Dummy },
                 { EntityType.Player, entityModels.Dummy },
             };
-            models = new ReadOnlyDictionary<EntityType, EntityModel>(registry);
+            Models = new ReadOnlyDictionary<EntityType, EntityModel>(registry);
         }
     }
 }

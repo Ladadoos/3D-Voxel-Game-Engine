@@ -28,12 +28,12 @@ namespace Minecraft
 
         private void CalculateNearFarWidthHeight(ProjectionMatrixInfo pInfo)
         {
-            float aspectRatio = pInfo.windowWidth / (float)pInfo.windowHeight;
+            float aspectRatio = pInfo.WindowPixelWidth / (float)pInfo.WindowPixelHeight;
             const float extesion = 2;
-            float tan = (float)Math.Tan(pInfo.fieldOfView * 0.5F) * extesion;
-            nearHeight = tan * pInfo.distanceNearPlane;
+            float tan = (float)Math.Tan(pInfo.FieldOfView * 0.5F) * extesion;
+            nearHeight = tan * pInfo.DistanceNearPlane;
             nearWidth = nearHeight * aspectRatio;
-            farHeight = tan * pInfo.distanceFarPlane;
+            farHeight = tan * pInfo.DistanceFarPlane;
             farWidth = farHeight * aspectRatio;
         }
 
@@ -43,8 +43,8 @@ namespace Minecraft
             Vector3 xAxis = camera.Right;
             Vector3 yAxis = Vector3.Cross(zAxis, xAxis);
 
-            Vector3 nearCenter = camera.Position - zAxis * camera.CurrentProjection.distanceNearPlane;
-            Vector3 farCenter = camera.Position - zAxis * camera.CurrentProjection.distanceFarPlane;
+            Vector3 nearCenter = camera.Position - zAxis * camera.CurrentProjection.DistanceNearPlane;
+            Vector3 farCenter = camera.Position - zAxis * camera.CurrentProjection.DistanceFarPlane;
 
             frustumPlanes[0].normal = -zAxis; //near plane
             frustumPlanes[0].distanceToOrigin = Vector3.Dot(frustumPlanes[0].normal, nearCenter);

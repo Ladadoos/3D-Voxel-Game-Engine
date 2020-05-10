@@ -5,7 +5,7 @@
         protected readonly TextureAtlas textureAtlas;
         protected readonly BlockFace[] emptyArray = new BlockFace[0];
         protected bool back, right, front, left, top, bottom;
-        public bool doubleSided { get; protected set; }
+        public bool DoubleSidedFaces { get; protected set; }
 
         protected BlockModel(TextureAtlas textureAtlas)
         {

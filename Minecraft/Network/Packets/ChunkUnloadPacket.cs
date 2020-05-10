@@ -5,11 +5,11 @@ namespace Minecraft
 {
     class ChunkUnloadPacket : Packet
     {
-        public List<Vector2> chunkGridPositions { get; private set; }
+        public List<Vector2> ChunkGridPositions { get; private set; }
 
         public ChunkUnloadPacket(List<Vector2> chunkGridPositions) : base(PacketType.ChunkUnload)
         {
-            this.chunkGridPositions = chunkGridPositions;
+            ChunkGridPositions = chunkGridPositions;
         }
 
         public override void Process(INetHandler netHandler)
@@ -19,8 +19,8 @@ namespace Minecraft
 
         protected override void ToStream(NetBufferedStream bufferedStream)
         {
-            bufferedStream.WriteInt32(chunkGridPositions.Count);
-            foreach(Vector2 gridPos in chunkGridPositions)
+            bufferedStream.WriteInt32(ChunkGridPositions.Count);
+            foreach(Vector2 gridPos in ChunkGridPositions)
             {
                 bufferedStream.WriteInt32((int)gridPos.X);
                 bufferedStream.WriteInt32((int)gridPos.Y);

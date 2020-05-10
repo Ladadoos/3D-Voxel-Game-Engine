@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class EntityMeshRegistry
     {
-        public ReadOnlyDictionary<EntityType, VAOModel> models;
+        public ReadOnlyDictionary<EntityType, VAOModel> Models { get; private set; }
         private readonly EntityModelRegistry entityModels;
 
         public EntityMeshRegistry(TextureAtlas textureAtlas)
@@ -18,11 +18,11 @@ namespace Minecraft
             EntityMeshGenerator entityMeshGenerator = new EntityMeshGenerator(entityModels);
 
             Dictionary<EntityType, VAOModel> registry = new Dictionary<EntityType, VAOModel>();
-            foreach (KeyValuePair<EntityType, EntityModel> entityResource in entityModels.models)
+            foreach (KeyValuePair<EntityType, EntityModel> entityResource in entityModels.Models)
             {
                 registry.Add(entityResource.Key, entityMeshGenerator.GenerateMeshFor(entityResource.Value));
             }
-            models = new ReadOnlyDictionary<EntityType, VAOModel>(registry);
+            Models = new ReadOnlyDictionary<EntityType, VAOModel>(registry);
         }
     }
 }

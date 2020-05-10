@@ -2,7 +2,7 @@
 {
     struct BiomeMembership
     {
-        public double percentage;
-        public Biome biome;
+        public double Percentage;
+        public Biome Biome;
     };
 }

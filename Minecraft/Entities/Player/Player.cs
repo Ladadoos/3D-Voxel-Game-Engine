@@ -7,7 +7,7 @@ namespace Minecraft
 {
     abstract class Player : Entity
     {
-        public string playerName;
+        public string Name { get; set; }
 
         protected bool isFlying = true;
         protected bool isInCreativeMode = true;
@@ -30,7 +30,7 @@ namespace Minecraft
 
         protected Player(int id, string playerName, Vector3 startPosition) : base(id, startPosition, EntityType.Player)
         {
-            this.playerName = playerName;
+            Name = playerName;
             jumpStopWatch.Start();
         }
 
@@ -47,13 +47,13 @@ namespace Minecraft
             Vector3 offset = new Vector3();
             offset += x * right;
             offset += z * moveForward;
-            acceleration += offset;
+            Acceleration += offset;
         }
 
         ///<summary> Moves vertical relative to world up vector. </summary>
         protected void MovePlayerVertically(float y)
         {
-            acceleration.Y += y;
+            Acceleration.Y += y;
         }
 
         protected void TryApplyGravity(double deltaTime)
@@ -139,24 +139,24 @@ namespace Minecraft
                 blocks = GetCollisionDetectionBlocks(world);
             }
 
-            velocity.X += acceleration.X * deltaTime;
-            position.X += velocity.X * deltaTime;
+            Velocity.X += Acceleration.X * deltaTime;
+            Position.X += Velocity.X * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
                 DoXAxisCollisionDetection(blocks);
             }
 
-            velocity.Y += acceleration.Y * deltaTime;
-            position.Y += velocity.Y * deltaTime;
+            Velocity.Y += Acceleration.Y * deltaTime;
+            Position.Y += Velocity.Y * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
                 DoYAxisCollisionDetection(blocks);
             }
 
-            velocity.Z += acceleration.Z * deltaTime;
-            position.Z += velocity.Z * deltaTime;
+            Velocity.Z += Acceleration.Z * deltaTime;
+            Position.Z += Velocity.Z * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
             {
@@ -164,7 +164,7 @@ namespace Minecraft
             }
 
             float friction = -10F;
-            velocity += friction * velocity * deltaTime;
+            Velocity += friction * Velocity * deltaTime;
         }
 
         /// <summary> Returns all blocks around the players position used for collision detection </summary>
@@ -172,7 +172,7 @@ namespace Minecraft
         {
             Dictionary<Vector3i, BlockState> collidables = new Dictionary<Vector3i, BlockState>();
 
-            Vector3i pos = new Vector3i(position);
+            Vector3i pos = new Vector3i(Position);
             for (int worldX = pos.X - 1; worldX <= pos.X + 1; worldX++)
             {
                 for (int worldY = pos.Y - 1; worldY <= pos.Y + Math.Ceiling(Constants.PLAYER_HEIGHT); worldY++)
@@ -198,20 +198,20 @@ namespace Minecraft
             {
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
-                    if (!hitbox.Intersects(aabb))
+                    if (!Hitbox.Intersects(aabb))
                     {
                         continue;
                     }
 
-                    if (velocity.X > 0.0F)
+                    if (Velocity.X > 0.0F)
                     {
-                        position.X = aabb.min.X - Constants.PLAYER_WIDTH;
+                        Position.X = aabb.Min.X - Constants.PLAYER_WIDTH;
                     }
-                    if (velocity.X < 0.0F)
+                    if (Velocity.X < 0.0F)
                     {
-                        position.X = aabb.max.X;
+                        Position.X = aabb.Max.X;
                     }
-                    velocity.X = 0.0F;
+                    Velocity.X = 0.0F;
                     TryStopRunning();
                 }
             }
@@ -224,21 +224,21 @@ namespace Minecraft
             {
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
-                    if (!hitbox.Intersects(aabb))
+                    if (!Hitbox.Intersects(aabb))
                     {
                         continue;
                     }
 
-                    if (velocity.Y > 0.0F)
+                    if (Velocity.Y > 0.0F)
                     {
-                        position.Y = aabb.min.Y - Constants.PLAYER_HEIGHT;
+                        Position.Y = aabb.Min.Y - Constants.PLAYER_HEIGHT;
                     }
-                    if (velocity.Y < 0.0F)
+                    if (Velocity.Y < 0.0F)
                     {
-                        position.Y = aabb.max.Y;
+                        Position.Y = aabb.Max.Y;
                         collidedY = true;
                     }
-                    velocity.Y = 0.0F;
+                    Velocity.Y = 0.0F;
                     verticalSpeed = 0.0F;
                 }
             }
@@ -252,20 +252,20 @@ namespace Minecraft
             {
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
-                    if (!hitbox.Intersects(aabb))
+                    if (!Hitbox.Intersects(aabb))
                     {
                         continue;
                     }
 
-                    if (velocity.Z > 0)
+                    if (Velocity.Z > 0)
                     {
-                        position.Z = aabb.min.Z - Constants.PLAYER_LENGTH;
+                        Position.Z = aabb.Min.Z - Constants.PLAYER_LENGTH;
                     }
-                    if (velocity.Z < 0)
+                    if (Velocity.Z < 0)
                     {
-                        position.Z = aabb.max.Z;
+                        Position.Z = aabb.Max.Z;
                     }
-                    velocity.Z = 0;
+                    Velocity.Z = 0;
                     TryStopRunning();
                 }
             }

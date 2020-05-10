@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class FontRegistry
     {
-        public ReadOnlyDictionary<FontType, Font> fonts;
+        public ReadOnlyDictionary<FontType, Font> Fonts { get; private set; }
 
         public FontRegistry()
         {
@@ -13,7 +13,7 @@ namespace Minecraft
 
         public Font GetValue(FontType fontType)
         {
-            fonts.TryGetValue(fontType, out Font font);
+            Fonts.TryGetValue(fontType, out Font font);
             return font;
         }
 
@@ -23,7 +23,7 @@ namespace Minecraft
             {
                 { FontType.Arial, new Font("../../Resources/arial.fnt", "../../Resources/arial.png", 512, 512) },
             };
-            fonts = new ReadOnlyDictionary<FontType, Font>(registry);
+            Fonts = new ReadOnlyDictionary<FontType, Font>(registry);
         }
     }
 }

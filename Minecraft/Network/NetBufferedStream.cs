@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 using System.IO;
 
 namespace Minecraft
@@ -70,6 +71,13 @@ namespace Minecraft
             WriteInt32(value.X);
             WriteInt32(value.Y);
             WriteInt32(value.Z);
+        }
+
+        public void WriteVector3(Vector3 value)
+        {
+            WriteFloat(value.X);
+            WriteFloat(value.Y);
+            WriteFloat(value.Z);
         }
 
         public void WriteBytes(byte[] value)

@@ -4,108 +4,108 @@ namespace Minecraft
 {
     class Game
     {
-        public GameWindow window { get; private set; }
+        public GameWindow Window { get; private set; }
 
-        public static Input input { get; private set; }
+        public static Input Input { get; private set; }
     
-        public MasterRenderer masterRenderer { get; private set; }
-        public ClientPlayer player { get; private set; }
-        public FPSCounter averageFpsCounter { get; private set; }
-        public Client client { get; private set; }
-        public WorldClient world { get; private set; }
-        public Server server { get; private set; }
-        public bool isServer { get; private set; }
-        public RunMode mode { get; private set; }
-        public float currentFps { get; private set; }
+        public MasterRenderer MasterRenderer { get; private set; }
+        public ClientPlayer ClientPlayer { get; private set; }
+        public FPSCounter AverageFPSCounter { get; private set; }
+        public Client Client { get; private set; }
+        public WorldClient World { get; private set; }
+        public Server Server { get; private set; }
+        public bool IsServer { get; private set; }
+        public RunMode RunMode { get; private set; }
+        public float CurrentFPS { get; private set; }
 
         private StartArgs startArgs;
 
         public Game(StartArgs startArgs)
         {
-            this.mode = startArgs.runMode;
+            this.RunMode = startArgs.RunMode;
             this.startArgs = startArgs;
 
-            isServer = mode == RunMode.ClientServer || mode == RunMode.Server;
+            IsServer = RunMode == RunMode.ClientServer || RunMode == RunMode.Server;
         }
 
         public void OnStartGame(GameWindow window)
         {
-            this.window = window;
+            this.Window = window;
             window.VSync = OpenTK.VSyncMode.Off;
             window.CursorVisible = false;
 
             Blocks.RegisterBlocks();
-            input = new Input();
-            averageFpsCounter = new FPSCounter();
+            Input = new Input();
+            AverageFPSCounter = new FPSCounter();
 
-            if (mode == RunMode.ClientServer)
+            if (RunMode == RunMode.ClientServer)
             {
-                player = new ClientPlayer(this);
-                masterRenderer = new MasterRenderer(this);
+                ClientPlayer = new ClientPlayer(this);
+                MasterRenderer = new MasterRenderer(this);
 
-                server = new Server(this, true);
-                server.Start(startArgs.ip, startArgs.port);
+                Server = new Server(this, true);
+                Server.Start(startArgs.IP, startArgs.Port);
 
-                world = new WorldClient(this);
+                World = new WorldClient(this);
 
-                client = new Client(this);
-                client.ConnectWith(startArgs.ip, startArgs.port);
-            } else if(mode == RunMode.Server)
+                Client = new Client(this);
+                Client.ConnectWith(startArgs.IP, startArgs.Port);
+            } else if(RunMode == RunMode.Server)
             {
-                server = new Server(this, true);
-                server.Start(startArgs.ip, startArgs.port);
+                Server = new Server(this, true);
+                Server.Start(startArgs.IP, startArgs.Port);
             } else{
-                player = new ClientPlayer(this);
-                masterRenderer = new MasterRenderer(this);
+                ClientPlayer = new ClientPlayer(this);
+                MasterRenderer = new MasterRenderer(this);
 
-                world = new WorldClient(this);
+                World = new WorldClient(this);
 
-                client = new Client(this);
-                client.ConnectWith(startArgs.ip, startArgs.port);
+                Client = new Client(this);
+                Client.ConnectWith(startArgs.IP, startArgs.Port);
             }          
         }
 
         public void OnCloseGame()
         {
-            if (mode != RunMode.Server)
+            if (RunMode != RunMode.Server)
             {
-                masterRenderer.CleanUp();
+                MasterRenderer.CleanUp();
             }
         }
 
         public void OnUpdateGame(double deltaTime)
         {
-            currentFps = (int)(1.0F / deltaTime);
+            CurrentFPS = (int)(1.0F / deltaTime);
 
             float elapsedSeconds = (float)deltaTime;
             elapsedSeconds = elapsedSeconds <= 0 ? 0.0001f : elapsedSeconds;
 
-            averageFpsCounter.IncrementFrameCounter();
-            averageFpsCounter.AddElapsedTime(deltaTime);
+            AverageFPSCounter.IncrementFrameCounter();
+            AverageFPSCounter.AddElapsedTime(deltaTime);
 
-            if (mode == RunMode.Server)
+            if (RunMode == RunMode.Server)
             {
-                server.world.Update(elapsedSeconds);
-                server.Update();
+                Server.World.Update(elapsedSeconds);
+                Server.Update();
             } else
             {
-                if(mode == RunMode.ClientServer)
+                if(RunMode == RunMode.ClientServer)
                 {
-                    server.world.Update(elapsedSeconds);
-                    server.Update();
+                    Server.World.Update(elapsedSeconds);
+                    Server.Update();
                 }
-                client.Update(elapsedSeconds);
-                input.Update();
-                world.Update(elapsedSeconds);
-                masterRenderer.EndFrameUpdate(world);
+                Client.Update(elapsedSeconds);
+                Input.Update();
+                World.Update(elapsedSeconds);
+                MasterRenderer.EndFrameUpdate(World);
             }
         }
 
         public void OnRenderGame()
         {
-            if (mode != RunMode.Server)
+            if (RunMode != RunMode.Server)
             {
-                masterRenderer.Render(world);
+                MasterRenderer.Render(World);
             } else
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -114,9 +114,9 @@ namespace Minecraft
 
         public void OnWindowResize(int newWidth, int newHeight)
         {
-            if (mode != RunMode.Server)
+            if (RunMode != RunMode.Server)
             {
-                player.camera.SetWindowSize(newWidth, newHeight);
+                ClientPlayer.camera.SetWindowSize(newWidth, newHeight);
             }
         }
     }

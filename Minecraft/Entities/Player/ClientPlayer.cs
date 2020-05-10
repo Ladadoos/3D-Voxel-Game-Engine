@@ -19,7 +19,13 @@ namespace Minecraft
         public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 200, 0))
         {
             this.game = game;
-            camera = new Camera(new ProjectionMatrixInfo(0.1F, 1000F, 1.5F, game.window.Width, game.window.Height));
+            camera = new Camera(new ProjectionMatrixInfo {
+                DistanceNearPlane = 0.1F,
+                DistanceFarPlane = 1000F,
+                FieldOfView = 1.5F,
+                WindowPixelWidth = game.Window.Width,
+                WindowPixelHeight = game.Window.Height
+            });
 
             OnToggleRunningHandler += OnRunningToggle;
             OnToggleCrouchingHandler += OnCrouchingToggle;
@@ -49,7 +55,7 @@ namespace Minecraft
 
         private void UpdateCameraPosition()
         {
-            Vector3 cameraPosition = position;
+            Vector3 cameraPosition = Position;
             cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
             cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
             cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
@@ -58,31 +64,31 @@ namespace Minecraft
 
         public override void Update(float deltaTime, World world)
         {
-            acceleration = Vector3.Zero;
+            Acceleration = Vector3.Zero;
             UpdateKeyboardInput();
             ApplyVelocityAndCheckCollision(deltaTime, world);
             mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world);
 
             UpdateCameraPosition();
 
-            if(Game.input.OnMousePress(MouseButton.Right) && game.window.Focused && mouseOverObject != null)
+            if(Game.Input.OnMousePress(MouseButton.Right) && game.Window.Focused && mouseOverObject != null)
             {
-                if(!isCrouching && world.GetBlockAt(mouseOverObject.intersectedBlockPos).GetBlock().isInteractable)
+                if(!isCrouching && world.GetBlockAt(mouseOverObject.IntersectedBlocKPos).GetBlock().isInteractable)
                 {
-                    game.client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.intersectedBlockPos));
-                } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.blockPlacePosition))
+                    game.Client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.IntersectedBlocKPos));
+                } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.BlockPlacePosition))
                 {
                     BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
-                    game.client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.blockPlacePosition));
+                    game.Client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.BlockPlacePosition));
                 }
             }
-            if(Game.input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
+            if(Game.Input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
-                selectedBlock = world.GetBlockAt(mouseOverObject.intersectedBlockPos);
+                selectedBlock = world.GetBlockAt(mouseOverObject.IntersectedBlocKPos);
             }
-            if(Game.input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
+            if(Game.Input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
             {
-                game.client.WritePacket(new RemoveBlockPacket(mouseOverObject.intersectedBlockPos));
+                game.Client.WritePacket(new RemoveBlockPacket(mouseOverObject.IntersectedBlocKPos));
             }
 
             realForward = camera.Forward;
@@ -93,7 +99,7 @@ namespace Minecraft
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
             {
                 elapsedMsSinceLastPosUpdate = 0;
-                game.client.WritePacket(new PlayerDataPacket(position, id));
+                game.Client.WritePacket(new PlayerDataPacket(Position, ID));
             }
         }
 
@@ -101,15 +107,15 @@ namespace Minecraft
         {
             float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 
-            bool wFocused = game.window.Focused;
-            bool inputToRun = wFocused && (Game.input.OnKeyDown(Key.ControlLeft) || Game.input.OnKeyDown(Key.ControlRight));
-            bool inputToCrouch = wFocused && (Game.input.OnKeyDown(Key.ShiftLeft) || Game.input.OnKeyDown(Key.ShiftRight));
-            bool inputToMoveLeft = wFocused && Game.input.OnKeyDown(Key.A);
-            bool inputToMoveBack = wFocused && Game.input.OnKeyDown(Key.S);
-            bool inputToMoveRight = wFocused && Game.input.OnKeyDown(Key.D);
-            bool inputToMoveForward = wFocused && Game.input.OnKeyDown(Key.W);
-            bool inputToJump = wFocused && Game.input.OnKeyDown(Key.Space);
-            bool inputToFly = wFocused && Game.input.OnKeyPress(Key.Space);
+            bool wFocused = game.Window.Focused;
+            bool inputToRun = wFocused && (Game.Input.OnKeyDown(Key.ControlLeft) || Game.Input.OnKeyDown(Key.ControlRight));
+            bool inputToCrouch = wFocused && (Game.Input.OnKeyDown(Key.ShiftLeft) || Game.Input.OnKeyDown(Key.ShiftRight));
+            bool inputToMoveLeft = wFocused && Game.Input.OnKeyDown(Key.A);
+            bool inputToMoveBack = wFocused && Game.Input.OnKeyDown(Key.S);
+            bool inputToMoveRight = wFocused && Game.Input.OnKeyDown(Key.D);
+            bool inputToMoveForward = wFocused && Game.Input.OnKeyDown(Key.W);
+            bool inputToJump = wFocused && Game.Input.OnKeyDown(Key.Space);
+            bool inputToFly = wFocused && Game.Input.OnKeyPress(Key.Space);
 
             //Prioritize crouching over running
             if(inputToRun && !inputToCrouch)

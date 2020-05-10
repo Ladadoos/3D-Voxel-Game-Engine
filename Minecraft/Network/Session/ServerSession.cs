@@ -12,7 +12,7 @@
 
         public bool IsBlockPositionInViewRange(Vector3i blockPos)
         {
-            return chunkProvider.currentlyVisibleChunks.Contains(World.GetChunkPosition(blockPos.X, blockPos.Z));
+            return chunkProvider.CurrentlyVisibleChunks.Contains(World.GetChunkPosition(blockPos.X, blockPos.Z));
         }
 
         public void Update()

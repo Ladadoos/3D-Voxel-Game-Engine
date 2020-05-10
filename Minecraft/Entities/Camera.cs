@@ -22,7 +22,7 @@ namespace Minecraft
 
         public Camera(ProjectionMatrixInfo projectionInfo)
         {
-            defaultProjection = projectionInfo.ShallowCopy();
+            defaultProjection = projectionInfo;
             CurrentProjection = projectionInfo;
             CurrentProjectionMatrix = CreateProjectionMatrix();
 
@@ -38,9 +38,12 @@ namespace Minecraft
 
         public void SetFieldOfView(float fieldOfView)
         {
-            if (CurrentProjection.fieldOfView != fieldOfView)
+            if (CurrentProjection.FieldOfView != fieldOfView)
             {
-                CurrentProjection.fieldOfView = fieldOfView;
+                ProjectionMatrixInfo newProjectionInfo = CurrentProjection;
+                newProjectionInfo.FieldOfView = fieldOfView;
+                CurrentProjection = newProjectionInfo;
+
                 CurrentProjectionMatrix = CreateProjectionMatrix();
                 OnProjectionChangedHandler?.Invoke(CurrentProjection);
             }
@@ -48,13 +51,16 @@ namespace Minecraft
 
         public void SetFieldOfViewToDefault()
         {
-            SetFieldOfView(defaultProjection.fieldOfView);
+            SetFieldOfView(defaultProjection.FieldOfView);
         }
 
         public void SetWindowSize(int width, int height)
         {
-            CurrentProjection.windowHeight = height;
-            CurrentProjection.windowWidth = width;
+            ProjectionMatrixInfo newProjectionInfo = CurrentProjection;
+            newProjectionInfo.WindowPixelHeight = height;
+            newProjectionInfo.WindowPixelWidth = width;
+            CurrentProjection = newProjectionInfo;
+
             CurrentProjectionMatrix = CreateProjectionMatrix();
             OnProjectionChangedHandler?.Invoke(CurrentProjection);
         }
@@ -62,10 +68,10 @@ namespace Minecraft
         private Matrix4 CreateProjectionMatrix()
         {
             return Matrix4.CreatePerspectiveFieldOfView(
-                CurrentProjection.fieldOfView,
-                CurrentProjection.windowWidth / (float)CurrentProjection.windowHeight,
-                CurrentProjection.distanceNearPlane,
-                CurrentProjection.distanceFarPlane);
+                CurrentProjection.FieldOfView,
+                CurrentProjection.WindowPixelWidth / (float)CurrentProjection.WindowPixelHeight,
+                CurrentProjection.DistanceNearPlane,
+                CurrentProjection.DistanceFarPlane);
         }
 
         private Matrix4 CreateViewMatrix()

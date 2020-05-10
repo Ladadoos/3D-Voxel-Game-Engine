@@ -5,19 +5,19 @@ namespace Minecraft
 {
     class UIImage : UIComponent
     {
-        private Texture _texture;
-        public Texture texture {
+        private Texture texture;
+        public Texture Texture {
             get {
-                return _texture;
+                return texture;
             }
             set {
-                if(_texture?.textureId == value.textureId)
+                if(texture?.ID == value.ID)
                 {
                     return;
                 }
 
-                _texture = value;
-                parentCanvas.AddComponentToClean(this);
+                texture = value;
+                ParentCanvas.AddComponentToClean(this);
             }
         }
 
@@ -25,16 +25,16 @@ namespace Minecraft
 
         public UIImage(UICanvas parentCanvas, Vector2 position, Vector2 dimension, Texture texture) : base(parentCanvas, position)
         {
-            this.texture = texture;
+            this.Texture = texture;
             this.dimension = dimension;
         }
 
         public override void Clean()
         {
-            float xNdc = (pixelPositionInCanvas.X / parentCanvas.pixelWidth) * 2 - 1;
-            float yNdc = 1 - (pixelPositionInCanvas.Y / parentCanvas.pixelHeight) * 2;
-            float cwidth = 2 * dimension.X / parentCanvas.pixelWidth;
-            float cHeight = 2 * -dimension.Y / parentCanvas.pixelHeight;
+            float xNdc = (PixelPositionInCanvas.X / ParentCanvas.PixelWidth) * 2 - 1;
+            float yNdc = 1 - (PixelPositionInCanvas.Y / ParentCanvas.PixelHeight) * 2;
+            float cwidth = 2 * dimension.X / ParentCanvas.PixelWidth;
+            float cHeight = 2 * -dimension.Y / ParentCanvas.PixelHeight;
             Vector3 topLeft = new Vector3(xNdc, yNdc, 0);
             Vector3 bottomLeft = new Vector3(xNdc, yNdc + cHeight, 0);
             Vector3 bottomRight = new Vector3(xNdc + cwidth, yNdc + cHeight, 0);
@@ -63,8 +63,8 @@ namespace Minecraft
         public override void Render(UIShader uiShader)
         {
             vaoModel.BindVAO();
-            uiShader.LoadTexture(uiShader.location_Texture, 0, texture.textureId);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.indicesCount);
+            uiShader.LoadTexture(uiShader.Location_Texture, 0, Texture.ID);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, vaoModel.IndicesCount);
         }
     }
 }

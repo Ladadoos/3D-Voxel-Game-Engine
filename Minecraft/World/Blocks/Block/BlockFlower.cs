@@ -16,7 +16,7 @@ namespace Minecraft
             return new AxisAlignedBox[] {
                 new AxisAlignedBox(
                     new Vector3(blockPos.X, blockPos.Y, blockPos.Z) + new Vector3(0.25F, 0, 0.25F),
-                    new Vector3(blockPos.X + Constants.CUBE_SIZE, blockPos.Y + Constants.CUBE_SIZE, blockPos.Z + Constants.CUBE_SIZE) - new Vector3(0.25F, 0.25f, 0.25F))
+                    new Vector3(blockPos.X + Constants.CUBE_DIM, blockPos.Y + Constants.CUBE_DIM, blockPos.Z + Constants.CUBE_DIM) - new Vector3(0.25F, 0.25f, 0.25F))
             };
         }
 
