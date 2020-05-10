@@ -18,7 +18,7 @@
             netHandler.ProcessPlayerLeavePacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteInt32(ID);
             bufferedStream.WriteInt32((int)Reason);

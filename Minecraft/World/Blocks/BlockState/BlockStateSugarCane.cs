@@ -11,23 +11,17 @@ namespace Minecraft
             return Blocks.SugarCane;
         }
 
-        public override void ToStream(NetBufferedStream bufferedStream)
+        public override void ToStream(BufferedDataStream bufferedStream)
         {
             base.ToStream(bufferedStream);
             bufferedStream.WriteFloat(elapsedTimeSinceLastGrowth);
         }
 
-        public override void FromStream(BinaryReader reader)
-        {
-            base.FromStream(reader);
-            elapsedTimeSinceLastGrowth = reader.ReadSingle();
-        }
+        public override int PayloadSize() => sizeof(float);
 
-        public override int PayloadSize() => 4;
-
-        public override void ExtractFromByteStream(byte[] bytes, int source)
+        public override void ExtractFromByteStream(byte[] bytes, ref int head)
         {
-            elapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, source);
+            elapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, ref head);
         }
     }
 }

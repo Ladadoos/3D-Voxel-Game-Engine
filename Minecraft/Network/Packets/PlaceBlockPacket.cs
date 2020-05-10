@@ -16,9 +16,10 @@
             netHandler.ProcessPlaceBlockPacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteVector3i(BlockPos);
+            bufferedStream.WriteInt32(BlockState.PayloadSize());
             BlockState.ToStream(bufferedStream);
         }
 

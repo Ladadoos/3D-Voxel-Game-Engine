@@ -14,7 +14,7 @@
             netHandler.ProcessPlayerBlockInteractionpacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteVector3i(BlockPos);
         }

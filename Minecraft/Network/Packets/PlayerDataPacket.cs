@@ -18,7 +18,7 @@ namespace Minecraft
             netHandler.ProcessPlayerDataPacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteInt32(EntityID);
             bufferedStream.WriteVector3(Position);

@@ -14,7 +14,7 @@ namespace Minecraft
             return Blocks.Tnt;
         }
 
-        public override void ToStream(NetBufferedStream bufferedStream)
+        public override void ToStream(BufferedDataStream bufferedStream)
         {
             base.ToStream(bufferedStream);
             bufferedStream.WriteFloat(elapsedSecondsSinceTrigger);
@@ -22,21 +22,13 @@ namespace Minecraft
             bufferedStream.WriteBool(triggered);
         }
 
-        public override void FromStream(BinaryReader reader)
-        {
-            base.FromStream(reader);
-            elapsedSecondsSinceTrigger = reader.ReadSingle();
-            triggeredByTnt = reader.ReadBoolean();
-            triggered = reader.ReadBoolean();
-        }
-
-        public override int PayloadSize() => 4 + 1 + 1;
+        public override int PayloadSize() => sizeof(float) + sizeof(bool) + sizeof(bool);
  
-        public override void ExtractFromByteStream(byte[] bytes, int source)
+        public override void ExtractFromByteStream(byte[] bytes, ref int head)
         {
-            elapsedSecondsSinceTrigger = DataConverter.BytesToFloat(bytes, source);
-            triggeredByTnt = DataConverter.BytesToBool(bytes, source + 4);
-            triggered = DataConverter.BytesToBool(bytes, source + 5);
+            elapsedSecondsSinceTrigger = DataConverter.BytesToFloat(bytes, ref head);
+            triggeredByTnt = DataConverter.BytesToBool(bytes, ref head);
+            triggered = DataConverter.BytesToBool(bytes, ref head);
         }
 
         public override string ToString()

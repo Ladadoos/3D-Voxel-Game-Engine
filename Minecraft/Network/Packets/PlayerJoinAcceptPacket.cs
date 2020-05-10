@@ -21,7 +21,7 @@ namespace Minecraft
             netHandler.ProcessJoinAcceptPacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteInt32(PlayerID);
             bufferedStream.WriteUtf8String(Name);

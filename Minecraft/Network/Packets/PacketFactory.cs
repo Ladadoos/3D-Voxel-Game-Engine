@@ -25,9 +25,12 @@ namespace Minecraft
                 case PacketType.PlaceBlock:
                     {
                         Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                        int byteSize = reader.ReadInt32();
                         ushort blockId = reader.ReadUInt16();
+                        byte[] bytes = reader.ReadBytes(byteSize);
                         BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                        blockState.FromStream(reader);
+                        int head = 0;
+                        blockState.ExtractFromByteStream(bytes, ref head);
                         return new PlaceBlockPacket(blockState, blockPos);
                     }
                 case PacketType.RemoveBlock:
@@ -42,45 +45,8 @@ namespace Minecraft
                     }
                 case PacketType.ChunkData:
                     {
-                        int gridX = reader.ReadInt32();
-                        int gridY = reader.ReadInt32();
-                        int totalSize = reader.ReadInt32();
-
-                        Chunk chunk = new Chunk(gridX, gridY);
-
-                        byte[] chunkBytes = reader.ReadBytes(totalSize);
-                        
-                        int pos = 0;
-                        for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
-                        {
-                            Section section = new Section(gridX, gridY, (byte)i);
-                            byte isSectionEmpty = chunkBytes[pos];
-                            pos++;
-                            if(isSectionEmpty != 0)
-                            {
-                                for(int x = 0; x < 16; x++)
-                                {
-                                    for(int y = 0; y < 16; y++)
-                                    {
-                                        for(int z = 0; z < 16; z++)
-                                        {        
-                                            ushort blockId = DataConverter.BytesToUInt16(chunkBytes, pos);
-                                            pos += 2;
-                                            if(blockId != 0)
-                                            {
-                                                BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();        
-                                                blockState.ExtractFromByteStream(chunkBytes, pos);
-                                                pos += blockState.PayloadSize();
-                                                section.AddBlockAt(x, y, z, blockState);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            chunk.Sections[i] = section;
-                        }
-
+                        int head = 0;
+                        Chunk chunk = DataConverter.BytesToChunk(reader.ReadBytes(reader.ReadInt32()), ref head);
                         return new ChunkDataPacket(chunk);
                     }
                 case PacketType.ChunkUnload:

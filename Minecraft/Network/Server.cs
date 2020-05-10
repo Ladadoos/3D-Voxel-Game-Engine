@@ -145,7 +145,7 @@ namespace Minecraft
                         Client = newClient,
                         NetStream = stream,
                         Reader = new BinaryReader(stream),
-                        Writer = new NetBufferedStream(new BufferedStream(stream)),
+                        Writer = new BufferedDataStream(new BufferedStream(stream)),
                     };
                     ServerNetHandler netHandler = new ServerNetHandler(game);
                     ServerSession session = new ServerSession(clientConnection, netHandler);

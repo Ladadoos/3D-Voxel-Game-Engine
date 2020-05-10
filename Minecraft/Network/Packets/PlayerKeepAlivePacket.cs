@@ -9,6 +9,6 @@
             netHandler.ProcessPlayerKeepAlivePacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream) { }
+        protected override void ToStream(BufferedDataStream bufferedStream) { }
     }
 }

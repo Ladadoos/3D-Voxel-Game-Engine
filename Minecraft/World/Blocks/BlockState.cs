@@ -6,16 +6,14 @@ namespace Minecraft
     {
         public abstract Block GetBlock();
 
-        public virtual void ToStream(NetBufferedStream bufferedStream)
+        public virtual void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteUInt16(GetBlock().id);
         }
 
-        public virtual void FromStream(BinaryReader reader) { }
-
         public virtual int PayloadSize() => 0;
 
-        public virtual void ExtractFromByteStream(byte[] bytes, int source) { }
+        public virtual void ExtractFromByteStream(byte[] bytes, ref int head) { }
 
         public override string ToString() => GetType().ToString();
     }

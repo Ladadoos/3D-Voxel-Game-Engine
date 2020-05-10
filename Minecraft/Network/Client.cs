@@ -103,7 +103,7 @@ namespace Minecraft
                 Client = tcpClient,
                 NetStream = netStream,
                 Reader = new BinaryReader(netStream),
-                Writer = new NetBufferedStream(new BufferedStream(netStream)),
+                Writer = new BufferedDataStream(new BufferedStream(netStream)),
             };
             ClientNetHandler netHandler = new ClientNetHandler(game);
             session = new ClientSession(serverConnection, netHandler);

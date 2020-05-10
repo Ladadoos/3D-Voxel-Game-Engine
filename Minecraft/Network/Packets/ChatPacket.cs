@@ -9,7 +9,7 @@
             Message = message;
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteUtf8String(Message);
         }

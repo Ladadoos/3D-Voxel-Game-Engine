@@ -4,16 +4,16 @@ using System.IO;
 
 namespace Minecraft
 {
-    class NetBufferedStream
+    class BufferedDataStream
     {
         private readonly BufferedStream bufferedStream;
 
-        public NetBufferedStream(BufferedStream bufferedStream)
+        public BufferedDataStream(BufferedStream bufferedStream)
         {
             this.bufferedStream = bufferedStream;
         }
 
-        public bool FlushToSocket()
+        public bool Flush()
         {
             try
             {
@@ -83,6 +83,42 @@ namespace Minecraft
         public void WriteBytes(byte[] value)
         {
             bufferedStream.Write(value, 0, value.Length);
+        }
+
+        public void WriteChunk(Chunk value)
+        {
+            WriteInt32(value.GetPayloadSize() + sizeof(int) + sizeof(int));
+            WriteInt32(value.GridX);
+            WriteInt32(value.GridZ);
+
+            for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
+            {
+                Section section = value.Sections[i];
+                if(section == null)
+                {
+                    WriteBool(false);
+                } else
+                {
+                    WriteBool(true);
+                    for(int x = 0; x < 16; x++)
+                    {
+                        for(int y = 0; y < 16; y++)
+                        {
+                            for(int z = 0; z < 16; z++)
+                            {
+                                BlockState state = section.GetBlockAt(x, y, z);
+                                if(state == null)
+                                {
+                                    WriteUInt16(0);
+                                } else
+                                {
+                                    state.ToStream(this);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

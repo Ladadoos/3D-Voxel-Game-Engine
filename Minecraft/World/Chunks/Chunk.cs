@@ -59,5 +59,35 @@ namespace Minecraft
                 }               
             }         
         }
+
+        public int GetPayloadSize()
+        {
+            int size = 0;
+            for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
+            {
+                Section section = Sections[i];
+                size++;
+                if(section == null)
+                {
+                    continue;
+                }
+                for(int x = 0; x < 16; x++)
+                {
+                    for(int y = 0; y < 16; y++)
+                    {
+                        for(int z = 0; z < 16; z++)
+                        {
+                            BlockState state = section.GetBlockAt(x, y, z);
+                            size += 2;
+                            if(state != null)
+                            {
+                                size += state.PayloadSize();
+                            }
+                        }
+                    }
+                }
+            }
+            return size;
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Minecraft
             netHandler.ProcessChunkUnloadPacket(this);
         }
 
-        protected override void ToStream(NetBufferedStream bufferedStream)
+        protected override void ToStream(BufferedDataStream bufferedStream)
         {
             bufferedStream.WriteInt32(ChunkGridPositions.Count);
             foreach(Vector2 gridPos in ChunkGridPositions)
