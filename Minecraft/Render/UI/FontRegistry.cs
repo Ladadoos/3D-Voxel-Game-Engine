@@ -2,28 +2,31 @@
 
 namespace Minecraft
 {
-    class FontRegistry
+    static class FontRegistry
     {
-        public ReadOnlyDictionary<FontType, Font> Fonts { get; private set; }
+        private static ReadOnlyDictionary<FontType, Font> fonts;
 
-        public FontRegistry()
+        public static void Initialize()
         {
             RegisterFonts();
         }
 
-        public Font GetValue(FontType fontType)
+        public static Font GetFont(FontType fontType)
         {
-            Fonts.TryGetValue(fontType, out Font font);
+            if(!fonts.TryGetValue(fontType, out Font font))
+            {
+                throw new KeyNotFoundException();
+            }
             return font;
         }
 
-        private void RegisterFonts()
+        private static void RegisterFonts()
         {
             Dictionary<FontType, Font> registry = new Dictionary<FontType, Font>
             {
                 { FontType.Arial, new Font("../../Resources/arial.fnt", "../../Resources/arial.png", 512, 512) },
             };
-            Fonts = new ReadOnlyDictionary<FontType, Font>(registry);
+            fonts = new ReadOnlyDictionary<FontType, Font>(registry);
         }
     }
 }

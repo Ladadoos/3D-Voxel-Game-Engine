@@ -65,7 +65,12 @@ namespace Minecraft
         public override void Update(float deltaTime, World world)
         {
             Acceleration = Vector3.Zero;
-            UpdateKeyboardInput();
+
+            if(!game.MasterRenderer.IngameCanvas.IsTyping)
+            {
+                UpdateKeyboardMovementInput();
+            }
+                
             ApplyVelocityAndCheckCollision(deltaTime, world);
             mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world);
 
@@ -103,7 +108,7 @@ namespace Minecraft
             }
         }
 
-        private void UpdateKeyboardInput()
+        private void UpdateKeyboardMovementInput()
         {
             float speedMultiplier = Constants.PLAYER_BASE_MOVE_SPEED;
 

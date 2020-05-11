@@ -10,7 +10,6 @@ namespace Minecraft
         private readonly CameraController cameraController;
         private readonly GameWindow window;
         private readonly UIShader uiShader;
-        private readonly FontRegistry fontRegistry = new FontRegistry();
       
         public UIRenderer(GameWindow window, CameraController cameraController)
         {
@@ -33,8 +32,6 @@ namespace Minecraft
                 screenCanvasses.ForEach(canvas => canvas.SetDimensions(projecInfo.WindowPixelWidth, projecInfo.WindowPixelHeight));
             }
         }
-
-        public Font GetFont(FontType type) => fontRegistry.GetValue(type);
 
         public void AddCanvas(UICanvas canvas)
         {

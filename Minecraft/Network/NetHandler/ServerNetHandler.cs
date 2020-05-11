@@ -61,7 +61,7 @@ namespace Minecraft
             }
 
             int playerId = game.Server.World.GenerateEntityId();
-            string serverPlayerName = "server_" + playerName + "_id_" + playerId;
+            string serverPlayerName = playerName + "-" + playerId % 10000;
             ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
             session.AssignPlayer(player);
 

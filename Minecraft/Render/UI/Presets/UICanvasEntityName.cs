@@ -18,7 +18,7 @@ namespace Minecraft
 
             otherEntity.OnDespawnedHandler += OnEntityDespawned;
 
-            UIText playerName = new UIText(this, game.MasterRenderer.GetFont(FontType.Arial), new Vector2(0, 0), Vector2.One, text);
+            UIText playerName = new UIText(this, FontRegistry.GetFont(FontType.Arial), new Vector2(0, 0), Vector2.One, text);
             AddComponentToRender(playerName);
         }
 

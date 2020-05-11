@@ -9,8 +9,8 @@ namespace Minecraft
     {
         public string Name { get; set; }
 
-        protected bool isFlying = true;
-        protected bool isInCreativeMode = true;
+        protected bool isFlying = false;
+        protected bool isInCreativeMode = false;
         protected bool doCollisionDetection = true;
         protected bool isInAir = true;
         protected bool isCrouching = false;

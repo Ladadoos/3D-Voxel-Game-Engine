@@ -38,7 +38,7 @@ namespace Minecraft
         private readonly EntityMeshRegistry entityMeshRegistry;
         private readonly ScreenQuad screenQuad;
         private readonly UIRenderer uiRenderer;
-        private readonly UICanvasIngame ingameCanvas;
+        public  readonly UICanvasIngame IngameCanvas;
 
         private readonly Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
         private readonly HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
@@ -70,8 +70,8 @@ namespace Minecraft
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.ClientPlayer);
 
             uiRenderer = new UIRenderer(game.Window, cameraController);
-            ingameCanvas = new UICanvasIngame(game);
-            AddCanvas(ingameCanvas);
+            IngameCanvas = new UICanvasIngame(game);
+            AddCanvas(IngameCanvas);
 
             EnableDepthTest();
             EnableCulling();
@@ -95,7 +95,6 @@ namespace Minecraft
         public Camera GetActiveCamera() => cameraController.Camera;
         public void AddCanvas(UICanvas canvas) => uiRenderer.AddCanvas(canvas);
         public void RemoveCanvas(UICanvas canvas) => uiRenderer.RemoveCanvas(canvas);
-        public Font GetFont(FontType type) => uiRenderer.GetFont(type);
 
         public void Render(World world)
         {

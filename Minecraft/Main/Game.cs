@@ -35,6 +35,8 @@ namespace Minecraft
             window.CursorVisible = false;
 
             Blocks.RegisterBlocks();
+            FontRegistry.Initialize();
+
             Input = new Input();
             AverageFPSCounter = new FPSCounter();
 

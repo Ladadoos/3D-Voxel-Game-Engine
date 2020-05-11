@@ -13,7 +13,7 @@ namespace Minecraft
         {
             this.game = game;
 
-            debugText = new UIText(this, game.MasterRenderer.GetFont(FontType.Arial), new Vector2(0, 0), new Vector2(0.4F, 0.4F), "");
+            debugText = new UIText(this, FontRegistry.GetFont(FontType.Arial), new Vector2(0, 0), new Vector2(0.4F, 0.4F), "");
             AddComponentToRender(debugText);
         }
 

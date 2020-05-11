@@ -5,13 +5,15 @@ in vec2 uv;
 in vec3 position;
 
 uniform sampler2D uiTexture;
+uniform float transparency;
+uniform vec3 color;
 
 void main()
 {
 	vec4 albedo = texture(uiTexture, uv);
 	if(albedo.a == 0)
-	{
-		discard;
-	}
-	fragmentColor = vec4(albedo.rgb, 1);
+    {
+        discard;
+    }
+	fragmentColor = vec4(albedo.rgb * color, transparency);
 }

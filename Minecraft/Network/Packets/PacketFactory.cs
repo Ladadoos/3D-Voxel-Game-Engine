@@ -19,8 +19,9 @@ namespace Minecraft
             {
                 case PacketType.Chat:
                     {
+                        string sender = ReadUtf8String(reader);
                         string message = ReadUtf8String(reader);
-                        return new ChatPacket(message);
+                        return new ChatPacket(sender, message);
                     }
                 case PacketType.PlaceBlock:
                     {

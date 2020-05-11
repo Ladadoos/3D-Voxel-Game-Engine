@@ -30,7 +30,7 @@ namespace Minecraft
 
         public void ProcessChatPacket(ChatPacket chatPacket)
         {
-            Logger.Info("Client received message " + chatPacket.Message);
+            game.MasterRenderer.IngameCanvas.AddUserMessage(chatPacket.Sender, chatPacket.Message);
         }
 
         public void ProcessChunkDataPacket(ChunkDataPacket chunkDataPacket)

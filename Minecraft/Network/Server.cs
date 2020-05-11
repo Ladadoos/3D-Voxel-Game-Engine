@@ -171,13 +171,6 @@ namespace Minecraft
             HandleClientLeave();
             CheckForKeepAlive();
 
-            //Check for console input in a non-blocking way
-            if (Console.KeyAvailable)
-            {
-                string input = Console.ReadLine();
-                BroadcastPacket(new ChatPacket(input));
-            }
-
             foreach (ServerSession client in ConnectedClients)
             {
                 if (client.State == SessionState.Closed)
