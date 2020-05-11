@@ -57,13 +57,13 @@ namespace Minecraft
         public static Chunk BytesToChunk(byte[] bytes, ref int head)
         {
             int gridX = BytesToInt32(bytes, ref head);
-            int gridY = BytesToInt32(bytes, ref head);
+            int gridZ = BytesToInt32(bytes, ref head);
 
-            Chunk chunk = new Chunk(gridX, gridY);
+            Chunk chunk = new Chunk(gridX, gridZ);
 
             for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
             {
-                Section section = new Section(gridX, gridY, (byte)i);
+                Section section = new Section(gridX, gridZ, (byte)i);
                 bool doesSectionHaveBlocks = BytesToBool(bytes, ref head);
                 if(doesSectionHaveBlocks)
                 {
@@ -77,6 +77,10 @@ namespace Minecraft
                                 if(blockId != 0)
                                 {
                                     BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
+                                    if(blockState.GetBlock().IsTickable)
+                                    {
+                                        chunk.TickableBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
+                                    }
                                     blockState.ExtractFromByteStream(bytes, ref head);
                                     section.AddBlockAt(x, y, z, blockState);
                                 }
