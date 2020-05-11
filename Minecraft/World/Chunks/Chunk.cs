@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 namespace Minecraft
 {
@@ -23,14 +24,29 @@ namespace Minecraft
             }
         }
 
-        public void AddBlock(int localX, int worldY, int localZ, BlockState blockstate)
+        public void RemoveBlockAt(int localX, int worldY, int localZ)
         {
-            if (worldY < 0)
+            if(worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)
             {
-                worldY = 0;
-            } else if (worldY > Constants.MAX_BUILD_HEIGHT - 1)
+                throw new ArgumentOutOfRangeException("Removing block at y level " + worldY + " in chunk (" + GridX + ", " + GridZ + ")");
+            }
+
+            int sectionHeight = worldY / 16;
+            int sectionLocalY = worldY - sectionHeight * 16;
+            Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
+
+            Sections[sectionHeight].RemoveBlockAt(localX, sectionLocalY, localZ);
+            if(TickableBlocks.TryGetValue(blockPos, out BlockState tickable))
             {
-                worldY = Constants.MAX_BUILD_HEIGHT - 1;
+                TickableBlocks.Remove(blockPos);
+            }
+        }
+
+        public void AddBlockAt(int localX, int worldY, int localZ, BlockState blockstate)
+        {
+            if (worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)
+            {
+                throw new ArgumentOutOfRangeException("Adding block at y level " + worldY + " in chunk (" + GridX + ", " + GridZ + ")");
             }
 
             int sectionHeight = worldY / 16;
@@ -43,21 +59,14 @@ namespace Minecraft
             int sectionLocalY = worldY - sectionHeight * 16;
             if(blockstate.GetBlock() == Blocks.Air)
             {
-                Sections[sectionHeight].RemoveBlockAt(localX, sectionLocalY, localZ);
-                if(TickableBlocks.TryGetValue(blockPos, out BlockState tickable))
-                {
-                    TickableBlocks.Remove(blockPos);
-                }
+                throw new ArgumentException("Can't add air to remove. Call removeblock instead!");
             }
-            else
-            {
-                Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
 
-                if (blockstate.GetBlock().IsTickable)
-                {
-                    TickableBlocks.Add(blockPos, blockstate);
-                }               
-            }         
+            Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
+            if (blockstate.GetBlock().IsTickable)
+            {
+                TickableBlocks.Add(blockPos, blockstate);
+            }                     
         }
 
         public int GetPayloadSize()

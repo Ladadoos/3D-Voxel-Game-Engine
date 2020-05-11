@@ -13,12 +13,12 @@
             double perl = perlin.GetValue(worldX * 0.0075f, worldY * 0.0075f, worldZ * 0.0075f);
             if(perl < -0.75f)
             {
-                chunk.AddBlock(localX, worldY - 1, localZ, Blocks.Gravel.GetNewDefaultState());
+                chunk.AddBlockAt(localX, worldY - 1, localZ, Blocks.Gravel.GetNewDefaultState());
             }else if(perl < -0.45f)
             {
                 for(int i = 1; i <= 3; i++)
                 {
-                    chunk.AddBlock(localX, worldY - i, localZ, Blocks.Dirt.GetNewDefaultState());
+                    chunk.AddBlockAt(localX, worldY - i, localZ, Blocks.Dirt.GetNewDefaultState());
                 }
      
                 double foliagePerl = perlin.GetValue(worldX * 0.75f, worldY * 0.75f, worldZ * 0.75f);
@@ -27,7 +27,7 @@
                     oakTreeGen.GenerateTreeAt(chunk, localX, worldY, localZ); oakTreeGen.GenerateTreeAt(chunk, localX, worldY, localZ);
                 }else if(foliagePerl < -0.5D)
                 {
-                    chunk.AddBlock(localX, worldY, localZ, Blocks.GrassBlade.GetNewDefaultState());
+                    chunk.AddBlockAt(localX, worldY, localZ, Blocks.GrassBlade.GetNewDefaultState());
                 }
             }
         }

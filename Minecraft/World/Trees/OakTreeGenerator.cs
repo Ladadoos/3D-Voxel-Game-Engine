@@ -15,7 +15,7 @@ namespace Minecraft
                 int r = 2 + random.Next(3);
                 for (int yy = 0; yy < r + 4; yy++)
                 {
-                    chunk.AddBlock(localX, worldY + yy, localZ, Blocks.OakLog.GetNewDefaultState());
+                    chunk.AddBlockAt(localX, worldY + yy, localZ, Blocks.OakLog.GetNewDefaultState());
                 }
                 worldY += r;
                 localX -= 2;
@@ -30,26 +30,26 @@ namespace Minecraft
                         }
                         for (int k = 0; k < 2; k++)
                         {
-                            chunk.AddBlock(localX + i, worldY + k, localZ + j, Blocks.OakLeaves.GetNewDefaultState());
+                            chunk.AddBlockAt(localX + i, worldY + k, localZ + j, Blocks.OakLeaves.GetNewDefaultState());
                         }
                     }
                 }
                 localX += 2;
                 localZ++;
                 worldY += 2;
-                chunk.AddBlock(localX, worldY++, localZ, Blocks.OakLeaves.GetNewDefaultState());
-                chunk.AddBlock(localX--, worldY--, localZ++, Blocks.OakLeaves.GetNewDefaultState());
+                chunk.AddBlockAt(localX, worldY++, localZ, Blocks.OakLeaves.GetNewDefaultState());
+                chunk.AddBlockAt(localX--, worldY--, localZ++, Blocks.OakLeaves.GetNewDefaultState());
                 for (int i = 0; i < 3; i++)
                 {
                     for (int k = 0; k < 2; k++)
                     {
-                        chunk.AddBlock(localX + i, worldY + k, localZ, Blocks.OakLeaves.GetNewDefaultState());
+                        chunk.AddBlockAt(localX + i, worldY + k, localZ, Blocks.OakLeaves.GetNewDefaultState());
                     }
                 }
                 localX++;
                 localZ++;
-                chunk.AddBlock(localX, worldY++, localZ, Blocks.OakLeaves.GetNewDefaultState());
-                chunk.AddBlock(localX, worldY, localZ, Blocks.OakLeaves.GetNewDefaultState());
+                chunk.AddBlockAt(localX, worldY++, localZ, Blocks.OakLeaves.GetNewDefaultState());
+                chunk.AddBlockAt(localX, worldY, localZ, Blocks.OakLeaves.GetNewDefaultState());
             }
         }
 

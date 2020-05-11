@@ -163,16 +163,16 @@ namespace Minecraft
                     }
                     int worldY = SeaLevel + (int)biomeHeightAddon;
 
-                    chunk.AddBlock(localX, worldY, localZ, bestBiome.Biome.TopBlock.GetNewDefaultState());
+                    chunk.AddBlockAt(localX, worldY, localZ, bestBiome.Biome.TopBlock.GetNewDefaultState());
                     for (int k = worldY - 1; k >= worldY - 3; k--)
                     {
-                        chunk.AddBlock(localX, k, localZ, bestBiome.Biome.GradiantBlock.GetNewDefaultState());
+                        chunk.AddBlockAt(localX, k, localZ, bestBiome.Biome.GradiantBlock.GetNewDefaultState());
                     }
 
                     worldY -= 3;
                     for (int k = worldY - 1; k >= 0; k--)
                     {
-                        chunk.AddBlock(localX, k, localZ, Blocks.Stone.GetNewDefaultState());
+                        chunk.AddBlockAt(localX, k, localZ, Blocks.Stone.GetNewDefaultState());
                     }
 
                     worldY += 4;
