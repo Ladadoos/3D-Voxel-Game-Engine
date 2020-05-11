@@ -5,8 +5,9 @@ namespace Minecraft
     abstract class Block
     {
         public ushort ID { get; private set; }
-        public bool IsTickable { get; protected set; }
-        public bool IsInteractable { get; protected set; }
+        public bool IsTickable { get; protected set; } //If this block has tick functionality
+        public bool IsInteractable { get; protected set; } //If this block can be interacted with
+        public bool IsOverridable { get; protected set; } //If another block can be placed at this blocks position
         protected readonly AxisAlignedBox[] emptyAABB = new AxisAlignedBox[0];
 
         protected Block(ushort id)

@@ -20,7 +20,7 @@ namespace Minecraft
                 return;
             }
 
-            Vector3i blockPos = player.mouseOverObject.IntersectedBlocKPos;
+            Vector3i blockPos = player.mouseOverObject.IntersectedBlockPos;
             BlockState state = player.mouseOverObject.BlockstateHit;
 
             float offset = 0.001f;

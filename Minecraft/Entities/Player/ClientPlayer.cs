@@ -78,9 +78,15 @@ namespace Minecraft
 
             if(Game.Input.OnMousePress(MouseButton.Right) && game.Window.Focused && mouseOverObject != null)
             {
-                if(!isCrouching && world.GetBlockAt(mouseOverObject.IntersectedBlocKPos).GetBlock().IsInteractable)
+                Block hitBlock = world.GetBlockAt(mouseOverObject.IntersectedBlockPos).GetBlock();
+
+                if(!isCrouching && hitBlock.IsInteractable)
                 {
-                    game.Client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.IntersectedBlocKPos));
+                    game.Client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.IntersectedBlockPos));
+                } else if(hitBlock.IsOverridable && selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.IntersectedBlockPos))
+                {
+                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                    game.Client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.IntersectedBlockPos));
                 } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.BlockPlacePosition))
                 {
                     BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
@@ -89,11 +95,11 @@ namespace Minecraft
             }
             if(Game.Input.OnMousePress(MouseButton.Middle) && mouseOverObject != null)
             {
-                selectedBlock = world.GetBlockAt(mouseOverObject.IntersectedBlocKPos);
+                selectedBlock = world.GetBlockAt(mouseOverObject.IntersectedBlockPos);
             }
             if(Game.Input.OnMousePress(MouseButton.Left) && mouseOverObject != null)
             {
-                game.Client.WritePacket(new RemoveBlockPacket(mouseOverObject.IntersectedBlocKPos));
+                game.Client.WritePacket(new RemoveBlockPacket(mouseOverObject.IntersectedBlockPos));
             }
 
             realForward = camera.Forward;

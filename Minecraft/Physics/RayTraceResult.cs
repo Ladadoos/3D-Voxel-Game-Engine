@@ -13,14 +13,14 @@ namespace Minecraft
         /// <summary> The position a block would be placed at if one were to be placed </summary>
         public Vector3i BlockPlacePosition { get; private set; }
         /// <summary> The grid position of the block the ray intersected </summary>
-        public Vector3i IntersectedBlocKPos { get; private set; }
+        public Vector3i IntersectedBlockPos { get; private set; }
 
         public RayTraceResult(Vector3 normalAtHit, Vector3 intersectedPoint, BlockState blockstateHit, Vector3i blockStatePos)
         {
             NormalAtHit = normalAtHit;
             IntersectionPoint = intersectedPoint;
             BlockstateHit = blockstateHit;
-            IntersectedBlocKPos = blockStatePos;
+            IntersectedBlockPos = blockStatePos;
             BlockPlacePosition = blockStatePos + new Vector3i(normalAtHit, false);
         }
     }

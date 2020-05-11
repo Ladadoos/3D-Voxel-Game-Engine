@@ -260,7 +260,7 @@ namespace Minecraft
                     return false;
                 }
 
-                if(oldState.GetBlock() != Blocks.Air)
+                if(oldState.GetBlock() != Blocks.Air && !oldState.GetBlock().IsOverridable)
                 {
                     Logger.Warn("Tried to place block where there was already one.");
                     return false;

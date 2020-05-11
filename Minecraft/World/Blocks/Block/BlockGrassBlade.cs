@@ -2,7 +2,10 @@
 {
     class BlockGrassBlade : Block
     {
-        public BlockGrassBlade(ushort id) : base(id) { }
+        public BlockGrassBlade(ushort id) : base(id)
+        {
+            IsOverridable = true;
+        }
 
         public override BlockState GetNewDefaultState()
         {
