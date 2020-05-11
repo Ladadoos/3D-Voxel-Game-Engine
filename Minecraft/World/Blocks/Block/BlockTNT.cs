@@ -6,8 +6,8 @@ namespace Minecraft
     {
         public BlockTNT(ushort id) : base(id)
         {
-            isTickable = true;
-            isInteractable = true;
+            IsTickable = true;
+            IsInteractable = true;
         }
 
         public override BlockState GetNewDefaultState()

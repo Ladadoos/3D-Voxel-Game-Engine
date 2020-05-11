@@ -4,7 +4,7 @@
     {
         public BlockStone(ushort id) : base(id)
         {
-            isInteractable = true;
+            IsInteractable = true;
         }
 
         public override BlockState GetNewDefaultState()

@@ -4,10 +4,10 @@ namespace Minecraft
 {
     class OpaqueMeshGenerator : MeshGenerator
     {
-        private const float topLight = 1.15F;
-        private const float bottomLight = 0.85F;
-        private const float sideXLight = 1F;
-        private const float sideZLight = 0.95F;
+        private const float staticTopLight = 1.15F;
+        private const float staticBottomLight = 0.85F;
+        private const float staticSideXLight = 1F;
+        private const float staticSideZLight = 0.95F;
 
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {           
@@ -58,27 +58,27 @@ namespace Minecraft
 
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Right, state, localChunkBlockPos, globalBlockPos, blockModel, sideZLight);
+                                BuildMeshForSide(Direction.Right, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideZLight);
                             }
                             if (ShouldAddWestFaceOfBlock(cXNeg, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Left, state, localChunkBlockPos, globalBlockPos, blockModel, sideXLight);
+                                BuildMeshForSide(Direction.Left, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideXLight);
                             }
                             if (ShouldAddSouthFaceOfBlock(cZNeg, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Back, state, localChunkBlockPos, globalBlockPos, blockModel, sideXLight);
+                                BuildMeshForSide(Direction.Back, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideXLight);
                             }
                             if (ShouldAddNorthFaceOfBlock(cZPos, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Front, state, localChunkBlockPos, globalBlockPos, blockModel, sideZLight);
+                                BuildMeshForSide(Direction.Front, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideZLight);
                             }
                             if (ShouldAddTopFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Top, state, localChunkBlockPos, globalBlockPos, blockModel, topLight);
+                                BuildMeshForSide(Direction.Top, state, localChunkBlockPos, globalBlockPos, blockModel, staticTopLight);
                             }
                             if (ShouldAddBottomFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
-                                BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, globalBlockPos, blockModel, bottomLight);
+                                BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, globalBlockPos, blockModel, staticBottomLight);
                             }
                         }
                     }
@@ -95,10 +95,10 @@ namespace Minecraft
             };                   
         }
 
-        private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, float lightValue)
+        private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, float staticLightValue)
         {
             BlockFace[] faces = model.GetPartialVisibleFaces(state, globalPos, direction);
-            AddFacesToMeshFromFront(faces, chunkLocalPos, lightValue);
+            AddFacesToMeshFromFront(faces, chunkLocalPos, staticLightValue);
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)

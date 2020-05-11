@@ -78,7 +78,7 @@ namespace Minecraft
 
             if(Game.Input.OnMousePress(MouseButton.Right) && game.Window.Focused && mouseOverObject != null)
             {
-                if(!isCrouching && world.GetBlockAt(mouseOverObject.IntersectedBlocKPos).GetBlock().isInteractable)
+                if(!isCrouching && world.GetBlockAt(mouseOverObject.IntersectedBlocKPos).GetBlock().IsInteractable)
                 {
                     game.Client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.IntersectedBlocKPos));
                 } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.BlockPlacePosition))

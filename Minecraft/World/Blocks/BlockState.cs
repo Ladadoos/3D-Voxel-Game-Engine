@@ -8,7 +8,7 @@ namespace Minecraft
 
         public virtual void ToStream(BufferedDataStream bufferedStream)
         {
-            bufferedStream.WriteUInt16(GetBlock().id);
+            bufferedStream.WriteUInt16(GetBlock().ID);
         }
 
         public virtual int PayloadSize() => 0;

@@ -36,7 +36,7 @@ namespace Minecraft
 
         protected abstract ChunkBufferLayout GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, float globalIllumination)
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, float staticLightValue)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -56,7 +56,7 @@ namespace Minecraft
                 indicesCount += 4;
                 foreach(float illum in face.Illumination)
                 {
-                    illuminations.Add(illum * globalIllumination);
+                    illuminations.Add(illum * staticLightValue);
                 }
 
                 for(int i = 0; i < 4; i++)
@@ -68,7 +68,7 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, float globalIllumination)
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, float staticLightValue)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -96,7 +96,7 @@ namespace Minecraft
                 indicesCount += 4;
                 foreach (float illum in face.Illumination)
                 {
-                    illuminations.Add(illum * globalIllumination);
+                    illuminations.Add(illum * staticLightValue);
                 }
 
                 for (int i = 0; i < 4; i++)

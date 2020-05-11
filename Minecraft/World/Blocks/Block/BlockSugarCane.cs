@@ -7,7 +7,7 @@
 
         public BlockSugarCane(ushort id) : base(id)
         {
-            isTickable = true;
+            IsTickable = true;
         }
 
         public override BlockState GetNewDefaultState()
