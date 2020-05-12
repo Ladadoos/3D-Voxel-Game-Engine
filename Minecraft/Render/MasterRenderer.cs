@@ -299,8 +299,8 @@ namespace Minecraft
         {
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
-            MeshChunk(chunk);
             MeshNeighbourChunks(world, chunk, localX == 0, localX == 15, localZ == 0, localZ == 15);
+            MeshChunk(chunk);
         }
 
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)
