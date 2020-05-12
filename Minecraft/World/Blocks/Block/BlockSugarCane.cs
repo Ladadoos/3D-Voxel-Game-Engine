@@ -8,6 +8,7 @@
         public BlockSugarCane(ushort id) : base(id)
         {
             IsTickable = true;
+            IsOpaque = false;
         }
 
         public override BlockState GetNewDefaultState()

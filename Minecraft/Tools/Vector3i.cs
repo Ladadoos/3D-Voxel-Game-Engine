@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 
 namespace Minecraft
 {
@@ -39,6 +40,11 @@ namespace Minecraft
         public Vector3 ToFloat()
         {
             return new Vector3(X, Y, Z);
+        }
+
+        public Vector3i ToChunkLocal()
+        {
+            return new Vector3i(X & 15, Y, Z & 15);
         }
 
         public static Vector3i operator+(Vector3i a, Vector3i b)
@@ -107,6 +113,16 @@ namespace Minecraft
             surroundings[5] = Down();
             return surroundings;
         } 
+
+        public double Distance(Vector3i vec)
+        {
+            return Math.Sqrt((vec.X - X) * (vec.X - X) + (vec.Y - Y) * (vec.Y - Y) + (vec.Z - Z) * (vec.Z - Z));
+        }
+
+        public int ManhattanDistance(Vector3i vec)
+        {
+            return Math.Abs(vec.X - X) + Math.Abs(vec.Y - Y) + Math.Abs(vec.Z - Z);
+        }
     }
 
     static class Vector3Extensions

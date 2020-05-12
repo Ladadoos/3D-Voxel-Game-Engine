@@ -5,6 +5,7 @@
         public BlockGrassBlade(ushort id) : base(id)
         {
             IsOverridable = true;
+            IsOpaque = false;
         }
 
         public override BlockState GetNewDefaultState()

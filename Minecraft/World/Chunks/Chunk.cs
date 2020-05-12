@@ -6,9 +6,11 @@ namespace Minecraft
     class Chunk
     {
         public Dictionary<Vector3i, BlockState> TickableBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
+        public Dictionary<Vector3i, BlockState> LightSourceBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
         public Section[] Sections { get; set; } = new Section[Constants.NUM_SECTIONS_IN_CHUNKS];
         public int GridX { get; private set; }
         public int GridZ { get; private set; }
+        public LightMap LightMap { get; private set; } = new LightMap();
 
         public Chunk(int gridX, int gridZ)
         {
@@ -36,10 +38,8 @@ namespace Minecraft
             Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
 
             Sections[sectionHeight].RemoveBlockAt(localX, sectionLocalY, localZ);
-            if(TickableBlocks.TryGetValue(blockPos, out BlockState tickable))
-            {
-                TickableBlocks.Remove(blockPos);
-            }
+            TickableBlocks.Remove(blockPos);
+            LightSourceBlocks.Remove(blockPos);
         }
 
         public void AddBlockAt(int localX, int worldY, int localZ, BlockState blockstate)
@@ -56,17 +56,22 @@ namespace Minecraft
             }
 
             Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
+            Block block = blockstate.GetBlock();
             int sectionLocalY = worldY - sectionHeight * 16;
-            if(blockstate.GetBlock() == Blocks.Air)
+            if(block == Blocks.Air)
             {
                 throw new ArgumentException("Can't add air to remove. Call removeblock instead!");
             }
 
             Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
-            if (blockstate.GetBlock().IsTickable)
+            if (block.IsTickable)
             {
                 TickableBlocks.Add(blockPos, blockstate);
-            }                     
+            }
+            if(block.LightIntensity > 0)
+            {
+                LightSourceBlocks.Add(blockPos, blockstate);
+            }
         }
 
         public int GetPayloadSize()

@@ -2,7 +2,10 @@
 {
     class BlockDeadBush : Block
     {
-        public BlockDeadBush(ushort id) : base(id) { }
+        public BlockDeadBush(ushort id) : base(id)
+        {
+            IsOpaque = false;
+        }
 
         public override BlockState GetNewDefaultState()
         {

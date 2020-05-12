@@ -8,17 +8,20 @@ namespace Minecraft
         private readonly WireframeRenderer wireframeRenderer;
         private readonly Game game;
         private readonly Camera debugCamera;
+        public readonly LightDebugRenderer lightDebug;
         private UICanvasDebug debugCanvas;
 
         private bool renderFromPlayerCamera;
         private bool renderHitboxes;
         private bool renderChunkBorders;
+        public bool renderBlockLightAreas;
         private bool displayDebugInfo;
 
         public DebugHelper(Game game, WireframeRenderer wireframeRenderer)
         {
             this.wireframeRenderer = wireframeRenderer;
             this.game = game;
+            this.lightDebug = new LightDebugRenderer(game, wireframeRenderer);
 
             debugCamera = new Camera(new ProjectionMatrixInfo
             {
@@ -75,6 +78,9 @@ namespace Minecraft
                 {
                     game.MasterRenderer.SetActiveCamera(game.ClientPlayer.camera);
                 }
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F7))
+            {
+                renderBlockLightAreas = !renderBlockLightAreas;              
             }
 
             Render();
@@ -91,16 +97,20 @@ namespace Minecraft
                     float length = Math.Abs(aabb.Max.Z - aabb.Min.Z);
                     float height = Math.Abs(aabb.Max.Y - aabb.Min.Y);
 
-                    float offset = 0.001f;
                     Vector3 scaleVector = new Vector3(width, height, length);
                     Vector3 translation = entity.Position;
-                    wireframeRenderer.RenderWireframeAt(2, translation, scaleVector, new Vector3(offset, offset, offset));
+                    wireframeRenderer.RenderWireframeAt(2, translation, scaleVector, new Vector3(0.5F, 0, 0));
                 }
             }
 
             if (renderChunkBorders)
             {
                 game.MasterRenderer.RenderChunkBorders();
+            }
+
+            if(renderBlockLightAreas)
+            {
+                lightDebug.RenderLightArea();
             }
         }
     }

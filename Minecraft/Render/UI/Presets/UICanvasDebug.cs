@@ -35,7 +35,14 @@ namespace Minecraft
             sb.AppendLine("Acceleration X=" + ax.ToString("0.000") + " Y=" + ay.ToString("0.000") + " Z=" + az.ToString("0.000"));
             Vector2 chunkPos = World.GetChunkPosition(x, z);
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y);
-            sb.AppendLine("FPS=" + game.CurrentFPS + " AVG FPS= " + game.AverageFPSCounter.GetAverageFPS());
+            if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            {
+                sb.AppendLine("Light sources in chunk=" + chunk.LightSourceBlocks.Count);
+                sb.AppendLine("Light=" + chunk.LightMap.GetBlockLightAt(new Vector3i(game.ClientPlayer.Position).ToChunkLocal()) +
+                    " Desired=" + game.MasterRenderer.DebugHelper.lightDebug.DesiredLightLevel +
+                    " Debug=" + game.MasterRenderer.DebugHelper.renderBlockLightAreas);
+            }
+            sb.AppendLine("FPS=" + game.CurrentFPS + " AVG FPS=" + game.AverageFPSCounter.GetAverageFPS());
             sb.AppendLine("Block=" + game.ClientPlayer.mouseOverObject?.BlockstateHit?.ToString());
             sb.AppendLine("IsServer=" + game.IsServer);
             debugText.Text = sb.ToString();

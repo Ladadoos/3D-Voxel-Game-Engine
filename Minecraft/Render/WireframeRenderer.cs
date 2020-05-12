@@ -42,8 +42,13 @@ namespace Minecraft
         }
 
         /// <summary> Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. </summary>
-        public void RenderWireframeAt(int lineWidth, Vector3 translation, Vector3 scale)
+        public void RenderWireframeAt(int lineWidth, Vector3 translation, Vector3 scale, Vector3 color)
         {
+            const float dt = 0.001F;
+            Vector3 offset = new Vector3(dt, dt, dt);
+            scale += offset;
+            translation -= (offset / 2);
+
             GL.LineWidth(lineWidth);
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
@@ -52,6 +57,7 @@ namespace Minecraft
             shader.Start();
             shader.LoadMatrix(shader.Location_ViewMatrix, activeCamera.CurrentViewMatrix);
             shader.LoadMatrix(shader.Location_ProjectionMatrix, activeCamera.CurrentProjectionMatrix);
+            shader.LoadVector(shader.Location_Color, color);
 
             Matrix4 transformMatrix = Matrix4.CreateScale(scale) * Matrix4.CreateTranslation(translation);
             shader.LoadMatrix(shader.Location_TransformationMatrix, Matrix4.Identity * transformMatrix);
@@ -61,14 +67,6 @@ namespace Minecraft
             shader.Stop();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
-        }
-
-        /// <summary> Draws a cube wireframe at the given location. Scale is relative to a 1x1x1 cube. </summary>
-        public void RenderWireframeAt(int lineWidth, Vector3 translation, Vector3 scale, Vector3 offset)
-        {
-            scale += offset;
-            translation -= (offset / 2);
-            RenderWireframeAt(lineWidth, translation, scale);
         }
 
         public void CleanUp()

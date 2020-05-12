@@ -4,7 +4,10 @@ namespace Minecraft
 {
     class BlockFlower : Block
     {
-        public BlockFlower(ushort id) : base(id) { }
+        public BlockFlower(ushort id) : base(id)
+        {
+            IsOpaque = false;
+        }
 
         public override BlockState GetNewDefaultState()
         {

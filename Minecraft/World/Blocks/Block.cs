@@ -8,6 +8,9 @@ namespace Minecraft
         public bool IsTickable { get; protected set; } //If this block has tick functionality
         public bool IsInteractable { get; protected set; } //If this block can be interacted with
         public bool IsOverridable { get; protected set; } //If another block can be placed at this blocks position
+        public bool IsOpaque { get; protected set; } = true; //If this blocks lets light through or not
+        public uint LightIntensity { get; protected set; } = 0; //The intensity of the light source. 15 is max, 0 is min.
+
         protected readonly AxisAlignedBox[] emptyAABB = new AxisAlignedBox[0];
 
         protected Block(ushort id)

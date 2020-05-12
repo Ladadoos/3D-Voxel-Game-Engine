@@ -8,6 +8,7 @@
         public int Location_TransformationMatrix { get; private set; }
         public int Location_ViewMatrix { get; private set; }
         public int Location_ProjectionMatrix { get; private set; }
+        public int Location_Color { get; private set; }
 
         public WireframeShader() : base(vertexFile, fragmentFile)
         {
@@ -18,6 +19,7 @@
             Location_TransformationMatrix = GetUniformLocation("transformationMatrix");
             Location_ViewMatrix = GetUniformLocation("viewMatrix");
             Location_ProjectionMatrix = GetUniformLocation("projectionMatrix");
+            Location_Color = GetUniformLocation("color");
         }
 
         protected override void BindAttributes()

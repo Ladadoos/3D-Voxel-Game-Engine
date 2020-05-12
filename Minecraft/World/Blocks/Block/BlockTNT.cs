@@ -8,6 +8,7 @@ namespace Minecraft
         {
             IsTickable = true;
             IsInteractable = true;
+            LightIntensity = 5;
         }
 
         public override BlockState GetNewDefaultState()

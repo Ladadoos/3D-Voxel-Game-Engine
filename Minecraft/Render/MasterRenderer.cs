@@ -31,7 +31,7 @@ namespace Minecraft
         private readonly EntityShader entityShader;
         private readonly CameraController cameraController;
         private readonly WireframeRenderer wireframeRenderer;
-        private readonly DebugHelper debugHelper;
+        public readonly DebugHelper DebugHelper;
         private readonly PlayerHoverBlockRenderer playerBlockRenderer;
         private readonly TextureAtlas textureAtlas;
         private readonly BlockModelRegistry blockModelRegistry;
@@ -66,7 +66,7 @@ namespace Minecraft
             entityMeshRegistry = new EntityMeshRegistry(textureAtlas);
             screenQuad = new ScreenQuad(game.Window);
             wireframeRenderer = new WireframeRenderer(this);
-            debugHelper = new DebugHelper(game, wireframeRenderer);
+            DebugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.ClientPlayer);
 
             uiRenderer = new UIRenderer(game.Window, cameraController);
@@ -142,7 +142,7 @@ namespace Minecraft
             GL.Disable(EnableCap.CullFace);
             GL.Disable(EnableCap.DepthTest);
             playerBlockRenderer.RenderSelection();
-            debugHelper.UpdateAndRender();        
+            DebugHelper.UpdateAndRender();        
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             uiRenderer.Render();
             GL.Disable(EnableCap.Blend);
@@ -161,7 +161,7 @@ namespace Minecraft
                     if (chunkToRender.Value.HardBlocksModel == null) continue;
 
                     Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                    wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16));
+                    wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16), new Vector3(0, 0, 1));
                 }
             }
         }

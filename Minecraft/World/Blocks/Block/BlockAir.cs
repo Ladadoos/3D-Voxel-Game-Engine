@@ -2,7 +2,10 @@
 {
     class BlockAir : Block
     {
-        public BlockAir(ushort id) : base(id) { }
+        public BlockAir(ushort id) : base(id)
+        {
+            IsOpaque = false;
+        }
 
         public override BlockState GetNewDefaultState()
         {
