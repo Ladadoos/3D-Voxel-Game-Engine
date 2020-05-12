@@ -66,10 +66,18 @@ namespace Minecraft
             Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
             if (block.IsTickable)
             {
+                if(TickableBlocks.ContainsKey(blockPos))
+                {
+                    TickableBlocks.Remove(blockPos);
+                }
                 TickableBlocks.Add(blockPos, blockstate);
             }
             if(block.LightIntensity > 0)
             {
+                if(LightSourceBlocks.ContainsKey(blockPos))
+                {
+                    LightSourceBlocks.Remove(blockPos);
+                }
                 LightSourceBlocks.Add(blockPos, blockstate);
             }
         }
