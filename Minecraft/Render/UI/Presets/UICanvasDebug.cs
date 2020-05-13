@@ -51,7 +51,7 @@ namespace Minecraft
                               " Debug=" + game.MasterRenderer.DebugHelper.renderBlockLightAreas);
 
                 string lightDebug = string.Empty;
-                if(chunkLocalPos.Y > 0 && chunkLocalPos.X < Constants.MAX_BUILD_HEIGHT)
+                if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT)
                 {
                     lightDebug += "Light at feet=" + chunk.LightMap.GetBlockLightAt(chunkLocalPos);
                 }
