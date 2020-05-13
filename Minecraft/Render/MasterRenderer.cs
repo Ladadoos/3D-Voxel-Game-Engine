@@ -23,9 +23,9 @@ namespace Minecraft
             public ChunkBufferLayout chunkLayout;
         }
 
-        private const float colorClearR = 0.57F;
-        private const float colorClearG = 0.73F;
-        private const float colorClearB = 1.0F;
+        private const float colorClearR = 0.02F;
+        private const float colorClearG = 0.01F;
+        private const float colorClearB = 0.03F;
 
         private readonly ShaderBasic basicShader;
         private readonly EntityShader entityShader;
@@ -272,7 +272,11 @@ namespace Minecraft
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
-        {
+        {            
+            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, chunk, blockPos, newState))
+            {
+                MeshChunk(editedLightMapChunk);
+            }
             MeshChunkAndSurroundings(world, chunk, blockPos, newState);
         }
 
