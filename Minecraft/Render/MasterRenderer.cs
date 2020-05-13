@@ -284,6 +284,10 @@ namespace Minecraft
         {
             if(chainPos == chainCount)
             {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockRemoved(world, chunk, blockPos))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
                 MeshChunkAndSurroundings(world, chunk, blockPos, oldState);
             }
         }
