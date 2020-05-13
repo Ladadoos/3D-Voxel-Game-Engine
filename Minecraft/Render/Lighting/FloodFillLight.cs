@@ -26,9 +26,9 @@ namespace Minecraft
         public static Chunk[] RepairLightGridBlockAdded(World world, Chunk chunk, Vector3i blockPos, BlockState blockState)
         {
             Vector3i sourceChunkLocalPos = blockPos.ToChunkLocal();
-            if(blockState.GetBlock().LightIntensity == 0 && chunk.LightMap.GetBlockLightAt(sourceChunkLocalPos) == 0)
+            if(blockState.GetBlock().LightIntensity == 0)
             {
-                return new Chunk[0];
+                return RepairLightGridBlockRemoved(world, chunk, blockPos);
             }
 
             Queue<Tuple<Chunk, Vector3i>> lightPropagationQueue = new Queue<Tuple<Chunk, Vector3i>>();
@@ -186,17 +186,13 @@ namespace Minecraft
                     bool canGoThrough = !world.GetBlockAt(worldPos).GetBlock().IsOpaque;
                     bool isLower = neighLightValue < lightValue - 1;
 
-                    if(isLower)
+                    if(isLower && canGoThrough)
                     {
                         currentChunk.LightMap.SetBlockLightAt(position, lightValue - 1);
+                        queue.Enqueue(new Tuple<Chunk, Vector3i>(currentChunk, position));
 
                         if(currentChunk != chunk && !processedChunks.Contains(currentChunk))
                             processedChunks.Add(currentChunk);
-
-                        if(canGoThrough)
-                        {
-                            queue.Enqueue(new Tuple<Chunk, Vector3i>(currentChunk, position));
-                        }
                     }
                 }
             }
