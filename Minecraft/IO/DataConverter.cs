@@ -77,9 +77,14 @@ namespace Minecraft
                                 if(blockId != 0)
                                 {
                                     BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                                    if(blockState.GetBlock().IsTickable)
+                                    Block block = blockState.GetBlock();
+                                    if(block.IsTickable)
                                     {
                                         chunk.TickableBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
+                                    }
+                                    if(block.LightIntensity > 0)
+                                    {
+                                        chunk.LightSourceBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
                                     }
                                     blockState.ExtractFromByteStream(bytes, ref head);
                                     section.AddBlockAt(x, y, z, blockState);
