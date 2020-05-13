@@ -25,7 +25,14 @@
 
         public void SetBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            map[(worldY << 8) + (localX << 4) + localZ] = lightValue << 28;
+            if(lightValue < 0 || lightValue > 15)
+                throw new System.Exception("Light was " + lightValue);
+
+            map[(worldY << 8) + (localX << 4) + localZ] = lightValue << 28; 
+            uint light = GetBlockLightAt(localX, worldY, localZ);
+
+            if(light != lightValue)
+                throw new System.Exception("Light was " + light + " but should be " + lightValue);
         }
 
         public uint GetBlockLightAt(uint localX, uint worldY, uint localZ)
