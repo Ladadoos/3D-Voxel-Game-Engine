@@ -49,17 +49,8 @@ namespace Minecraft
                             Vector3i localChunkBlockPos = new Vector3i(localX, sectionLocalY + sectionHeight * 16, localZ);
                             Vector3i globalBlockPos = new Vector3i(localX + chunk.GridX * 16, sectionLocalY + sectionHeight * 16, localZ + chunk.GridZ * 16);
 
-                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, globalBlockPos);
-                            float k = Maths.ConvertRange(0, 15, 0, 1, chunk.LightMap.GetBlockLightAt(localChunkBlockPos)) + 0.1f;
-                            if (blockModel.DoubleSidedFaces)
-                            {
-                                AddFacesToMeshDualSided(faces, localChunkBlockPos, k);
-                                continue;
-                            }
-                            AddFacesToMeshFromFront(faces, localChunkBlockPos, k);
-
-                            bool istnt = state.GetBlock() == Blocks.Tnt;
-
+                            float averageLight = 0;
+                            int additions = 0;
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
                                 float l = 0;
@@ -73,7 +64,8 @@ namespace Minecraft
                                 }
                                 l /= 15f;
                                 l += 0.1f;
-                                
+                                averageLight += l;
+                                additions++;
                                 BuildMeshForSide(Direction.Right, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideZLight * l);
                             }
                             if (ShouldAddWestFaceOfBlock(cXNeg, section, localX, sectionLocalY, localZ))
@@ -89,6 +81,8 @@ namespace Minecraft
                                 }
                                 l /= 15f;
                                 l += 0.1f;
+                                averageLight += l;
+                                additions++;
 
                                 BuildMeshForSide(Direction.Left, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideXLight * l);
                             }
@@ -105,6 +99,8 @@ namespace Minecraft
                                 }
                                 l /= 15f;
                                 l += 0.1f;
+                                averageLight += l;
+                                additions++;
 
                                 BuildMeshForSide(Direction.Back, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideXLight * l);
                             }
@@ -121,6 +117,8 @@ namespace Minecraft
                                 }
                                 l /= 15f;
                                 l += 0.1f;
+                                averageLight += l;
+                                additions++;
 
                                 BuildMeshForSide(Direction.Front, state, localChunkBlockPos, globalBlockPos, blockModel, staticSideZLight * l);
                             }
@@ -128,11 +126,33 @@ namespace Minecraft
                             {
                                 float l = 0.1f + chunk.LightMap.GetBlockLightAt((uint)localChunkBlockPos.X, (uint)Math.Min(localChunkBlockPos.Y + 1, 255), (uint)localChunkBlockPos.Z) / 15f;
                                 BuildMeshForSide(Direction.Top, state, localChunkBlockPos, globalBlockPos, blockModel, staticTopLight * l);
+                                averageLight += l;
+                                additions++;
                             }
                             if (ShouldAddBottomFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
                                 float l = 0.1f + chunk.LightMap.GetBlockLightAt((uint)localChunkBlockPos.X, (uint)Math.Max(localChunkBlockPos.Y - 1, 0), (uint)localChunkBlockPos.Z) / 15f;
                                 BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, globalBlockPos, blockModel, staticBottomLight * l);
+                                averageLight += l;
+                                additions++;
+                            }
+
+                            float k = 0.0F;
+                            if(!state.GetBlock().IsOpaque)
+                            {
+                                k = chunk.LightMap.GetBlockLightAt(localChunkBlockPos) / 15f + 0.1f;
+                            } else
+                            {
+                                k = averageLight / additions;
+                            }
+
+                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, globalBlockPos);                           
+                            if(blockModel.DoubleSidedFaces)
+                            {
+                                AddFacesToMeshDualSided(faces, localChunkBlockPos, k);
+                            } else
+                            {
+                                AddFacesToMeshFromFront(faces, localChunkBlockPos, k);
                             }
                         }
                     }
