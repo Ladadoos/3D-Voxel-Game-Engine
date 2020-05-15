@@ -47,21 +47,29 @@ namespace Minecraft
             if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 sb.AppendLine("Light sources in chunk=" + chunk.LightSourceBlocks.Count +
-                              " Desired=" + game.MasterRenderer.DebugHelper.lightDebug.DesiredLightLevel +
+                              " Desired strength=" + game.MasterRenderer.DebugHelper.lightDebug.DesiredLightLevel +
                               " Debug=" + game.MasterRenderer.DebugHelper.renderBlockLightAreas);
 
                 string lightDebug = string.Empty;
                 if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT)
                 {
-                    lightDebug += "Light at feet=" + chunk.LightMap.GetBlockLightAt(chunkLocalPos);
+                    lightDebug += "Light at feet R=" + chunk.LightMap.GetRedBlockLightAt(chunkLocalPos) +
+                                               " G=" + chunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
+                                               " B=" + chunk.LightMap.GetBlueBlockLightAt(chunkLocalPos);
                 }
                 if(game.ClientPlayer.mouseOverObject != null)
                 {
                     Vector3i intersectedBlockPos = game.ClientPlayer.mouseOverObject.IntersectedBlockPos;
                     Vector2 mouseOverChunkPos = World.GetChunkPosition(intersectedBlockPos.X, intersectedBlockPos.Z);
+
                     if(game.World.loadedChunks.TryGetValue(mouseOverChunkPos, out Chunk cursorChunk))
                     {
-                        lightDebug += (lightDebug != string.Empty ? " " : "") + "Light at mouse=" + cursorChunk.LightMap.GetBlockLightAt(intersectedBlockPos.ToChunkLocal());
+                        Vector3i intersectedBlockLocalPos = intersectedBlockPos.ToChunkLocal();
+
+                        lightDebug += (lightDebug != string.Empty ? " " : "") +
+                                    "Light at mouse R=" + cursorChunk.LightMap.GetRedBlockLightAt(intersectedBlockLocalPos) +
+                                    " G=" + cursorChunk.LightMap.GetGreenBlockLightAt(intersectedBlockLocalPos) +
+                                    " B=" + cursorChunk.LightMap.GetBlueBlockLightAt(intersectedBlockLocalPos);
                     }                      
                 }
 

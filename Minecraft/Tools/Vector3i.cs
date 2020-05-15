@@ -10,6 +10,7 @@ namespace Minecraft
         public readonly static Vector3i EastBasis = new Vector3i(0, 0, 1);
         public readonly static Vector3i WestBasis = new Vector3i(0, 0, -1);
         public readonly static Vector3i Zero = new Vector3i(0, 0, 0);
+        public readonly static Vector3i One = new Vector3i(1, 1, 1);
 
         public int X;
         public int Y;

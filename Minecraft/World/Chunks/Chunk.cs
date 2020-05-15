@@ -72,7 +72,7 @@ namespace Minecraft
                 }
                 TickableBlocks.Add(blockPos, blockstate);
             }
-            if(block.LightIntensity > 0)
+            if(blockstate is ILightSource)
             {
                 if(LightSourceBlocks.ContainsKey(blockPos))
                 {

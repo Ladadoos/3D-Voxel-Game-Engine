@@ -2,7 +2,10 @@
 {
     class BlockCactus : Block
     {
-        public BlockCactus(ushort id) : base(id) { }
+        public BlockCactus(ushort id) : base(id)
+        {
+            IsOpaque = false;
+        }
 
         public override BlockState GetNewDefaultState()
         {

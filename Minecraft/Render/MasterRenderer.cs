@@ -10,7 +10,7 @@ namespace Minecraft
     {
         public float[] positions;
         public float[] textureCoordinates;
-        public float[] lights;
+        public uint[] lights;
         public float[] normals;
         public int indicesCount;
     }

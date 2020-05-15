@@ -82,7 +82,7 @@ namespace Minecraft
                                     {
                                         chunk.TickableBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
                                     }
-                                    if(block.LightIntensity > 0)
+                                    if(blockState is ILightSource)
                                     {
                                         chunk.LightSourceBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
                                     }

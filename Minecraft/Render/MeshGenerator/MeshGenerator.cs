@@ -7,7 +7,7 @@ namespace Minecraft
     {
         protected List<float> vertexPositions = new List<float>();
         protected List<float> textureUVs = new List<float>();
-        protected List<float> illuminations = new List<float>();
+        protected List<uint> illuminations = new List<uint>();
         protected List<float> normals = new List<float>();
         protected int indicesCount;
 
@@ -36,7 +36,7 @@ namespace Minecraft
 
         protected abstract ChunkBufferLayout GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, float staticLightValue)
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -56,7 +56,7 @@ namespace Minecraft
                 indicesCount += 4;
                 foreach(float illum in face.Illumination)
                 {
-                    illuminations.Add(illum * staticLightValue);
+                    illuminations.Add(light.GetStorage());
                 }
 
                 for(int i = 0; i < 4; i++)
@@ -68,7 +68,7 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, float staticLightValue)
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
         {
             foreach (BlockFace face in toAddFaces)
             {
@@ -96,7 +96,7 @@ namespace Minecraft
                 indicesCount += 4;
                 foreach (float illum in face.Illumination)
                 {
-                    illuminations.Add(illum * staticLightValue);
+                    illuminations.Add(light.GetStorage());
                 }
 
                 for (int i = 0; i < 4; i++)
@@ -108,10 +108,10 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, float globalIllumination)
+        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
         {
-            AddFacesToMeshFromFront(toAddFaces, blockPos, globalIllumination);
-            AddFacesToMeshFromBack(toAddFaces, blockPos, globalIllumination);
+            AddFacesToMeshFromFront(toAddFaces, blockPos, light);
+            AddFacesToMeshFromBack(toAddFaces, blockPos, light);
         }
     }
 }

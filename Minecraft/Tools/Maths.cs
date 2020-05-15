@@ -46,6 +46,9 @@ namespace Minecraft
             return from + (to - from) * t;
         }
 
+        /// <summary>
+        /// Converts from one range to another. Boundaries are all inclusive.
+        /// </summary>
         public static float ConvertRange(float oldMin, float oldMax, float newMin, float newMax, float oldValue)
         {
             float oldRange = oldMax - oldMin;

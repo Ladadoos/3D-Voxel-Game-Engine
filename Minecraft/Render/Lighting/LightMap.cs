@@ -1,63 +1,126 @@
-﻿namespace Minecraft
+﻿using OpenTK;
+
+namespace Minecraft
 {
     class LightMap
     {
+        //TODO Consider switching over to ushort to save on 2 bytes per entry.
+
         //0000 0000 0000 0000 0000 0000 0000 0000
-        //XXXX YYYY ---- ---- ---- ---- ---- ----
-        //X = light caused by blocks, from 0 to 15
-        //Y = light caused by the sun, from 0 to 15
+        //                    SSSS BBBB GGGG RRRR
+        //R = red color channel, 0 to 15
+        //G = green color channel, 0 to 15
+        //B = blue color channel, 0 to 15
+        //S = sunlight, 0 to 15
 
         private uint[] map = new uint[16 * 16 * 256];
 
-        public void Reset()
+        /*
+         * Red channel
+         */
+        public void SetRedBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            for(uint x = 0; x < 16; x++)
-            {
-                for(uint z = 0; z < 16; z++)
-                {
-                    for(uint y = 0; y < 256; y++)
-                    {
-                        SetBlockLightAt(x, y, z, 0);
-                    }
-                }
-            }
+            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFFFF0) | lightValue;
         }
 
-        public void SetBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
+        public uint GetRedBlockLightAt(uint localX, uint worldY, uint localZ)
         {
-            if(lightValue < 0 || lightValue > 15)
-                throw new System.Exception("Light was " + lightValue);
-
-            map[(worldY << 8) + (localX << 4) + localZ] = lightValue << 28; 
-            uint light = GetBlockLightAt(localX, worldY, localZ);
-
-            if(light != lightValue)
-                throw new System.Exception("Light was " + light + " but should be " + lightValue);
+            return map[(worldY << 8) + (localX << 4) + localZ] & 0xF;
         }
 
-        public uint GetBlockLightAt(uint localX, uint worldY, uint localZ)
+        public void SetRedBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
         {
-            return (map[(worldY << 8) + (localX << 4) + localZ] & 0xF0000000) >> 28;
+            SetRedBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z, lightValue);
         }
 
-        public void SetBlockLightAt(Vector3i localPos, uint lightValue)
+        public uint GetRedBlockLightAt(Vector3i chunkLocalPos)
         {
-            SetBlockLightAt((uint)localPos.X, (uint)localPos.Y, (uint)localPos.Z, lightValue);
+            return GetRedBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z);
         }
 
-        public uint GetBlockLightAt(Vector3i localPos)
+        /*
+         * Green channel
+         */
+        public void SetGreenBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            return GetBlockLightAt((uint)localPos.X, (uint)localPos.Y, (uint)localPos.Z);
+            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFFF0F) | (lightValue << 4);
         }
 
-        public void SetSunLightAt(int localX, int worldY, int localZ, uint lightValue)
+        public uint GetGreenBlockLightAt(uint localX, uint worldY, uint localZ)
         {
-            map[(localX << 8) + (worldY << 4) + localZ] = lightValue << 24;
+            return (map[(worldY << 8) + (localX << 4) + localZ] >> 4) & 0xF;
         }
 
-        public uint GetSunLightAt(int localX, int worldY, int localZ)
+        public void SetGreenBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
         {
-            return (map[(localX << 8) + (worldY << 4) + localZ] & 0x0F000000) >> 24;
+            SetGreenBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z, lightValue);
+        }
+
+        public uint GetGreenBlockLightAt(Vector3i chunkLocalPos)
+        {
+            return GetGreenBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z);
+        }
+
+        /*
+         * Blue channel
+         */
+        public void SetBlueBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
+        {
+            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFF0FF) | (lightValue << 8);
+        }
+
+        public uint GetBlueBlockLightAt(uint localX, uint worldY, uint localZ)
+        {
+            return (map[(worldY << 8) + (localX << 4) + localZ] >> 8) & 0xF;
+        }
+
+        public void SetBlueBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
+        {
+            SetBlueBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z, lightValue);
+        }
+
+        public uint GetBlueBlockLightAt(Vector3i chunkLocalPos)
+        {
+            return GetBlueBlockLightAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z);
+        }
+
+        /*
+         * Sun light intensity
+         */
+        public void SetSunLightIntensityAt(uint localX, uint worldY, uint localZ, uint lightValue)
+        {
+            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFF0FFF) | (lightValue << 12);
+        }
+
+        public uint GetSunLightIntensityAt(uint localX, uint worldY, uint localZ)
+        {
+            return (map[(worldY << 8) + (localX << 4) + localZ] >> 12) & 0xF;
+        }
+
+        public void SetSunLightIntensityAt(Vector3i chunkLocalPos, uint lightValue)
+        {
+            SetSunLightIntensityAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z, lightValue);
+        }
+
+        public uint GetSunLightIntensityAt(Vector3i chunkLocalPos)
+        {
+            return GetSunLightIntensityAt((uint)chunkLocalPos.X, (uint)chunkLocalPos.Y, (uint)chunkLocalPos.Z);
+        }
+
+        /*
+         * General
+         */
+
+        /// <summary>
+        /// Returns the red, green and blue channel at the given coordinates and sets them in the returned light.
+        /// </summary>
+        public Light GetLightColorAt(uint localX, uint worldY, uint localZ)
+        {
+            Light light = new Light();
+            light.SetRedChannel(GetRedBlockLightAt(localX, worldY, localZ));
+            light.SetGreenChannel(GetGreenBlockLightAt(localX, worldY, localZ));
+            light.SetBlueChannel(GetBlueBlockLightAt(localX, worldY, localZ));
+            return light;
         }
     }
 }

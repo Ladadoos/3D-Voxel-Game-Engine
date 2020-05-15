@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL;
 
 namespace Minecraft
@@ -78,12 +79,18 @@ namespace Minecraft
         /// Creates a vertex bufffer object and buffers the given float values. The integer specifies the number of elements in the datastructure.
         /// A Vector3 would for example have this integer set to 3 (X, Y, Z)
         /// </summary>
-        private void CreateVBO(int nrOfElementsInStructure, float[] data)
+        private void CreateVBO<T>(int nrOfElementsInStructure, T[] data) where T : struct
         {
+            VertexAttribPointerType dataType = VertexAttribPointerType.Float;
+            if(typeof(T) == typeof(Light) || typeof(T) == typeof(uint))
+            {
+                dataType = VertexAttribPointerType.UnsignedInt;
+            }
+
             int vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * sizeof(float)), data, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(buffers.Count, nrOfElementsInStructure, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * SizeOf<T>()), data, BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(buffers.Count, nrOfElementsInStructure, dataType, false, 0, 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.EnableVertexAttribArray(buffers.Count);
             buffers.Add(vboID);
@@ -103,6 +110,11 @@ namespace Minecraft
         public void UnbindVAO()
         {
             GL.BindVertexArray(0);
+        }
+
+        private int SizeOf<T>() where T : struct
+        {
+            return Marshal.SizeOf(default(T));
         }
     }
 }
