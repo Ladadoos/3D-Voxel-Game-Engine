@@ -84,6 +84,7 @@ namespace Minecraft
             VertexAttribPointerType dataType = VertexAttribPointerType.Float;
             if(typeof(T) == typeof(Light) || typeof(T) == typeof(uint))
             {
+                //TODO This should be changed later to actually support multiple attribute types.
                 dataType = VertexAttribPointerType.Float;
             }
 
