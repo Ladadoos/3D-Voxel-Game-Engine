@@ -84,7 +84,7 @@ namespace Minecraft
             VertexAttribPointerType dataType = VertexAttribPointerType.Float;
             if(typeof(T) == typeof(Light) || typeof(T) == typeof(uint))
             {
-                dataType = VertexAttribPointerType.UnsignedInt;
+                dataType = VertexAttribPointerType.Float;
             }
 
             int vboID = GL.GenBuffer();
