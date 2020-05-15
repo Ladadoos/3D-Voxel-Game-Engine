@@ -63,6 +63,17 @@ namespace Minecraft
                         updatedChunks.Add(updatedChunk);
                     }
                 }
+
+                //Very bright and large lights can engulf very weak light sources.
+                //Make sure we check to expand from the sources after having removed some light from previous step.
+                foreach(KeyValuePair<Vector3i, BlockState> kp in chunk.LightSourceBlocks)
+                {
+                    Vector3i chunkLocalPos = kp.Key.ToChunkLocal();
+                    uint lightValue = LightUtils.GetChannelColor(kp.Value as ILightSource, channel);
+                    LightUtils.SetLightOfChannel(chunk, chunkLocalPos, channel, lightValue);
+                    lightPropagationQueue.Enqueue(new LightAddNode(chunk, chunkLocalPos));
+                }
+
                 foreach(Chunk updatedChunk in PropagateLight(world, chunk, lightPropagationQueue, channel))
                 {
                     if(!updatedChunks.Contains(updatedChunk))
@@ -70,6 +81,9 @@ namespace Minecraft
                         updatedChunks.Add(updatedChunk);
                     }
                 }
+
+                lightPropagationQueue.Clear();
+                darknessPropagationQueue.Clear();
             }
 
             return updatedChunks.ToArray();
@@ -121,14 +135,12 @@ namespace Minecraft
             while(darkQueue.Count != 0)
             {
                 LightRemoveNode lightRemoveNode = darkQueue.Dequeue();
-                Chunk parentChunk = lightRemoveNode.currentChunk;
-                Chunk currentChunk = parentChunk;
 
                 Vector3i[] neighbourPositions = lightRemoveNode.currentChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
                     Vector3i position = neighbourPositions[i];
-                    currentChunk = parentChunk;
+                    Chunk currentChunk = lightRemoveNode.currentChunk;
 
                     //Update our chunk and positions accordingly, in case we go outside of the bounds of the current chunk.
                     if(position.X < 0)
@@ -153,7 +165,7 @@ namespace Minecraft
 
                         currentChunk = cZNeg;
                         position.Z = 15;
-                    }else if(position.Z > 15)
+                    } else if(position.Z > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX, currentChunk.GridZ + 1), out Chunk cZPos))
                             continue;
@@ -197,10 +209,8 @@ namespace Minecraft
             while(queue.Count != 0)
             {
                 LightAddNode lightAddNode = queue.Dequeue();
-                Chunk parentChunk = lightAddNode.currentChunk;
-                Chunk currentChunk = parentChunk;
                 
-                uint currentLight = LightUtils.GetLightOfChannel(parentChunk, lightAddNode.currentChunkLocalPos, channel);
+                uint currentLight = LightUtils.GetLightOfChannel(lightAddNode.currentChunk, lightAddNode.currentChunkLocalPos, channel);
                 if(currentLight <= 1)
                     continue;
 
@@ -208,7 +218,7 @@ namespace Minecraft
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
                     Vector3i position = neighbourPositions[i];
-                    currentChunk = parentChunk;
+                    Chunk currentChunk = lightAddNode.currentChunk;
 
                     //Update our chunk and positions accordingly, in case we go outside of the bounds of the current chunk.
                     if(position.X < 0)
@@ -218,7 +228,7 @@ namespace Minecraft
 
                         currentChunk = cXNeg;
                         position.X = 15;
-                    }else if(position.X > 15)
+                    } else if(position.X > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX + 1, currentChunk.GridZ), out Chunk cXPos))
                             continue;
