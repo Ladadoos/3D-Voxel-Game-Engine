@@ -63,7 +63,6 @@ namespace Minecraft
 
             for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
             {
-                Section section = new Section(gridX, gridZ, (byte)i);
                 bool doesSectionHaveBlocks = BytesToBool(bytes, ref head);
                 if(doesSectionHaveBlocks)
                 {
@@ -77,24 +76,13 @@ namespace Minecraft
                                 if(blockId != 0)
                                 {
                                     BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
-                                    Block block = blockState.GetBlock();
-                                    if(block.IsTickable)
-                                    {
-                                        chunk.TickableBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
-                                    }
-                                    if(blockState is ILightSource)
-                                    {
-                                        chunk.LightSourceBlocks.Add(new Vector3i(gridX * 16 + x, i * 16 + y, gridZ * 16 + z), blockState);
-                                    }
                                     blockState.ExtractFromByteStream(bytes, ref head);
-                                    section.AddBlockAt(x, y, z, blockState);
+                                    chunk.AddBlockAt(x, i * 16 + y, z, blockState);
                                 }
                             }
                         }
                     }
                 }
-
-                chunk.Sections[i] = section;
             }
             return chunk;
         }

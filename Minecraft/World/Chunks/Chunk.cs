@@ -26,6 +26,27 @@ namespace Minecraft
             }
         }
 
+        public BlockState GetBlockAt(Vector3i localPos)
+        {
+            if(localPos.Y < 0 || localPos.Y >= Constants.MAX_BUILD_HEIGHT)
+            {
+                return Blocks.Air.GetNewDefaultState();
+            }
+
+            int sectionHeight = localPos.Y / 16;
+            if(Sections[sectionHeight] == null)
+            {
+                return Blocks.Air.GetNewDefaultState();
+            }
+
+            BlockState block = Sections[sectionHeight].GetBlockAt(localPos.X, localPos.Y & 15, localPos.Z);
+            if(block == null)
+            {
+                return Blocks.Air.GetNewDefaultState();
+            }
+            return block;
+        }
+
         public void RemoveBlockAt(int localX, int worldY, int localZ)
         {
             if(worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)

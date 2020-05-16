@@ -221,12 +221,10 @@ namespace Minecraft
                 return false;
             }
 
-            int localX = blockPos.X & 15;
-            int localZ = blockPos.Z & 15;
-            int worldY = blockPos.Y;
+            Vector3i chunkLocalPos = blockPos.ToChunkLocal();
 
             BlockState oldState = GetBlockAt(blockPos);
-            chunk.RemoveBlockAt(localX, worldY, localZ);
+            chunk.RemoveBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
             BlockState air = Blocks.Air.GetNewDefaultState();
             air.GetBlock().OnAdd(air, this, blockPos);
@@ -276,10 +274,9 @@ namespace Minecraft
                 }
             }
 
-            int localX = blockPos.X & 15;
-            int localZ = blockPos.Z & 15;
-            int worldY = blockPos.Y;
-            chunk.AddBlockAt(localX, worldY, localZ, newBlockState);
+            Vector3i chunkLocalPos = blockPos.ToChunkLocal();
+
+            chunk.AddBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z, newBlockState);
             newBlockState.GetBlock().OnAdd(newBlockState, this, blockPos);
             OnBlockPlacedHandler?.Invoke(this, chunk, blockPos, oldState, newBlockState);
 
@@ -293,33 +290,13 @@ namespace Minecraft
         
         public BlockState GetBlockAt(Vector3i blockPos)
         {
-            if (IsOutsideBuildHeight(blockPos.Y))
-            {
-                return Blocks.Air.GetNewDefaultState(); 
-            }
-
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
-            if (!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 return Blocks.Air.GetNewDefaultState();
             }
 
-            int sectionHeight = blockPos.Y / 16;
-            if(chunk.Sections[sectionHeight] == null)
-            {
-                return Blocks.Air.GetNewDefaultState(); 
-            }
-
-            int localX = blockPos.X & 15;    
-            int localY = blockPos.Y & 15;
-            int localZ = blockPos.Z & 15;
-
-            BlockState blockType = chunk.Sections[sectionHeight].GetBlockAt(localX, localY, localZ);
-            if (blockType == null)
-            {
-                return Blocks.Air.GetNewDefaultState(); 
-            }
-            return blockType;
+            return chunk.GetBlockAt(blockPos.ToChunkLocal());
         }
     }
 }
