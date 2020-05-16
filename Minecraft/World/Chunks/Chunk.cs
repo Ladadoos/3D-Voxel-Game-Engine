@@ -11,6 +11,7 @@ namespace Minecraft
         public int GridX { get; private set; }
         public int GridZ { get; private set; }
         public LightMap LightMap { get; private set; } = new LightMap();
+        public int[,] TopMostBlocks { get; private set; } = new int[16, 16];
 
         public Chunk(int gridX, int gridZ)
         {
@@ -24,6 +25,11 @@ namespace Minecraft
             {
                 kp.Value.GetBlock().OnTick(kp.Value, world, kp.Key, deltaTime);
             }
+        }
+
+        public BlockState GetBlockAt(int localX, int worldY, int localZ)
+        {
+            return GetBlockAt(new Vector3i(localX, worldY, localZ));
         }
 
         public BlockState GetBlockAt(Vector3i localPos)
@@ -58,9 +64,24 @@ namespace Minecraft
             int sectionLocalY = worldY - sectionHeight * 16;
             Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
 
+            TopMostBlocks[localX, localZ] = FindNewTopMostBlockAt(localX, localZ);
+
             Sections[sectionHeight].RemoveBlockAt(localX, sectionLocalY, localZ);
             TickableBlocks.Remove(blockPos);
             LightSourceBlocks.Remove(blockPos);
+        }
+
+        private int FindNewTopMostBlockAt(int localX, int localZ)
+        {
+            int previousTopY = TopMostBlocks[localX, localZ];
+            for(int y = previousTopY - 1; y >= 0; y--)
+            {
+                if(GetBlockAt(localX, y, localZ).GetBlock() != Blocks.Air)
+                {
+                    return y;
+                }
+            }
+            return 0;
         }
 
         public void AddBlockAt(int localX, int worldY, int localZ, BlockState blockstate)
@@ -85,6 +106,7 @@ namespace Minecraft
             }
 
             Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
+
             if (block.IsTickable)
             {
                 if(TickableBlocks.ContainsKey(blockPos))
@@ -100,6 +122,11 @@ namespace Minecraft
                     LightSourceBlocks.Remove(blockPos);
                 }
                 LightSourceBlocks.Add(blockPos, blockstate);
+            }
+
+            if(TopMostBlocks[localX, localZ] < worldY)
+            {
+                TopMostBlocks[localX, localZ] = worldY;
             }
         }
 

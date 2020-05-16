@@ -19,67 +19,75 @@ namespace Minecraft
 
         public override void Update()
         {
-            float x = game.ClientPlayer.Position.X;
-            float y = game.ClientPlayer.Position.Y;
-            float z = game.ClientPlayer.Position.Z;
+            float playerX = game.ClientPlayer.Position.X;
+            float playerY = game.ClientPlayer.Position.Y;
+            float playerZ = game.ClientPlayer.Position.Z;
+
+            float playerVelX = game.ClientPlayer.Velocity.X;
+            float playerVelY = game.ClientPlayer.Velocity.Y;
+            float playerVelZ = game.ClientPlayer.Velocity.Z;
+
+            float playerAccelX = game.ClientPlayer.Acceleration.X;
+            float playerAccelY = game.ClientPlayer.Acceleration.Y;
+            float playerAccelZ = game.ClientPlayer.Velocity.Z;
 
             Vector3i chunkLocalPos = new Vector3i(game.ClientPlayer.Position).ToChunkLocal();
-            Vector2 chunkPos = World.GetChunkPosition(x, z);
-            Vector3i gridPos = new Vector3i(game.ClientPlayer.Position);
+            Vector2 chunkPos = World.GetChunkPosition(playerX, playerZ);
+            Vector3i playerGridPos = new Vector3i(game.ClientPlayer.Position);
+            game.World.loadedChunks.TryGetValue(chunkPos, out Chunk currentChunk);
 
             StringBuilder sb = new StringBuilder();
+
             sb.AppendLine("Focused=" + game.Window.Focused + " Vsync=" + game.Window.VSync);
-
-            sb.AppendLine("Position X=" + x.ToString("0.00") + " Y=" + y.ToString("0.00") + " Z=" + z.ToString("0.00") + 
-                          " Grid Position X=" + gridPos.X + " Y=" + gridPos.Y + " Z= " + gridPos.Z);
-
-            float vx = game.ClientPlayer.Velocity.X;
-            float vy = game.ClientPlayer.Velocity.Y;
-            float vz = game.ClientPlayer.Velocity.Z;
-            sb.AppendLine("Velocity X=" + vx.ToString("0.00") + " Y=" + vy.ToString("0.00") + " Z=" + vz.ToString("0.00"));
-            float ax = game.ClientPlayer.Acceleration.X;
-            float ay = game.ClientPlayer.Acceleration.Y;
-            float az = game.ClientPlayer.Velocity.Z;
-            sb.AppendLine("Acceleration X=" + ax.ToString("0.00") + " Y=" + ay.ToString("0.00") + " Z=" + az.ToString("0.00"));
-            
+            sb.AppendLine("Position X=" + playerX.ToString("0.00") + " Y=" + playerY.ToString("0.00") + " Z=" + playerZ.ToString("0.00") + 
+                          " Grid Position X=" + playerGridPos.X + " Y=" + playerGridPos.Y + " Z= " + playerGridPos.Z);
+            sb.AppendLine("Velocity X=" + playerVelX.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
+            sb.AppendLine("Acceleration X=" + playerAccelX.ToString("0.00") + " Y=" + playerAccelY.ToString("0.00") + " Z=" + playerAccelZ.ToString("0.00"));       
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y);
 
-            if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            if(currentChunk != null)
             {
-                sb.AppendLine("Light sources in chunk=" + chunk.LightSourceBlocks.Count +
+                sb.AppendLine("Light sources in chunk=" + currentChunk.LightSourceBlocks.Count +
                               " Desired strength=" + game.MasterRenderer.DebugHelper.lightDebug.DesiredLightLevel +
                               " Debug=" + game.MasterRenderer.DebugHelper.renderBlockLightAreas);
-
-                string lightDebug = string.Empty;
-                if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT)
-                {
-                    lightDebug += "Light at feet R=" + chunk.LightMap.GetRedBlockLightAt(chunkLocalPos) +
-                                               " G=" + chunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
-                                               " B=" + chunk.LightMap.GetBlueBlockLightAt(chunkLocalPos);
-                }
-                if(game.ClientPlayer.mouseOverObject != null)
-                {
-                    Vector3i intersectedBlockPos = game.ClientPlayer.mouseOverObject.IntersectedBlockPos;
-                    Vector2 mouseOverChunkPos = World.GetChunkPosition(intersectedBlockPos.X, intersectedBlockPos.Z);
-
-                    if(game.World.loadedChunks.TryGetValue(mouseOverChunkPos, out Chunk cursorChunk))
-                    {
-                        Vector3i intersectedBlockLocalPos = intersectedBlockPos.ToChunkLocal();
-
-                        lightDebug += (lightDebug != string.Empty ? " " : "") +
-                                    "Light at mouse R=" + cursorChunk.LightMap.GetRedBlockLightAt(intersectedBlockLocalPos) +
-                                    " G=" + cursorChunk.LightMap.GetGreenBlockLightAt(intersectedBlockLocalPos) +
-                                    " B=" + cursorChunk.LightMap.GetBlueBlockLightAt(intersectedBlockLocalPos);
-                    }                      
-                }
-
-                if(lightDebug != string.Empty)
-                    sb.AppendLine(lightDebug);
             }
+
+            string lightDebug = string.Empty;
+            string blockDebug = string.Empty;
+            if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT)
+            {
+                lightDebug += "Light at feet R=" + currentChunk.LightMap.GetRedBlockLightAt(chunkLocalPos) +
+                                            " G=" + currentChunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
+                                            " B=" + currentChunk.LightMap.GetBlueBlockLightAt(chunkLocalPos);
+            }
+            if(game.ClientPlayer.mouseOverObject != null)
+            {
+                Vector3i intersectedBlockPos = game.ClientPlayer.mouseOverObject.IntersectedBlockPos;
+                Vector2 mouseOverChunkPos = World.GetChunkPosition(intersectedBlockPos.X, intersectedBlockPos.Z);
+
+                if(game.World.loadedChunks.TryGetValue(mouseOverChunkPos, out Chunk cursorChunk))
+                {
+                    Vector3i mouseBlockLocalPos = intersectedBlockPos.ToChunkLocal();
+
+                    lightDebug += (lightDebug != string.Empty ? " " : "") +
+                                "Light at mouse R=" + cursorChunk.LightMap.GetRedBlockLightAt(mouseBlockLocalPos) +
+                                " G=" + cursorChunk.LightMap.GetGreenBlockLightAt(mouseBlockLocalPos) +
+                                " B=" + cursorChunk.LightMap.GetBlueBlockLightAt(mouseBlockLocalPos);
+
+                    blockDebug = "Is Top Block=" + (currentChunk.TopMostBlocks[mouseBlockLocalPos.X, mouseBlockLocalPos.Z] == mouseBlockLocalPos.Y);
+                }                      
+            }
+
+            if(lightDebug != string.Empty)
+                sb.AppendLine(lightDebug);
+
+            if(blockDebug != string.Empty)
+                sb.AppendLine(blockDebug);
 
             sb.AppendLine("FPS=" + game.CurrentFPS + " AVG FPS=" + game.AverageFPSCounter.GetAverageFPS());
             sb.AppendLine("Block=" + game.ClientPlayer.mouseOverObject?.BlockstateHit?.ToString());
             sb.AppendLine("IsServer=" + game.IsServer);
+
             debugText.Text = sb.ToString();
         }
     }
