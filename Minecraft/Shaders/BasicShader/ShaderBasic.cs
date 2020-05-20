@@ -9,6 +9,8 @@
         public int Location_TransformationMatrix { get; private set; }
         public int Location_ViewMatrix { get; private set; }
         public int Location_ProjectionMatrix { get; private set; }
+        public int Location_SunColor { get; private set; }
+        public int Location_AmbientColor { get; private set; }
 
         public ShaderBasic() : base(vertexFile, fragmentFile)
         {
@@ -20,6 +22,8 @@
             Location_TransformationMatrix = GetUniformLocation("transformationMatrix");
             Location_ViewMatrix = GetUniformLocation("viewMatrix");
             Location_ProjectionMatrix = GetUniformLocation("projectionMatrix");
+            Location_SunColor = GetUniformLocation("sunColor");
+            Location_AmbientColor = GetUniformLocation("ambientColor");
         }
 
         protected override void BindAttributes()

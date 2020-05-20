@@ -5,7 +5,8 @@ namespace Minecraft
     struct Light
     {
         /* 0000 0000 0000 0000 0000 0000 0000 0000
-         * ---- ---- ---- IIII IIII BBBB GGGG RRRR
+         * ---- ---- SSSS IIII IIII BBBB GGGG RRRR
+         * S = sun light occlusion, 4 bits, values between 0 and 15
          * I = illumination (brightness), 1 byte, values between 0 and 255
          * R = red color channel, 4 bits, values between 0 and 15
          * G = green color channel, 4 bits, values between 0 and 15
@@ -98,6 +99,27 @@ namespace Minecraft
         public void ConvertAndSetBlueChannel(float blueChannel)
         {
             SetBlueChannel((uint)Maths.ConvertRange(0, 1, 0, 15, blueChannel));
+        }
+
+        /*
+        * Sun light
+        */
+        public void SetSunlight(uint brightness)
+        {
+            if(brightness < 0 || brightness > 15)
+                throw new Exception("Invalid brightness of " + brightness);
+
+            storage = (storage & 0xFF0FFFFF) | (brightness << 20);
+        }
+
+        public uint GetSunlight()
+        {
+            return (storage >> 20) & 0xF;
+        }
+
+        public void ConvertAndSetSunlight(float brightness)
+        {
+            SetSunlight((uint)Maths.ConvertRange(0, 1, 0, 15, brightness));
         }
     }
 }

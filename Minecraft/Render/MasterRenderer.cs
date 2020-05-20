@@ -39,6 +39,8 @@ namespace Minecraft
         private readonly ScreenQuad screenQuad;
         private readonly UIRenderer uiRenderer;
         public  readonly UICanvasIngame IngameCanvas;
+        private readonly Skydome skydome;
+        public readonly int DitherTextureId;
 
         private readonly Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
         private readonly HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
@@ -68,6 +70,8 @@ namespace Minecraft
             wireframeRenderer = new WireframeRenderer(this);
             DebugHelper = new DebugHelper(game, wireframeRenderer);
             playerBlockRenderer = new PlayerHoverBlockRenderer(wireframeRenderer, game.ClientPlayer);
+            DitherTextureId = TextureLoader.LoadDitherTexture();
+            skydome = new Skydome(game);
 
             uiRenderer = new UIRenderer(game.Window, cameraController);
             IngameCanvas = new UICanvasIngame(game);
@@ -103,9 +107,13 @@ namespace Minecraft
             GL.ClearColor(colorClearR, colorClearG, colorClearB, 1.0f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            skydome.Render();
+
             basicShader.Start();
             basicShader.LoadTexture(basicShader.Location_TextureAtlas, 0, textureAtlas.ID);
             basicShader.LoadMatrix(basicShader.Location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
+            basicShader.LoadVector(basicShader.Location_SunColor, world.Environment.GetCurrentSunColor());
+            basicShader.LoadVector(basicShader.Location_AmbientColor, world.Environment.AmbientColor);
 
             lock (meshLock)
             {

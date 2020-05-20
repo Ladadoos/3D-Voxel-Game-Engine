@@ -54,13 +54,14 @@ namespace Minecraft
 
             string lightDebug = string.Empty;
             string blockDebug = string.Empty;
-            if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT)
+            if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT && currentChunk != null)
             {
                 lightDebug += "Light at feet R=" + currentChunk.LightMap.GetRedBlockLightAt(chunkLocalPos) +
                                             " G=" + currentChunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
-                                            " B=" + currentChunk.LightMap.GetBlueBlockLightAt(chunkLocalPos);
+                                            " B=" + currentChunk.LightMap.GetBlueBlockLightAt(chunkLocalPos) +
+                                            " Sun=" + currentChunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
             }
-            if(game.ClientPlayer.mouseOverObject != null)
+            if(game.ClientPlayer.mouseOverObject != null && currentChunk != null)
             {
                 Vector3i intersectedBlockPos = game.ClientPlayer.mouseOverObject.IntersectedBlockPos;
                 Vector2 mouseOverChunkPos = World.GetChunkPosition(intersectedBlockPos.X, intersectedBlockPos.Z);
@@ -86,6 +87,7 @@ namespace Minecraft
 
             sb.AppendLine("FPS=" + game.CurrentFPS + " AVG FPS=" + game.AverageFPSCounter.GetAverageFPS());
             sb.AppendLine("Block=" + game.ClientPlayer.mouseOverObject?.BlockstateHit?.ToString());
+            sb.AppendLine("Time=" + game.World.Environment.CurrentTime);
             sb.AppendLine("IsServer=" + game.IsServer);
 
             debugText.Text = sb.ToString();

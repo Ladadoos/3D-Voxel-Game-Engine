@@ -11,6 +11,7 @@ namespace Minecraft
 
         private const float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
+        public Environment Environment { get; private set; }
 
         private readonly Queue<List<Vector3i>> toRemoveBlocks = new Queue<List<Vector3i>>();
         private readonly Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
@@ -42,6 +43,8 @@ namespace Minecraft
         protected World(Game game)
         {
             this.game = game;
+            Environment = new Environment(24);
+            Environment.AmbientColor = new Vector3(0.025F, 0.025F, 0.025F);
         }
 
         public bool DespawnEntity(int entityId)
@@ -122,14 +125,16 @@ namespace Minecraft
             return false;
         }
 
-        public virtual void Update(float deltaTime)
+        public virtual void Update(float deltaTimeSeconds)
         {
             foreach(Entity entity in loadedEntities.Values)
             {
-                entity.Update(deltaTime, this);
+                entity.Update(deltaTimeSeconds, this);
             }
 
-            Tick(deltaTime);
+            Tick(deltaTimeSeconds);
+
+            Environment.Update(deltaTimeSeconds);
 
             ClearBlockRemoveBuffer();
             ClearBlockAddBuffer();

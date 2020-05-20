@@ -35,13 +35,13 @@ namespace Minecraft
 
         public void UpdateAndRender()
         {
-            if (Game.Input.OnKeyPress(OpenTK.Input.Key.F1))
+            if(Game.Input.OnKeyPress(OpenTK.Input.Key.F1))
             {
                 renderHitboxes = !renderHitboxes;
-            }else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F2) && game.RunMode != RunMode.Server)
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F2) && game.RunMode != RunMode.Server)
             {
                 displayDebugInfo = !displayDebugInfo;
-                if (displayDebugInfo)
+                if(displayDebugInfo)
                 {
                     debugCanvas = new UICanvasDebug(game);
                     game.MasterRenderer.AddCanvas(debugCanvas);
@@ -49,11 +49,11 @@ namespace Minecraft
                 {
                     game.MasterRenderer.RemoveCanvas(debugCanvas);
                 }
-            }else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F3))
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F3))
             {
                 GC.Collect();
                 Logger.Info("Manual garbage collected.");
-            } else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F4))
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F4))
             {
                 Vector3i[] blockPositions = new Vector3i[7 * 7 * 7];
                 int i = 0;
@@ -61,8 +61,8 @@ namespace Minecraft
                     for(int y = -3; y < 3; y++)
                         for(int z = -3; z < 3; z++)
                             blockPositions[i++] = new Vector3i(x, y, z) + new Vector3i(game.ClientPlayer.Position);
-                 game.Client.WritePacket(new RemoveBlockPacket(blockPositions));
-            } else if (Game.Input.OnKeyPress(OpenTK.Input.Key.F5))
+                game.Client.WritePacket(new RemoveBlockPacket(blockPositions));
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F5))
             {
                 renderChunkBorders = !renderChunkBorders;
             } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F6))
@@ -80,7 +80,18 @@ namespace Minecraft
                 }
             } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F7))
             {
-                renderBlockLightAreas = !renderBlockLightAreas;              
+                renderBlockLightAreas = !renderBlockLightAreas;
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F8))
+            {
+                for(int x = 0; x < 14; x++)
+                {
+                    for(int z = 0; z < 14; z++)
+                    {
+                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                             new Vector3i(x, 2, z) + new Vector3i(game.ClientPlayer.Position)));
+                    }
+                }
+                
             }
 
             Render();

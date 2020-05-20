@@ -147,6 +147,7 @@
     <Compile Include="Render\Shapes\EntityModels.cs" />
     <Compile Include="Render\Shapes\FullBlockModel.cs" />
     <Compile Include="Render\Shapes\ScissorModel.cs" />
+    <Compile Include="Render\Skydome.cs" />
     <Compile Include="Render\UI\Character.cs" />
     <Compile Include="Render\UI\CharacterBuilder.cs" />
     <Compile Include="Render\UI\Font.cs" />
@@ -165,6 +166,9 @@
     <Compile Include="Render\ViewFrustum.cs" />
     <Compile Include="Render\WireframeRenderer.cs" />
     <Compile Include="Network\Server.cs" />
+    <Compile Include="Shaders\Skydome\SkydomeShader.cs" />
+    <None Include="Shaders\Skydome\fs_skydome.glsl" />
+    <None Include="Shaders\Skydome\vs_skydome.glsl" />
     <Compile Include="Shaders\UIShader\UIShader.cs" />
     <Compile Include="Shaders\EntityShader\EntityShader.cs" />
     <Compile Include="Shaders\PostRenderShader\PostRenderShader.cs" />
@@ -177,7 +181,9 @@
     <Compile Include="Textures\TextureAtlas.cs" />
     <Compile Include="Render\DebugHelper.cs" />
     <Compile Include="Tools\Input.cs" />
+    <Compile Include="Tools\Model\ModelData.cs" />
     <Compile Include="Tools\Noise\Noise3DPerlin.cs" />
+    <Compile Include="Tools\Model\OBJLoader.cs" />
     <Compile Include="Tools\ReadOnlyDictionary.cs" />
     <Compile Include="Tools\TextureLoader.cs" />
     <Compile Include="Tools\Logger.cs" />
@@ -241,7 +247,9 @@
     <Compile Include="World\Trees\ITreeGenerator.cs" />
     <Compile Include="World\Sections\Section.cs" />
     <Compile Include="World\Trees\OakTreeGenerator.cs" />
+    <Compile Include="World\World\Environment.cs" />
     <Compile Include="World\World\EntityIdTracker.cs" />
+    <Compile Include="World\World\Sky.cs" />
     <Compile Include="World\World\World.cs" />
     <Compile Include="World\Generation\WorldGenerator.cs" />
     <Compile Include="World\World\WorldClient.cs" />

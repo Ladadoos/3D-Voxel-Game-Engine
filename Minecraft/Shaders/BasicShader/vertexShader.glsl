@@ -6,6 +6,7 @@ layout (location = 3) in uint vertexIllumination;
 
 out vec2 uv;
 out float brightness;
+out float sunlight;
 out vec3 rgbColor;
 out vec3 position;
 out vec3 normal;
@@ -21,9 +22,10 @@ void main()
 	position = vertexPosition;
 	normal = vertexNormal;
 
-	brightness  = (((vertexIllumination >> 12) & 0xFF) / 15.0F);
-	float red   = ((vertexIllumination        & 0xF)  / 15.0F) + 0.05f;
-	float green = (((vertexIllumination >> 4)  & 0xF)  / 15.0F) + 0.05f;
-	float blue  = (((vertexIllumination >> 8)  & 0xF)  / 15.0F) + 0.05f;
+	brightness  = ((vertexIllumination >> 12) & 0xFF) / 15.0F;
+	sunlight    = ((vertexIllumination >> 20) & 0xF)  / 15.0F;
+	float red   = (vertexIllumination         & 0xF)  / 15.0F;
+	float green = ((vertexIllumination >> 4)  & 0xF)  / 15.0F;
+	float blue  = ((vertexIllumination >> 8)  & 0xF)  / 15.0F;
 	rgbColor = vec3(red, green, blue);
 }
