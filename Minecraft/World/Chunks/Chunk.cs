@@ -19,6 +19,11 @@ namespace Minecraft
             GridZ = gridZ;
         }
 
+        public override string ToString()
+        {
+            return "Chunk[" + GridX + "," + GridZ + "]";
+        }
+
         public void Tick(float deltaTime, World world)
         {
             foreach(KeyValuePair<Vector3i, BlockState> kp in TickableBlocks)

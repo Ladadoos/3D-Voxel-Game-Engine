@@ -65,6 +65,9 @@ namespace Minecraft
                                     {
                                         light = cXPos.LightMap.GetLightColorAt(0, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
                                         light.SetSunlight(cXPos.LightMap.GetSunLightIntensityAt(0, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
+                                    } else
+                                    {
+                                        light.SetSunlight(10);
                                     }
                                 } else
                                 {
@@ -91,6 +94,9 @@ namespace Minecraft
                                     {
                                         light = cXNeg.LightMap.GetLightColorAt(15, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
                                         light.SetSunlight(cXNeg.LightMap.GetSunLightIntensityAt(15, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
+                                    } else
+                                    {
+                                        light.SetSunlight(10);
                                     }
                                 } else
                                 {
@@ -117,6 +123,9 @@ namespace Minecraft
                                     {
                                         light = cZNeg.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 15);
                                         light.SetSunlight(cZNeg.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 15));
+                                    } else
+                                    {
+                                        light.SetSunlight(10);
                                     }
                                 } else
                                 {
@@ -143,6 +152,9 @@ namespace Minecraft
                                     {
                                         light = cZPos.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 0);
                                         light.SetSunlight(cZPos.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 0));
+                                    } else
+                                    {
+                                        light.SetSunlight(10);
                                     }
                                 } else
                                 {

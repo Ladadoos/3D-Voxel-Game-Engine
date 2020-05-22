@@ -8,8 +8,7 @@ namespace Minecraft
         /// <summary>
         /// The current time in seconds.
         /// </summary>
-        public int CurrentTime { get { return (int)currentTime; } }
-        private float currentTime;
+        public float CurrentTime { get; set; }
 
         /// <summary>
         /// The total amount of time in an ingame day in seconds.
@@ -53,20 +52,20 @@ namespace Minecraft
         /// <summary>
         /// Returns the current time scaled to earth time, so 24 hour long days
         /// </summary>
-        private float GetCurrentEarthTime() => currentTime * 24.0F / TimeInDay;
+        private float GetCurrentEarthTime() => CurrentTime * 24.0F / TimeInDay;
 
         public void Update(float deltaTimeSeconds)
         {
-            currentTime += deltaTimeSeconds;
-            if(currentTime >= TimeInDay)
+            CurrentTime += deltaTimeSeconds;
+            if(CurrentTime >= TimeInDay)
             {
-                currentTime = 0;
+                CurrentTime = 0;
             }
 
             //Determine the current position on the unit sphere, add an offset to make angle
             //to make the sun rise at 6AM and set at start setting at 6PM
             double sunRiseAllignmentOffset = ((TimeInDay / 24.0F * 6.0F) / TimeInDay) * Math.PI * 2;
-            sunRotationRads = (currentTime / TimeInDay) * Math.PI * 2 - sunRiseAllignmentOffset;
+            sunRotationRads = (CurrentTime / TimeInDay) * Math.PI * 2 - sunRiseAllignmentOffset;
 
             Vector3 newSunPosition = new Vector3((float)Math.Cos(sunRotationRads), (float)Math.Sin(sunRotationRads), 0).Normalized();
             SunPosition = newSunPosition;

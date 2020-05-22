@@ -26,7 +26,7 @@ namespace Minecraft
             skydomeShader.LoadMatrix(skydomeShader.Location_ProjectionMatrix, activeCamera.CurrentViewMatrix.ClearTranslation() * activeCamera.CurrentProjectionMatrix);
 
             Environment environment = game.World.Environment;
-            skydomeShader.LoadInt(skydomeShader.Location_CurrentTime, environment.CurrentTime);
+            skydomeShader.LoadInt(skydomeShader.Location_CurrentTime, (int)environment.CurrentTime);
             skydomeShader.LoadVector(skydomeShader.Location_SunPosition, environment.SunPosition);
             skydomeShader.LoadVector(skydomeShader.Location_TopSkyColor, environment.GetCurrentTopSkyColor());
             skydomeShader.LoadVector(skydomeShader.Location_BottomSkyColor, environment.GetCurrentBottomSkyColor());

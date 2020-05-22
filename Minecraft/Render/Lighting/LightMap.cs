@@ -15,6 +15,20 @@ namespace Minecraft
 
         private uint[] map = new uint[16 * 16 * 256];
 
+        public void ClearSunlightMap()
+        {
+            for(int x = 0; x < 16; x++)
+            {
+                for(int z = 0; z < 16; z++)
+                {
+                    for(int y = 0; y < 256; y++)
+                    {
+                        SetSunLightIntensityAt(new Vector3i(x, y, z), 0);
+                    }
+                }
+            }
+        }
+
         /*
          * Red channel
          */

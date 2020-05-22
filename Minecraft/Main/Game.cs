@@ -31,7 +31,7 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.Window = window;
-            window.VSync = OpenTK.VSyncMode.Off;
+            window.VSync = OpenTK.VSyncMode.On;
             window.CursorVisible = false;
 
             Blocks.RegisterBlocks();

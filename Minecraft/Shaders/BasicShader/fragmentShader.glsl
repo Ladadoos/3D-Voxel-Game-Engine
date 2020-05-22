@@ -28,7 +28,7 @@ void main()
 		discard;
    }
 
-   vec4 materialColor = albedo * vec4(rgbColor, 1.0F) + albedo * vec4(sunColor, 1.0F);
+   vec4 materialColor = albedo * vec4(rgbColor, 1.0F) + albedo * vec4(sunColor, 1.0F) * sunlight;
    materialColor.x = convertRange(0, 1, 0, 1 - ambientColor.x, materialColor.x);
    materialColor.y = convertRange(0, 1, 0, 1 - ambientColor.y, materialColor.y);
    materialColor.z = convertRange(0, 1, 0, 1 - ambientColor.z, materialColor.z);

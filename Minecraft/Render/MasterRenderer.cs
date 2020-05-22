@@ -240,6 +240,18 @@ namespace Minecraft
 
         public void OnChunkLoaded(World world, Chunk chunk)
         {
+            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, chunk))
+            {
+                MeshChunk(editedLightMapChunk);
+            }
+
+            foreach(KeyValuePair<Vector3i, BlockState> kp in chunk.LightSourceBlocks)
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, chunk, kp.Key, kp.Value))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
             MeshChunk(chunk);
             MeshNeighbourChunks(world, chunk);
         }
@@ -280,8 +292,13 @@ namespace Minecraft
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
-        {            
+        {                
             foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, chunk, blockPos, newState))
+            {
+                MeshChunk(editedLightMapChunk);
+            }
+
+            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGridOnBlockAdded(world, chunk, blockPos, newState))
             {
                 MeshChunk(editedLightMapChunk);
             }
@@ -293,6 +310,11 @@ namespace Minecraft
             if(chainPos == chainCount)
             {
                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockRemoved(world, chunk, blockPos))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGridBlockRemoved(world, chunk, blockPos))
                 {
                     MeshChunk(editedLightMapChunk);
                 }

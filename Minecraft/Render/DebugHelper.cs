@@ -83,15 +83,53 @@ namespace Minecraft
                 renderBlockLightAreas = !renderBlockLightAreas;
             } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F8))
             {
-                for(int x = 0; x < 14; x++)
+                for(int x = 0; x < 16; x++)
                 {
-                    for(int z = 0; z < 14; z++)
+                    for(int z = 0; z < 16; z++)
+                    {
+                        Vector2 chunkPos = World.GetChunkPosition(game.ClientPlayer.Position.X, game.ClientPlayer.Position.Z);
+                        if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+                        {
+                            game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                             new Vector3i(x + 16 * chunk.GridX, (int)game.ClientPlayer.Position.Y + 4, z + 16 * chunk.GridZ)));
+                        }                       
+                    }
+                }
+            } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F9))
+            {
+                for(int x = 0; x < 8; x++)
+                {
+                    for(int z = 0; z < 8; z++)
                     {
                         game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
                              new Vector3i(x, 2, z) + new Vector3i(game.ClientPlayer.Position)));
                     }
                 }
-                
+
+                for(int x = 0; x < 8; x++)
+                {
+                    for(int z = 0; z < 8; z++)
+                    {
+                        for(int y = 1; y < 7; y++)
+                        {
+                            if(x == 0 || z == 0 || x == 7 || z == 7)
+                            {
+                                game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                                 new Vector3i(x, 2 + y, z) + new Vector3i(game.ClientPlayer.Position)));
+                            }
+                        }
+                    }
+                }
+
+                for(int x = 0; x < 8; x++)
+                {
+                    for(int z = 0; z < 8; z++)
+                    {
+                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                             new Vector3i(x, 9, z) + new Vector3i(game.ClientPlayer.Position)));
+                    }
+                }
+
             }
 
             Render();

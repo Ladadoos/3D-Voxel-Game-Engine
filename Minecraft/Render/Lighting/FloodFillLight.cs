@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 
@@ -39,6 +38,11 @@ namespace Minecraft
             }
         }
 
+        public static Chunk[] RepairSunlightGridBlockRemoved(World world, Chunk chunk, Vector3i blockPos)
+        {
+            return RepairSunlightGridOnBlockAdded(world, chunk, blockPos, null);
+        }
+
         public static Chunk[] RepairSunlightGrid(World world, Chunk chunk)
         {
             HashSet<Chunk> updatedChunks = new HashSet<Chunk>();
@@ -48,19 +52,14 @@ namespace Minecraft
             {
                 for(int z = 0; z < 16; z++)
                 {
-                    if(chunk.GetBlockAt(x, 255, z).GetBlock() == Blocks.Air)
+                    if(!chunk.GetBlockAt(x, 255, z).GetBlock().IsOpaque)
                     {
                         Vector3i chunkLocalPos = new Vector3i(x, 255, z).ToChunkLocal();
                         chunk.LightMap.SetSunLightIntensityAt(chunkLocalPos, 15);
                         lightPropagationQueue.Enqueue(new LightAddNode(chunk, chunkLocalPos));
-                    } else
-                    {
-                        throw new Exception("lol");
                     }
                 }
             }
-            if(lightPropagationQueue.Count != 16 * 16)
-                throw new Exception();
 
             foreach(Chunk updatedChunk in PropagateSunlight(world, chunk, lightPropagationQueue))
             {
@@ -75,23 +74,9 @@ namespace Minecraft
 
         public static Chunk[] RepairSunlightGridOnBlockAdded(World world, Chunk chunk, Vector3i blockPos, BlockState blockState)
         {
-         /*  for(int x = 0; x < 16; x++)
-            {
-                for(int z = 0; z < 16; z++)
-                {
-                    for(int y = 0; y < 256; y++)
-                    {
-                        chunk.LightMap.SetSunLightIntensityAt(new Vector3i(x, y, z), 0);
-                    }
-                }
-            }
-
-            return RepairSunlightGrid(world, chunk);*/
-
             HashSet<Chunk> updatedChunks = new HashSet<Chunk>();
 
             Vector3i chunkLocalPos = blockPos.ToChunkLocal();
-
             Queue<LightRemoveNode> darknessPropagationQueue = new Queue<LightRemoveNode>();
             Queue<LightAddNode> lightPropagationQueue = new Queue<LightAddNode>();
 
@@ -139,14 +124,14 @@ namespace Minecraft
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX - 1, currentChunk.GridZ), out Chunk cXNeg))
                             continue;
-
+                      
                         currentChunk = cXNeg;
                         position.X = 15;
                     } else if(position.X > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX + 1, currentChunk.GridZ), out Chunk cXPos))
                             continue;
-
+                  
                         currentChunk = cXPos;
                         position.X = 0;
                     }
@@ -154,14 +139,14 @@ namespace Minecraft
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX, currentChunk.GridZ - 1), out Chunk cZNeg))
                             continue;
-
+                  
                         currentChunk = cZNeg;
                         position.Z = 15;
                     } else if(position.Z > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX, currentChunk.GridZ + 1), out Chunk cZPos))
                             continue;
-
+                 
                         currentChunk = cZPos;
                         position.Z = 0;
                     }
@@ -172,8 +157,8 @@ namespace Minecraft
                     uint neighbourLight = currentChunk.LightMap.GetSunLightIntensityAt(position);
 
                     // Any light that is darker than our current light, we remove it.
-                    if((neighbourLight != 0 && neighbourLight < lightRemoveNode.currentLight ||
-                        (lightRemoveNode.currentLight == 15 && lightRemoveNode.currentChunkLocalPos.Down() == position)))
+                    if((neighbourLight != 0 && neighbourLight < lightRemoveNode.currentLight) ||
+                        (lightRemoveNode.currentLight == 15 && lightRemoveNode.currentChunkLocalPos.Down() == position))
                     {
                         currentChunk.LightMap.SetSunLightIntensityAt(position, 0);
                         darkQueue.Enqueue(new LightRemoveNode(currentChunk, position, neighbourLight));
@@ -203,7 +188,7 @@ namespace Minecraft
             {
                 LightAddNode lightAddNode = queue.Dequeue();
 
-                uint currentLight = chunk.LightMap.GetSunLightIntensityAt(lightAddNode.currentChunkLocalPos);
+                uint currentLight = lightAddNode.currentChunk.LightMap.GetSunLightIntensityAt(lightAddNode.currentChunkLocalPos);
                 if(currentLight <= 1)
                     continue;
 
@@ -218,14 +203,14 @@ namespace Minecraft
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX - 1, currentChunk.GridZ), out Chunk cXNeg))
                             continue;
-
+                   
                         currentChunk = cXNeg;
                         position.X = 15;
                     } else if(position.X > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX + 1, currentChunk.GridZ), out Chunk cXPos))
                             continue;
-
+               
                         currentChunk = cXPos;
                         position.X = 0;
                     }
@@ -233,14 +218,14 @@ namespace Minecraft
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX, currentChunk.GridZ - 1), out Chunk cZNeg))
                             continue;
-
+                      
                         currentChunk = cZNeg;
                         position.Z = 15;
                     } else if(position.Z > 15)
                     {
                         if(!world.loadedChunks.TryGetValue(new Vector2(currentChunk.GridX, currentChunk.GridZ + 1), out Chunk cZPos))
                             continue;
-
+                
                         currentChunk = cZPos;
                         position.Z = 0;
                     }

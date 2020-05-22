@@ -41,7 +41,7 @@ namespace Minecraft
                     {
                         for(uint y = 0; y < 256; y++)
                         {
-                            uint lightValue = chunk.LightMap.GetBlockLightAt(x, y, z);
+                            uint lightValue = chunk.LightMap.GetSunLightIntensityAt(x, y, z);
                             if(lightValue == DesiredLightLevel)
                             {
                                 Vector3 scaleVector = new Vector3(1, 1, 1);
