@@ -125,9 +125,4 @@ namespace Minecraft
             return Math.Abs(vec.X - X) + Math.Abs(vec.Y - Y) + Math.Abs(vec.Z - Z);
         }
     }
-
-    static class Vector2Extensions
-    {
-
-    }
 }
