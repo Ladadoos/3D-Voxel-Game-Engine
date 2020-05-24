@@ -67,7 +67,7 @@ namespace Minecraft
 
             game.Server.World.SpawnEntity(player);
             Vector3 spawnPosition = game.Server.World.GenerateAndGetValidSpawn();
-            session.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId, spawnPosition)); // Accept join
+            session.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId, spawnPosition, game.Server.World.Environment.CurrentTime)); // Accept join
             session.State = SessionState.Accepted;
 
             //Let all the online players know about the new player

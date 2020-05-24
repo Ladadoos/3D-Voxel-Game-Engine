@@ -76,7 +76,8 @@ namespace Minecraft
                         int playerId = reader.ReadInt32();
                         string playerName = ReadUtf8String(reader);
                         Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                        return new PlayerJoinAcceptPacket(playerName, playerId, position);
+                        float currentTime = reader.ReadSingle();
+                        return new PlayerJoinAcceptPacket(playerName, playerId, position, currentTime);
                     }
                 case PacketType.PlayerJoin:
                     {

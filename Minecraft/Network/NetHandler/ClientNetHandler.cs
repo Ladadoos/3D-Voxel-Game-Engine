@@ -80,6 +80,8 @@ namespace Minecraft
             game.ClientPlayer.Position = playerJoinAcceptPacket.SpawnPosition;
             session.State = SessionState.Accepted;
 
+            game.World.Environment.CurrentTime = playerJoinAcceptPacket.CurrentTime;
+
             game.World.SpawnEntity(game.ClientPlayer);
         }
 
