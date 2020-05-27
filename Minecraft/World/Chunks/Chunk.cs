@@ -91,6 +91,9 @@ namespace Minecraft
 
         public void AddBlockAt(int localX, int worldY, int localZ, BlockState blockstate)
         {
+            if(blockstate.GetBlock() == Blocks.Air)
+                throw new ArgumentException("Cannot add air.");
+
             if (worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)
             {
                 throw new ArgumentOutOfRangeException("Adding block at y level " + worldY + " in chunk (" + GridX + ", " + GridZ + ")");

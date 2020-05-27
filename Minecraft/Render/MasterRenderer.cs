@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using OpenTK.Graphics.OpenGL;
 using System.Threading;
+using System;
+using System.Linq;
 
 namespace Minecraft
 {
@@ -19,38 +21,47 @@ namespace Minecraft
     {
         struct ChunkRemeshLayout
         {
-            public RenderChunk renderChunk;
+            public Vector2 chunkGridPosition;
             public ChunkBufferLayout chunkLayout;
         }
 
+        //The colors used to clear the framebuffer with
         private const float colorClearR = 0.02F;
         private const float colorClearG = 0.01F;
         private const float colorClearB = 0.03F;
 
+        private readonly Game game;
+
+        public  readonly DebugHelper DebugHelper;
+        public  readonly UICanvasIngame IngameCanvas;
+        public  readonly int DitherTextureId;
         private readonly ShaderBasic basicShader;
         private readonly EntityShader entityShader;
         private readonly CameraController cameraController;
         private readonly WireframeRenderer wireframeRenderer;
-        public readonly DebugHelper DebugHelper;
         private readonly PlayerHoverBlockRenderer playerBlockRenderer;
         private readonly TextureAtlas textureAtlas;
         private readonly BlockModelRegistry blockModelRegistry;
         private readonly EntityMeshRegistry entityMeshRegistry;
         private readonly ScreenQuad screenQuad;
         private readonly UIRenderer uiRenderer;
-        public  readonly UICanvasIngame IngameCanvas;
         private readonly Skydome skydome;
-        public readonly int DitherTextureId;
-
-        private readonly Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
-        private readonly HashSet<Chunk> toRemeshChunks = new HashSet<Chunk>();
         private readonly OpaqueMeshGenerator blocksMeshGenerator;
 
+        //The chunks that are currently being rendered
+        private readonly Dictionary<Vector2, RenderChunk> toRenderChunks = new Dictionary<Vector2, RenderChunk>();
+
+        //The chunks that are awaiting to be remeshed
+        private readonly LinkedList<Chunk> toRemeshChunksQueue = new LinkedList<Chunk>();
+        private readonly HashSet<Chunk> toRemeshChunksSet = new HashSet<Chunk>();
+        //Meshes for chunk positions that should not be loaded to the GPU because we are already too far away from this chunk position
+        private readonly HashSet<Vector2> unloadFilter = new HashSet<Vector2>();
+
+        //The meshes of chunks that have been generated and are awaiting to be handled and added to the rendering chunks
         private readonly Queue<ChunkRemeshLayout> availableChunkMeshes = new Queue<ChunkRemeshLayout>();
+
         private readonly object meshLock = new object();
         private readonly Thread meshGenerationThread;
-
-        private readonly Game game;
 
         public MasterRenderer(Game game)
         {
@@ -115,22 +126,20 @@ namespace Minecraft
             basicShader.LoadVector(basicShader.Location_SunColor, world.Environment.GetCurrentSunColor());
             basicShader.LoadVector(basicShader.Location_AmbientColor, world.Environment.AmbientColor);
 
-            lock (meshLock)
+            foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
-                foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
-                {
-                    if (chunkToRender.Value.HardBlocksModel == null) continue;
+                if (chunkToRender.Value.HardBlocksModel == null)
+                    throw new Exception();
 
-                    Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                    Vector3 max = min + new Vector3(16, 256, 16);
-                    if (!cameraController.Camera.IsAABBInViewFrustum(new AxisAlignedBox(min, max)))
-                    {
-                        continue;
-                    }
-                    chunkToRender.Value.HardBlocksModel.BindVAO();
-                    basicShader.LoadMatrix(basicShader.Location_TransformationMatrix, chunkToRender.Value.TransformationMatrix);
-                    GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.HardBlocksModel.IndicesCount);
+                Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
+                Vector3 max = min + new Vector3(16, 256, 16);
+                if (!cameraController.Camera.IsAABBInViewFrustum(new AxisAlignedBox(min, max)))
+                {
+                    continue;
                 }
+                chunkToRender.Value.HardBlocksModel.BindVAO();
+                basicShader.LoadMatrix(basicShader.Location_TransformationMatrix, chunkToRender.Value.TransformationMatrix);
+                GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.HardBlocksModel.IndicesCount);
             }
 
             entityShader.Start();
@@ -162,15 +171,19 @@ namespace Minecraft
         
         public void RenderChunkBorders()
         {
-            lock (meshLock)
+            foreach (KeyValuePair<Vector2, Chunk> chunkToRender in game.World.loadedChunks)
             {
-                foreach (KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
-                {
-                    if (chunkToRender.Value.HardBlocksModel == null) continue;
+                Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
+                wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16), new Vector3(0, 0, 1));
+            }
 
-                    Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
-                    wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16), new Vector3(0, 0, 1));
-                }
+            foreach(KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
+            {
+                 if(chunkToRender.Value.HardBlocksModel == null)
+                   throw new Exception();
+
+                Vector3 min = new Vector3(chunkToRender.Key.X * 16 + 4, 0, chunkToRender.Key.Y * 16 + 4);
+                wireframeRenderer.RenderWireframeAt(1, min, new Vector3(12, 256, 12), new Vector3(1, 0, 1));
             }
         }
 
@@ -182,31 +195,20 @@ namespace Minecraft
 
                 lock (meshLock)
                 {
-                    Chunk remeshedChunk = null;
-                    foreach (Chunk chunk in toRemeshChunks)
+                    if(toRemeshChunksQueue.Count <= 0)
+                        continue;
+
+                    Chunk chunk = toRemeshChunksQueue.First.Value;
+                    toRemeshChunksQueue.RemoveFirst();
+                    if(!toRemeshChunksSet.Remove(chunk))
+                        throw new Exception();
+
+                    //Generate the mesh for the chunk and add it to the queue to be used later
+                    availableChunkMeshes.Enqueue(new ChunkRemeshLayout()
                     {
-                        Vector2 gridPosition = new Vector2(chunk.GridX, chunk.GridZ);
-
-                        if (!toRenderChunks.TryGetValue(gridPosition, out RenderChunk renderChunk))
-                        {
-                            renderChunk = new RenderChunk(chunk.GridX, chunk.GridZ);
-                            toRenderChunks.Add(gridPosition, renderChunk);
-                        }
-
-                        availableChunkMeshes.Enqueue(new ChunkRemeshLayout()
-                        {
-                            renderChunk = renderChunk,
-                            chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.World, chunk)
-                        });
-
-                        remeshedChunk = chunk;
-                        break;
-                    }
-
-                    if(remeshedChunk != null)
-                    {
-                        toRemeshChunks.Remove(remeshedChunk);
-                    }
+                        chunkGridPosition = new Vector2(chunk.GridX, chunk.GridZ),
+                        chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.World, chunk)
+                    });
                 }
             }
         }
@@ -224,22 +226,35 @@ namespace Minecraft
 
             lock(meshLock)
             {
-                if(availableChunkMeshes.Count > 0)
+                while(availableChunkMeshes.Count > 0 && !foundChunkToRemesh)
                 {
                     chunkMesh = availableChunkMeshes.Dequeue();
-                    foundChunkToRemesh = true;
+
+                    if(!unloadFilter.Remove(chunkMesh.chunkGridPosition))
+                        foundChunkToRemesh = true;
                 }
             }
 
             if(foundChunkToRemesh)
             {
-                chunkMesh.renderChunk.HardBlocksModel?.CleanUp();
-                chunkMesh.renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+                if(toRenderChunks.TryGetValue(chunkMesh.chunkGridPosition, out RenderChunk renderChunk))
+                {
+                    renderChunk.HardBlocksModel.CleanUp();
+                } else
+                {
+                    renderChunk = new RenderChunk((int)chunkMesh.chunkGridPosition.X, (int)chunkMesh.chunkGridPosition.Y);
+                    toRenderChunks.Add(chunkMesh.chunkGridPosition, renderChunk);
+                }
+
+                renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
             }
         }
 
         public void OnChunkLoaded(World world, Chunk chunk)
         {
+            if(toRenderChunks.ContainsKey(new Vector2(chunk.GridX, chunk.GridZ)))
+                 throw new Exception();
+
             foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, chunk))
             {
                 MeshChunk(editedLightMapChunk);
@@ -283,11 +298,21 @@ namespace Minecraft
 
         public void OnChunkUnloaded(World world, Chunk chunk)
         {
+            Vector2 chunkPos = new Vector2(chunk.GridX, chunk.GridZ);
             lock (meshLock)
             {
-                toRenderChunks.Remove(new Vector2(chunk.GridX, chunk.GridZ));
-                toRemeshChunks.Remove(chunk);
+                if(toRemeshChunksSet.Remove(chunk))
+                {
+                    if(!toRemeshChunksQueue.Remove(chunk))
+                        throw new Exception();
+                }
+                if(availableChunkMeshes.Where(m => m.chunkGridPosition == chunkPos).Count() > 0)
+                {
+                    Logger.Warn("Unloading chunk of which a mesh is awaiting processing: " + chunkPos);
+                    unloadFilter.Add(chunkPos);
+                } 
             }
+            toRenderChunks.Remove(chunkPos);
             MeshNeighbourChunks(world, chunk);
         }
 
@@ -326,9 +351,10 @@ namespace Minecraft
         {
             lock (meshLock)
             {
-                if (!toRemeshChunks.Contains(chunk))
+                if (!toRemeshChunksSet.Contains(chunk))
                 {
-                    toRemeshChunks.Add(chunk);
+                    toRemeshChunksSet.Add(chunk);
+                    toRemeshChunksQueue.AddLast(chunk);
                 }
             }
         }
@@ -362,12 +388,9 @@ namespace Minecraft
             TextureLoader.CleanUp();
             wireframeRenderer.CleanUp();
 
-            lock(meshLock)
+            foreach(KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
             {
-                foreach(KeyValuePair<Vector2, RenderChunk> chunkToRender in toRenderChunks)
-                {
-                    chunkToRender.Value.CleanUp();
-                }
+                chunkToRender.Value.CleanUp();
             }
         }
 

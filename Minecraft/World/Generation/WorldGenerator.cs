@@ -7,21 +7,16 @@ namespace Minecraft
 {
     struct GenerateChunkRequest
     {
-        public Vector2 gridPosition;
-        public World world;
+        public int playerId; //The id of the player who requested for this chunk to be generated
+        public Vector2 gridPosition; //At what chunk grid position the chunk should be generated
+        public World world; //In what would the chunk should be generated
         public Action<GenerateChunkOutput> callback;
     }
 
     struct GenerateChunkOutput
     {
-        public Chunk chunk;
-        public World world;
-    }
-
-    struct GenerateChunkRequestOutgoing
-    {
-        public Vector2 gridPosition;
-        public World world;
+        public Chunk chunk; //The generated chunk
+        public World world; //The world in which the chunk was generated
     }
 
     class WorldGenerator
@@ -68,13 +63,17 @@ namespace Minecraft
             lock(generationLock)
             {
                 var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
+
+                //Check if anyone else already requested for a chunk to be generated at this position
                 if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> requests))
                 {
                     requests.Add(request);
-                } else
+                } else //Else just start a new list of the request
                 {
                     chunkGenerationRequests.Add(tuple, new List<GenerateChunkRequest>() { request });
                 }
+
+                //Chunk generation requests are handled in a first-come-first-serve manner
                 chunkGenerationOrder.Enqueue(request);
             }
         }
@@ -87,11 +86,14 @@ namespace Minecraft
             {
                 Thread.Sleep(5);
 
+                //TODO improve the lock constraint by moving some code outside of the lock.
+
                 bool generated = false;             
                 lock(generationLock)
                 {
                     if(chunkGenerationOrder.Count > 0)
                     {
+                        //Dequeue the oldest chunk generation request
                         GenerateChunkRequest request = chunkGenerationOrder.Dequeue();
 
                         var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
@@ -99,15 +101,19 @@ namespace Minecraft
                         {
                             Chunk chunk = GenerateBlocksForChunkAt((int)request.gridPosition.X, (int)request.gridPosition.Y);
 
-                            foreach(var awaitingRequest in allRequests)
+                            GenerateChunkOutput answer = new GenerateChunkOutput()
                             {
-                                GenerateChunkOutput answer = new GenerateChunkOutput()
-                                {
-                                    chunk = chunk,
-                                    world = request.world
-                                };
+                                chunk = chunk,
+                                world = request.world
+                            };
+
+                            //Multiple people might have requested for this chunk to also be generated. We reply to those too
+                            //while we are at it
+                            foreach(var awaitingRequest in allRequests)
+                            {                                
                                 generationOutput.Add(new Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>(answer, awaitingRequest.callback));
                             }
+
                             chunkGenerationRequests.Remove(tuple);
                             generated = true;
                         }

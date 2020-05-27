@@ -101,10 +101,11 @@ namespace Minecraft
 
         public int GenerateEntityId() => entityIdTracker.GenerateId();
 
-        public void RequestGenerationOfChunk(Vector2 gridPosition, Action<GenerateChunkOutput> callback)
+        public void RequestGenerationOfChunk(int playerId, Vector2 gridPosition, Action<GenerateChunkOutput> callback)
         {
             worldGenerator.AddChunkGenerationRequest(new GenerateChunkRequest()
             {
+                playerId = playerId,
                 gridPosition = gridPosition,
                 world = this,
                 callback = callback

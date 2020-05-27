@@ -7,7 +7,7 @@ namespace Minecraft
         public Vector3 ServerPosition { get; set; }
         private const float positionLerpSmoothFactor = 20;
 
-        public OtherClientPlayer(int id, string playerName) : base(id, playerName, new Vector3(10, 100, 10))
+        public OtherClientPlayer(int id, string playerName, World world) : base(id, playerName, world, Vector3.Zero)
         {
         }
 

@@ -13,10 +13,10 @@ namespace Minecraft
 
         private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
 
-        private const float secondsPerPosUpdate = 1F;
+        private const float secondsPerPosUpdate = 0.1F;
         private float elapsedMsSinceLastPosUpdate;
 
-        public ClientPlayer(Game game) : base(-1, "", new Vector3(0, 200, 0))
+        public ClientPlayer(Game game) : base(-1, "", null, new Vector3(-1, -1, -1))
         {
             this.game = game;
             camera = new Camera(new ProjectionMatrixInfo {
@@ -110,7 +110,7 @@ namespace Minecraft
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)
             {
                 elapsedMsSinceLastPosUpdate = 0;
-                game.Client.WritePacket(new PlayerDataPacket(Position, ID));
+                game.Client.WritePacket(new PlayerDataPacket(ID, Position, Velocity));
             }
         }
 

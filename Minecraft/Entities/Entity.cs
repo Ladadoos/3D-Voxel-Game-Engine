@@ -6,6 +6,8 @@ namespace Minecraft
     {
         public int ID { get; set; }
         public EntityType EntityType { get; private set; }
+        public World World { get; set; }
+
 
         public Vector3 Position;
         public Vector3 Velocity;
@@ -22,9 +24,10 @@ namespace Minecraft
 
         private Vector2 previousChunkPos = new Vector2(float.MaxValue, float.MaxValue);
 
-        protected Entity(int id, Vector3 position, EntityType entityType)
+        protected Entity(int id, World world, Vector3 position, EntityType entityType)
         {
             ID = id;
+            World = world;
             Position = position;
             Velocity = Vector3.Zero;
             Acceleration = Vector3.Zero;

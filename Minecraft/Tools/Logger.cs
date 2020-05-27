@@ -9,7 +9,7 @@ namespace Minecraft
 
     static class Logger
     {
-        private static LogLevel logLevel = LogLevel.Packet;
+        private static LogLevel logLevel = LogLevel.Error;
 
         public static void SetLogLevel(LogLevel logLevel)
         {

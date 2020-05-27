@@ -165,7 +165,7 @@ namespace Minecraft
             }
         }
 
-        public void Update()
+        public void Update(float deltaTimeSeconds)
         {
             HandleClientJoin();
             HandleClientLeave();
@@ -178,7 +178,7 @@ namespace Minecraft
                     continue;
                 }
 
-                client.Update();
+                client.Update(deltaTimeSeconds);
 
                 if(!client.NetDataAvailable())
                 {

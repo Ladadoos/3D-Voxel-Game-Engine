@@ -44,7 +44,8 @@ namespace Minecraft
             {
                 if (game.World.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
                 {
-                    game.World.RemovePlayerPresenceOfChunk(chunk);
+                    if(!game.World.RemovePlayerPresenceOfChunk(chunk))
+                        throw new Exception();
                 }
             }
         }
@@ -87,7 +88,7 @@ namespace Minecraft
 
         public void ProcessPlayerJoinPacket(PlayerJoinPacket playerJoinPacket)
         {
-            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.PlayerID, playerJoinPacket.Name);
+            OtherClientPlayer otherPlayer = new OtherClientPlayer(playerJoinPacket.PlayerID, playerJoinPacket.Name, game.World);
             UICanvasEntityName playerNameCanvas = new UICanvasEntityName(game, otherPlayer, playerJoinPacket.Name);
             game.MasterRenderer.AddCanvas(playerNameCanvas);
             game.World.SpawnEntity(otherPlayer);

@@ -31,7 +31,7 @@ namespace Minecraft
         public void OnStartGame(GameWindow window)
         {
             this.Window = window;
-            window.VSync = OpenTK.VSyncMode.On;
+            window.VSync = OpenTK.VSyncMode.Off;
             window.CursorVisible = false;
 
             Blocks.RegisterBlocks();
@@ -75,26 +75,26 @@ namespace Minecraft
             }
         }
 
-        public void OnUpdateGame(double deltaTime)
+        public void OnUpdateGame(double deltaTimeSeconds)
         {
-            CurrentFPS = (int)(1.0F / deltaTime);
+            CurrentFPS = (int)(1.0F / deltaTimeSeconds);
 
-            float elapsedSeconds = (float)deltaTime;
+            float elapsedSeconds = (float)deltaTimeSeconds;
             elapsedSeconds = elapsedSeconds <= 0 ? 0.0001f : elapsedSeconds;
 
             AverageFPSCounter.IncrementFrameCounter();
-            AverageFPSCounter.AddElapsedTime(deltaTime);
+            AverageFPSCounter.AddElapsedTime(deltaTimeSeconds);
 
             if (RunMode == RunMode.Server)
             {
                 Server.World.Update(elapsedSeconds);
-                Server.Update();
+                Server.Update(elapsedSeconds);
             } else
             {
                 if(RunMode == RunMode.ClientServer)
                 {
                     Server.World.Update(elapsedSeconds);
-                    Server.Update();
+                    Server.Update(elapsedSeconds);
                 }
                 Client.Update(elapsedSeconds);
                 Input.Update();

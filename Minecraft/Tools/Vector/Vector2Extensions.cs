@@ -5,9 +5,9 @@ namespace Minecraft
 {
     static class Vector2Extensions
     {
-        public static Vector2 ManhattanDistance(this Vector2 thisVec, Vector2 otherVec)
+        public static int ManhattanDistance(this Vector2 thisVec, Vector2 otherVec)
         {
-            return new Vector2(Math.Abs(thisVec.X - otherVec.X) + Math.Abs(thisVec.Y - otherVec.Y);
+            return (int)(Math.Abs(thisVec.X - otherVec.X) + Math.Abs(thisVec.Y - otherVec.Y));
         }
     }
 }

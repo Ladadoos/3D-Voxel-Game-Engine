@@ -47,6 +47,7 @@ namespace Minecraft
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             session.Player.Position = playerDataPacket.Position;
+            session.Player.Velocity = playerDataPacket.Velocity;
             game.Server.BroadcastPacketExceptTo(session, playerDataPacket);
         }
 
@@ -62,7 +63,7 @@ namespace Minecraft
 
             int playerId = game.Server.World.GenerateEntityId();
             string serverPlayerName = playerName + "-" + playerId % 10000;
-            ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, new Vector3(10, 100, 10));
+            ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, game.Server.World, new Vector3(10, 100, 10));
             session.AssignPlayer(player);
 
             game.Server.World.SpawnEntity(player);

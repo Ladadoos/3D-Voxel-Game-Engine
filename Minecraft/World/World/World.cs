@@ -75,6 +75,8 @@ namespace Minecraft
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population + 1;
+                if(this is WorldClient && newPopulation > 1)
+                    throw new ArgumentException("World client population should never exceed 1");
                 chunkPlayerPopulation[chunkPos] = newPopulation;
             } else
             {

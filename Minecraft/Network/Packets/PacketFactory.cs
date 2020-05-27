@@ -25,7 +25,7 @@ namespace Minecraft
                     }
                 case PacketType.PlaceBlock:
                     {
-                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                        Vector3i blockPos = ReadVector3i(reader);
                         int byteSize = reader.ReadInt32();
                         ushort blockId = reader.ReadUInt16();
                         byte[] bytes = reader.ReadBytes(byteSize);
@@ -40,7 +40,7 @@ namespace Minecraft
                         Vector3i[] blockPositions = new Vector3i[blockCount];
                         for(int i = 0; i < blockCount; i++)
                         {
-                            blockPositions[i] = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());                             
+                            blockPositions[i] = ReadVector3i(reader);                             
                         }
                         return new RemoveBlockPacket(blockPositions);
                     }
@@ -63,8 +63,9 @@ namespace Minecraft
                 case PacketType.EntityPosition:
                     {
                         int entityId = reader.ReadInt32();
-                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-                        return new PlayerDataPacket(position, entityId);
+                        Vector3 position = ReadVector3(reader);
+                        Vector3 velocity = ReadVector3(reader);
+                        return new PlayerDataPacket(entityId, position, velocity);
                     }
                 case PacketType.PlayerJoinRequest:
                     {
@@ -75,7 +76,7 @@ namespace Minecraft
                     {
                         int playerId = reader.ReadInt32();
                         string playerName = ReadUtf8String(reader);
-                        Vector3 position = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+                        Vector3 position = ReadVector3(reader);
                         float currentTime = reader.ReadSingle();
                         return new PlayerJoinAcceptPacket(playerName, playerId, position, currentTime);
                     }
@@ -94,7 +95,7 @@ namespace Minecraft
                     }
                 case PacketType.PlayerBlockInteraction:
                     {
-                        Vector3i blockPos = new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
+                        Vector3i blockPos = ReadVector3i(reader);
                         return new PlayerBlockInteractionPacket(blockPos);
                     }
                 case PacketType.PlayerKeepAlive:
@@ -104,6 +105,9 @@ namespace Minecraft
                 default: throw new Exception("Invalid packet type: " + packetType);
             }
         }
+
+        private Vector3 ReadVector3(BinaryReader reader) => new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
+        private Vector3i ReadVector3i(BinaryReader reader) => new Vector3i(reader.ReadInt32(), reader.ReadInt32(), reader.ReadInt32());
 
         private string ReadUtf8String(BinaryReader reader)
         {    
