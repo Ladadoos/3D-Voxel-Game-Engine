@@ -24,6 +24,6 @@
         public const float PLAYER_STOP_FORCE_MULTIPLIER = 0.80F;
         public const float PLAYER_MOUSE_SENSIVITY = 0.0015F;
         public const float PLAYER_IN_AIR_SLOWDOWN = 0.75F;
-        public const float PLAYER_FLYING_MULTIPLIER = 6.0F;
+        public const float PLAYER_FLYING_MULTIPLIER = 16.0F;
     }
 }

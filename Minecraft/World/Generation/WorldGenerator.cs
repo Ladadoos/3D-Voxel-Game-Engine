@@ -60,10 +60,10 @@ namespace Minecraft
 
         public void AddChunkGenerationRequest(GenerateChunkRequest request)
         {
+            var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
+
             lock(generationLock)
             {
-                var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
-
                 //Check if anyone else already requested for a chunk to be generated at this position
                 if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> requests))
                 {
@@ -79,54 +79,52 @@ namespace Minecraft
         }
 
         private void ChunkGeneratorThread()
-        {
-            List<Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>> generationOutput = new List<Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>>();
+        {  
+            List<GenerateChunkRequest> allRequests = new List<GenerateChunkRequest>();
+            GenerateChunkRequest request = new GenerateChunkRequest();
+            Chunk chunk = null;
 
             while(true)
             {
                 Thread.Sleep(5);
 
-                //TODO improve the lock constraint by moving some code outside of the lock.
-
-                bool generated = false;             
+                bool shouldGenerateChunk = false;             
                 lock(generationLock)
                 {
                     if(chunkGenerationOrder.Count > 0)
                     {
                         //Dequeue the oldest chunk generation request
-                        GenerateChunkRequest request = chunkGenerationOrder.Dequeue();
+                        request = chunkGenerationOrder.Dequeue();
 
                         var tuple = new Tuple<World, Vector2>(request.world, request.gridPosition);
-                        if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> allRequests))
+                        if(chunkGenerationRequests.TryGetValue(tuple, out List<GenerateChunkRequest> requests))
                         {
-                            Chunk chunk = GenerateBlocksForChunkAt((int)request.gridPosition.X, (int)request.gridPosition.Y);
-
-                            GenerateChunkOutput answer = new GenerateChunkOutput()
-                            {
-                                chunk = chunk,
-                                world = request.world
-                            };
-
-                            //Multiple people might have requested for this chunk to also be generated. We reply to those too
-                            //while we are at it
-                            foreach(var awaitingRequest in allRequests)
-                            {                                
-                                generationOutput.Add(new Tuple<GenerateChunkOutput, Action<GenerateChunkOutput>>(answer, awaitingRequest.callback));
-                            }
-
+                            shouldGenerateChunk = true;
                             chunkGenerationRequests.Remove(tuple);
-                            generated = true;
+                            allRequests = new List<GenerateChunkRequest>(requests);
+                        } else
+                        {
+                            throw new ArgumentException();
                         }
                     }
                 }
 
-                if(generated)
+                if(shouldGenerateChunk)
                 {
-                    foreach(var outputEntry in generationOutput)
+                    chunk = GenerateBlocksForChunkAt((int)request.gridPosition.X, (int)request.gridPosition.Y);
+
+                    GenerateChunkOutput answer = new GenerateChunkOutput()
                     {
-                        outputEntry.Item2.Invoke(outputEntry.Item1);
+                        chunk = chunk,
+                        world = request.world
+                    };
+
+                    //Multiple people might have requested for this chunk to also be generated. We reply to those too
+                    //while we are at it
+                    foreach(var outputEntry in allRequests)
+                    {
+                        outputEntry.callback.Invoke(answer);
                     }
-                    generationOutput.Clear();
                 }
             }
         }

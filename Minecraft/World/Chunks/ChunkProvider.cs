@@ -50,7 +50,6 @@ namespace Minecraft
         public ChunkProvider(ServerSession session)
         {
             this.session = session;
-
             session.OnPlayerAssignedHandler += OnPlayerAssigned;
         }
 
@@ -70,7 +69,7 @@ namespace Minecraft
             remainingChunkRequests = GetChunkLoadQueue(world, playerGridPos);
 
             //Unload all chunks that are outside of our view distance
-            UnloadChunks(world, CurrentlyLoadedChunks.Where(c => !IsChunkVisible(c)).ToList());
+            UnloadChunks(world, CurrentlyLoadedChunks.Where(c => !session.IsChunkVisible(c)).ToList());
         }
 
         private void UnloadChunks(World world, List<Vector2> chunkPositions)
@@ -130,14 +129,6 @@ namespace Minecraft
                 CurrentlyLoadedChunks.Add(new Vector2(chunk.GridX, chunk.GridZ));
                 session.WritePacket(new ChunkDataPacket(chunk));
             }
-        }
-
-        public bool IsChunkVisible(Vector2 chunkPosition)
-        {
-            Vector2 playerChunkPos = World.GetChunkPosition(session.Player.Position.X, session.Player.Position.Z);
-            int dx = (int)Math.Abs(chunkPosition.X - playerChunkPos.X);
-            int dz = (int)Math.Abs(chunkPosition.Y - playerChunkPos.Y);
-            return dx >= 0 && dx <= session.PlayerSettings.ViewDistance && dz >= 0 && dz <= session.PlayerSettings.ViewDistance;
         }
 
         private Queue<Tuple<int, Vector2>> GetChunkLoadQueue(World world, Vector2 playerGridPosition)
@@ -222,7 +213,7 @@ namespace Minecraft
                 World world = outputEntry.world;
                 Chunk chunk = outputEntry.chunk;
 
-                if(IsChunkVisible(new Vector2(chunk.GridX, chunk.GridZ)))
+                if(session.IsChunkVisible(new Vector2(chunk.GridX, chunk.GridZ)))
                 {
                     AddPresenceToChunkInWorld(world, chunk);
                 } else

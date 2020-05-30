@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class BlockModelRegistry
     {
-        public ReadOnlyDictionary<Block, BlockModel> Models { get; private set; }
+        public BlockModel[] Models { get; private set; }
         private readonly BlockModels blockModels;
 
         public BlockModelRegistry(TextureAtlas textureAtlas)
@@ -15,25 +15,23 @@ namespace Minecraft
 
         private void RegisterBlockModels()
         {
-            Dictionary<Block, BlockModel> registry = new Dictionary<Block, BlockModel>
-            {
-                { Blocks.Dirt, blockModels.Dirt },
-                { Blocks.Stone, blockModels.Stone },
-                { Blocks.Flower, blockModels.Flower },
-                { Blocks.Tnt, blockModels.Tnt },
-                { Blocks.Grass, blockModels.Grass },
-                { Blocks.Sand, blockModels.Sand },
-                { Blocks.SugarCane, blockModels.SugarCane },
-                { Blocks.Wheat, blockModels.Wheat },
-                { Blocks.SandStone, blockModels.Sandstone },
-                { Blocks.GrassBlade, blockModels.GrassBlade },
-                { Blocks.DeadBush, blockModels.DeadBush },
-                { Blocks.Cactus, blockModels.Cactus },
-                { Blocks.OakLog, blockModels.OakLog },
-                { Blocks.OakLeaves, blockModels.OakLeaves },
-                { Blocks.Gravel, blockModels.Gravel }
-            };
-            Models = new ReadOnlyDictionary<Block, BlockModel>(registry);
+            Models = new BlockModel[Blocks.Count + 1];
+
+            Models[Blocks.Dirt.ID] = blockModels.Dirt;
+            Models[Blocks.Stone.ID] = blockModels.Stone;
+            Models[Blocks.Flower.ID] = blockModels.Flower;
+            Models[Blocks.Tnt.ID] = blockModels.Tnt;
+            Models[Blocks.Grass.ID] = blockModels.Grass;
+            Models[Blocks.Sand.ID] = blockModels.Sand;
+            Models[Blocks.SugarCane.ID] = blockModels.SugarCane;
+            Models[Blocks.Wheat.ID] = blockModels.Wheat;
+            Models[Blocks.SandStone.ID] = blockModels.SandStone;
+            Models[Blocks.GrassBlade.ID] = blockModels.GrassBlade;
+            Models[Blocks.DeadBush.ID] = blockModels.DeadBush;
+            Models[Blocks.Cactus.ID] = blockModels.Cactus;
+            Models[Blocks.OakLog.ID] = blockModels.OakLog;
+            Models[Blocks.OakLeaves.ID] = blockModels.OakLeaves;
+            Models[Blocks.Gravel.ID] = blockModels.Gravel;
         }
     }
 }

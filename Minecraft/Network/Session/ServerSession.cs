@@ -10,11 +10,6 @@
             chunkProvider = new ChunkProvider(this);
         }
 
-        public bool IsBlockPositionInViewRange(Vector3i blockPos)
-        {
-            return chunkProvider.IsChunkVisible(World.GetChunkPosition(blockPos.X, blockPos.Z));
-        }
-
         public void Update(float deltaTimeSeconds)
         {
             chunkProvider.Update(deltaTimeSeconds);

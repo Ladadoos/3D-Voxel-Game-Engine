@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL;
 using System.Threading;
 using System;
-using System.Linq;
 
 namespace Minecraft
 {
@@ -54,11 +53,9 @@ namespace Minecraft
         //The chunks that are awaiting to be remeshed
         private readonly LinkedList<Chunk> toRemeshChunksQueue = new LinkedList<Chunk>();
         private readonly HashSet<Chunk> toRemeshChunksSet = new HashSet<Chunk>();
-        //Meshes for chunk positions that should not be loaded to the GPU because we are already too far away from this chunk position
-        private readonly HashSet<Vector2> unloadFilter = new HashSet<Vector2>();
 
         //The meshes of chunks that have been generated and are awaiting to be handled and added to the rendering chunks
-        private readonly Queue<ChunkRemeshLayout> availableChunkMeshes = new Queue<ChunkRemeshLayout>();
+        private readonly List<ChunkRemeshLayout> availableChunkMeshes = new List<ChunkRemeshLayout>();
 
         private readonly object meshLock = new object();
         private readonly Thread meshGenerationThread;
@@ -204,7 +201,7 @@ namespace Minecraft
                         throw new Exception();
 
                     //Generate the mesh for the chunk and add it to the queue to be used later
-                    availableChunkMeshes.Enqueue(new ChunkRemeshLayout()
+                    availableChunkMeshes.Add(new ChunkRemeshLayout()
                     {
                         chunkGridPosition = new Vector2(chunk.GridX, chunk.GridZ),
                         chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.World, chunk)
@@ -221,32 +218,38 @@ namespace Minecraft
 
         private void RemeshChunkIfMeshAvailable()
         {
-            bool foundChunkToRemesh = false;
-            ChunkRemeshLayout chunkMesh = new ChunkRemeshLayout();
-
-            lock(meshLock)
+            const int meshesPerFrame = 2;
+            for(int i = 0; i < meshesPerFrame; i++)
             {
-                while(availableChunkMeshes.Count > 0 && !foundChunkToRemesh)
-                {
-                    chunkMesh = availableChunkMeshes.Dequeue();
+                bool foundChunkToRemesh = false;
+                ChunkRemeshLayout chunkMesh = new ChunkRemeshLayout();
 
-                    if(!unloadFilter.Remove(chunkMesh.chunkGridPosition))
+                lock(meshLock)
+                {
+                    if(availableChunkMeshes.Count > 0)
+                    {
+                        chunkMesh = availableChunkMeshes[0];
+                        availableChunkMeshes.RemoveAt(0);
                         foundChunkToRemesh = true;
+                    }
                 }
-            }
 
-            if(foundChunkToRemesh)
-            {
-                if(toRenderChunks.TryGetValue(chunkMesh.chunkGridPosition, out RenderChunk renderChunk))
+                if(foundChunkToRemesh)
                 {
-                    renderChunk.HardBlocksModel.CleanUp();
+                    if(toRenderChunks.TryGetValue(chunkMesh.chunkGridPosition, out RenderChunk renderChunk))
+                    {
+                        renderChunk.HardBlocksModel.CleanUp();
+                    } else
+                    {
+                        renderChunk = new RenderChunk((int)chunkMesh.chunkGridPosition.X, (int)chunkMesh.chunkGridPosition.Y);
+                        toRenderChunks.Add(chunkMesh.chunkGridPosition, renderChunk);
+                    }
+
+                    renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
                 } else
                 {
-                    renderChunk = new RenderChunk((int)chunkMesh.chunkGridPosition.X, (int)chunkMesh.chunkGridPosition.Y);
-                    toRenderChunks.Add(chunkMesh.chunkGridPosition, renderChunk);
+                    break;
                 }
-
-                renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
             }
         }
 
@@ -267,6 +270,155 @@ namespace Minecraft
                     MeshChunk(editedLightMapChunk);
                 }
             }
+
+            /* if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXNeg))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXPos))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZNeg))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZPos))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNeg1))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXNeg1))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPos2))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXPos2))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cZNeg3))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZNeg3))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cZPos4))
+             {
+                 foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZPos4))
+                 {
+                     MeshChunk(editedLightMapChunk);
+                 }
+             }*/
+
+            /* if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg)
+                && cXNeg.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cXNeg.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cXNeg, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos)
+                 && cXPos.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cXPos.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cXPos, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg)
+                && cZNeg.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cZNeg.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cZNeg, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos)
+                && cZPos.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cZPos.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cZPos, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNeg1)
+                && cXNeg1.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cXNeg1.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cXNeg1, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPos2)
+                && cXPos2.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cXPos2.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cXPos2, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cZNeg3)
+                 && cZNeg3.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cZNeg3.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cZNeg3, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cZPos4)
+                && cZPos4.LightSourceBlocks.Count != 0)
+             {
+                 foreach(KeyValuePair<Vector3i, BlockState> kp in cZPos4.LightSourceBlocks)
+                 {
+                     foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, cZPos4, kp.Key, kp.Value))
+                     {
+                         MeshChunk(editedLightMapChunk);
+                     }
+                 }
+             }
+             */
             MeshChunk(chunk);
             MeshNeighbourChunks(world, chunk);
         }
@@ -306,11 +458,7 @@ namespace Minecraft
                     if(!toRemeshChunksQueue.Remove(chunk))
                         throw new Exception();
                 }
-                if(availableChunkMeshes.Where(m => m.chunkGridPosition == chunkPos).Count() > 0)
-                {
-                    Logger.Warn("Unloading chunk of which a mesh is awaiting processing: " + chunkPos);
-                    unloadFilter.Add(chunkPos);
-                } 
+                availableChunkMeshes.RemoveAll(m => m.chunkGridPosition == chunkPos);
             }
             toRenderChunks.Remove(chunkPos);
             MeshNeighbourChunks(world, chunk);
@@ -327,6 +475,65 @@ namespace Minecraft
             {
                 MeshChunk(editedLightMapChunk);
             }
+
+          /*  if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXNeg))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXPos))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZNeg))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZPos))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNeg1))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXNeg1))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPos2))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cXPos2))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cZNeg3))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZNeg3))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }
+            if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cZPos4))
+            {
+                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, cZPos4))
+                {
+                    MeshChunk(editedLightMapChunk);
+                }
+            }*/
+
             MeshChunkAndSurroundings(world, chunk, blockPos, newState);
         }
 

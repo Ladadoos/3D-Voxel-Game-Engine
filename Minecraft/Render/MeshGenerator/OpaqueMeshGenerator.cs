@@ -26,9 +26,7 @@ namespace Minecraft
             {
                 Section section = chunk.Sections[sectionHeight];
                 if (section == null)
-                {
                     continue;
-                }
 
                 for (int localX = 0; localX < 16; localX++)
                 {
@@ -38,14 +36,9 @@ namespace Minecraft
                         {
                             BlockState state = section.GetBlockAt(localX, sectionLocalY, localZ);
                             if (state == null)
-                            {
                                 continue;
-                            }
 
-                            if (!blockModelRegistry.Models.TryGetValue(state.GetBlock(), out BlockModel blockModel))
-                            {
-                                throw new System.Exception("Could not find model for: " + state.GetBlock().GetType());
-                            }
+                            BlockModel blockModel = blockModelRegistry.Models[state.GetBlock().ID];
 
                             Vector3i localChunkBlockPos = new Vector3i(localX, sectionLocalY + sectionHeight * 16, localZ);
                             Vector3i globalBlockPos = new Vector3i(localX + chunk.GridX * 16, sectionLocalY + sectionHeight * 16, localZ + chunk.GridZ * 16);
@@ -263,18 +256,15 @@ namespace Minecraft
                 if (blockWest == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockWest.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Right);
+                return !blockModelRegistry.Models[blockWest.GetBlock().ID].IsOpaqueOnSide(Direction.Right);
             } else
             {
                 BlockState blockWest = currentSection.GetBlockAt(localX - 1, localY, localZ);
                 if (blockWest == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockWest.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Right);
+                return !blockModelRegistry.Models[blockWest.GetBlock().ID].IsOpaqueOnSide(Direction.Right);
             }
-            return false;
         }
 
         private bool ShouldAddEastFaceOfBlock(Chunk eastChunk, Section currentSection, int localX, int localY, int localZ)
@@ -292,18 +282,15 @@ namespace Minecraft
                 if (blockEast == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockEast.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Left);
+                return !blockModelRegistry.Models[blockEast.GetBlock().ID].IsOpaqueOnSide(Direction.Left);
             } else
             {
                 BlockState blockEast = currentSection.GetBlockAt(localX + 1, localY, localZ);
                 if (blockEast == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockEast.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Left);
+                return !blockModelRegistry.Models[blockEast.GetBlock().ID].IsOpaqueOnSide(Direction.Left);
             }
-            return false;
         }
 
         private bool ShouldAddNorthFaceOfBlock(Chunk northChunk, Section currentSection, int localX, int localY, int localZ)
@@ -321,18 +308,15 @@ namespace Minecraft
                 if (blockNorth == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockNorth.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Back);
+                return !blockModelRegistry.Models[blockNorth.GetBlock().ID].IsOpaqueOnSide(Direction.Back);
             } else
             {
                 BlockState blockNorth = currentSection.GetBlockAt(localX, localY, localZ + 1);
                 if (blockNorth == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockNorth.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Back);
+                return !blockModelRegistry.Models[blockNorth.GetBlock().ID].IsOpaqueOnSide(Direction.Back);
             }
-            return false;
         }
 
         private bool ShouldAddSouthFaceOfBlock(Chunk southChunk, Section currentSection, int localX, int localY, int localZ)
@@ -350,18 +334,15 @@ namespace Minecraft
                 if (blockSouth == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockSouth.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Front);
+                return !blockModelRegistry.Models[blockSouth.GetBlock().ID].IsOpaqueOnSide(Direction.Front);
             } else
             {
                 BlockState blockSouth = currentSection.GetBlockAt(localX, localY, localZ - 1);
                 if (blockSouth == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockSouth.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Front);
+                return !blockModelRegistry.Models[blockSouth.GetBlock().ID].IsOpaqueOnSide(Direction.Front);
             }
-            return false;
         }
 
         private bool ShouldAddTopFaceOfBlock(Chunk currentChunk, Section currentSection, int localX, int localY, int localZ)
@@ -379,18 +360,15 @@ namespace Minecraft
                 if (blockAbove == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockAbove.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Bottom);
+                return !blockModelRegistry.Models[blockAbove.GetBlock().ID].IsOpaqueOnSide(Direction.Bottom);
             } else
             {
                 BlockState blockAbove = currentSection.GetBlockAt(localX, localY + 1, localZ);
                 if (blockAbove == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockAbove.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Bottom);
+                return !blockModelRegistry.Models[blockAbove.GetBlock().ID].IsOpaqueOnSide(Direction.Bottom);
             }
-            return false;
         }
 
         private bool ShouldAddBottomFaceOfBlock(Chunk currentChunk, Section currentSection, int localX, int localY, int localZ)
@@ -408,18 +386,15 @@ namespace Minecraft
                 if (blockBottom == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockBottom.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Top);
+                return !blockModelRegistry.Models[blockBottom.GetBlock().ID].IsOpaqueOnSide(Direction.Top);
             } else
             {
                 BlockState blockBottom = currentSection.GetBlockAt(localX, localY - 1, localZ);
                 if (blockBottom == null)
                     return true;
 
-                if (blockModelRegistry.Models.TryGetValue(blockBottom.GetBlock(), out BlockModel blockModel))
-                    return !blockModel.IsOpaqueOnSide(Direction.Top);
+                return !blockModelRegistry.Models[blockBottom.GetBlock().ID].IsOpaqueOnSide(Direction.Top);
             }
-            return false;
         }
     }
 }

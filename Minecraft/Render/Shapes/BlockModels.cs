@@ -10,7 +10,7 @@
         public readonly BlockModel Sand;
         public readonly BlockModel SugarCane;
         public readonly BlockModel Wheat;
-        public readonly BlockModel Sandstone;
+        public readonly BlockModel SandStone;
         public readonly BlockModel GrassBlade;
         public readonly BlockModel DeadBush;
         public readonly BlockModel Cactus;
@@ -28,7 +28,7 @@
             Sand = new BlockModelSand(textureAtlas);
             SugarCane = new BlockModelSugarCane(textureAtlas);
             Wheat = new BlockModelWheat(textureAtlas);
-            Sandstone = new BlockModelSandstone(textureAtlas);
+            SandStone = new BlockModelSandstone(textureAtlas);
             GrassBlade = new BlockModelGrassBlade(textureAtlas);
             DeadBush = new BlockModelDeadBush(textureAtlas);
             Cactus = new BlockModelCactus(textureAtlas);

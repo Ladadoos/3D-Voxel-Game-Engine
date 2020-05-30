@@ -21,6 +21,7 @@ namespace Minecraft
         public static readonly Block OakLeaves = new BlockOakLeaves(15);
         public static readonly Block Gravel = new BlockGravel(16);
 
+        public static int Count { get { return registeredBlocks.Count; } }
         private static List<Block> registeredBlocks;
 
         public static void RegisterBlocks()
@@ -48,7 +49,7 @@ namespace Minecraft
 
         public static Block GetBlockFromIdentifier(int id)
         {
-            id -= 1;
+            id--;
             if (id < 0 || id >= registeredBlocks.Count)
             {
                 throw new System.Exception("Invalid id: " + id);
