@@ -7,7 +7,7 @@ namespace Minecraft
     static class FloodFillLight
     {
         /// <summary>
-        /// Struct used in the BFS algortihm used to propagate light
+        /// Struct used in the BFS algorithm used to propagate light
         /// </summary>
         struct LightAddNode
         {
@@ -45,18 +45,64 @@ namespace Minecraft
 
         public static Chunk[] RepairSunlightGrid(World world, Chunk chunk)
         {
+            Queue<LightAddNode> lightPropagationQueue = new Queue<LightAddNode>();
             HashSet<Chunk> updatedChunks = new HashSet<Chunk>();
 
-            Queue<LightAddNode> lightPropagationQueue = new Queue<LightAddNode>();
-            for(int x = 0; x < 16; x++)
+            uint lowestEmptyHeight = chunk.GetLowestEmptySectionAfterEachOtherFromTop() * 16;
+
+            if(lowestEmptyHeight == 15)
             {
-                for(int z = 0; z < 16; z++)
+                for(int x = 0; x < 16; x++)
                 {
-                    if(!chunk.GetBlockAt(x, 255, z).GetBlock().IsOpaque)
+                    for(int z = 0; z < 16; z++)
                     {
-                        Vector3i chunkLocalPos = new Vector3i(x, 255, z).ToChunkLocal();
+                        if(!chunk.GetBlockAt(x, 255, z).GetBlock().IsOpaque)
+                        {
+                            Vector3i chunkLocalPos = new Vector3i(x, 255, z).ToChunkLocal();
+                            chunk.LightMap.SetSunLightIntensityAt(chunkLocalPos, 15);
+                            lightPropagationQueue.Enqueue(new LightAddNode(chunk, chunkLocalPos));
+                        }
+                    }
+                }
+            } else
+            {
+                //Fill inner core
+                for(uint x = 1; x < 15; x++)
+                {
+                    for(uint y = lowestEmptyHeight + 1; y < Constants.MAX_BUILD_HEIGHT; y++)
+                    {
+                        for(uint z = 1; z < 15; z++)
+                        {
+                            chunk.LightMap.SetSunLightIntensityAt(x, y, z, 15);
+                        }
+                    }
+                }
+
+                //Fill bottom
+                for(int x = 0; x < 16; x++)
+                {
+                    for(int z = 0; z < 16; z++)
+                    {
+                        Vector3i chunkLocalPos = new Vector3i(x, (int)lowestEmptyHeight, z).ToChunkLocal();
                         chunk.LightMap.SetSunLightIntensityAt(chunkLocalPos, 15);
                         lightPropagationQueue.Enqueue(new LightAddNode(chunk, chunkLocalPos));
+                    }
+                }
+
+                //Fill top sides
+                for(int x = 0; x < 16; x++)
+                {
+                    for(int z = 0; z < 16; z++)
+                    {
+                        if(x == 0 || x == 15 || z == 0 || z == 15)
+                        {
+                            if(!chunk.GetBlockAt(x, 255, z).GetBlock().IsOpaque)
+                            {
+                                Vector3i chunkLocalPos = new Vector3i(x, 255, z).ToChunkLocal();
+                                chunk.LightMap.SetSunLightIntensityAt(chunkLocalPos, 15);
+                                lightPropagationQueue.Enqueue(new LightAddNode(chunk, chunkLocalPos));
+                            }
+                        }
                     }
                 }
             }
@@ -187,12 +233,15 @@ namespace Minecraft
             while(queue.Count != 0)
             {
                 LightAddNode lightAddNode = queue.Dequeue();
+                Vector3i chunkLocalPos = lightAddNode.currentChunkLocalPos;
 
-                uint currentLight = lightAddNode.currentChunk.LightMap.GetSunLightIntensityAt(lightAddNode.currentChunkLocalPos);
+                uint currentLight = lightAddNode.currentChunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
                 if(currentLight <= 1)
                     continue;
 
-                Vector3i[] neighbourPositions = lightAddNode.currentChunkLocalPos.GetSurroundingPositions();
+                Vector3i[] neighbourPositions = currentLight == 15 ? 
+                    chunkLocalPos.GetSurroundingPositionsBesidesUp() :
+                    chunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
                     Vector3i position = neighbourPositions[i];
@@ -233,13 +282,12 @@ namespace Minecraft
                     if(position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT)
                         continue;
 
-                    Vector3i worldPos = new Vector3i(position.X + currentChunk.GridX * 16, position.Y, position.Z + currentChunk.GridZ * 16);
-                    if(world.GetBlockAt(worldPos).GetBlock().IsOpaque)
+                    if(currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     //If our neighbour is enough darker compared to the light in the current block, propagate this light - 1 to said block,
                     //unless we are propagating down at full intensity
-                    if(lightAddNode.currentChunkLocalPos.Down() == position && currentLight == 15)
+                    if(chunkLocalPos.Down() == position && currentLight == 15)
                     {
                         currentChunk.LightMap.SetSunLightIntensityAt(position, currentLight);
                         queue.Enqueue(new LightAddNode(currentChunk, position));
@@ -476,8 +524,7 @@ namespace Minecraft
                     if(position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT)
                         continue;
 
-                    Vector3i worldPos = new Vector3i(position.X + currentChunk.GridX * 16, position.Y, position.Z + currentChunk.GridZ * 16);
-                    if(world.GetBlockAt(worldPos).GetBlock().IsOpaque)
+                    if(currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     //If our neighbour is enough darker compared to the light in the current block, propagate this light - 1 to said block.

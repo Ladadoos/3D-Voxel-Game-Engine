@@ -21,7 +21,7 @@ namespace Minecraft
         {
             Vector3 position = Origin;
             Vector3 offset = Direction / 50;
-            BlockState hitBlockState = Blocks.Air.GetNewDefaultState();
+            BlockState hitBlockState = Blocks.AirState;
             for (int i = 0; i < 200; i++)
             {
                 position += offset;

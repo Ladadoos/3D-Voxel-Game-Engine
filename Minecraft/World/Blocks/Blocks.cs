@@ -5,6 +5,8 @@ namespace Minecraft
     class Blocks
     {
         public static readonly Block Air = new BlockAir(1);
+        public static readonly BlockState AirState = Air.GetNewDefaultState();
+
         public static readonly Block Dirt = new BlockDirt(2);
         public static readonly Block Stone = new BlockStone(3);
         public static readonly Block Flower = new BlockFlower(4);

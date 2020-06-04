@@ -103,17 +103,28 @@ namespace Minecraft
             return this + SouthBasis;
         }
 
+        private static Vector3i[] allSurroundings = new Vector3i[6];
         public Vector3i[] GetSurroundingPositions()
         {
-            Vector3i[] surroundings = new Vector3i[6];
+            allSurroundings[0] = North();
+            allSurroundings[1] = South();
+            allSurroundings[2] = East();
+            allSurroundings[3] = West();
+            allSurroundings[4] = Up();
+            allSurroundings[5] = Down();
+            return allSurroundings;
+        }
+
+        private static Vector3i[] surroundings = new Vector3i[5];
+        public Vector3i[] GetSurroundingPositionsBesidesUp()
+        {
             surroundings[0] = North();
             surroundings[1] = South();
             surroundings[2] = East();
             surroundings[3] = West();
-            surroundings[4] = Up();
-            surroundings[5] = Down();
+            surroundings[4] = Down();
             return surroundings;
-        } 
+        }
 
         public double Distance(Vector3i vec)
         {

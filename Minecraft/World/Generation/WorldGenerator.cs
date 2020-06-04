@@ -35,7 +35,7 @@ namespace Minecraft
 
         private readonly Biome[] registeredBiomes;
         private const int activeBiomes = 3;
-        public readonly int SeaLevel = 100;
+        public readonly int SeaLevel = 62;
 
         private readonly object generationLock = new object();
         private readonly Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();

@@ -17,13 +17,13 @@ namespace Minecraft
 
         public void ClearSunlightMap()
         {
-            for(int x = 0; x < 16; x++)
+            for(uint x = 0; x < 16; x++)
             {
-                for(int z = 0; z < 16; z++)
+                for(uint z = 0; z < 16; z++)
                 {
-                    for(int y = 0; y < 256; y++)
+                    for(uint y = 0; y < 256; y++)
                     {
-                        SetSunLightIntensityAt(new Vector3i(x, y, z), 0);
+                        SetSunLightIntensityAt(x, y, z, 0);
                     }
                 }
             }

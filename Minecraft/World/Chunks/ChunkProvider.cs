@@ -153,16 +153,26 @@ namespace Minecraft
                 {
                     Vector2 chunkPos = playerGridPosition + new Vector2(x, z);
 
-                       //Don't load chunks that are already loaded
-                    if(!CurrentlyLoadedChunks.Contains(chunkPos) && 
-                       //Don't load chunks of which we already asked for them to be loaded and are awaiting for them
-                       !outgoingChunkRequests.Contains(new GenerateChunkRequestOutgoing() { world = world, gridPosition = chunkPos }) &&
-                       //Don't load chunks that we have already received back but still need to process
-                       receivedChunkData.Where(s => s.Item1 == chunkPos).Count() == 0)
+                    //Don't load chunks that are already loaded
+                    if(!CurrentlyLoadedChunks.Contains(chunkPos))
                     {
-                        visibleChunks.Enqueue(new Tuple<int, Vector2>(Math.Max(Math.Abs(x), Math.Abs(z)), chunkPos));
+                        var request = new GenerateChunkRequestOutgoing() { world = world, gridPosition = chunkPos };
+                        bool enqueueChunk = false;
+                        lock(chunkRetrievalLock)
+                        {
+                            //Don't load chunks of which we already asked for them to be loaded and are awaiting for them
+                            enqueueChunk = !outgoingChunkRequests.Contains(request) && 
+                                //Don't load chunks that we have already received back but still need to process
+                                receivedChunkData.Where(s => s.Item1 == chunkPos).Count() == 0;
+                        }
+
+                        if(enqueueChunk)
+                        {
+                            visibleChunks.Enqueue(new Tuple<int, Vector2>(Math.Max(Math.Abs(x), Math.Abs(z)), chunkPos));
+                        }
                     }
                 }
+
                 if(x == z || (x < 0 && x == -z) || (x > 0 && x == 1 - z))
                 {
                     t = dx;

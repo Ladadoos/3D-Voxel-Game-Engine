@@ -180,7 +180,7 @@ namespace Minecraft
                    throw new Exception();
 
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16 + 4, 0, chunkToRender.Key.Y * 16 + 4);
-                wireframeRenderer.RenderWireframeAt(1, min, new Vector3(12, 256, 12), new Vector3(1, 0, 1));
+                wireframeRenderer.RenderWireframeAt(1, min, new Vector3(8, 256, 8), new Vector3(1, 0, 1));
             }
         }
 

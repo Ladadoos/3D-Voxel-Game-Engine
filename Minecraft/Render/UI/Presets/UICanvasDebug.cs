@@ -43,7 +43,7 @@ namespace Minecraft
                           " Grid Position X=" + playerGridPos.X + " Y=" + playerGridPos.Y + " Z= " + playerGridPos.Z);
             sb.AppendLine("Velocity X=" + playerVelX.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
             sb.AppendLine("Acceleration X=" + playerAccelX.ToString("0.00") + " Y=" + playerAccelY.ToString("0.00") + " Z=" + playerAccelZ.ToString("0.00"));       
-            sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y);
+            sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y + " Section Y=" + (int)(playerY / 16));
 
             if(currentChunk != null)
             {

@@ -43,7 +43,8 @@ namespace Minecraft
         protected World(Game game)
         {
             this.game = game;
-            Environment = new Environment(24);
+            Environment = new Environment(24000);
+            Environment.CurrentTime = 24000;
             Environment.AmbientColor = new Vector3(0.025F, 0.025F, 0.025F);
         }
 
@@ -233,7 +234,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(blockPos);
             chunk.RemoveBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
-            BlockState air = Blocks.Air.GetNewDefaultState();
+            BlockState air = Blocks.AirState;
             air.GetBlock().OnAdd(air, this, blockPos);
             OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState, chainPos, chainCount);
             return true;
@@ -300,7 +301,7 @@ namespace Minecraft
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
-                return Blocks.Air.GetNewDefaultState();
+                return Blocks.AirState;
             }
 
             return chunk.GetBlockAt(blockPos.ToChunkLocal());

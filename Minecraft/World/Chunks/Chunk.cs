@@ -41,19 +41,19 @@ namespace Minecraft
         {
             if(localPos.Y < 0 || localPos.Y >= Constants.MAX_BUILD_HEIGHT)
             {
-                return Blocks.Air.GetNewDefaultState();
+                return Blocks.AirState;
             }
 
             int sectionHeight = localPos.Y / 16;
             if(Sections[sectionHeight] == null)
             {
-                return Blocks.Air.GetNewDefaultState();
+                return Blocks.AirState;
             }
 
             BlockState block = Sections[sectionHeight].GetBlockAt(localPos.X, localPos.Y & 15, localPos.Z);
             if(block == null)
             {
-                return Blocks.Air.GetNewDefaultState();
+                return Blocks.AirState;
             }
             return block;
         }
@@ -136,6 +136,24 @@ namespace Minecraft
             {
                 TopMostBlocks[localX, localZ] = worldY;
             }
+        }
+
+        public uint GetLowestEmptySectionAfterEachOtherFromTop()
+        {
+            uint lowestSection = Constants.NUM_SECTIONS_IN_CHUNKS - 1;
+            Section section = null;
+            for(int i = Constants.NUM_SECTIONS_IN_CHUNKS - 1; i >= 0; i--)
+            {
+                section = Sections[i];
+                if(section == null || (section != null && section.IsFullAir))
+                {
+                    lowestSection = (uint)i;
+                } else
+                {
+                    break;
+                }                  
+            }
+            return lowestSection;
         }
 
         public int GetPayloadSize()
