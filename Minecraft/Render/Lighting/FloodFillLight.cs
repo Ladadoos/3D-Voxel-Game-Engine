@@ -11,13 +11,13 @@ namespace Minecraft
         /// </summary>
         struct LightAddNode
         {
-            public readonly Chunk currentChunk;
-            public readonly Vector3i currentChunkLocalPos;
+            public readonly Chunk Chunk;
+            public readonly Vector3i ChunkLocalPos;
 
             public LightAddNode(Chunk currentChunk, Vector3i currentChunkLocalPos)
             {
-                this.currentChunk = currentChunk;
-                this.currentChunkLocalPos = currentChunkLocalPos;
+                Chunk = currentChunk;
+                ChunkLocalPos = currentChunkLocalPos;
             }
         }
 
@@ -225,9 +225,9 @@ namespace Minecraft
             while(queue.Count != 0)
             {
                 LightAddNode lightAddNode = queue.Dequeue();
-                Vector3i chunkLocalPos = lightAddNode.currentChunkLocalPos;
+                Vector3i chunkLocalPos = lightAddNode.ChunkLocalPos;
 
-                uint currentLight = lightAddNode.currentChunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
+                uint currentLight = lightAddNode.Chunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
                 if(currentLight <= 1)
                     continue;
 
@@ -237,7 +237,7 @@ namespace Minecraft
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
                     Vector3i position = neighbourPositions[i];
-                    Chunk currentChunk = lightAddNode.currentChunk;
+                    Chunk currentChunk = lightAddNode.Chunk;
 
                     //Update our chunk and positions accordingly, in case we go outside of the bounds of the current chunk.
                     if(position.X < 0)
@@ -356,9 +356,19 @@ namespace Minecraft
             Vector3i sourceChunkLocalPos = blockPos.ToChunkLocal();
 
             //Run BFS on the different color channels to propagate light accordingly.
+            Queue<LightRemoveNode> darknessPropagationQueue = new Queue<LightRemoveNode>();
             Queue<LightAddNode> lightPropagationQueue = new Queue<LightAddNode>();
+
             foreach(LightChannel channel in LightUtils.BlockVisibileColorChannels)
             {
+                uint currentLightValue = LightUtils.GetLightOfChannel(chunk, sourceChunkLocalPos, channel);
+                darknessPropagationQueue.Enqueue(new LightRemoveNode(chunk, sourceChunkLocalPos, currentLightValue));
+                LightUtils.SetLightOfChannel(chunk, sourceChunkLocalPos, channel, 0);
+
+                foreach(Chunk updatedChunk in PropagateDarkness(world, chunk, darknessPropagationQueue, lightPropagationQueue, channel))
+                    if(!updatedChunks.Contains(updatedChunk))
+                        updatedChunks.Add(updatedChunk);
+
                 uint lightValue = LightUtils.GetChannelColor(lightSource, channel);
                 LightUtils.SetLightOfChannel(chunk, sourceChunkLocalPos, channel, lightValue);
                 lightPropagationQueue.Enqueue(new LightAddNode(chunk, sourceChunkLocalPos));
@@ -367,6 +377,7 @@ namespace Minecraft
                     if(!updatedChunks.Contains(updatedChunk))
                         updatedChunks.Add(updatedChunk);
 
+                darknessPropagationQueue.Clear();
                 lightPropagationQueue.Clear();
             }
 
@@ -427,7 +438,7 @@ namespace Minecraft
                     uint neighbourLight = LightUtils.GetLightOfChannel(currentChunk, position, channel);
 
                     // Any light that is darker than our current light, we remove it.
-                    if(neighbourLight != 0 && neighbourLight < lightRemoveNode.currentLight)
+                    if(neighbourLight > 0 && neighbourLight < lightRemoveNode.currentLight)
                     {
                         LightUtils.SetLightOfChannel(currentChunk, position, channel, 0);
                         darkQueue.Enqueue(new LightRemoveNode(currentChunk, position, neighbourLight));
@@ -457,15 +468,15 @@ namespace Minecraft
             {
                 LightAddNode lightAddNode = queue.Dequeue();
 
-                uint currentLight = LightUtils.GetLightOfChannel(lightAddNode.currentChunk, lightAddNode.currentChunkLocalPos, channel);
+                uint currentLight = LightUtils.GetLightOfChannel(lightAddNode.Chunk, lightAddNode.ChunkLocalPos, channel);
                 if(currentLight <= 1)
                     continue;
 
-                Vector3i[] neighbourPositions = lightAddNode.currentChunkLocalPos.GetSurroundingPositions();
+                Vector3i[] neighbourPositions = lightAddNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
                     Vector3i position = neighbourPositions[i];
-                    Chunk currentChunk = lightAddNode.currentChunk;
+                    Chunk currentChunk = lightAddNode.Chunk;
 
                     //Update our chunk and positions accordingly, in case we go outside of the bounds of the current chunk.
                     if(position.X < 0)
