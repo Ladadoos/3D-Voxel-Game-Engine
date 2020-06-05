@@ -40,8 +40,9 @@ namespace Minecraft
 
             sb.AppendLine("Focused=" + game.Window.Focused + " Vsync=" + game.Window.VSync);
             sb.AppendLine("Position X=" + playerX.ToString("0.00") + " Y=" + playerY.ToString("0.00") + " Z=" + playerZ.ToString("0.00") + 
-                          " Grid Position X=" + playerGridPos.X + " Y=" + playerGridPos.Y + " Z= " + playerGridPos.Z);
-            sb.AppendLine("Velocity X=" + playerVelX.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
+                          " Grid Position X=" + playerGridPos.X + " Y=" + playerGridPos.Y + " Z= " + playerGridPos.Z +
+                          " ChunkLocal X=" + chunkLocalPos.X + " Y=" + chunkLocalPos.Y + " Z=" + chunkLocalPos.Z);
+            sb.AppendLine("Velocity X=" + chunkLocalPos.X.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
             sb.AppendLine("Acceleration X=" + playerAccelX.ToString("0.00") + " Y=" + playerAccelY.ToString("0.00") + " Z=" + playerAccelZ.ToString("0.00"));       
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y + " Section Y=" + (int)(playerY / 16));
 
@@ -57,9 +58,9 @@ namespace Minecraft
             if(chunkLocalPos.Y > 0 && chunkLocalPos.Y < Constants.MAX_BUILD_HEIGHT && currentChunk != null)
             {
                 lightDebug += "Light at feet R=" + currentChunk.LightMap.GetRedBlockLightAt(chunkLocalPos) +
-                                            " G=" + currentChunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
-                                            " B=" + currentChunk.LightMap.GetBlueBlockLightAt(chunkLocalPos) +
-                                            " Sun=" + currentChunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
+                                           " G=" + currentChunk.LightMap.GetGreenBlockLightAt(chunkLocalPos) +
+                                           " B=" + currentChunk.LightMap.GetBlueBlockLightAt(chunkLocalPos) +
+                                           " Sun=" + currentChunk.LightMap.GetSunLightIntensityAt(chunkLocalPos);
             }
             if(game.ClientPlayer.mouseOverObject != null && currentChunk != null)
             {
@@ -72,8 +73,8 @@ namespace Minecraft
 
                     lightDebug += (lightDebug != string.Empty ? " " : "") +
                                 "Light at mouse R=" + cursorChunk.LightMap.GetRedBlockLightAt(mouseBlockLocalPos) +
-                                " G=" + cursorChunk.LightMap.GetGreenBlockLightAt(mouseBlockLocalPos) +
-                                " B=" + cursorChunk.LightMap.GetBlueBlockLightAt(mouseBlockLocalPos);
+                                              " G=" + cursorChunk.LightMap.GetGreenBlockLightAt(mouseBlockLocalPos) +
+                                              " B=" + cursorChunk.LightMap.GetBlueBlockLightAt(mouseBlockLocalPos);
 
                     blockDebug = "Is Top Block=" + (currentChunk.TopMostBlocks[mouseBlockLocalPos.X, mouseBlockLocalPos.Z] == mouseBlockLocalPos.Y);
                 }                      
@@ -87,7 +88,7 @@ namespace Minecraft
 
             sb.AppendLine("FPS=" + game.CurrentFPS + " AVG FPS=" + game.AverageFPSCounter.GetAverageFPS());
             sb.AppendLine("Block=" + game.ClientPlayer.mouseOverObject?.BlockstateHit?.ToString());
-            sb.AppendLine("Time=" + game.World.Environment.CurrentTime);
+            sb.AppendLine("Time=" + game.World.Environment.CurrentTime.ToString("0.00") + "/" + game.World.Environment.TimeInDay);
             sb.AppendLine("IsServer=" + game.IsServer);
 
             debugText.Text = sb.ToString();
