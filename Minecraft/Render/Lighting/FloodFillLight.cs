@@ -131,21 +131,13 @@ namespace Minecraft
             chunk.LightMap.SetSunLightIntensityAt(chunkLocalPos, 0);
 
             foreach(Chunk updatedChunk in PropagateDarknessSunlight(world, chunk, darknessPropagationQueue, lightPropagationQueue))
-            {
                 if(!updatedChunks.Contains(updatedChunk))
-                {
                     updatedChunks.Add(updatedChunk);
-                }
-            }
 
             foreach(Chunk updatedChunk in PropagateSunlight(world, chunk, lightPropagationQueue))
-            {
                 if(!updatedChunks.Contains(updatedChunk))
-                {
                     updatedChunks.Add(updatedChunk);
-                }
-            }
-       
+
             return updatedChunks.ToArray();
         }
 
@@ -326,12 +318,8 @@ namespace Minecraft
                 LightUtils.SetLightOfChannel(chunk, sourceChunkLocalPos, channel, 0);
 
                 foreach(Chunk updatedChunk in PropagateDarkness(world, chunk, darknessPropagationQueue, lightPropagationQueue, channel))
-                {
                     if(!updatedChunks.Contains(updatedChunk))
-                    {
                         updatedChunks.Add(updatedChunk);
-                    }
-                }
 
                 //Very bright and large lights can engulf very weak light sources.
                 //Make sure we check to expand from the sources after having removed some light from previous step.
@@ -344,12 +332,8 @@ namespace Minecraft
                 }
 
                 foreach(Chunk updatedChunk in PropagateLight(world, chunk, lightPropagationQueue, channel))
-                {
                     if(!updatedChunks.Contains(updatedChunk))
-                    {
                         updatedChunks.Add(updatedChunk);
-                    }
-                }
 
                 lightPropagationQueue.Clear();
                 darknessPropagationQueue.Clear();
@@ -365,9 +349,7 @@ namespace Minecraft
         {
             //If a non-lightsource block was placed, darker areas might have appeared so this only needs to be fixed.
             if(!(blockState is ILightSource lightSource))
-            {
                 return RepairLightGridBlockRemoved(world, chunk, blockPos);
-            }
 
             HashSet<Chunk> updatedChunks = new HashSet<Chunk>();
 
@@ -382,12 +364,8 @@ namespace Minecraft
                 lightPropagationQueue.Enqueue(new LightAddNode(chunk, sourceChunkLocalPos));
 
                 foreach(Chunk updatedChunk in PropagateLight(world, chunk, lightPropagationQueue, channel))
-                {
                     if(!updatedChunks.Contains(updatedChunk))
-                    {
                         updatedChunks.Add(updatedChunk);
-                    }
-                }
 
                 lightPropagationQueue.Clear();
             }
@@ -463,7 +441,7 @@ namespace Minecraft
 
                         if(currentChunk != chunk && !processedChunks.Contains(currentChunk))
                             processedChunks.Add(currentChunk);
-                    }
+                    } 
                 }
             }
 

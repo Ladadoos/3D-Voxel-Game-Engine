@@ -32,9 +32,7 @@ namespace Minecraft
             foreach (BlockFace face in entityModel.EntityFaces)
             {
                 foreach (float uv in face.TextureCoords)
-                {
                     textureUVs.Add(uv);
-                }
 
                 foreach (Vector3 modelSpacePosition in face.Positions)
                 {
@@ -44,9 +42,9 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                foreach(float illumination in face.Illumination)
+                for(int i = 0; i < face.Positions.Length; i++)
                 {
-                    illumations.Add(illumination);
+                    illumations.Add(1.0F);
                 }
                 
                 for (int i = 0; i < 4; i++)

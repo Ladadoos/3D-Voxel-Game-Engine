@@ -18,15 +18,9 @@ namespace Minecraft
         public void ClearSunlightMap()
         {
             for(uint x = 0; x < 16; x++)
-            {
                 for(uint z = 0; z < 16; z++)
-                {
                     for(uint y = 0; y < 256; y++)
-                    {
                         SetSunLightIntensityAt(x, y, z, 0);
-                    }
-                }
-            }
         }
 
         /*

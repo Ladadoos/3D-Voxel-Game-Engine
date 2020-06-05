@@ -5,6 +5,7 @@ namespace Minecraft
 {
     class BlockStateTNT : BlockState, ILightSource
     {
+        private static Random r = new Random();
         public Vector3i LightColor { get; private set; }
 
         public float elapsedSecondsSinceTrigger;
@@ -14,7 +15,6 @@ namespace Minecraft
 
         public BlockStateTNT()
         {
-            Random r = new Random();
             LightColor = new Vector3i(r.Next(15), r.Next(15), r.Next(15));
         }
 

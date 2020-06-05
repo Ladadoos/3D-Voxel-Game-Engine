@@ -9,8 +9,6 @@ namespace Minecraft
 
         protected float[] uvBladeOne, uvBladeTwo;
 
-        protected float[] illumination = new float[4] { 1, 1, 1, 1 };
-
         protected ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
@@ -20,8 +18,8 @@ namespace Minecraft
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
         {
             return new BlockFace[] {
-                new BlockFace(bladeOneFace, uvBladeOne, illumination),
-                new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
+                new BlockFace(bladeOneFace, uvBladeOne),
+                new BlockFace(bladeTwoFace, uvBladeTwo)
             };
         }
 
@@ -85,18 +83,18 @@ namespace Minecraft
             {
                 case 1:
                     return new BlockFace[] {
-                            new BlockFace(bladeOneFace, uvBladeOneHalfMaturity, illumination),
-                            new BlockFace(bladeTwoFace, uvBladeTwoHalfMaturity, illumination)
+                            new BlockFace(bladeOneFace, uvBladeOneHalfMaturity),
+                            new BlockFace(bladeTwoFace, uvBladeTwoHalfMaturity)
                         };
                 case 2:
                     return new BlockFace[] {
-                            new BlockFace(bladeOneFace, uvBladeOneFullMaturity, illumination),
-                            new BlockFace(bladeTwoFace, uvBladeTwoFullMaturity, illumination)
+                            new BlockFace(bladeOneFace, uvBladeOneFullMaturity),
+                            new BlockFace(bladeTwoFace, uvBladeTwoFullMaturity)
                         };
                 default:
                     return new BlockFace[] {
-                            new BlockFace(bladeOneFace, uvBladeOne, illumination),
-                            new BlockFace(bladeTwoFace, uvBladeTwo, illumination)
+                            new BlockFace(bladeOneFace, uvBladeOne),
+                            new BlockFace(bladeTwoFace, uvBladeTwo)
                         };
             }
         }
@@ -140,8 +138,8 @@ namespace Minecraft
             }
 
             return new BlockFace[] {
-                new BlockFace(bladeOneFaceCopy, uvBladeOne, illumination),
-                new BlockFace(bladeTwoFaceCopy, uvBladeTwo, illumination)
+                new BlockFace(bladeOneFaceCopy, uvBladeOne),
+                new BlockFace(bladeTwoFaceCopy, uvBladeTwo)
             };
         }
     }

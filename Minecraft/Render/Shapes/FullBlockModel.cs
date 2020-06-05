@@ -14,8 +14,6 @@ namespace Minecraft
 
         protected float[] uvBack, uvRight, uvFront, uvLeft, uvTop, uvBottom;
 
-        protected float[] illumination = new float[4] { 1, 1, 1, 1 };
-
         protected FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
             SetStandardUVs();
@@ -32,12 +30,12 @@ namespace Minecraft
         {
             switch(direction)
             {
-                case Direction.Back: return new BlockFace[] { new BlockFace(backFace, uvBack, illumination) };
-                case Direction.Right: return new BlockFace[] { new BlockFace(rightFace, uvRight, illumination) };
-                case Direction.Front: return new BlockFace[] { new BlockFace(frontFace, uvFront, illumination) };
-                case Direction.Left: return new BlockFace[] { new BlockFace(leftFace, uvLeft, illumination) };
-                case Direction.Top: return new BlockFace[] { new BlockFace(topFace, uvTop, illumination) };
-                case Direction.Bottom: return new BlockFace[] { new BlockFace(bottomFace, uvBottom, illumination) };
+                case Direction.Back: return new BlockFace[] { new BlockFace(backFace, uvBack) };
+                case Direction.Right: return new BlockFace[] { new BlockFace(rightFace, uvRight) };
+                case Direction.Front: return new BlockFace[] { new BlockFace(frontFace, uvFront) };
+                case Direction.Left: return new BlockFace[] { new BlockFace(leftFace, uvLeft) };
+                case Direction.Top: return new BlockFace[] { new BlockFace(topFace, uvTop) };
+                case Direction.Bottom: return new BlockFace[] { new BlockFace(bottomFace, uvBottom) };
                 default: throw new System.Exception("Uncatched face.");
             }
         }
@@ -198,12 +196,12 @@ namespace Minecraft
         public override BlockFace[] GetAlwaysVisibleFaces(BlockState state, Vector3i blockPos)
         {
             return new BlockFace[] {
-                new BlockFace(backFace, uvBack, illumination),
-                new BlockFace(rightFace, uvRight, illumination),
-                new BlockFace(frontFace, uvFront, illumination),
-                new BlockFace(leftFace, uvLeft, illumination),
-                new BlockFace(topFace, uvTop, illumination),
-                new BlockFace(bottomFace, uvBottom, illumination)
+                new BlockFace(backFace, uvBack),
+                new BlockFace(rightFace, uvRight),
+                new BlockFace(frontFace, uvFront),
+                new BlockFace(leftFace, uvLeft),
+                new BlockFace(topFace, uvTop),
+                new BlockFace(bottomFace, uvBottom)
             };
         }
 

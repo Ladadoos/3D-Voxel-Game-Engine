@@ -54,7 +54,7 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                foreach(float illum in face.Illumination)
+                for(int i = 0; i < face.Positions.Length; i++)
                 {
                     illuminations.Add(light.GetStorage());
                 }
@@ -94,7 +94,7 @@ namespace Minecraft
                 }
 
                 indicesCount += 4;
-                foreach (float illum in face.Illumination)
+                for(int i = 0; i < face.Positions.Length; i++)
                 {
                     illuminations.Add(light.GetStorage());
                 }

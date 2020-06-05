@@ -8,7 +8,6 @@ namespace Minecraft
         public EntityType EntityType { get; private set; }
         public World World { get; set; }
 
-
         public Vector3 Position;
         public Vector3 Velocity;
         public Vector3 Acceleration;

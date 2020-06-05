@@ -17,8 +17,6 @@ namespace Minecraft
     {
         public DummyEntityModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
-            float[] illumination = new float[4] { 1, 1, 1, 1 };
-
             Vector3[] backFace = new Vector3[] { new Vector3(0.5f, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 2f, 0), new Vector3(0.5f, 2f, 0) };
             Vector3[] rightFace = new Vector3[] { new Vector3(0.5f, 0, 0.5f), new Vector3(0.5f, 0, 0), new Vector3(0.5f, 2f, 0), new Vector3(0.5f, 2f, 0.5f) };
             Vector3[] frontFace = new Vector3[] { new Vector3(0, 0, 0.5f), new Vector3(0.5f, 0, 0.5f), new Vector3(0.5f, 2f, 0.5f), new Vector3(0, 2f, 0.5f) };
@@ -33,12 +31,12 @@ namespace Minecraft
             float[] uvTop = textureAtlas.GetTextureCoords(new Vector2(2, 12));
             float[] uvBottom = textureAtlas.GetTextureCoords(new Vector2(2, 12));
 
-            EntityFaces = new BlockFace[] { new BlockFace(backFace, uvBack, illumination),
-                new BlockFace(rightFace, uvRight, illumination),
-                new BlockFace(frontFace, uvFront, illumination),
-                new BlockFace(leftFace, uvLeft, illumination),
-                new BlockFace(topFace, uvTop, illumination),
-                new BlockFace(bottomFace, uvBottom, illumination) };
+            EntityFaces = new BlockFace[] { new BlockFace(backFace, uvBack),
+                new BlockFace(rightFace, uvRight),
+                new BlockFace(frontFace, uvFront),
+                new BlockFace(leftFace, uvLeft),
+                new BlockFace(topFace, uvTop),
+                new BlockFace(bottomFace, uvBottom) };
         }
     }
 }

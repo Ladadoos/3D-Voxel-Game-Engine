@@ -90,7 +90,7 @@ namespace Minecraft
                         Vector2 chunkPos = World.GetChunkPosition(game.ClientPlayer.Position.X, game.ClientPlayer.Position.Z);
                         if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
                         {
-                            game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                            game.Client.WritePacket(new PlaceBlockPacket(Blocks.Tnt.GetNewDefaultState(),
                              new Vector3i(x + 16 * chunk.GridX, (int)game.ClientPlayer.Position.Y + 4, z + 16 * chunk.GridZ)));
                         }                       
                     }
