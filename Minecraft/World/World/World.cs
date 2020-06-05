@@ -196,7 +196,9 @@ namespace Minecraft
 
         public static Vector2 GetChunkPosition(float worldX, float worldZ)
         {
-            return new Vector2((int)worldX >> 4, (int)worldZ >> 4);
+            int x = worldX < 0 ? (int)(worldX - 1) >> 4 : (int)worldX >> 4;
+            int z = worldZ < 0 ? (int)(worldZ - 1) >> 4 : (int)worldZ >> 4;
+            return new Vector2(x, z);
         }
 
         public void QueueToRemoveBlockAt(Vector3i blockPos)
