@@ -258,7 +258,7 @@ namespace Minecraft
             if(toRenderChunks.ContainsKey(new Vector2(chunk.GridX, chunk.GridZ)))
                  throw new Exception();
 
-            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGrid(world, chunk))
+            foreach(Chunk editedLightMapChunk in FloodFillLight.GenerateInitialSunlightGrid(world, chunk))
             {
                 MeshChunk(editedLightMapChunk);
             }

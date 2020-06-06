@@ -29,7 +29,7 @@ namespace Minecraft
 
             float playerAccelX = game.ClientPlayer.Acceleration.X;
             float playerAccelY = game.ClientPlayer.Acceleration.Y;
-            float playerAccelZ = game.ClientPlayer.Velocity.Z;
+            float playerAccelZ = game.ClientPlayer.Acceleration.Z;
 
             Vector3i chunkLocalPos = new Vector3i(game.ClientPlayer.Position).ToChunkLocal();
             Vector2 chunkPos = World.GetChunkPosition(playerX, playerZ);
@@ -42,7 +42,7 @@ namespace Minecraft
             sb.AppendLine("Position X=" + playerX.ToString("0.00") + " Y=" + playerY.ToString("0.00") + " Z=" + playerZ.ToString("0.00") + 
                           " Grid Position X=" + playerGridPos.X + " Y=" + playerGridPos.Y + " Z= " + playerGridPos.Z +
                           " ChunkLocal X=" + chunkLocalPos.X + " Y=" + chunkLocalPos.Y + " Z=" + chunkLocalPos.Z);
-            sb.AppendLine("Velocity X=" + chunkLocalPos.X.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
+            sb.AppendLine("Velocity X=" + playerVelX.ToString("0.00") + " Y=" + playerVelY.ToString("0.00") + " Z=" + playerVelZ.ToString("0.00"));
             sb.AppendLine("Acceleration X=" + playerAccelX.ToString("0.00") + " Y=" + playerAccelY.ToString("0.00") + " Z=" + playerAccelZ.ToString("0.00"));       
             sb.AppendLine("Chunk X=" + (int)chunkPos.X + " Z=" + (int)chunkPos.Y + " Section Y=" + (int)(playerY / 16));
 

@@ -13,7 +13,7 @@ namespace Minecraft
         //B = blue color channel, 0 to 15
         //S = sunlight, 0 to 15
 
-        private uint[] map = new uint[16 * 16 * 256];
+        private uint[] map = new uint[16 * 16 * Constants.MAX_BUILD_HEIGHT];
 
         public void ClearSunlightMap()
         {
