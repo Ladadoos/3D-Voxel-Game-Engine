@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 using System.Text;
 
 namespace Minecraft
@@ -90,6 +91,7 @@ namespace Minecraft
             sb.AppendLine("Block=" + game.ClientPlayer.mouseOverObject?.BlockstateHit?.ToString());
             sb.AppendLine("Time=" + game.World.Environment.CurrentTime.ToString("0.00") + "/" + game.World.Environment.TimeInDay);
             sb.AppendLine("IsServer=" + game.IsServer);
+            sb.AppendLine("Mem=" + (int)(GC.GetTotalMemory(false) / 1000000) + "MB");
 
             debugText.Text = sb.ToString();
         }
