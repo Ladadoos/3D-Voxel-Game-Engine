@@ -122,13 +122,19 @@ namespace Minecraft
         /// <summary>
         /// Returns the red, green and blue channel at the given coordinates and sets them in the returned light.
         /// </summary>
-        public Light GetLightColorAt(uint localX, uint worldY, uint localZ)
+        public Light GetLightColorAt(uint localX, uint worldY, uint localZ, uint mult = 1)
         {
             Light light = new Light();
-            light.SetRedChannel(GetRedBlockLightAt(localX, worldY, localZ));
-            light.SetGreenChannel(GetGreenBlockLightAt(localX, worldY, localZ));
-            light.SetBlueChannel(GetBlueBlockLightAt(localX, worldY, localZ));
+            light.SetRedChannel(GetRedBlockLightAt(localX, worldY, localZ) * mult);
+            light.SetGreenChannel(GetGreenBlockLightAt(localX, worldY, localZ) * mult);
+            light.SetBlueChannel(GetBlueBlockLightAt(localX, worldY, localZ) * mult);
+            light.SetSunlight(GetSunLightIntensityAt(localX, worldY, localZ) * mult);
             return light;
+        }
+
+        public Light GetLightColorAt(Vector3i position, uint mult = 1)
+        {
+            return GetLightColorAt((uint)position.X, (uint)position.Y, (uint)position.Z, mult);
         }
     }
 }

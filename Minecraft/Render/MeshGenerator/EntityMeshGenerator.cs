@@ -31,8 +31,11 @@ namespace Minecraft
         {
             foreach (BlockFace face in entityModel.EntityFaces)
             {
-                foreach (float uv in face.TextureCoords)
-                    textureUVs.Add(uv);
+                foreach(Vector2 uv in face.TextureCoords)
+                {
+                    textureUVs.Add(uv.X);
+                    textureUVs.Add(uv.Y);
+                }
 
                 foreach (Vector3 modelSpacePosition in face.Positions)
                 {

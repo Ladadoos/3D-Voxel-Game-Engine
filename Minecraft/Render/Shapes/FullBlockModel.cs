@@ -9,10 +9,10 @@ namespace Minecraft
         protected Vector3[] rightFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(1, 0, 0), new Vector3(1, 1, 0), new Vector3(1, 1, 1) };
         protected Vector3[] frontFace = new Vector3[] { new Vector3(0, 0, 1), new Vector3(1, 0, 1), new Vector3(1, 1, 1), new Vector3(0, 1, 1) };
         protected Vector3[] leftFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1), new Vector3(0, 1, 0) };
-        protected Vector3[] topFace = new Vector3[] { new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 0), new Vector3(0, 1, 0) };
-        protected Vector3[] bottomFace = new Vector3[] { new Vector3(0, 0, 0), new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 0, 1) };
+        protected Vector3[] topFace = new Vector3[] { new Vector3(0, 1, 0), new Vector3(0, 1, 1), new Vector3(1, 1, 1), new Vector3(1, 1, 0) };
+        protected Vector3[] bottomFace = new Vector3[] { new Vector3(1, 0, 0), new Vector3(1, 0, 1), new Vector3(0, 0, 1), new Vector3(0, 0, 0) };
 
-        protected float[] uvBack, uvRight, uvFront, uvLeft, uvTop, uvBottom;
+        protected Vector2[] uvBack, uvRight, uvFront, uvLeft, uvTop, uvBottom;
 
         protected FullBlockModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
@@ -26,18 +26,20 @@ namespace Minecraft
             return emptyArray;
         }
 
+        private static BlockFace[] partialFaces = new BlockFace[1];
         public override BlockFace[] GetPartialVisibleFaces(BlockState state, Vector3i blockPos, Direction direction)
         {
             switch(direction)
             {
-                case Direction.Back: return new BlockFace[] { new BlockFace(backFace, uvBack) };
-                case Direction.Right: return new BlockFace[] { new BlockFace(rightFace, uvRight) };
-                case Direction.Front: return new BlockFace[] { new BlockFace(frontFace, uvFront) };
-                case Direction.Left: return new BlockFace[] { new BlockFace(leftFace, uvLeft) };
-                case Direction.Top: return new BlockFace[] { new BlockFace(topFace, uvTop) };
-                case Direction.Bottom: return new BlockFace[] { new BlockFace(bottomFace, uvBottom) };
+                case Direction.Back: partialFaces[0] = new BlockFace(backFace, uvBack); break;
+                case Direction.Right: partialFaces[0] = new BlockFace(rightFace, uvRight); break;
+                case Direction.Front:  partialFaces[0] = new BlockFace(frontFace, uvFront); break;
+                case Direction.Left: partialFaces[0] = new BlockFace(leftFace, uvLeft); break;
+                case Direction.Top: partialFaces[0] = new BlockFace(topFace, uvTop); break;
+                case Direction.Bottom: partialFaces[0] = new BlockFace(bottomFace, uvBottom); break;
                 default: throw new System.Exception("Uncatched face.");
             }
+             return partialFaces;
         }
 
         protected abstract void SetStandardUVs();

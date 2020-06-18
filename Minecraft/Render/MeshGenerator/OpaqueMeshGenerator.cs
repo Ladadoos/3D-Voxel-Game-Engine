@@ -11,6 +11,9 @@ namespace Minecraft
         private const uint staticSideXLight = 13;
         private const uint staticSideZLight = 11;
 
+        private SmoothLighting smoothLigher = new SmoothLighting();
+        private bool smoothLighting = true;
+
         public OpaqueMeshGenerator(BlockModelRegistry blockModelRegistry) : base (blockModelRegistry)
         {           
         }
@@ -22,10 +25,12 @@ namespace Minecraft
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg);
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos);
 
+            Light[] lightBuffer = new Light[4];
+
             for (int sectionHeight = 0; sectionHeight < chunk.Sections.Length; sectionHeight++)
             {
                 Section section = chunk.Sections[sectionHeight];
-                if (section == null)
+                if (section == null || section.IsEmpty)
                     continue;
 
                 for (int localX = 0; localX < 16; localX++)
@@ -41,7 +46,7 @@ namespace Minecraft
                             BlockModel blockModel = blockModelRegistry.Models[state.GetBlock().ID];
 
                             Vector3i localChunkBlockPos = new Vector3i(localX, sectionLocalY + sectionHeight * 16, localZ);
-                            Vector3i globalBlockPos = new Vector3i(localX + chunk.GridX * 16, sectionLocalY + sectionHeight * 16, localZ + chunk.GridZ * 16);
+                            Vector3i worldBlockPos = new Vector3i(localX + chunk.GridX * 16, sectionLocalY + sectionHeight * 16, localZ + chunk.GridZ * 16);
 
                             uint averageRed = 0;
                             uint averageBlue = 0;
@@ -75,7 +80,12 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Right, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)               
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, localChunkBlockPos.X, localChunkBlockPos.Y, localChunkBlockPos.Z, Direction.Right);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Right, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
                             if (ShouldAddWestFaceOfBlock(cXNeg, section, localX, sectionLocalY, localZ))
                             {
@@ -104,7 +114,12 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Left, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, localChunkBlockPos.X, localChunkBlockPos.Y, localChunkBlockPos.Z, Direction.Left);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Left, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
                             if (ShouldAddSouthFaceOfBlock(cZNeg, section, localX, sectionLocalY, localZ))
                             {
@@ -133,7 +148,12 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Back, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, localChunkBlockPos.X, localChunkBlockPos.Y, localChunkBlockPos.Z, Direction.Back);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Back, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
                             if (ShouldAddNorthFaceOfBlock(cZPos, section, localX, sectionLocalY, localZ))
                             {
@@ -162,7 +182,12 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Front, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, localChunkBlockPos.X, localChunkBlockPos.Y, localChunkBlockPos.Z, Direction.Front);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Front, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
                             if (ShouldAddTopFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
@@ -179,7 +204,12 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Top, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, (int)chunkLocalX, localChunkBlockPos.Y, (int)chunkLocalZ, Direction.Top);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Top, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
                             if (ShouldAddBottomFaceOfBlock(chunk, section, localX, sectionLocalY, localZ))
                             {
@@ -196,29 +226,36 @@ namespace Minecraft
                                 averageBlue += light.GetBlueChannel();
                                 numAverages++;
 
-                                BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, globalBlockPos, blockModel, light);
+                                if(smoothLighting)
+                                    lightBuffer = smoothLigher.GetLightsAt(world, chunk, (int)chunkLocalX, localChunkBlockPos.Y, (int)chunkLocalZ, Direction.Bottom);
+                                else
+                                    for(int i = 0; i < 4; i++) lightBuffer[i] = light;
+
+                                BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
 
                             Light lightAlwaysyVisibleFaces = new Light();
                             if(!state.GetBlock().IsOpaque)
                             {
-                                lightAlwaysyVisibleFaces = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
+                                lightAlwaysyVisibleFaces = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
                             } else if(numAverages != 0)
                             {
-                                lightAlwaysyVisibleFaces.SetRedChannel((uint)(averageRed / numAverages));
-                                lightAlwaysyVisibleFaces.SetGreenChannel((uint)(averageGreen / numAverages));
-                                lightAlwaysyVisibleFaces.SetBlueChannel((uint)(averageBlue / numAverages));
+                                lightAlwaysyVisibleFaces.SetRedChannel((uint)(averageRed / numAverages * 4));
+                                lightAlwaysyVisibleFaces.SetGreenChannel((uint)(averageGreen / numAverages * 4));
+                                lightAlwaysyVisibleFaces.SetBlueChannel((uint)(averageBlue / numAverages * 4));
                             }
-                            lightAlwaysyVisibleFaces.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
-                            lightAlwaysyVisibleFaces.SetBrightness(15);
+                            lightAlwaysyVisibleFaces.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z) * 4);
+                            lightAlwaysyVisibleFaces.SetBrightness(16 * 4 - 1);
 
-                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, globalBlockPos);                           
+                            for(int i = 0; i < 4; i++) lightBuffer[i] = lightAlwaysyVisibleFaces;
+
+                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, worldBlockPos);                           
                             if(blockModel.DoubleSidedFaces)
                             {
-                                AddFacesToMeshDualSided(faces, localChunkBlockPos, lightAlwaysyVisibleFaces);
+                                AddFacesToMeshDualSided(faces, localChunkBlockPos, lightBuffer);
                             } else
                             {
-                                AddFacesToMeshFromFront(faces, localChunkBlockPos, lightAlwaysyVisibleFaces);
+                                AddFacesToMeshFromFront(faces, localChunkBlockPos, lightBuffer);
                             }
                         }
                     }
@@ -235,10 +272,10 @@ namespace Minecraft
             };                   
         }
 
-        private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, Light light)
+        private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, Light[] lights)
         {
             BlockFace[] faces = model.GetPartialVisibleFaces(state, globalPos, direction);
-            AddFacesToMeshFromFront(faces, chunkLocalPos, light);
+            AddFacesToMeshFromFront(faces, chunkLocalPos, lights);
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)

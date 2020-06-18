@@ -149,12 +149,10 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightRemoveNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = InsureCorrectChunkPositionReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
                         lightRemoveNode.Chunk, out bool referenceFixable);
 
-                    if(!referenceFixable ||
-                        position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT ||
-                        currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
+                    if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     uint neighbourLight = currentChunk.LightMap.GetSunLightIntensityAt(position);
@@ -201,12 +199,10 @@ namespace Minecraft
                     chunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = InsureCorrectChunkPositionReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
                         lightAddNode.Chunk, out bool referenceFixable);
 
-                    if(!referenceFixable ||
-                        position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT ||
-                        currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
+                    if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     //If our neighbour is enough darker compared to the light in the current block, propagate this light - 1 to said block,
@@ -329,12 +325,10 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightRemoveNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = InsureCorrectChunkPositionReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
                         lightRemoveNode.Chunk, out bool referenceFixable);
 
-                    if(!referenceFixable ||
-                        position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT ||
-                        currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
+                    if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     uint neighbourLight = LightUtils.GetLightOfChannel(currentChunk, position, channel);
@@ -377,12 +371,10 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightAddNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = InsureCorrectChunkPositionReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
                         lightAddNode.Chunk, out bool referenceFixable);
 
-                    if(!referenceFixable ||
-                        position.Y < 0 || position.Y >= Constants.MAX_BUILD_HEIGHT ||
-                        currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
+                    if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
                         continue;
 
                     //If our neighbour is enough darker compared to the light in the current block, propagate this light - 1 to said block.
@@ -399,59 +391,6 @@ namespace Minecraft
             }
 
             return processedChunks;
-        }
-
-        /// <summary>
-        /// while propagating light, it can be that a chunk local position is not chunk local anymore to the chunk it was in.
-        /// The chunk reference should be changed and the position should be fixed accordingly.
-        /// </summary>
-        private static (Vector3i, Chunk) InsureCorrectChunkPositionReference(World world, Vector3i position, Chunk chunk, 
-            out bool wasReferenceFixable)
-        {
-            wasReferenceFixable = true;
-            if(position.X < 0)
-            {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
-                {
-                    chunk = cXNeg;
-                    position.X = 15;
-                } else
-                {
-                    wasReferenceFixable = false;
-                }                              
-            } else if(position.X > 15)
-            {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
-                {
-                    chunk = cXPos;
-                    position.X = 0;
-                } else
-                {
-                    wasReferenceFixable = false;
-                }
-            } else if(position.Z < 0)
-            {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
-                {
-                    chunk = cZNeg;
-                    position.Z = 15;
-                } else
-                {
-                    wasReferenceFixable = false;
-                }
-            } else if(position.Z > 15)
-            {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
-                {
-                    chunk = cZPos;
-                    position.Z = 0;
-                } else
-                {
-                    wasReferenceFixable = false;
-                }
-            }
-
-            return (position, chunk);
         }
     }
 }

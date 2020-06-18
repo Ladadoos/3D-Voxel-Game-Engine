@@ -5,121 +5,75 @@ namespace Minecraft
     struct Light
     {
         /* 0000 0000 0000 0000 0000 0000 0000 0000
-         * ---- ---- SSSS IIII IIII BBBB GGGG RRRR
-         * S = sun light occlusion, 4 bits, values between 0 and 15
-         * I = illumination (brightness), 1 byte, values between 0 and 255
-         * R = red color channel, 4 bits, values between 0 and 15
-         * G = green color channel, 4 bits, values between 0 and 15
-         * B = blue color channel, 4 bits, values between 0 and 15
-         */
-
+        *    II IIII SSSS SSBB BBBB GGGG GGRR RRRR
+        *  I = illumation, S = sunlight, RGB = red, green, blue block channel
+        */
         private uint storage;
 
         public uint GetStorage() => storage;
+
+        public Light(uint r, uint g, uint b, uint s, uint br) : this()
+        {
+            SetRedChannel(r);
+            SetGreenChannel(g);
+            SetBlueChannel(b);
+            SetSunlight(s);
+            SetBrightness(br);
+        }
 
         /*
          * Brightness
          */
         public void SetBrightness(uint brightness)
         {
-            if(brightness < 0 || brightness > 15)
+            if(brightness < 0 || brightness > 127)
                 throw new Exception("Invalid brightness of " + brightness);
-
-            storage = (storage & 0xFFF00FFF) | (brightness << 12);
+            storage = (storage & 0xC0FFFFFF) | (brightness << 24);
         }
-
-        public uint GetBrightness()
-        {
-            return (storage >> 12) & 0xFF;
-        }
-
-        public void ConvertAndSetBrightness(float brightness)
-        {
-            SetBrightness((uint)Maths.ConvertRange(0, 1, 0, 15, brightness));
-        }
+        public uint GetBrightness() => (storage >> 12) & 0xFF;
 
         /*
          * Red channel
          */
         public void SetRedChannel(uint redChannel)
         {
-            if(redChannel < 0 || redChannel > 15)
+            if(redChannel < 0 || redChannel > 127)
                 throw new Exception("Invalid red channel of " + redChannel);
-
-            storage = (storage & 0xFFFFFFF0) | redChannel;
+            storage = (storage & 0xFFFFFFC0) | redChannel;
         }
-
-        public uint GetRedChannel()
-        {
-            return storage & 0xF;
-        }
-
-        public void ConvertAndSetRedChannel(float redChannel)
-        {
-            SetRedChannel((uint)Maths.ConvertRange(0, 1, 0, 15, redChannel));
-        }
+        public uint GetRedChannel() => storage & 0x3F;
 
         /*
          * Green channel
          */
         public void SetGreenChannel(uint greenChannel)
         {
-            if(greenChannel < 0 || greenChannel > 15)
+            if(greenChannel < 0 || greenChannel > 127)
                 throw new Exception("Invalid green channel of " + greenChannel);
-
-            storage = (storage & 0xFFFFFF0F) | (greenChannel << 4);
+            storage = (storage & 0xFFFFF03F) | (greenChannel << 6);
         }
-
-        public uint GetGreenChannel()
-        {
-            return (storage >> 4) & 0xF;
-        }
-
-        public void ConvertAndSetGreenChannel(float greenChannel)
-        {
-            SetGreenChannel((uint)Maths.ConvertRange(0, 1, 0, 15, greenChannel));
-        }
+        public uint GetGreenChannel() => (storage >> 6) & 0x3F;
 
         /*
          * Blue channel
          */
         public void SetBlueChannel(uint blueChannel)
         {
-            if(blueChannel < 0 || blueChannel > 15)
+            if(blueChannel < 0 || blueChannel > 127)
                 throw new Exception("Invalid blue channel of " + blueChannel);
-
-            storage = (storage & 0xFFFFF0FF) | (blueChannel << 8);
+            storage = (storage & 0xFFFC0FFF) | (blueChannel << 12);
         }
-
-        public uint GetBlueChannel()
-        {
-            return (storage >> 8) & 0xF;
-        }
-
-        public void ConvertAndSetBlueChannel(float blueChannel)
-        {
-            SetBlueChannel((uint)Maths.ConvertRange(0, 1, 0, 15, blueChannel));
-        }
+        public uint GetBlueChannel() => (storage >> 12) & 0x3F;
 
         /*
         * Sun light
         */
         public void SetSunlight(uint brightness)
         {
-            if(brightness < 0 || brightness > 15)
-                throw new Exception("Invalid brightness of " + brightness);
-
-            storage = (storage & 0xFF0FFFFF) | (brightness << 20);
+            if(brightness < 0 || brightness > 127)
+                throw new Exception("Invalid sunlight of " + brightness);
+            storage = (storage & 0xFF03FFFF) | (brightness << 18);
         }
-
-        public uint GetSunlight()
-        {
-            return (storage >> 20) & 0xF;
-        }
-
-        public void ConvertAndSetSunlight(float brightness)
-        {
-            SetSunlight((uint)Maths.ConvertRange(0, 1, 0, 15, brightness));
-        }
+        public uint GetSunlight() => (storage >> 18) & 0x3F;
     }
 }

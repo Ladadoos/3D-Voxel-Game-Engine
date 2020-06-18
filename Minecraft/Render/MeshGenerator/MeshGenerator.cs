@@ -36,28 +36,47 @@ namespace Minecraft
 
         protected abstract ChunkBufferLayout GenerateMesh(World world, Chunk chunk);
 
-        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
+        private void AddVector3(Vector3 vec)
+        {
+            vertexPositions.Add(vec.X);
+            vertexPositions.Add(vec.Y);
+            vertexPositions.Add(vec.Z);
+        }
+
+        private void AddVector2(Vector2 vec)
+        {
+            textureUVs.Add(vec.X);
+            textureUVs.Add(vec.Y);
+        }
+
+        protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)
         {
             foreach (BlockFace face in toAddFaces)
             {
-                foreach (float uv in face.TextureCoords)
-                {
-                    textureUVs.Add(uv);
-                }
+                AddVector2(face.TextureCoords[0]);
+                AddVector2(face.TextureCoords[1]);
+                AddVector2(face.TextureCoords[2]);
+                AddVector2(face.TextureCoords[0]);
+                AddVector2(face.TextureCoords[2]);
+                AddVector2(face.TextureCoords[3]);
 
-                foreach (Vector3 modelSpacePosition in face.Positions)
-                {
-                    Vector3 world = modelSpacePosition.Plus(blockPos);
-                    vertexPositions.Add(world.X);
-                    vertexPositions.Add(world.Y);
-                    vertexPositions.Add(world.Z);
-                }
+                AddVector3(face.Positions[0].Plus(blockPos));
+                AddVector3(face.Positions[1].Plus(blockPos));
+                AddVector3(face.Positions[2].Plus(blockPos));
+                AddVector3(face.Positions[0].Plus(blockPos));
+                AddVector3(face.Positions[2].Plus(blockPos));
+                AddVector3(face.Positions[3].Plus(blockPos));
 
-                indicesCount += 4;
-                for(int i = 0; i < face.Positions.Length; i++)
-                {
-                    illuminations.Add(light.GetStorage());
-                }
+                indicesCount += 6;
+                if(face.Positions.Length != lights.Length)
+                    throw new System.Exception();
+
+                illuminations.Add(lights[0].GetStorage());
+                illuminations.Add(lights[1].GetStorage());
+                illuminations.Add(lights[2].GetStorage());
+                illuminations.Add(lights[0].GetStorage());
+                illuminations.Add(lights[2].GetStorage());
+                illuminations.Add(lights[3].GetStorage());
 
                 for(int i = 0; i < 4; i++)
                 {
@@ -68,38 +87,36 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
+        protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)
         {
-            foreach (BlockFace face in toAddFaces)
+            foreach(BlockFace face in toAddFaces)
             {
-                for (int i = 0; i < face.TextureCoords.Length; i += 4)
-                {
-                    textureUVs.Add(face.TextureCoords[i + 2]);
-                    textureUVs.Add(face.TextureCoords[i + 3]);
-                    textureUVs.Add(face.TextureCoords[i]);
-                    textureUVs.Add(face.TextureCoords[i + 1]);
-                }
+                AddVector2(face.TextureCoords[1]);
+                AddVector2(face.TextureCoords[0]);
+                AddVector2(face.TextureCoords[3]);
+                AddVector2(face.TextureCoords[1]);
+                AddVector2(face.TextureCoords[3]);
+                AddVector2(face.TextureCoords[2]);
 
-                for (int i = 0; i < face.Positions.Length; i += 2)
-                {
-                    Vector3 world = face.Positions[i + 1].Plus(blockPos);
-                    vertexPositions.Add(world.X);
-                    vertexPositions.Add(world.Y);
-                    vertexPositions.Add(world.Z);
+                AddVector3(face.Positions[1].Plus(blockPos));
+                AddVector3(face.Positions[0].Plus(blockPos));
+                AddVector3(face.Positions[3].Plus(blockPos));
+                AddVector3(face.Positions[1].Plus(blockPos));
+                AddVector3(face.Positions[3].Plus(blockPos));
+                AddVector3(face.Positions[2].Plus(blockPos));
 
-                    world = face.Positions[i].Plus(blockPos);
-                    vertexPositions.Add(world.X);
-                    vertexPositions.Add(world.Y);
-                    vertexPositions.Add(world.Z);
-                }
+                indicesCount += 6;
+                if(face.Positions.Length != lights.Length)
+                    throw new System.Exception();
 
-                indicesCount += 4;
-                for(int i = 0; i < face.Positions.Length; i++)
-                {
-                    illuminations.Add(light.GetStorage());
-                }
+                illuminations.Add(lights[1].GetStorage());
+                illuminations.Add(lights[0].GetStorage());
+                illuminations.Add(lights[3].GetStorage());
+                illuminations.Add(lights[1].GetStorage());
+                illuminations.Add(lights[3].GetStorage());
+                illuminations.Add(lights[2].GetStorage());
 
-                for (int i = 0; i < 4; i++)
+                for(int i = 0; i < 4; i++)
                 {
                     normals.Add(face.Normal.X);
                     normals.Add(face.Normal.Y);
@@ -108,10 +125,10 @@ namespace Minecraft
             }
         }
 
-        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, Light light)
+        protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)
         {
-            AddFacesToMeshFromFront(toAddFaces, blockPos, light);
-            AddFacesToMeshFromBack(toAddFaces, blockPos, light);
+            AddFacesToMeshFromFront(toAddFaces, blockPos, lights);
+            AddFacesToMeshFromBack(toAddFaces, blockPos, lights);
         }
     }
 }

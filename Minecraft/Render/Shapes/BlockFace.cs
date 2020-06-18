@@ -5,10 +5,10 @@ namespace Minecraft
     struct BlockFace
     {
         public Vector3[] Positions { get; private set; }
-        public float[] TextureCoords { get; private set; }
+        public Vector2[] TextureCoords { get; private set; }
         public Vector3 Normal { get; private set; }
 
-        public BlockFace(Vector3[] positions, float[] textureCoords)
+        public BlockFace(Vector3[] positions, Vector2[] textureCoords)
         {
             Positions = positions;
             TextureCoords = textureCoords;

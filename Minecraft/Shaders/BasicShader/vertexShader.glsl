@@ -22,10 +22,10 @@ void main()
 	position = vertexPosition;
 	normal = vertexNormal;
 
-	brightness  = ((vertexIllumination >> 12) & 0xFF) / 15.0F;
-	sunlight    = ((vertexIllumination >> 20) & 0xF)  / 15.0F;
-	float red   = (vertexIllumination         & 0xF)  / 15.0F;
-	float green = ((vertexIllumination >> 4)  & 0xF)  / 15.0F;
-	float blue  = ((vertexIllumination >> 8)  & 0xF)  / 15.0F;
+	brightness  = ((vertexIllumination >> 24) & 0x3F) / 64.0F;
+	sunlight    = ((vertexIllumination >> 18) & 0x3F) / 64.0F;
+	float red   = (vertexIllumination         & 0x3F) / 64.0F;
+	float green = ((vertexIllumination >> 6)  & 0x3F) / 64.0F;
+	float blue  = ((vertexIllumination >> 12) & 0x3F) / 64.0F;
 	rgbColor = vec3(red, green, blue);
 }

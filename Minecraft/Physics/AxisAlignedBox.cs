@@ -58,9 +58,9 @@ namespace Minecraft
             return float.MaxValue;
         }
 
+        private static Vector3[] allCorners = new Vector3[8];
         public Vector3[] GetAllCorners()
         {
-            Vector3[] allCorners = new Vector3[8];
             Vector3 deltaX = new Vector3(Max.X - Min.X, 0, 0);
             Vector3 deltaZ = new Vector3(0, 0, Max.Z - Min.Z);
 

@@ -33,6 +33,6 @@ void main()
    materialColor.y = convertRange(0, 1, 0, 1 - ambientColor.y, materialColor.y);
    materialColor.z = convertRange(0, 1, 0, 1 - ambientColor.z, materialColor.z);
 
-   fragmentColor = (materialColor + albedo * vec4(ambientColor, 1.0F))* brightness;
+   fragmentColor = (materialColor + albedo * vec4(ambientColor, 1.0F)) * brightness;
    normalDepthColor = vec4(normal, 1.0F);
 }

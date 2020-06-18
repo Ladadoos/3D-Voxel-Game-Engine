@@ -7,7 +7,7 @@ namespace Minecraft
         protected Vector3[] bladeOneFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1) };
         protected Vector3[] bladeTwoFace = new Vector3[] { new Vector3(1, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1), new Vector3(1, 1, 0) };
 
-        protected float[] uvBladeOne, uvBladeTwo;
+        protected Vector2[] uvBladeOne, uvBladeTwo;
 
         protected ScissorModel(TextureAtlas textureAtlas) : base(textureAtlas)
         {
@@ -55,11 +55,11 @@ namespace Minecraft
 
     class BlockModelWheat : ScissorModel
     {
-        private float[] uvBladeOneHalfMaturity;
-        private float[] uvBladeTwoHalfMaturity;
+        private Vector2[] uvBladeOneHalfMaturity;
+        private Vector2[] uvBladeTwoHalfMaturity;
 
-        private float[] uvBladeOneFullMaturity;
-        private float[] uvBladeTwoFullMaturity;
+        private Vector2[] uvBladeOneFullMaturity;
+        private Vector2[] uvBladeTwoFullMaturity;
 
         public BlockModelWheat(TextureAtlas textureAtlas) : base(textureAtlas) { }
 

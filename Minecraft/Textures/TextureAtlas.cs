@@ -12,17 +12,23 @@ namespace Minecraft
             cellUVSize = 1.0F / cellsPerRow;
         }
 
-        public float[] GetTextureCoords(float atlasGridX, float atlasGridY)
+        public Vector2[] GetTextureCoords(float atlasGridX, float atlasGridY)
         {
             float xMin = atlasGridX * cellUVSize;
             float yMin = atlasGridY * cellUVSize;
             float xMax = atlasGridX * cellUVSize + cellUVSize;
             float yMax = atlasGridY * cellUVSize + cellUVSize;
 
-            return new float[]{ xMax, yMax, xMin, yMax, xMin, yMin, xMax, yMin };
+            return new Vector2[]
+            {
+                new Vector2(xMax, yMax),
+                new Vector2(xMin, yMax),
+                new Vector2(xMin, yMin),
+                new Vector2(xMax, yMin)
+            };
         }
 
-        public float[] GetTextureCoords(Vector2 atlatGrid)
+        public Vector2[] GetTextureCoords(Vector2 atlatGrid)
         {
             return GetTextureCoords(atlatGrid.X, atlatGrid.Y);
         }

@@ -136,7 +136,7 @@ namespace Minecraft
                 }
                 chunkToRender.Value.HardBlocksModel.BindVAO();
                 basicShader.LoadMatrix(basicShader.Location_TransformationMatrix, chunkToRender.Value.TransformationMatrix);
-                GL.DrawArrays(PrimitiveType.Quads, 0, chunkToRender.Value.HardBlocksModel.IndicesCount);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, chunkToRender.Value.HardBlocksModel.IndicesCount);
             }
 
             entityShader.Start();

@@ -145,7 +145,7 @@ namespace Minecraft
             for(int i = Constants.NUM_SECTIONS_IN_CHUNKS - 1; i >= 0; i--)
             {
                 section = Sections[i];
-                if(section == null || (section != null && section.IsFullAir))
+                if(section == null || (section != null && section.IsFullTransparent))
                 {
                     lowestSection = (uint)i;
                 } else

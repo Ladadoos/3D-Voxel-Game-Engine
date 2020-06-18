@@ -1,25 +1,23 @@
-﻿using OpenTK;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     enum Direction : byte
     {
         Back = 0,  //Side facing negative Z
-        Right = 1, //Side facing negative X
+        Right = 1, //Side facing positive X
         Front = 2, //Side facing positive Z
-        Left = 3,  //Side facing positive X
+        Left = 3,  //Side facing negative X
         Top = 4,   //Side facing positive Y
         Bottom = 5 //Side facing negative Y
     };
 
     static class DirectionUtil
     {
-        private static Vector3 Back = new Vector3(0, 0, -1);
-        private static Vector3 Right = new Vector3(-1, 0, 0);
-        private static Vector3 Front = new Vector3(0, 0, 1);
-        private static Vector3 Left = new Vector3(1, 0, 0);
-        private static Vector3 Top = new Vector3(0, 1, 0);
-        private static Vector3 Bottom = new Vector3(0, -1, 0);
+        private static Vector3i Back = new Vector3i(0, 0, -1);
+        private static Vector3i Right = new Vector3i(1, 0, 0);
+        private static Vector3i Front = new Vector3i(0, 0, 1);
+        private static Vector3i Left = new Vector3i(-1, 0, 0);
+        private static Vector3i Top = new Vector3i(0, 1, 0);
+        private static Vector3i Bottom = new Vector3i(0, -1, 0);
 
         public static Direction Invert(Direction direction)
         {
@@ -35,7 +33,7 @@ namespace Minecraft
             }
         }
 
-        public static Vector3 ToUnit(Direction direction)
+        public static Vector3i ToUnit(Direction direction)
         {
             switch (direction)
             {
