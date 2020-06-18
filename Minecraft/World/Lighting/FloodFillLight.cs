@@ -38,6 +38,8 @@ namespace Minecraft
             }
         }
 
+        private static BlockPropagation blockPropagation = new BlockPropagation();
+
         public static Chunk[] RepairSunlightGridBlockRemoved(World world, Chunk chunk, Vector3i blockPos)
         {
             return RepairSunlightGridOnBlockAdded(world, chunk, blockPos, null);
@@ -141,6 +143,8 @@ namespace Minecraft
         {
             HashSet<Chunk> processedChunks = new HashSet<Chunk>();
 
+            blockPropagation.Begin();
+
             //Propagate light via BFS
             while(darkQueue.Count != 0)
             {
@@ -149,7 +153,7 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightRemoveNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = blockPropagation.FixReference(world, neighbourPositions[i],
                         lightRemoveNode.Chunk, out bool referenceFixable);
 
                     if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
@@ -184,6 +188,8 @@ namespace Minecraft
         {
             HashSet<Chunk> processedChunks = new HashSet<Chunk>();
 
+            blockPropagation.Begin();
+
             //Propagate light via BFS
             while(queue.Count != 0)
             {
@@ -199,7 +205,7 @@ namespace Minecraft
                     chunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = blockPropagation.FixReference(world, neighbourPositions[i],
                         lightAddNode.Chunk, out bool referenceFixable);
 
                     if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
@@ -317,6 +323,8 @@ namespace Minecraft
         {
             HashSet<Chunk> processedChunks = new HashSet<Chunk>();
 
+            blockPropagation.Begin();
+
             //Propagate light via BFS
             while(darkQueue.Count != 0)
             {
@@ -325,7 +333,7 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightRemoveNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = blockPropagation.FixReference(world, neighbourPositions[i],
                         lightRemoveNode.Chunk, out bool referenceFixable);
 
                     if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)
@@ -359,6 +367,8 @@ namespace Minecraft
         {
             HashSet<Chunk> processedChunks = new HashSet<Chunk>();
 
+            blockPropagation.Begin();
+
             //Propagate light via BFS
             while(lightQueue.Count != 0)
             {
@@ -371,7 +381,7 @@ namespace Minecraft
                 Vector3i[] neighbourPositions = lightAddNode.ChunkLocalPos.GetSurroundingPositions();
                 for(int i = 0; i < neighbourPositions.Length; i++)
                 {
-                    (Vector3i position, Chunk currentChunk) = BlockPropagation.FixReference(world, neighbourPositions[i],
+                    (Vector3i position, Chunk currentChunk) = blockPropagation.FixReference(world, neighbourPositions[i],
                         lightAddNode.Chunk, out bool referenceFixable);
 
                     if(!referenceFixable || currentChunk.GetBlockAt(position).GetBlock().IsOpaque)

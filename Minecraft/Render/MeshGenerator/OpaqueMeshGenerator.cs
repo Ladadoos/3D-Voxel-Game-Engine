@@ -25,6 +25,9 @@ namespace Minecraft
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg);
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos);
 
+            if(smoothLighting)
+                smoothLigher.Initialize();
+
             Light[] lightBuffer = new Light[4];
 
             for (int sectionHeight = 0; sectionHeight < chunk.Sections.Length; sectionHeight++)
@@ -234,28 +237,31 @@ namespace Minecraft
                                 BuildMeshForSide(Direction.Bottom, state, localChunkBlockPos, worldBlockPos, blockModel, lightBuffer);
                             }
 
-                            Light lightAlwaysyVisibleFaces = new Light();
-                            if(!state.GetBlock().IsOpaque)
+                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, worldBlockPos);
+                            if(faces.Length != 0)
                             {
-                                lightAlwaysyVisibleFaces = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
-                            } else if(numAverages != 0)
-                            {
-                                lightAlwaysyVisibleFaces.SetRedChannel((uint)(averageRed / numAverages * 4));
-                                lightAlwaysyVisibleFaces.SetGreenChannel((uint)(averageGreen / numAverages * 4));
-                                lightAlwaysyVisibleFaces.SetBlueChannel((uint)(averageBlue / numAverages * 4));
-                            }
-                            lightAlwaysyVisibleFaces.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z) * 4);
-                            lightAlwaysyVisibleFaces.SetBrightness(16 * 4 - 1);
+                                Light lightAlwaysyVisibleFaces = new Light();
+                                if(!state.GetBlock().IsOpaque)
+                                {
+                                    lightAlwaysyVisibleFaces = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
+                                } else if(numAverages != 0)
+                                {
+                                    lightAlwaysyVisibleFaces.SetRedChannel((uint)(averageRed / numAverages * 4));
+                                    lightAlwaysyVisibleFaces.SetGreenChannel((uint)(averageGreen / numAverages * 4));
+                                    lightAlwaysyVisibleFaces.SetBlueChannel((uint)(averageBlue / numAverages * 4));
+                                }
+                                lightAlwaysyVisibleFaces.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z) * 4);
+                                lightAlwaysyVisibleFaces.SetBrightness(16 * 4 - 1);
 
-                            for(int i = 0; i < 4; i++) lightBuffer[i] = lightAlwaysyVisibleFaces;
+                                for(int i = 0; i < 4; i++) lightBuffer[i] = lightAlwaysyVisibleFaces;
 
-                            BlockFace[] faces = blockModel.GetAlwaysVisibleFaces(state, worldBlockPos);                           
-                            if(blockModel.DoubleSidedFaces)
-                            {
-                                AddFacesToMeshDualSided(faces, localChunkBlockPos, lightBuffer);
-                            } else
-                            {
-                                AddFacesToMeshFromFront(faces, localChunkBlockPos, lightBuffer);
+                                if(blockModel.DoubleSidedFaces)
+                                {
+                                    AddFacesToMeshDualSided(faces, localChunkBlockPos, lightBuffer);
+                                } else
+                                {
+                                    AddFacesToMeshFromFront(faces, localChunkBlockPos, lightBuffer);
+                                }
                             }
                         }
                     }
