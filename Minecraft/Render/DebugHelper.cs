@@ -90,7 +90,7 @@ namespace Minecraft
                         Vector2 chunkPos = World.GetChunkPosition(game.ClientPlayer.Position.X, game.ClientPlayer.Position.Z);
                         if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
                         {
-                            game.Client.WritePacket(new PlaceBlockPacket(Blocks.Tnt.GetNewDefaultState(),
+                            game.Client.WritePacket(new PlaceBlockPacket(Blocks.GetState(Blocks.Tnt),
                              new Vector3i(x + 16 * chunk.GridX, (int)game.ClientPlayer.Position.Y + 4, z + 16 * chunk.GridZ)));
                         }                       
                     }
@@ -101,7 +101,7 @@ namespace Minecraft
                 {
                     for(int z = 0; z < 8; z++)
                     {
-                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.GetState(Blocks.Grass),
                              new Vector3i(x, 2, z) + new Vector3i(game.ClientPlayer.Position)));
                     }
                 }
@@ -114,7 +114,7 @@ namespace Minecraft
                         {
                             if(x == 0 || z == 0 || x == 7 || z == 7)
                             {
-                                game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                                game.Client.WritePacket(new PlaceBlockPacket(Blocks.GetState(Blocks.Grass),
                                  new Vector3i(x, 2 + y, z) + new Vector3i(game.ClientPlayer.Position)));
                             }
                         }
@@ -125,7 +125,7 @@ namespace Minecraft
                 {
                     for(int z = 0; z < 8; z++)
                     {
-                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.Grass.GetNewDefaultState(),
+                        game.Client.WritePacket(new PlaceBlockPacket(Blocks.GetState(Blocks.Grass),
                              new Vector3i(x, 9, z) + new Vector3i(game.ClientPlayer.Position)));
                     }
                 }

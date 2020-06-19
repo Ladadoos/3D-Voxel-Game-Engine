@@ -23,9 +23,9 @@ namespace Minecraft
             return Writer.Flush();
         }
 
-        public Packet ReadPacket()
+        public Packet ReadPacket(Session session)
         {
-            return packetFactory.ReadPacket(this);
+            return packetFactory.ReadPacket(session);
         }
     }
 }

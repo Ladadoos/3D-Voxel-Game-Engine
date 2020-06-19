@@ -8,9 +8,9 @@ namespace Minecraft
 {
     class PacketFactory
     {
-        public Packet ReadPacket(Connection connection)
+        public Packet ReadPacket(Session session)
         {
-            BinaryReader reader = connection.Reader;
+            BinaryReader reader = session.Connection.Reader;
 
             int packetType = reader.ReadInt32();
             PacketType type = (PacketType)packetType;
@@ -29,7 +29,7 @@ namespace Minecraft
                         int byteSize = reader.ReadInt32();
                         ushort blockId = reader.ReadUInt16();
                         byte[] bytes = reader.ReadBytes(byteSize);
-                        BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
+                        BlockState blockState = Blocks.GetState(Blocks.GetBlockFromIdentifier(blockId));
                         int head = 0;
                         blockState.ExtractFromByteStream(bytes, ref head);
                         return new PlaceBlockPacket(blockState, blockPos);
@@ -47,7 +47,9 @@ namespace Minecraft
                 case PacketType.ChunkData:
                     {
                         int head = 0;
-                        Chunk chunk = DataConverter.BytesToChunk(reader.ReadBytes(reader.ReadInt32()), ref head);
+                        int chunkByteSize = reader.ReadInt32();
+                        byte[] chunkBytes = reader.ReadBytes(chunkByteSize);
+                        Chunk chunk = DataConverter.BytesToChunk(chunkBytes, session.Player.World, ref head);
                         return new ChunkDataPacket(chunk);
                     }
                 case PacketType.ChunkUnload:

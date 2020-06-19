@@ -9,6 +9,7 @@
         {
             IsTickable = true;
             IsOpaque = false;
+            HasCustomState = true;
         }
 
         public override BlockState GetNewDefaultState()
@@ -35,7 +36,7 @@
                 originalWheat.elapsedTimeSinceLastGrowth = 0;
 
                 world.QueueToRemoveBlockAt(blockPos);
-                BlockStateWheat newWheat = (BlockStateWheat)Blocks.Wheat.GetNewDefaultState();
+                BlockStateWheat newWheat = (BlockStateWheat)Blocks.GetState(Blocks.Wheat);
                 newWheat.maturity = (ushort)(originalWheat.maturity + 1);
                 world.QueueToAddBlockAt(blockPos, newWheat);
             }

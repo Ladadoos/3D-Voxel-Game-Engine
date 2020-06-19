@@ -8,6 +8,7 @@ namespace Minecraft
         {
             IsTickable = true;
             IsInteractable = true;
+            HasCustomState = true;
         }
 
         public override BlockState GetNewDefaultState()

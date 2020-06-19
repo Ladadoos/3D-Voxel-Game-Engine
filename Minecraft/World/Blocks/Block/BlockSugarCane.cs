@@ -9,6 +9,7 @@
         {
             IsTickable = true;
             IsOpaque = false;
+            HasCustomState = true;
         }
 
         public override BlockState GetNewDefaultState()

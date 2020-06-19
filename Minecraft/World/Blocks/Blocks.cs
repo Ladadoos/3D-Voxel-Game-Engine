@@ -4,9 +4,15 @@ namespace Minecraft
 {
     class Blocks
     {
-        public static readonly Block Air = new BlockAir(1);
-        public static readonly BlockState AirState = Air.GetNewDefaultState();
+        public static BlockState GetState(Block block)
+        {
+            if(block.HasCustomState)
+                return block.GetNewDefaultState();
+            int arrayId = block.ID - 1;
+            return defaultStates[arrayId];
+        }
 
+        public static readonly Block Air = new BlockAir(1);
         public static readonly Block Dirt = new BlockDirt(2);
         public static readonly Block Stone = new BlockStone(3);
         public static readonly Block Flower = new BlockFlower(4);
@@ -23,12 +29,13 @@ namespace Minecraft
         public static readonly Block OakLeaves = new BlockOakLeaves(15);
         public static readonly Block Gravel = new BlockGravel(16);
 
-        public static int Count { get { return registeredBlocks.Count; } }
-        private static List<Block> registeredBlocks;
+        public static int Count { get { return registeredBlocks.Length; } }
+        private static Block[] registeredBlocks;
+        private static BlockState[] defaultStates;
 
         public static void RegisterBlocks()
         {
-            registeredBlocks = new List<Block>()
+            List<Block> blocks = new List<Block>()
             {
                 Air,
                 Dirt,
@@ -47,15 +54,19 @@ namespace Minecraft
                 OakLeaves,
                 Gravel
             };
+
+            registeredBlocks = blocks.ToArray();
+            defaultStates = new BlockState[registeredBlocks.Length];
+            for(int i = 0; i < registeredBlocks.Length; i++)
+                defaultStates[i] = blocks[i].GetNewDefaultState();
         }
 
         public static Block GetBlockFromIdentifier(int id)
         {
             id--;
-            if (id < 0 || id >= registeredBlocks.Count)
-            {
+            if (id < 0 || id >= registeredBlocks.Length)
                 throw new System.Exception("Invalid id: " + id);
-            }
+
             return registeredBlocks[id];
         }
     }

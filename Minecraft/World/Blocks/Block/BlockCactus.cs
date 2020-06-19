@@ -5,6 +5,7 @@
         public BlockCactus(ushort id) : base(id)
         {
             IsOpaque = false;
+            HasCustomState = true;
         }
 
         public override BlockState GetNewDefaultState()

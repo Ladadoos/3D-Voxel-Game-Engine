@@ -22,7 +22,7 @@ namespace Minecraft
             OnBlockRemovedHandler += OnBlockRemovedServer;
             OnEntityDespawnedHandler += OnEntityDespawnedServer;
 
-            worldGenerator = new WorldGenerator();
+            worldGenerator = new WorldGenerator(this);
             LoadSpawnArea();
         }
 
@@ -75,7 +75,7 @@ namespace Minecraft
             {
                 for(int zOffset = -platformSize; zOffset < platformSize; zOffset++)
                 {
-                    QueueToAddBlockAt(new Vector3i(x + xOffset, worldGenerator.SeaLevel, z + zOffset), Blocks.Stone.GetNewDefaultState());
+                    QueueToAddBlockAt(new Vector3i(x + xOffset, worldGenerator.SeaLevel, z + zOffset), Blocks.GetState(Blocks.Stone));
                 }
             }
 

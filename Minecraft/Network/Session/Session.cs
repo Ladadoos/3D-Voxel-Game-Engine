@@ -13,7 +13,7 @@ namespace Minecraft
         public Player Player { get; private set; }
         public INetHandler NetHandler { get; private set; }
         public PlayerSettings PlayerSettings { get; private set; }
-        private readonly Connection connection;
+        public Connection Connection { get; private set; }
 
         private SessionState state;
         public SessionState State {
@@ -33,7 +33,7 @@ namespace Minecraft
 
         protected Session(Connection connection, INetHandler netHandler)
         {
-            this.connection = connection;
+            this.Connection = connection;
             NetHandler = netHandler;
             Player = Player;
 
@@ -60,7 +60,7 @@ namespace Minecraft
             return IsChunkVisible(World.GetChunkPosition(blockPos.X, blockPos.Z));
         }
 
-        public bool NetDataAvailable() => connection.NetStream.DataAvailable;
+        public bool NetDataAvailable() => Connection.NetStream.DataAvailable;
 
         public bool WritePacket(Packet packet)
         {
@@ -70,7 +70,7 @@ namespace Minecraft
                 return false;
             }
 
-            if (!connection.WritePacket(packet))
+            if (!Connection.WritePacket(packet))
             {
                 State = SessionState.Closed;
                 return false;
@@ -80,12 +80,12 @@ namespace Minecraft
 
         public Packet ReadPacket()
         {
-            return connection.ReadPacket();
+            return Connection.ReadPacket(this);
         }
 
         public void Close()
         {
-            connection.Close();
+            Connection.Close();
         }
     }
 }

@@ -5,10 +5,14 @@ namespace Minecraft
 {
     abstract class MeshGenerator
     {
-        protected List<float> vertexPositions = new List<float>();
-        protected List<float> textureUVs = new List<float>();
-        protected List<uint> illuminations = new List<uint>();
-        protected List<float> normals = new List<float>();
+        protected float[] vertexPositions = new float[1048576];
+        protected int positionPointer = 0;
+        protected float[] vertexUVs = new float[1048576];
+        protected int uvsPointer = 0;
+        protected uint[] vertexLights = new uint[1048576];
+        protected int lightsPointer = 0;
+        protected float[] vertexNormals = new float[1048576];
+        protected int normalPointer = 0;
         protected int indicesCount;
 
         protected readonly BlockModelRegistry blockModelRegistry;
@@ -20,10 +24,10 @@ namespace Minecraft
 
         protected void ClearData()
         {
-            vertexPositions.Clear();
-            textureUVs.Clear();
-            illuminations.Clear();
-            normals.Clear();
+            positionPointer = 0;
+            uvsPointer = 0;
+            lightsPointer = 0;
+            normalPointer = 0;
             indicesCount = 0;
         }
 
@@ -38,91 +42,59 @@ namespace Minecraft
 
         private void AddVector3(Vector3 vec)
         {
-            vertexPositions.Add(vec.X);
-            vertexPositions.Add(vec.Y);
-            vertexPositions.Add(vec.Z);
+            vertexPositions[positionPointer++] = vec.X;
+            vertexPositions[positionPointer++] = vec.Y;
+            vertexPositions[positionPointer++] = vec.Z;
         }
 
         private void AddVector2(Vector2 vec)
         {
-            textureUVs.Add(vec.X);
-            textureUVs.Add(vec.Y);
+            vertexUVs[uvsPointer++] = vec.X;
+            vertexUVs[uvsPointer++] = vec.Y;
         }
 
         protected void AddFacesToMeshFromFront(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)
         {
-            foreach (BlockFace face in toAddFaces)
-            {
-                AddVector2(face.TextureCoords[0]);
-                AddVector2(face.TextureCoords[1]);
-                AddVector2(face.TextureCoords[2]);
-                AddVector2(face.TextureCoords[0]);
-                AddVector2(face.TextureCoords[2]);
-                AddVector2(face.TextureCoords[3]);
-
-                AddVector3(face.Positions[0].Plus(blockPos));
-                AddVector3(face.Positions[1].Plus(blockPos));
-                AddVector3(face.Positions[2].Plus(blockPos));
-                AddVector3(face.Positions[0].Plus(blockPos));
-                AddVector3(face.Positions[2].Plus(blockPos));
-                AddVector3(face.Positions[3].Plus(blockPos));
-
-                indicesCount += 6;
-                if(face.Positions.Length != lights.Length)
-                    throw new System.Exception();
-
-                illuminations.Add(lights[0].GetStorage());
-                illuminations.Add(lights[1].GetStorage());
-                illuminations.Add(lights[2].GetStorage());
-                illuminations.Add(lights[0].GetStorage());
-                illuminations.Add(lights[2].GetStorage());
-                illuminations.Add(lights[3].GetStorage());
-
-                for(int i = 0; i < 4; i++)
-                {
-                    normals.Add(face.Normal.X);
-                    normals.Add(face.Normal.Y);
-                    normals.Add(face.Normal.Z);
-                }
-            }
+            foreach(BlockFace face in toAddFaces)
+                AddFace(face, blockPos, lights, 0, 1, 2, 0, 2, 3);
         }
 
         protected void AddFacesToMeshFromBack(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)
         {
             foreach(BlockFace face in toAddFaces)
-            {
-                AddVector2(face.TextureCoords[1]);
-                AddVector2(face.TextureCoords[0]);
-                AddVector2(face.TextureCoords[3]);
-                AddVector2(face.TextureCoords[1]);
-                AddVector2(face.TextureCoords[3]);
-                AddVector2(face.TextureCoords[2]);
+                AddFace(face, blockPos, lights, 1, 0, 3, 1, 3, 2);
+        }
 
-                AddVector3(face.Positions[1].Plus(blockPos));
-                AddVector3(face.Positions[0].Plus(blockPos));
-                AddVector3(face.Positions[3].Plus(blockPos));
-                AddVector3(face.Positions[1].Plus(blockPos));
-                AddVector3(face.Positions[3].Plus(blockPos));
-                AddVector3(face.Positions[2].Plus(blockPos));
+        private void AddFace(BlockFace face, Vector3i blockPos, Light[] lights, int v1, int v2, int v3, int v4, int v5, int v6)
+        {
+            AddVector2(face.TextureCoords[v1]);
+            AddVector2(face.TextureCoords[v2]);
+            AddVector2(face.TextureCoords[v3]);
+            AddVector2(face.TextureCoords[v4]);
+            AddVector2(face.TextureCoords[v5]);
+            AddVector2(face.TextureCoords[v6]);
 
-                indicesCount += 6;
-                if(face.Positions.Length != lights.Length)
-                    throw new System.Exception();
+            AddVector3(face.Positions[v1].Plus(blockPos));
+            AddVector3(face.Positions[v2].Plus(blockPos));
+            AddVector3(face.Positions[v3].Plus(blockPos));
+            AddVector3(face.Positions[v4].Plus(blockPos));
+            AddVector3(face.Positions[v5].Plus(blockPos));
+            AddVector3(face.Positions[v6].Plus(blockPos));
 
-                illuminations.Add(lights[1].GetStorage());
-                illuminations.Add(lights[0].GetStorage());
-                illuminations.Add(lights[3].GetStorage());
-                illuminations.Add(lights[1].GetStorage());
-                illuminations.Add(lights[3].GetStorage());
-                illuminations.Add(lights[2].GetStorage());
+            indicesCount += 6;
+            if(face.Positions.Length != lights.Length)
+                throw new System.Exception();
 
-                for(int i = 0; i < 4; i++)
-                {
-                    normals.Add(face.Normal.X);
-                    normals.Add(face.Normal.Y);
-                    normals.Add(face.Normal.Z);
-                }
-            }
+            vertexLights[lightsPointer++] = lights[v1].GetStorage();
+            vertexLights[lightsPointer++] = lights[v2].GetStorage();
+            vertexLights[lightsPointer++] = lights[v3].GetStorage();
+            vertexLights[lightsPointer++] = lights[v4].GetStorage();
+            vertexLights[lightsPointer++] = lights[v5].GetStorage();
+            vertexLights[lightsPointer++] = lights[v6].GetStorage();
+
+            vertexNormals[normalPointer++] = face.Normal.X;
+            vertexNormals[normalPointer++] = face.Normal.Y;
+            vertexNormals[normalPointer++] = face.Normal.Z;
         }
 
         protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights)

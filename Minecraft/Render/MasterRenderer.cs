@@ -9,10 +9,14 @@ namespace Minecraft
 {
     class ChunkBufferLayout
     {
-        public float[] positions;
-        public float[] textureCoordinates;
-        public uint[] lights;
-        public float[] normals;
+        public float[] vertexPositions;
+        public int positionsPointer;
+        public float[] vertexUVs;
+        public int uvsPointer;
+        public uint[] vertexLights;
+        public int lightsPointer;
+        public float[] vertexNormals;
+        public int normalsPointer;
         public int indicesCount;
     }
 
@@ -54,8 +58,11 @@ namespace Minecraft
         private readonly LinkedList<Chunk> toRemeshChunksQueue = new LinkedList<Chunk>();
         private readonly HashSet<Chunk> toRemeshChunksSet = new HashSet<Chunk>();
 
-        //The meshes of chunks that have been generated and are awaiting to be handled and added to the rendering chunks
-        private readonly List<ChunkRemeshLayout> availableChunkMeshes = new List<ChunkRemeshLayout>();
+        //The new mesh for a chunk that is ready to be rendered. This may only be one at a time
+        //so that large arrays do not have to be copied and so that they can all reference
+        //so the same array which is constantly reused.
+        private ChunkRemeshLayout availableChunkMesh;
+        private bool chunkAvailableToRemesh;
 
         private readonly object meshLock = new object();
         private readonly Thread meshGenerationThread;
@@ -192,7 +199,7 @@ namespace Minecraft
 
                 lock (meshLock)
                 {
-                    if(toRemeshChunksQueue.Count <= 0)
+                    if(toRemeshChunksQueue.Count <= 0 || chunkAvailableToRemesh)
                         continue;
 
                     Chunk chunk = toRemeshChunksQueue.First.Value;
@@ -200,12 +207,13 @@ namespace Minecraft
                     if(!toRemeshChunksSet.Remove(chunk))
                         throw new Exception();
 
-                    //Generate the mesh for the chunk and add it to the queue to be used later
-                    availableChunkMeshes.Add(new ChunkRemeshLayout()
+                    //Generate the mesh for the chunk
+                    availableChunkMesh = new ChunkRemeshLayout()
                     {
                         chunkGridPosition = new Vector2(chunk.GridX, chunk.GridZ),
                         chunkLayout = blocksMeshGenerator.GenerateMeshFor(game.World, chunk)
-                    });
+                    };
+                    chunkAvailableToRemesh = true;
                 }
             }
         }
@@ -218,38 +226,23 @@ namespace Minecraft
 
         private void RemeshChunkIfMeshAvailable()
         {
-            const int meshesPerFrame = 2;
-            for(int i = 0; i < meshesPerFrame; i++)
+            lock(meshLock)
             {
-                bool foundChunkToRemesh = false;
-                ChunkRemeshLayout chunkMesh = new ChunkRemeshLayout();
+                if(!chunkAvailableToRemesh)
+                    return;
 
-                lock(meshLock)
+                ChunkRemeshLayout chunkMesh = availableChunkMesh;
+                if(toRenderChunks.TryGetValue(chunkMesh.chunkGridPosition, out RenderChunk renderChunk))
                 {
-                    if(availableChunkMeshes.Count > 0)
-                    {
-                        chunkMesh = availableChunkMeshes[0];
-                        availableChunkMeshes.RemoveAt(0);
-                        foundChunkToRemesh = true;
-                    }
-                }
-
-                if(foundChunkToRemesh)
-                {
-                    if(toRenderChunks.TryGetValue(chunkMesh.chunkGridPosition, out RenderChunk renderChunk))
-                    {
-                        renderChunk.HardBlocksModel.CleanUp();
-                    } else
-                    {
-                        renderChunk = new RenderChunk((int)chunkMesh.chunkGridPosition.X, (int)chunkMesh.chunkGridPosition.Y);
-                        toRenderChunks.Add(chunkMesh.chunkGridPosition, renderChunk);
-                    }
-
-                    renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+                    renderChunk.HardBlocksModel.CleanUp();
                 } else
                 {
-                    break;
+                    renderChunk = new RenderChunk((int)chunkMesh.chunkGridPosition.X, (int)chunkMesh.chunkGridPosition.Y);
+                    toRenderChunks.Add(chunkMesh.chunkGridPosition, renderChunk);
                 }
+
+                renderChunk.HardBlocksModel = new VAOModel(chunkMesh.chunkLayout);
+                chunkAvailableToRemesh = false;
             }
         }
 
@@ -458,7 +451,9 @@ namespace Minecraft
                     if(!toRemeshChunksQueue.Remove(chunk))
                         throw new Exception();
                 }
-                availableChunkMeshes.RemoveAll(m => m.chunkGridPosition == chunkPos);
+
+                if(chunkAvailableToRemesh && availableChunkMesh.chunkGridPosition == chunkPos)
+                    chunkAvailableToRemesh = false;
             }
             toRenderChunks.Remove(chunkPos);
             MeshNeighbourChunks(world, chunk);

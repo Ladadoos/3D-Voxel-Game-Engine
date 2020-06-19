@@ -25,9 +25,6 @@ namespace Minecraft
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg);
             world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos);
 
-            if(smoothLighting)
-                smoothLigher.Initialize();
-
             Light[] lightBuffer = new Light[4];
 
             for (int sectionHeight = 0; sectionHeight < chunk.Sections.Length; sectionHeight++)
@@ -270,10 +267,14 @@ namespace Minecraft
 
             return new ChunkBufferLayout()
             {
-                positions = vertexPositions.ToArray(),
-                textureCoordinates = textureUVs.ToArray(),
-                lights = illuminations.ToArray(),
-                normals = normals.ToArray(),
+                vertexPositions = vertexPositions,
+                positionsPointer = positionPointer,
+                vertexUVs = vertexUVs,
+                uvsPointer = uvsPointer,
+                vertexLights = vertexLights,
+                lightsPointer = lightsPointer,
+                vertexNormals = vertexNormals,
+                normalsPointer = normalPointer,
                 indicesCount = indicesCount
             };                   
         }

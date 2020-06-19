@@ -4,8 +4,6 @@ namespace Minecraft
 {
     class SmoothLighting
     {
-        private BlockPropagation blockPropagation = new BlockPropagation();
-
         private Corner[] cornerTop = new Corner[] { Corner.BottomLeft, Corner.BottomRight, Corner.TopRight, Corner.TopLeft };
         private Corner[] cornerBottom = new Corner[] { Corner.TopLeft, Corner.TopRight, Corner.BottomRight, Corner.BottomLeft };
         private Corner[] cornerRight = new Corner[] { Corner.BottomRight, Corner.BottomLeft, Corner.TopLeft, Corner.TopRight };
@@ -24,11 +22,6 @@ namespace Minecraft
             }
         }
 
-        public void Initialize()
-        {
-            blockPropagation.Begin();
-        }
-
         private (Chunk, Vector3i)[] blockBuffer = new (Chunk, Vector3i)[4];
         private Light[] lighBuffer = new Light[4];
         public Light[] GetLightsAt(World world, Chunk chunk, int localX, int worldY, int localZ, Direction dir)
@@ -37,7 +30,7 @@ namespace Minecraft
 
             Block blockSource = null;
             bool sideSource = true;
-            var (pPos, pChunk) = blockPropagation.FixReference(world, anchor, chunk, out bool pWasFixed);
+            var (pPos, pChunk) = BlockPropagation.FixReference(world, anchor, chunk, out bool pWasFixed);
             if(!pWasFixed)
             {
                 blockBuffer[0] = (null, pPos);
@@ -62,7 +55,7 @@ namespace Minecraft
                 int i = 1;
                 foreach(Vector3i target in GetTargets(world, chunk, anchor, dir, corner))
                 {
-                    var (fPos, fChunk) = blockPropagation.FixReference(world, target, chunk, out bool wasFixed);
+                    var (fPos, fChunk) = BlockPropagation.FixReference(world, target, chunk, out bool wasFixed);
                     if(!wasFixed)
                         blockBuffer[i] = (null, fPos);
                     else

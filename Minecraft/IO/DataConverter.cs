@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Minecraft
 {
@@ -54,12 +55,16 @@ namespace Minecraft
             return new Vector3i(x, y, z);
         }
 
-        public static Chunk BytesToChunk(byte[] bytes, ref int head)
+        public static Chunk BytesToChunk(byte[] bytes, World world, ref int head)
         {
+            if(world == null)
+                throw new NotImplementedException();
+
             int gridX = BytesToInt32(bytes, ref head);
             int gridZ = BytesToInt32(bytes, ref head);
 
-            Chunk chunk = new Chunk(gridX, gridZ);
+            Chunk chunk = world.ChunkPool.GetObject();
+            chunk.ResetAndAssign(gridX, gridZ);
 
             for(int i = 0; i < Constants.NUM_SECTIONS_IN_CHUNKS; i++)
             {
@@ -75,7 +80,7 @@ namespace Minecraft
                                 ushort blockId = BytesToUInt16(bytes, ref head);
                                 if(blockId != 0)
                                 {
-                                    BlockState blockState = Blocks.GetBlockFromIdentifier(blockId).GetNewDefaultState();
+                                    BlockState blockState = Blocks.GetState(Blocks.GetBlockFromIdentifier(blockId));
                                     blockState.ExtractFromByteStream(bytes, ref head);
                                     chunk.AddBlockAt(x, i * 16 + y, z, blockState);
                                 }

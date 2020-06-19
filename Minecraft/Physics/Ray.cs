@@ -2,7 +2,7 @@
 
 namespace Minecraft
 {
-    class Ray
+    struct Ray
     {
         public Vector3 Origin { get; private set; }
         public Vector3 Direction { get; private set; }
@@ -21,7 +21,7 @@ namespace Minecraft
         {
             Vector3 position = Origin;
             Vector3 offset = Direction / 50;
-            BlockState hitBlockState = Blocks.AirState;
+            BlockState hitBlockState = Blocks.GetState(Blocks.Air);
             for (int i = 0; i < 200; i++)
             {
                 position += offset;

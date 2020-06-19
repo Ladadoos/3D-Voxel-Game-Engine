@@ -19,6 +19,44 @@ namespace Minecraft
             GridZ = gridZ;
         }
 
+        public Chunk() { }
+
+        public void ResetAndAssign(int gridX, int gridZ)
+        {
+            //Reset
+            TickableBlocks.Clear();
+            LightSourceBlocks.Clear();
+
+            for(int h = 0; h < Constants.NUM_SECTIONS_IN_CHUNKS; h++)
+            {
+                Section section = Sections[h];
+                if(section == null)
+                    continue;
+
+                for(int x = 0; x < 16; x++)
+                    for(int y = 0; y < 16; y++)
+                        for(int z = 0; z < 16; z++)
+                            section.RemoveBlockAt(x, y, z);
+            }
+
+            LightMap.ClearSunlightMap();
+
+            for(int x = 0; x < 16; x++)
+                for(int y = 0; y < 16; y++)
+                    TopMostBlocks[x, y] = 0;
+
+            //Assign
+            GridX = gridX;
+            GridZ = gridZ;
+
+            for(int h = 0; h < Constants.NUM_SECTIONS_IN_CHUNKS; h++)
+            {
+                Section section = Sections[h];
+                if(section != null)
+                    section.SetChunkCoordinates(GridX, gridZ);
+            }
+        }
+
         public override string ToString()
         {
             return "Chunk[" + GridX + "," + GridZ + "]";
@@ -41,19 +79,19 @@ namespace Minecraft
         {
             if(localPos.Y < 0 || localPos.Y >= Constants.MAX_BUILD_HEIGHT)
             {
-                return Blocks.AirState;
+                return Blocks.GetState(Blocks.Air);
             }
 
             int sectionHeight = localPos.Y / 16;
             if(Sections[sectionHeight] == null)
             {
-                return Blocks.AirState;
+                return Blocks.GetState(Blocks.Air);
             }
 
             BlockState block = Sections[sectionHeight].GetBlockAt(localPos.X, localPos.Y & 15, localPos.Z);
             if(block == null)
             {
-                return Blocks.AirState;
+                return Blocks.GetState(Blocks.Air);
             }
             return block;
         }

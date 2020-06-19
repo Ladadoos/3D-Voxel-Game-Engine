@@ -29,10 +29,10 @@ namespace Minecraft
             IndicesCount = chunkLayout.indicesCount;
             CreateVAO();
             BindVAO();
-            CreateVBO(3, chunkLayout.positions);
-            CreateVBO(3, chunkLayout.normals);
-            CreateVBO(2, chunkLayout.textureCoordinates);
-            CreateVBO(1, chunkLayout.lights);
+            CreateVBO(3, chunkLayout.vertexPositions, chunkLayout.positionsPointer);
+            CreateVBO(3, chunkLayout.vertexNormals, chunkLayout.normalsPointer);
+            CreateVBO(2, chunkLayout.vertexUVs, chunkLayout.uvsPointer);
+            CreateVBO(1, chunkLayout.vertexLights, chunkLayout.lightsPointer);
             UnbindVAO();
         }
 
@@ -79,7 +79,7 @@ namespace Minecraft
         /// Creates a vertex bufffer object and buffers the given float values. The integer specifies the number of elements in the datastructure.
         /// A Vector3 would for example have this integer set to 3 (X, Y, Z)
         /// </summary>
-        private void CreateVBO<T>(int nrOfElementsInStructure, T[] data) where T : struct
+        private void CreateVBO<T>(int nrOfElementsInStructure, T[] data, int overrideLength = -1) where T : struct
         {
             VertexAttribPointerType dataType = VertexAttribPointerType.Float;
             if(typeof(T) == typeof(Light) || typeof(T) == typeof(uint))
@@ -90,7 +90,12 @@ namespace Minecraft
 
             int vboID = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboID);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * SizeOf<T>()), data, BufferUsageHint.StaticDraw);
+
+            if(overrideLength == -1)
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(data.Length * SizeOf<T>()), data, BufferUsageHint.StaticDraw);
+            else
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(overrideLength * SizeOf<T>()), data, BufferUsageHint.StaticDraw);
+
             GL.VertexAttribPointer(buffers.Count, nrOfElementsInStructure, dataType, false, 0, 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.EnableVertexAttribArray(buffers.Count);

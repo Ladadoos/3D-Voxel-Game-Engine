@@ -37,13 +37,17 @@ namespace Minecraft
         private const int activeBiomes = 3;
         public readonly int SeaLevel = 62;
 
+        private WorldServer world;
+
         private readonly object generationLock = new object();
         private readonly Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>> chunkGenerationRequests = new Dictionary<Tuple<World, Vector2>, List<GenerateChunkRequest>>();
         private readonly Queue<GenerateChunkRequest> chunkGenerationOrder = new Queue<GenerateChunkRequest>();
         private readonly Thread terrainGeneratorThread;
 
-        public WorldGenerator()
+        public WorldGenerator(WorldServer world)
         {
+            this.world = world;
+
             registeredBiomes = new Biome[activeBiomes]
             {
                 mountainBiome,
@@ -131,7 +135,8 @@ namespace Minecraft
 
         public Chunk GenerateBlocksForChunkAt(int chunkX, int chunkY)
         {
-            Chunk chunk = new Chunk(chunkX, chunkY);
+            Chunk chunk = world.ChunkPool.GetObject();
+            chunk.ResetAndAssign(chunkX, chunkY);
 
             const float chunkDim = 16;
 
@@ -167,16 +172,16 @@ namespace Minecraft
                     }
                     int worldY = SeaLevel + (int)biomeHeightAddon;
 
-                    chunk.AddBlockAt(localX, worldY, localZ, bestBiome.Biome.TopBlock.GetNewDefaultState());
+                    chunk.AddBlockAt(localX, worldY, localZ, Blocks.GetState(bestBiome.Biome.TopBlock));
                     for (int k = worldY - 1; k >= worldY - 3; k--)
                     {
-                        chunk.AddBlockAt(localX, k, localZ, bestBiome.Biome.GradiantBlock.GetNewDefaultState());
+                        chunk.AddBlockAt(localX, k, localZ, Blocks.GetState(bestBiome.Biome.GradiantBlock));
                     }
 
                     worldY -= 3;
                     for (int k = worldY - 1; k >= 0; k--)
                     {
-                        chunk.AddBlockAt(localX, k, localZ, Blocks.Stone.GetNewDefaultState());
+                        chunk.AddBlockAt(localX, k, localZ, Blocks.GetState(Blocks.Stone));
                     }
 
                     worldY += 4;

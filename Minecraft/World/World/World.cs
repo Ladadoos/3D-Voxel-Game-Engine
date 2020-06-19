@@ -22,6 +22,8 @@ namespace Minecraft
 
         public Dictionary<Vector2, int> chunkPlayerPopulation { get; private set; } = new Dictionary<Vector2, int>();
 
+        public ObjectPool<Chunk> ChunkPool { get; private set; } = new ObjectPool<Chunk>(128);
+
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
@@ -43,8 +45,8 @@ namespace Minecraft
         protected World(Game game)
         {
             this.game = game;
-            Environment = new Environment(24000);
-            Environment.CurrentTime = 24000;
+            Environment = new Environment(2400);
+            Environment.CurrentTime = 2400;
             Environment.AmbientColor = new Vector3(0.025F, 0.025F, 0.025F);
         }
 
@@ -76,8 +78,8 @@ namespace Minecraft
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population + 1;
-                if(this is WorldClient && newPopulation > 1)
-                    throw new ArgumentException("World client population should never exceed 1");
+                if((this is WorldServer && newPopulation > 2) || (this is WorldClient && newPopulation > 1))
+                    throw new ArgumentException("World client population should never exceed " + newPopulation);
                 chunkPlayerPopulation[chunkPos] = newPopulation;
             } else
             {
@@ -123,9 +125,15 @@ namespace Minecraft
             if (loadedChunks.Remove(chunkPos))
             {
                 OnChunkUnloadedHandler?.Invoke(this, chunk);
+                OnChunkUnloadedPostProcess(chunk);
                 return true;
             }
             return false;
+        }
+
+        protected virtual void OnChunkUnloadedPostProcess(Chunk chunk)
+        {
+            ChunkPool.ReturnObject(chunk);
         }
 
         public virtual void Update(float deltaTimeSeconds)
@@ -236,7 +244,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(blockPos);
             chunk.RemoveBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
-            BlockState air = Blocks.AirState;
+            BlockState air = Blocks.GetState(Blocks.Air);
             air.GetBlock().OnAdd(air, this, blockPos);
             OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState, chainPos, chainCount);
             return true;
@@ -303,7 +311,7 @@ namespace Minecraft
             Vector2 chunkPos = GetChunkPosition(blockPos.X, blockPos.Z);
             if(!loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
-                return Blocks.AirState;
+                return Blocks.GetState(Blocks.Air);
             }
 
             return chunk.GetBlockAt(blockPos.ToChunkLocal());

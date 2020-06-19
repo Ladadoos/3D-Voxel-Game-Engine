@@ -19,6 +19,12 @@
             IsFullTransparent = true;
         }
 
+        public void SetChunkCoordinates(int gridX, int gridZ)
+        {
+            GridX = gridX;
+            GridZ = gridZ;
+        }
+
         public void AddBlockAt(int localX, int localY, int localZ, BlockState blockstate)
         {
             blocks[(localX << 8) + (localY << 4) + localZ] = blockstate;

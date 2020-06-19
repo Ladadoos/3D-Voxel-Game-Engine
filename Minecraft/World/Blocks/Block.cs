@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using System;
 
 namespace Minecraft
 {
@@ -14,12 +13,17 @@ namespace Minecraft
         public bool IsOverridable { get; protected set; }
         //If this blocks lets light through or not
         public bool IsOpaque { get; protected set; } = true;
+        //If this block has blockstate specific data 
+        public bool HasCustomState { get; protected set; } = false;
 
         protected readonly AxisAlignedBox[] emptyAABB = new AxisAlignedBox[0];
+        private readonly AxisAlignedBox fullBlockAABB = new AxisAlignedBox(Vector3.Zero, Vector3.Zero);
+        private readonly AxisAlignedBox[] fullBlockAABBList = new AxisAlignedBox[1];
 
         protected Block(ushort id)
         {
             ID = id;
+            fullBlockAABBList[0] = fullBlockAABB;
         }
 
         public abstract BlockState GetNewDefaultState();
@@ -47,18 +51,21 @@ namespace Minecraft
 
         public virtual AxisAlignedBox[] GetSelectionBox(BlockState state, Vector3i blockPos)
         {
-            return new AxisAlignedBox[] { GetFullBlockCollision(blockPos) };
+            fullBlockAABBList[0] = GetFullBlockCollision(blockPos);
+            return fullBlockAABBList;
         }
 
         public virtual AxisAlignedBox[] GetCollisionBox(BlockState state, Vector3i blockPos)
         {
-            return new AxisAlignedBox[] { GetFullBlockCollision(blockPos) };
+            fullBlockAABBList[0] = GetFullBlockCollision(blockPos);
+            return fullBlockAABBList;
         }
 
-        public static AxisAlignedBox GetFullBlockCollision(Vector3i blockPos)
+        public AxisAlignedBox GetFullBlockCollision(Vector3i blockPos)
         {
-            return new AxisAlignedBox(new Vector3(blockPos.X, blockPos.Y, blockPos.Z),
+            fullBlockAABB.SetDimensions(new Vector3(blockPos.X, blockPos.Y, blockPos.Z),
                 new Vector3(blockPos.X + Constants.CUBE_DIM, blockPos.Y + Constants.CUBE_DIM, blockPos.Z + Constants.CUBE_DIM));
+            return fullBlockAABB;
         }
 
         protected void NotifyNeighbours(BlockState blockState, World world, Vector3i blockPos)

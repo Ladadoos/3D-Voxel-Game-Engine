@@ -11,7 +11,7 @@ namespace Minecraft
         public Camera camera;
         public RayTraceResult mouseOverObject { get; private set; }
 
-        private BlockState selectedBlock = Blocks.Tnt.GetNewDefaultState();
+        private BlockState selectedBlock = Blocks.GetState(Blocks.Wheat);
 
         private const float secondsPerPosUpdate = 0.1F;
         private float elapsedMsSinceLastPosUpdate;
@@ -85,11 +85,11 @@ namespace Minecraft
                     game.Client.WritePacket(new PlayerBlockInteractionPacket(mouseOverObject.IntersectedBlockPos));
                 } else if(hitBlock.IsOverridable && selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.IntersectedBlockPos))
                 {
-                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                    BlockState newBlock = Blocks.GetState(selectedBlock.GetBlock());
                     game.Client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.IntersectedBlockPos));
                 } else if(selectedBlock.GetBlock().CanAddBlockAt(world, mouseOverObject.BlockPlacePosition))
                 {
-                    BlockState newBlock = selectedBlock.GetBlock().GetNewDefaultState();
+                    BlockState newBlock = Blocks.GetState(selectedBlock.GetBlock());
                     game.Client.WritePacket(new PlaceBlockPacket(newBlock, mouseOverObject.BlockPlacePosition));
                 }
             }
