@@ -124,6 +124,7 @@
     <Compile Include="Physics\Ray.cs" />
     <Compile Include="Physics\RayTraceResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Render\ChunkBufferLayout.cs" />
     <Compile Include="Render\LightDebugRenderer.cs" />
     <Compile Include="Render\MeshGenerator\SmoothLighting.cs" />
     <Compile Include="World\Utils\ObjectPool.cs" />

@@ -60,9 +60,7 @@ namespace Minecraft
         protected void TryApplyGravity(double deltaTime)
         {
             if (!isInAir)
-            {
                 return;
-            }
 
             verticalSpeed += (float)(Constants.GRAVITY * deltaTime);
             MovePlayerVertically(verticalSpeed);
@@ -110,9 +108,7 @@ namespace Minecraft
         protected void TryStartCrouching()
         {
             if (isRunning)
-            {
                 TryStopRunning();
-            }
 
             isCrouching = true;
             OnToggleCrouchingHandler?.Invoke(isCrouching);
@@ -130,48 +126,39 @@ namespace Minecraft
         protected void ApplyVelocityAndCheckCollision(float deltaTime, World world)
         {
             if (!isFlying)
-            {
                 TryApplyGravity(deltaTime);
-            }
 
-            Dictionary<Vector3i, BlockState> blocks = new Dictionary<Vector3i, BlockState>();
+            Dictionary<Vector3i, BlockState> blocks = null;
             if (doCollisionDetection)
-            {
                 blocks = GetCollisionDetectionBlocks(world);
-            }
 
             Velocity.X += Acceleration.X * deltaTime;
             Position.X += Velocity.X * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
-            {
                 DoXAxisCollisionDetection(blocks);
-            }
 
             Velocity.Y += Acceleration.Y * deltaTime;
             Position.Y += Velocity.Y * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
-            {
                 DoYAxisCollisionDetection(blocks);
-            }
 
             Velocity.Z += Acceleration.Z * deltaTime;
             Position.Z += Velocity.Z * deltaTime;
             UpdateAxisAlignedBox();
             if (doCollisionDetection)
-            {
                 DoZAxisCollisionDetection(blocks);
-            }
 
             float friction = -10F;
             Velocity += friction * Velocity * deltaTime;
         }
 
+        private Dictionary<Vector3i, BlockState> collidableBlocks = new Dictionary<Vector3i, BlockState>();
         /// <summary> Returns all blocks around the players position used for collision detection </summary>
         private Dictionary<Vector3i, BlockState> GetCollisionDetectionBlocks(World world)
         {
-            Dictionary<Vector3i, BlockState> collidables = new Dictionary<Vector3i, BlockState>();
+            collidableBlocks.Clear();
 
             Vector3i pos = new Vector3i(Position);
             for (int worldX = pos.X - 1; worldX <= pos.X + 1; worldX++)
@@ -183,14 +170,12 @@ namespace Minecraft
                         Vector3i blockPos = new Vector3i(worldX, worldY, worldZ);
                         BlockState blockstate = world.GetBlockAt(blockPos);
                         if (blockstate.GetBlock() != Blocks.Air)
-                        {
-                            collidables.Add(blockPos, blockstate);
-                        }
+                            collidableBlocks.Add(blockPos, blockstate);
                     }
                 }
             }
 
-            return collidables;
+            return collidableBlocks;
         }
 
         private void DoXAxisCollisionDetection(Dictionary<Vector3i, BlockState> blocks)
@@ -200,18 +185,14 @@ namespace Minecraft
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!Hitbox.Intersects(aabb))
-                    {
                         continue;
-                    }
 
                     if (Velocity.X > 0.0F)
-                    {
                         Position.X = aabb.Min.X - Constants.PLAYER_WIDTH;
-                    }
+
                     if (Velocity.X < 0.0F)
-                    {
                         Position.X = aabb.Max.X;
-                    }
+
                     Velocity.X = 0.0F;
                     TryStopRunning();
                 }
@@ -226,14 +207,11 @@ namespace Minecraft
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!Hitbox.Intersects(aabb))
-                    {
                         continue;
-                    }
 
                     if (Velocity.Y > 0.0F)
-                    {
                         Position.Y = aabb.Min.Y - Constants.PLAYER_HEIGHT;
-                    }
+
                     if (Velocity.Y < 0.0F)
                     {
                         Position.Y = aabb.Max.Y;
@@ -254,18 +232,14 @@ namespace Minecraft
                 foreach (AxisAlignedBox aabb in collidable.Value.GetBlock().GetCollisionBox(collidable.Value, collidable.Key))
                 {
                     if (!Hitbox.Intersects(aabb))
-                    {
                         continue;
-                    }
 
                     if (Velocity.Z > 0)
-                    {
                         Position.Z = aabb.Min.Z - Constants.PLAYER_LENGTH;
-                    }
+
                     if (Velocity.Z < 0)
-                    {
                         Position.Z = aabb.Max.Z;
-                    }
+
                     Velocity.Z = 0;
                     TryStopRunning();
                 }

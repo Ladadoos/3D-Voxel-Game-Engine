@@ -17,9 +17,7 @@ namespace Minecraft
         public void CleanUp()
         {
             if(HardBlocksModel != null)
-            {
                 HardBlocksModel.CleanUp();
-            }
         }
     }
 }
