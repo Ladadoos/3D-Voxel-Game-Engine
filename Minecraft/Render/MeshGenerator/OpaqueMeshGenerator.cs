@@ -6,10 +6,10 @@ namespace Minecraft
 {
     class OpaqueMeshGenerator : MeshGenerator
     {
-        private const uint staticTopLight = 15;
-        private const uint staticBottomLight = 9;
-        private const uint staticSideXLight = 13;
-        private const uint staticSideZLight = 11;
+        private const uint staticTopLight = 60;
+        private const uint staticBottomLight = 36;
+        private const uint staticSideXLight = 52;
+        private const uint staticSideZLight = 44;
 
         private SmoothLighting smoothLigher = new SmoothLighting();
         private bool smoothLighting = true;
@@ -53,25 +53,16 @@ namespace Minecraft
                             uint averageGreen = 0;
                             int numAverages = 0;
 
+                            const int outOfBoundsLight = 48;
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
                                 Light light = new Light();
-
                                 if(localChunkBlockPos.X + 1 > 15)
                                 {
                                     if(cXPos != null)
-                                    {
-                                        light = cXPos.LightMap.GetLightColorAt(0, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
-                                        light.SetSunlight(cXPos.LightMap.GetSunLightIntensityAt(0, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
-                                    } else
-                                    {
-                                        light.SetSunlight(10);
-                                    }
+                                        light = cXPos.LightMap.GetLightColorAt(0, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
                                 } else
-                                {
-                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X + 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
-                                    light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X + 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
-                                }
+                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X + 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
 
                                 light.SetBrightness(staticSideZLight);
 
@@ -90,22 +81,12 @@ namespace Minecraft
                             if (ShouldAddWestFaceOfBlock(cXNeg, section, localX, sectionLocalY, localZ))
                             {
                                 Light light = new Light();
-
                                 if(localChunkBlockPos.X - 1 < 0)
                                 {
                                     if(cXNeg != null)
-                                    {
-                                        light = cXNeg.LightMap.GetLightColorAt(15, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
-                                        light.SetSunlight(cXNeg.LightMap.GetSunLightIntensityAt(15, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
-                                    } else
-                                    {
-                                        light.SetSunlight(10);
-                                    }
+                                        light = cXNeg.LightMap.GetLightColorAt(15, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
                                 } else
-                                {
-                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X - 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z);
-                                    light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X - 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z));
-                                }
+                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X - 1, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z, 4);
 
                                 light.SetBrightness(staticSideZLight);
 
@@ -124,25 +105,15 @@ namespace Minecraft
                             if (ShouldAddSouthFaceOfBlock(cZNeg, section, localX, sectionLocalY, localZ))
                             {
                                 Light light = new Light();
-
                                 if(localChunkBlockPos.Z - 1 < 0)
                                 {
                                     if(cZNeg != null)
-                                    {
-                                        light = cZNeg.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 15);
-                                        light.SetSunlight(cZNeg.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 15));
-                                    } else
-                                    {
-                                        light.SetSunlight(10);
-                                    }
+                                        light = cZNeg.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 15, 4);
                                 } else
-                                {
-                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z - 1);
-                                    light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z - 1));
-                                }
-                                
+                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z - 1, 4);
+                                                           
                                 light.SetBrightness(staticSideXLight);
-                                
+
                                 averageRed += light.GetRedChannel();
                                 averageGreen += light.GetGreenChannel();
                                 averageBlue += light.GetBlueChannel();
@@ -158,22 +129,12 @@ namespace Minecraft
                             if (ShouldAddNorthFaceOfBlock(cZPos, section, localX, sectionLocalY, localZ))
                             {
                                 Light light = new Light();
-
                                 if(localChunkBlockPos.Z + 1 > 15)
                                 {
                                     if(cZPos != null)
-                                    {
-                                        light = cZPos.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 0);
-                                        light.SetSunlight(cZPos.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 0));
-                                    } else
-                                    {
-                                        light.SetSunlight(10);
-                                    }
+                                        light = cZPos.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, 0, 4);
                                 } else
-                                {
-                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z + 1);
-                                    light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z + 1));
-                                }
+                                    light = chunk.LightMap.GetLightColorAt((uint)localChunkBlockPos.X, (uint)localChunkBlockPos.Y, (uint)localChunkBlockPos.Z + 1, 4);
 
                                 light.SetBrightness(staticSideXLight);
 
@@ -195,9 +156,8 @@ namespace Minecraft
                                 uint worldY = (uint)Math.Min(localChunkBlockPos.Y + 1, 255);
                                 uint chunkLocalZ = (uint)localChunkBlockPos.Z;
 
-                                Light light = chunk.LightMap.GetLightColorAt(chunkLocalX, worldY, chunkLocalZ);
+                                Light light = chunk.LightMap.GetLightColorAt(chunkLocalX, worldY, chunkLocalZ, 4);
                                 light.SetBrightness(staticTopLight);
-                                light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt(chunkLocalX, worldY, chunkLocalZ));
 
                                 averageRed += light.GetRedChannel();
                                 averageGreen += light.GetGreenChannel();
@@ -217,9 +177,8 @@ namespace Minecraft
                                 uint worldY = (uint)Math.Max(localChunkBlockPos.Y - 1, 0);
                                 uint chunkLocalZ = (uint)localChunkBlockPos.Z;
 
-                                Light light = chunk.LightMap.GetLightColorAt(chunkLocalX, worldY, chunkLocalZ);
+                                Light light = chunk.LightMap.GetLightColorAt(chunkLocalX, worldY, chunkLocalZ, 4);
                                 light.SetBrightness(staticBottomLight);
-                                light.SetSunlight(chunk.LightMap.GetSunLightIntensityAt(chunkLocalX, worldY, chunkLocalZ));
 
                                 averageRed += light.GetRedChannel();
                                 averageGreen += light.GetGreenChannel();
