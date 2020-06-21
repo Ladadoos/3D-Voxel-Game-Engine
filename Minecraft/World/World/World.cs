@@ -53,9 +53,7 @@ namespace Minecraft
         public bool DespawnEntity(int entityId)
         {
             if(!loadedEntities.TryGetValue(entityId, out Entity despawnedEntity))
-            {
                 throw new Exception("Despawning unit that is not alive with ID " + entityId);
-            }
 
             if (loadedEntities.Remove(entityId))
             {
@@ -78,8 +76,12 @@ namespace Minecraft
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population + 1;
-                if((this is WorldServer && newPopulation > 2) || (this is WorldClient && newPopulation > 1))
-                    throw new ArgumentException("World client population should never exceed " + newPopulation);
+                if((this is WorldServer && newPopulation > 2) && !game.Server.IsOpenToPublic)
+                    throw new ArgumentException("Private world server population should never exceed " + newPopulation);
+
+                if((this is WorldClient && newPopulation > 1))
+                    throw new ArgumentException("Client world server population should never exceed one. It had " + newPopulation);
+
                 chunkPlayerPopulation[chunkPos] = newPopulation;
             } else
             {

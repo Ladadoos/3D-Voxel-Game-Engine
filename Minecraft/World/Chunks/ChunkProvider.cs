@@ -90,6 +90,10 @@ namespace Minecraft
             session.WritePacket(new ChunkUnloadPacket(chunkPositions));
         }
 
+        /// <summary>
+        /// Either directly sends the chunk data packet to the player if it is already present or 
+        /// sends a request for generate the chunk at the given position.
+        /// </summary>
         private void LoadChunk(World world, Vector2 chunkPos)
         {
             //If the seen chunk is not loaded, request generation of said chunk
@@ -168,7 +172,8 @@ namespace Minecraft
 
                         if(enqueueChunk)
                         {
-                            visibleChunks.Enqueue(new Tuple<int, Vector2>(Math.Max(Math.Abs(x), Math.Abs(z)), chunkPos));
+                            int maxChunkDistToPlayer = Math.Max(Math.Abs(x), Math.Abs(z));
+                            visibleChunks.Enqueue(new Tuple<int, Vector2>(maxChunkDistToPlayer, chunkPos));
                         }
                     }
                 }
