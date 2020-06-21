@@ -28,7 +28,7 @@ namespace Minecraft
         public static int BytesToInt32(byte[] bytes, ref int head)
         {
             //Little endian
-            int value = bytes[head] | (bytes[head + 1] << 8) | (bytes[head + 1] << 16) | (bytes[head + 1] << 24);
+            int value = bytes[head] | (bytes[head + 1] << 8) | (bytes[head + 2] << 16) | (bytes[head + 3] << 24);
             head += 4;
             return value;
         }
