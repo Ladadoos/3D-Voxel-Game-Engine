@@ -63,11 +63,12 @@ namespace Minecraft
 
             int playerId = game.Server.World.GenerateEntityId();
             string serverPlayerName = playerName + "-" + playerId % 10000;
-            ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, game.Server.World, new Vector3(10, 100, 10));
+            Vector3 spawnPosition = game.Server.World.GenerateAndGetValidSpawn();
+
+            ServerPlayer player = new ServerPlayer(playerId, serverPlayerName, game.Server.World, spawnPosition);
             session.AssignPlayer(player);
 
             game.Server.World.SpawnEntity(player);
-            Vector3 spawnPosition = game.Server.World.GenerateAndGetValidSpawn();
             session.WritePacket(new PlayerJoinAcceptPacket(serverPlayerName, playerId, spawnPosition, game.Server.World.Environment.CurrentTime)); // Accept join
             session.State = SessionState.Accepted;
 
