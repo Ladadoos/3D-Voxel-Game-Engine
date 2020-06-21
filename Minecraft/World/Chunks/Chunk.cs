@@ -37,6 +37,9 @@ namespace Minecraft
                     for(int y = 0; y < 16; y++)
                         for(int z = 0; z < 16; z++)
                             section.RemoveBlockAt(x, y, z);
+
+                if(!section.IsEmpty || !section.IsFullTransparent)
+                    throw new Exception("Invalid section reset." + section.ToString());
             }
 
             LightMap.ClearSunlightMap();
@@ -53,7 +56,7 @@ namespace Minecraft
             {
                 Section section = Sections[h];
                 if(section != null)
-                    section.SetChunkCoordinates(GridX, gridZ);
+                    section.ResetAndAssign(GridX, gridZ);
             }
         }
 
@@ -65,9 +68,7 @@ namespace Minecraft
         public void Tick(float deltaTime, World world)
         {
             foreach(KeyValuePair<Vector3i, BlockState> kp in TickableBlocks)
-            {
                 kp.Value.GetBlock().OnTick(kp.Value, world, kp.Key, deltaTime);
-            }
         }
 
         public BlockState GetBlockAt(int localX, int worldY, int localZ)
@@ -78,30 +79,23 @@ namespace Minecraft
         public BlockState GetBlockAt(Vector3i localPos)
         {
             if(localPos.Y < 0 || localPos.Y >= Constants.MAX_BUILD_HEIGHT)
-            {
                 return Blocks.GetState(Blocks.Air);
-            }
 
             int sectionHeight = localPos.Y / 16;
             if(Sections[sectionHeight] == null)
-            {
                 return Blocks.GetState(Blocks.Air);
-            }
 
             BlockState block = Sections[sectionHeight].GetBlockAt(localPos.X, localPos.Y & 15, localPos.Z);
             if(block == null)
-            {
                 return Blocks.GetState(Blocks.Air);
-            }
+
             return block;
         }
 
         public void RemoveBlockAt(int localX, int worldY, int localZ)
         {
             if(worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)
-            {
                 throw new ArgumentOutOfRangeException("Removing block at y level " + worldY + " in chunk (" + GridX + ", " + GridZ + ")");
-            }
 
             int sectionHeight = worldY / 16;
             int sectionLocalY = worldY - sectionHeight * 16;
@@ -118,62 +112,45 @@ namespace Minecraft
         {
             int previousTopY = TopMostBlocks[localX, localZ];
             for(int y = previousTopY - 1; y >= 0; y--)
-            {
                 if(GetBlockAt(localX, y, localZ).GetBlock() != Blocks.Air)
-                {
                     return y;
-                }
-            }
             return 0;
         }
 
         public void AddBlockAt(int localX, int worldY, int localZ, BlockState blockstate)
         {
-            if(blockstate.GetBlock() == Blocks.Air)
-                throw new ArgumentException("Cannot add air.");
-
             if (worldY < 0 || worldY > Constants.MAX_BUILD_HEIGHT - 1)
-            {
                 throw new ArgumentOutOfRangeException("Adding block at y level " + worldY + " in chunk (" + GridX + ", " + GridZ + ")");
-            }
 
             int sectionHeight = worldY / 16;
             if(Sections[sectionHeight] == null)
-            {
                 Sections[sectionHeight] = new Section(GridX, GridZ, (byte)sectionHeight);
-            }
 
-            Vector3i blockPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
+            Vector3i worlPos = new Vector3i(localX + GridX * 16, worldY, localZ + GridZ * 16);
             Block block = blockstate.GetBlock();
             int sectionLocalY = worldY - sectionHeight * 16;
             if(block == Blocks.Air)
-            {
-                throw new ArgumentException("Can't add air to remove. Call removeblock instead!");
-            }
+                throw new ArgumentException("Can't add air to remove a black. Call removeblock instead!");
 
             Sections[sectionHeight].AddBlockAt(localX, sectionLocalY, localZ, blockstate);
 
             if (block.IsTickable)
             {
-                if(TickableBlocks.ContainsKey(blockPos))
-                {
-                    TickableBlocks.Remove(blockPos);
-                }
-                TickableBlocks.Add(blockPos, blockstate);
+                if(TickableBlocks.ContainsKey(worlPos))
+                    TickableBlocks.Remove(worlPos);
+       
+                TickableBlocks.Add(worlPos, blockstate);
             }
             if(blockstate is ILightSource)
             {
-                if(LightSourceBlocks.ContainsKey(blockPos))
-                {
-                    LightSourceBlocks.Remove(blockPos);
-                }
-                LightSourceBlocks.Add(blockPos, blockstate);
+                if(LightSourceBlocks.ContainsKey(worlPos))
+                    LightSourceBlocks.Remove(worlPos);
+
+                LightSourceBlocks.Add(worlPos, blockstate);
             }
 
             if(TopMostBlocks[localX, localZ] < worldY)
-            {
                 TopMostBlocks[localX, localZ] = worldY;
-            }
         }
 
         public uint GetLowestEmptySectionAfterEachOtherFromTop()

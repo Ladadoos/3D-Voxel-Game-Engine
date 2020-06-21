@@ -4,16 +4,14 @@ namespace Minecraft
 {
     class LightMap
     {
-        //TODO Consider switching over to ushort to save on 2 bytes per entry.
-
-        //0000 0000 0000 0000 0000 0000 0000 0000
-        //                    SSSS BBBB GGGG RRRR
+        //0000 0000 0000 0000
+        //SSSS BBBB GGGG RRRR
         //R = red color channel, 0 to 15
         //G = green color channel, 0 to 15
         //B = blue color channel, 0 to 15
         //S = sunlight, 0 to 15
 
-        private uint[] map = new uint[16 * 16 * Constants.MAX_BUILD_HEIGHT];
+        private ushort[] map = new ushort[16 * 16 * Constants.MAX_BUILD_HEIGHT];
 
         public void ClearSunlightMap()
         {
@@ -28,12 +26,12 @@ namespace Minecraft
          */
         public void SetRedBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFFFF0) | lightValue;
+            map[(worldY << 8) + (localX << 4) + localZ] = (ushort)((map[(worldY << 8) + (localX << 4) + localZ] & 0xFFF0) | (ushort)lightValue);
         }
 
         public uint GetRedBlockLightAt(uint localX, uint worldY, uint localZ)
         {
-            return map[(worldY << 8) + (localX << 4) + localZ] & 0xF;
+            return (uint)(map[(worldY << 8) + (localX << 4) + localZ] & 0xF);
         }
 
         public void SetRedBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
@@ -51,12 +49,12 @@ namespace Minecraft
          */
         public void SetGreenBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFFF0F) | (lightValue << 4);
+            map[(worldY << 8) + (localX << 4) + localZ] = (ushort)((map[(worldY << 8) + (localX << 4) + localZ] & 0xFF0F) | (ushort)(lightValue << 4));
         }
 
         public uint GetGreenBlockLightAt(uint localX, uint worldY, uint localZ)
         {
-            return (map[(worldY << 8) + (localX << 4) + localZ] >> 4) & 0xF;
+            return (uint)(map[(worldY << 8) + (localX << 4) + localZ] >> 4) & 0xF;
         }
 
         public void SetGreenBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
@@ -74,12 +72,12 @@ namespace Minecraft
          */
         public void SetBlueBlockLightAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFFF0FF) | (lightValue << 8);
+            map[(worldY << 8) + (localX << 4) + localZ] = (ushort)((map[(worldY << 8) + (localX << 4) + localZ] & 0xF0FF) | (ushort)(lightValue << 8));
         }
 
         public uint GetBlueBlockLightAt(uint localX, uint worldY, uint localZ)
         {
-            return (map[(worldY << 8) + (localX << 4) + localZ] >> 8) & 0xF;
+            return (uint)(map[(worldY << 8) + (localX << 4) + localZ] >> 8) & 0xF;
         }
 
         public void SetBlueBlockLightAt(Vector3i chunkLocalPos, uint lightValue)
@@ -97,12 +95,12 @@ namespace Minecraft
          */
         public void SetSunLightIntensityAt(uint localX, uint worldY, uint localZ, uint lightValue)
         {
-            map[(worldY << 8) + (localX << 4) + localZ] = (map[(worldY << 8) + (localX << 4) + localZ] & 0xFFFF0FFF) | (lightValue << 12);
+            map[(worldY << 8) + (localX << 4) + localZ] = (ushort)((map[(worldY << 8) + (localX << 4) + localZ] & 0x0FFF) | (ushort)(lightValue << 12));
         }
 
         public uint GetSunLightIntensityAt(uint localX, uint worldY, uint localZ)
         {
-            return (map[(worldY << 8) + (localX << 4) + localZ] >> 12) & 0xF;
+            return (uint)(map[(worldY << 8) + (localX << 4) + localZ] >> 12) & 0xF;
         }
 
         public void SetSunLightIntensityAt(Vector3i chunkLocalPos, uint lightValue)
