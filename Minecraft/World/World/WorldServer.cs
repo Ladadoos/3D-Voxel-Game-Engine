@@ -14,8 +14,6 @@ namespace Minecraft
         private EntityIdTracker entityIdTracker = new EntityIdTracker();
         private WorldGenerator worldGenerator;
 
-        private List<Vector3i> blockRemovalBuffer = new List<Vector3i>();
-
         public WorldServer(Game game) : base(game)
         {
             OnBlockPlacedHandler += OnBlockPlacedServer;
@@ -133,21 +131,15 @@ namespace Minecraft
             }           
         }
 
-        private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount)
+        private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
-            blockRemovalBuffer.Add(blockPos);
-
-            if(chainPos == chainCount)
+            RemoveBlockPacket packet = new RemoveBlockPacket(new Vector3i[] { blockPos });
+            foreach(ServerSession session in world.game.Server.ConnectedClients)
             {
-                RemoveBlockPacket packet = new RemoveBlockPacket(blockRemovalBuffer.ToArray());
-                foreach(ServerSession session in world.game.Server.ConnectedClients)
+                if(session.IsBlockPositionInViewRange(blockPos))
                 {
-                    if(session.IsBlockPositionInViewRange(blockPos))
-                    {
-                        session.WritePacket(packet);
-                    }
+                    session.WritePacket(packet);
                 }
-                blockRemovalBuffer.Clear();
             }
         }
     }

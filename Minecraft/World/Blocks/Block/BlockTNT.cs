@@ -49,7 +49,7 @@ namespace Minecraft
             List<BlockStateTNT> explosives = new List<BlockStateTNT>();
             List<Vector3i> targets = new List<Vector3i>();
 
-            const int explosionSize = 30;
+            const int explosionSize = 10;
             for (int x = -explosionSize; x <= explosionSize; x++)
             {
                 for (int y = -explosionSize; y <= explosionSize; y++)

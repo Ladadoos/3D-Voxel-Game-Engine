@@ -13,7 +13,7 @@ namespace Minecraft
         private float elapsedMillisecondsSinceLastTick;
         public Environment Environment { get; private set; }
 
-        private readonly Queue<List<Vector3i>> toRemoveBlocks = new Queue<List<Vector3i>>();
+        private readonly Queue<Vector3i> toRemoveBlocks = new Queue<Vector3i>();
         private readonly Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
         private readonly Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
@@ -27,7 +27,7 @@ namespace Minecraft
         public delegate void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState);
         public event OnBlockPlaced OnBlockPlacedHandler;
 
-        public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount);
+        public delegate void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState);
         public event OnBlockRemoved OnBlockRemovedHandler;
 
         public delegate void OnChunkLoaded(World world, Chunk chunk);
@@ -157,13 +157,7 @@ namespace Minecraft
         protected void ClearBlockRemoveBuffer()
         {
             while(toRemoveBlocks.Count > 0)
-            {
-                List<Vector3i> blocks = toRemoveBlocks.Dequeue();
-                for(int i = 0; i < blocks.Count; i++)
-                {
-                    RemoveBlockAt(blocks[i], i + 1, blocks.Count);
-                }
-            }
+                RemoveBlockAt(toRemoveBlocks.Dequeue());
         }
 
         protected void ClearBlockAddBuffer()
@@ -213,12 +207,19 @@ namespace Minecraft
 
         public void QueueToRemoveBlockAt(Vector3i blockPos)
         {
-            toRemoveBlocks.Enqueue(new List<Vector3i>() { blockPos });
+            toRemoveBlocks.Enqueue(blockPos);
         }
 
         public void QueueToRemoveBlocksAt(List<Vector3i> blockPositions)
         {
-            toRemoveBlocks.Enqueue(blockPositions);
+            foreach(Vector3i blockPos in blockPositions)
+                toRemoveBlocks.Enqueue(blockPos);
+        }
+
+        public void QueueToRemoveBlocksAt(Vector3i[] blockPositions)
+        {
+            foreach(Vector3i blockPos in blockPositions)
+                toRemoveBlocks.Enqueue(blockPos);
         }
 
         public void QueueToAddBlockAt(Vector3i blockPos, BlockState block)
@@ -226,7 +227,7 @@ namespace Minecraft
             toAddBlocks.Enqueue(new Tuple<Vector3i, BlockState>(blockPos, block));
         }
 
-        private bool RemoveBlockAt(Vector3i blockPos, int chainPos, int chainCount)
+        private bool RemoveBlockAt(Vector3i blockPos)
         {
             if (IsOutsideBuildHeight(blockPos.Y))
             {
@@ -246,7 +247,7 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(blockPos);
             chunk.RemoveBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
-            OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState, chainPos, chainCount);
+            OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState);
             return true;
         }
 

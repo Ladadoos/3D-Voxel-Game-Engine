@@ -294,7 +294,7 @@ namespace Minecraft
             MeshChunkAndSurroundings(world, chunk, blockPos, newState, true);
         }
 
-        public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount)
+        public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
             foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockRemoved(world, chunk, blockPos))
                 MeshChunk(editedLightMapChunk, true);
