@@ -24,6 +24,7 @@
 
         protected override void ToStream(BufferedDataStream bufferedStream)
         {
+            bufferedStream.WriteInt32(BlockCount * sizeof(int) * 3 + sizeof(int));
             bufferedStream.WriteInt32(BlockCount);
             foreach(Vector3i blockPos in BlockPositions)
             {

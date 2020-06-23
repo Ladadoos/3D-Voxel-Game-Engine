@@ -75,5 +75,12 @@ namespace Minecraft
             storage = (storage & 0xFF03FFFF) | (brightness << 18);
         }
         public uint GetSunlight() => (storage >> 18) & 0x3F;
+
+        public static (uint r, uint g, uint b, uint s, uint br) Add(Light l1, Light l2)
+        {
+            return (l1.GetRedChannel() + l2.GetRedChannel(), l1.GetGreenChannel() + l2.GetGreenChannel(),
+                    l1.GetBlueChannel() + l2.GetBlueChannel(), l1.GetSunlight() + l2.GetSunlight(),
+                    l1.GetBrightness() + l2.GetBrightness());
+        }
     }
 }

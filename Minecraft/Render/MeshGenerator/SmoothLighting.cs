@@ -42,6 +42,7 @@ namespace Minecraft
             }
 
             Light d = new Light(0, 0, 0, 0, 0);
+            Light d2 = new Light(0, 0, 0, 15, 15);
             if(sideSource && blockSource.IsOpaque)
             {
                 for(int i = 0; i < 4; i++)
@@ -99,10 +100,10 @@ namespace Minecraft
                 if(sideCorner)
                     blockCorner = blockBuffer[3].Item1.GetBlockAt(blockBuffer[3].Item2).GetBlock();
 
-                Light l1 = sideSource ? (blockSource.IsOpaque ? d : blockBuffer[0].Item1.LightMap.GetLightColorAt(blockBuffer[0].Item2)) : d;
-                Light l2 = sideOne    ? (blockOne.IsOpaque    ? d : blockBuffer[1].Item1.LightMap.GetLightColorAt(blockBuffer[1].Item2)) : d;
-                Light l3 = sideTwo    ? (blockTwo.IsOpaque    ? d : blockBuffer[2].Item1.LightMap.GetLightColorAt(blockBuffer[2].Item2)) : d;
-                Light l4 = sideCorner ? (blockCorner.IsOpaque ? d : blockBuffer[3].Item1.LightMap.GetLightColorAt(blockBuffer[3].Item2)) : d;
+                Light l1 = sideSource ? (blockSource.IsOpaque ? d : blockBuffer[0].Item1.LightMap.GetLightColorAt(blockBuffer[0].Item2)) : d2;
+                Light l2 = sideOne    ? (blockOne.IsOpaque    ? d : blockBuffer[1].Item1.LightMap.GetLightColorAt(blockBuffer[1].Item2)) : d2;
+                Light l3 = sideTwo    ? (blockTwo.IsOpaque    ? d : blockBuffer[2].Item1.LightMap.GetLightColorAt(blockBuffer[2].Item2)) : d2;
+                Light l4 = sideCorner ? (blockCorner.IsOpaque ? d : blockBuffer[3].Item1.LightMap.GetLightColorAt(blockBuffer[3].Item2)) : d2;
                 lighBuffer[j] = 
                     new Light(l1.GetRedChannel()   + l2.GetRedChannel()   + l3.GetRedChannel()   + l4.GetRedChannel(),
                               l1.GetGreenChannel() + l2.GetGreenChannel() + l3.GetGreenChannel() + l4.GetGreenChannel(),

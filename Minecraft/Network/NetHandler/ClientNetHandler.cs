@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using System.Linq;
 
 namespace Minecraft
 {
@@ -22,10 +23,7 @@ namespace Minecraft
 
         public void ProcessRemoveBlockPacket(RemoveBlockPacket removeBlockPacket)
         {
-            foreach(Vector3i blockPos in removeBlockPacket.BlockPositions)
-            {
-                game.World.QueueToRemoveBlockAt(blockPos);
-            }
+            game.World.QueueToRemoveBlocksAt(removeBlockPacket.BlockPositions.ToList());
         }
 
         public void ProcessChatPacket(ChatPacket chatPacket)

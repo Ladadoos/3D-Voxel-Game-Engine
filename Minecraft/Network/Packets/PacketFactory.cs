@@ -36,11 +36,17 @@ namespace Minecraft
                     }
                 case PacketType.RemoveBlock:
                     {
-                        int blockCount = reader.ReadInt32();
-                        Vector3i[] blockPositions = new Vector3i[blockCount];
-                        for(int i = 0; i < blockCount; i++)
+                        int head = 0;
+                        int byteSize = reader.ReadInt32();
+                        byte[] removalBytes = reader.ReadBytes(byteSize);
+                        int numOfBlocks = DataConverter.BytesToInt32(removalBytes, ref head);
+                        Vector3i[] blockPositions = new Vector3i[numOfBlocks];
+                        for(int i = 0; i < numOfBlocks; i++)
                         {
-                            blockPositions[i] = ReadVector3i(reader);                             
+                            blockPositions[i] = new Vector3i(
+                                DataConverter.BytesToInt32(removalBytes, ref head),
+                                DataConverter.BytesToInt32(removalBytes, ref head),
+                                DataConverter.BytesToInt32(removalBytes, ref head));
                         }
                         return new RemoveBlockPacket(blockPositions);
                     }

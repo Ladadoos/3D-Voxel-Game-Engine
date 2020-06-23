@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Minecraft
 {
@@ -46,14 +47,16 @@ namespace Minecraft
         private void Explode(BlockStateTNT blockstate, World world)
         {
             List<BlockStateTNT> explosives = new List<BlockStateTNT>();
+            List<Vector3i> targets = new List<Vector3i>();
 
-            for (int x = -4; x <= 4; x++)
+            const int explosionSize = 30;
+            for (int x = -explosionSize; x <= explosionSize; x++)
             {
-                for (int y = -4; y <= 4; y++)
+                for (int y = -explosionSize; y <= explosionSize; y++)
                 {
-                    for (int z = -4; z <= 4; z++)
+                    for (int z = -explosionSize; z <= explosionSize; z++)
                     {
-                        if (x * x + y * y + z * z > 14)
+                        if (x * x + y * y + z * z > explosionSize * explosionSize)
                         {
                             continue;
                         }
@@ -72,11 +75,13 @@ namespace Minecraft
                             explosives.Add(tntBlock);
                         } else
                         {
-                            world.QueueToRemoveBlockAt(target);
+                            targets.Add(target);
                         }
                     }
                 }
             }
+
+            world.QueueToRemoveBlocksAt(targets);
 
             foreach (BlockStateTNT state in explosives)
             {

@@ -53,7 +53,6 @@ namespace Minecraft
                             uint averageGreen = 0;
                             int numAverages = 0;
 
-                            const int outOfBoundsLight = 48;
                             if (ShouldAddEastFaceOfBlock(cXPos, section, localX, sectionLocalY, localZ))
                             {
                                 Light light = new Light();
@@ -213,10 +212,10 @@ namespace Minecraft
 
                                 if(blockModel.DoubleSidedFaces)
                                 {
-                                    AddFacesToMeshDualSided(faces, localChunkBlockPos, lightBuffer);
+                                    AddFacesToMeshDualSided(faces, localChunkBlockPos, lightBuffer, false);
                                 } else
                                 {
-                                    AddFacesToMeshFromFront(faces, localChunkBlockPos, lightBuffer);
+                                    AddFacesToMeshFromFront(faces, localChunkBlockPos, lightBuffer, false);
                                 }
                             }
                         }
@@ -241,7 +240,14 @@ namespace Minecraft
         private void BuildMeshForSide(Direction direction, BlockState state, Vector3i chunkLocalPos, Vector3i globalPos, BlockModel model, Light[] lights)
         {
             BlockFace[] faces = model.GetPartialVisibleFaces(state, globalPos, direction);
-            AddFacesToMeshFromFront(faces, chunkLocalPos, lights);
+            AddFacesToMeshFromFront(faces, chunkLocalPos, lights, FlipTriangles(lights));
+        }
+
+        private bool FlipTriangles(Light[] buffer)
+        {
+            var (r1, g1, b1, s1, br1) = Light.Add(buffer[0], buffer[2]);
+            var (r2, g2, b2, s2, br2) = Light.Add(buffer[1], buffer[3]);
+            return r1 + g1 + b1 + s1 > r2 + g2 + b2 + s2;
         }
 
         private bool ShouldAddWestFaceOfBlock(Chunk westChunk, Section currentSection, int localX, int localY, int localZ)

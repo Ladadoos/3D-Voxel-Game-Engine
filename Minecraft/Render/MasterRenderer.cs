@@ -296,16 +296,13 @@ namespace Minecraft
 
         public void OnBlockRemoved(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, int chainPos, int chainCount)
         {
-            if(chainPos == chainCount)
-            {
-                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockRemoved(world, chunk, blockPos))
-                    MeshChunk(editedLightMapChunk, true);
+            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockRemoved(world, chunk, blockPos))
+                MeshChunk(editedLightMapChunk, true);
 
-                foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGridBlockRemoved(world, chunk, blockPos))
-                    MeshChunk(editedLightMapChunk, true);
+            foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGridBlockRemoved(world, chunk, blockPos))
+                MeshChunk(editedLightMapChunk, true);
 
-                MeshChunkAndSurroundings(world, chunk, blockPos, oldState, true);
-            }
+             MeshChunkAndSurroundings(world, chunk, blockPos, oldState, true);
         }
 
         private void MeshChunk(Chunk chunk, bool immediate = false)
