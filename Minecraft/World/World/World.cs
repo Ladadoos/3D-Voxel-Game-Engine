@@ -246,8 +246,6 @@ namespace Minecraft
             BlockState oldState = GetBlockAt(blockPos);
             chunk.RemoveBlockAt(chunkLocalPos.X, chunkLocalPos.Y, chunkLocalPos.Z);
             oldState.GetBlock().OnDestroy(oldState, this, blockPos);
-            BlockState air = Blocks.GetState(Blocks.Air);
-            air.GetBlock().OnAdd(air, this, blockPos);
             OnBlockRemovedHandler?.Invoke(this, chunk, blockPos, oldState, chainPos, chainCount);
             return true;
         }
