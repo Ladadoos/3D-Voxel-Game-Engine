@@ -72,7 +72,7 @@ namespace Minecraft
             }
                 
             ApplyVelocityAndCheckCollision(deltaTime, world);
-            mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world);
+            mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world, MaxBlockReach);
 
             UpdateCameraPosition();
 
