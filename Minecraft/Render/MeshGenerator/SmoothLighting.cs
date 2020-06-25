@@ -42,7 +42,7 @@ namespace Minecraft
             }
 
             Light d = new Light(0, 0, 0, 0, 15);
-            Light d2 = new Light(0, 0, 0, 15, 15);
+            Light d2 = new Light(0, 0, 0, 15, 0);
             if(sideSource && blockSource.IsOpaque)
             {
                 for(int i = 0; i < 4; i++)
@@ -80,7 +80,7 @@ namespace Minecraft
                 if(sideOne && sideTwo && blockOne.IsOpaque && blockTwo.IsOpaque)
                 {
                     if(!sideSource)
-                        lighBuffer[j] = new Light(0, 10, 0, 0, 1);
+                        lighBuffer[j] = new Light(0, 0, 0, 15, 15);
                     else
                     {
                         Chunk currentChunk = blockBuffer[0].Item1;
