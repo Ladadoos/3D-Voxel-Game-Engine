@@ -254,15 +254,15 @@ namespace Minecraft
         {
             if (cXNegPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
                 MeshChunk(cXNeg, immediate);
-
+                
             if (cXPosPredicate &&  world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
                 MeshChunk(cXPos, immediate);
-
+               
             if (cZNegPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
                 MeshChunk(cZNeg, immediate);
-
+              
             if (cZPosPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
-                MeshChunk(cZPos, immediate);
+                MeshChunk(cZPos, immediate);            
         }
 
         public void OnChunkUnloaded(World world, Chunk chunk)
@@ -284,7 +284,7 @@ namespace Minecraft
         }
 
         public void OnBlockPlaced(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
-        {                
+        {
             foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, chunk, blockPos, newState))
                 MeshChunk(editedLightMapChunk, true);
 
@@ -302,7 +302,7 @@ namespace Minecraft
             foreach(Chunk editedLightMapChunk in FloodFillLight.RepairSunlightGridBlockRemoved(world, chunk, blockPos))
                 MeshChunk(editedLightMapChunk, true);
 
-             MeshChunkAndSurroundings(world, chunk, blockPos, oldState, true);
+            MeshChunkAndSurroundings(world, chunk, blockPos, oldState, true);
         }
 
         private void MeshChunk(Chunk chunk, bool immediate = false)
@@ -324,8 +324,8 @@ namespace Minecraft
         {
             int localX = blockPos.X & 15;
             int localZ = blockPos.Z & 15;
-            MeshNeighbourChunks(world, chunk, localX == 0, localX == 15, localZ == 0, localZ == 15, immediate);
             MeshChunk(chunk, immediate);
+            MeshNeighbourChunks(world, chunk, immediate, localX == 0, localX == 15, localZ == 0, localZ == 15);
         }
 
         private void OnPlayerCameraProjectionChanged(ProjectionMatrixInfo pInfo)

@@ -17,13 +17,12 @@ namespace Minecraft
             DistanceToIntersection = float.MaxValue;
         }
 
-        public RayTraceResult TraceWorld(World world, int maxDist = 1)
+        public RayTraceResult TraceWorld(World world, int maxDist = 1, int stepsPerBlock = 50)
         {
             Vector3 originalPosition = Origin;
             Vector3 position = Origin;
-            const int minStep = 50;
-            int maxSteps = maxDist * minStep;
-            Vector3 offset = Direction / minStep;
+            int maxSteps = maxDist * stepsPerBlock;
+            Vector3 offset = Direction / stepsPerBlock;
             BlockState hitBlockState = Blocks.GetState(Blocks.Air);
             for (int i = 0; i < maxSteps; i++)
             {

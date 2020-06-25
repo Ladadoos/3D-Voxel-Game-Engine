@@ -15,7 +15,7 @@ namespace Minecraft
         protected bool isInAir = true;
         protected bool isCrouching = false;
         protected bool isRunning = false;
-        protected const int MaxBlockReach = 4;
+        protected const int MaxBlockReach = 40;
         protected Stopwatch jumpStopWatch = new Stopwatch();
 
         protected Vector3 realForward; //Vector facing towards where the player is looking

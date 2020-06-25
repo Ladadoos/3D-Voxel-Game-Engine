@@ -41,7 +41,7 @@ namespace Minecraft
                 blockSource = pChunk.GetBlockAt(pPos).GetBlock();
             }
 
-            Light d = new Light(0, 0, 0, 0, 0);
+            Light d = new Light(0, 0, 0, 0, 15);
             Light d2 = new Light(0, 0, 0, 15, 15);
             if(sideSource && blockSource.IsOpaque)
             {
@@ -91,7 +91,7 @@ namespace Minecraft
                         uint g = currentChunk.LightMap.GetGreenBlockLightAt(x, y, z);
                         uint b = currentChunk.LightMap.GetBlueBlockLightAt(x, y, z);
                         uint s = currentChunk.LightMap.GetSunLightIntensityAt(x, y, z);
-                        lighBuffer[j] = new Light(r, g, b, s, 63);
+                        lighBuffer[j] = new Light(r, g, b, s, 48);
                     }
                     j++;
                     continue;
@@ -105,15 +105,27 @@ namespace Minecraft
                 Light l3 = sideTwo    ? (blockTwo.IsOpaque    ? d : blockBuffer[2].Item1.LightMap.GetLightColorAt(blockBuffer[2].Item2)) : d2;
                 Light l4 = sideCorner ? (blockCorner.IsOpaque ? d : blockBuffer[3].Item1.LightMap.GetLightColorAt(blockBuffer[3].Item2)) : d2;
                 lighBuffer[j] = 
-                    new Light(l1.GetRedChannel()   + l2.GetRedChannel()   + l3.GetRedChannel()   + l4.GetRedChannel(),
-                              l1.GetGreenChannel() + l2.GetGreenChannel() + l3.GetGreenChannel() + l4.GetGreenChannel(),
-                              l1.GetBlueChannel()  + l2.GetBlueChannel()  + l3.GetBlueChannel()  + l4.GetBlueChannel(),
-                              l1.GetSunlight()     + l2.GetSunlight()     + l3.GetSunlight()     + l4.GetSunlight(),
-                              63);
+                    new Light(GetLightChannelAverage(l1.GetRedChannel()   , l2.GetRedChannel()   , l3.GetRedChannel()   , l4.GetRedChannel()),
+                              GetLightChannelAverage(l1.GetGreenChannel() , l2.GetGreenChannel() , l3.GetGreenChannel() , l4.GetGreenChannel()),
+                              GetLightChannelAverage(l1.GetBlueChannel()  , l2.GetBlueChannel()  , l3.GetBlueChannel()  , l4.GetBlueChannel()),
+                              GetLightChannelAverage(l1.GetSunlight()     , l2.GetSunlight()     , l3.GetSunlight()     , l4.GetSunlight()),
+                              63 - l1.GetBrightness() - l2.GetBrightness() - l3.GetBrightness() - l4.GetBrightness());
                 j++;
             }
 
             return lighBuffer;
+        }
+
+        private uint GetLightChannelAverage(uint l1, uint l2, uint l3, uint l4)
+        {
+            uint acc = 0;
+            uint tot = 0;
+            if(l1 > 0) { acc += l1; tot++; }
+            if(l2 > 0) { acc += l2; tot++; }
+            if(l3 > 0) { acc += l3; tot++; }
+            if(l4 > 0) { acc += l4; tot++; }
+            if(tot == 0) return 0;
+            return acc / tot * 4;
         }
 
         private static Vector3i[] targetBuffer = new Vector3i[3];

@@ -18,7 +18,12 @@ namespace Minecraft
             for(uint x = 0; x < 16; x++)
                 for(uint z = 0; z < 16; z++)
                     for(uint y = 0; y < 256; y++)
+                    {
+                        SetRedBlockLightAt(x, y, z, 0);
+                        SetGreenBlockLightAt(x, y, z, 0);
+                        SetBlueBlockLightAt(x, y, z, 0);
                         SetSunLightIntensityAt(x, y, z, 0);
+                    }
         }
 
         /*

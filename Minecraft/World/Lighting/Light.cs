@@ -30,7 +30,7 @@ namespace Minecraft
                 throw new Exception("Invalid brightness of " + brightness);
             storage = (storage & 0xC0FFFFFF) | (brightness << 24);
         }
-        public uint GetBrightness() => (storage >> 12) & 0xFF;
+        public uint GetBrightness() => (storage >> 24) & 0x3F;
 
         /*
          * Red channel

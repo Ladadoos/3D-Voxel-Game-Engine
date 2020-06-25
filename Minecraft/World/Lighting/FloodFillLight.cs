@@ -45,7 +45,7 @@ namespace Minecraft
 
         public static Chunk[] RepairSunlightGridBlockRemoved(World world, Chunk chunk, Vector3i blockPos)
         {
-            return RepairSunlightGridOnBlockAdded(world, chunk, blockPos, null);
+            return RepairSunlightGridOnBlockAdded(world, chunk, blockPos, null).Where(c => c != chunk).ToArray();
         }
 
         public static Chunk[] GenerateInitialSunlightGrid(World world, Chunk chunk)
@@ -115,6 +115,7 @@ namespace Minecraft
                 if(!updatedChunks.Contains(updatedChunk))
                     updatedChunks.Add(updatedChunk);
 
+            updatedChunks.Remove(chunk);
             return updatedChunks.ToArray();
         }
 
@@ -138,6 +139,7 @@ namespace Minecraft
                 if(!updatedChunks.Contains(updatedChunk))
                     updatedChunks.Add(updatedChunk);
 
+            updatedChunks.Remove(chunk);
             return updatedChunks.ToArray();
         }
 
@@ -272,6 +274,7 @@ namespace Minecraft
                 darknessPropagationQueue.Clear();
             }
 
+            updatedChunks.Remove(chunk);
             return updatedChunks.ToArray();
         }
 
@@ -314,6 +317,7 @@ namespace Minecraft
                 lightPropagationQueue.Clear();
             }
 
+            updatedChunks.Remove(chunk);
             return updatedChunks.ToArray();
         }
 

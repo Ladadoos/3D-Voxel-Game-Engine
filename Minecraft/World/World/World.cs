@@ -46,8 +46,8 @@ namespace Minecraft
         {
             this.game = game;
             Environment = new Environment(2400);
-            Environment.CurrentTime = 2400;
-            Environment.AmbientColor = new Vector3(0.025F, 0.025F, 0.025F);
+            Environment.CurrentTime = 1200;
+            Environment.AmbientColor = new Vector3(0.075F, 0.075F, 0.095F);
         }
 
         public bool DespawnEntity(int entityId)
