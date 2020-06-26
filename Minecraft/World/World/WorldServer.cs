@@ -116,13 +116,13 @@ namespace Minecraft
 
             if(entity is ServerPlayer)
             {
-                game.Server.BroadcastPacket(new PlayerLeavePacket(entity.ID, LeaveReason.Leave, "disconnect"));
+                Game.Server.BroadcastPacket(new PlayerLeavePacket(entity.ID, LeaveReason.Leave, "disconnect"));
             }
         }
 
         private void OnBlockPlacedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState, BlockState newState)
         {
-            foreach(ServerSession session in world.game.Server.ConnectedClients)
+            foreach(ServerSession session in Game.Server.ConnectedClients)
             {
                 if(session.IsBlockPositionInViewRange(blockPos))
                 {
@@ -134,7 +134,7 @@ namespace Minecraft
         private void OnBlockRemovedServer(World world, Chunk chunk, Vector3i blockPos, BlockState oldState)
         {
             RemoveBlockPacket packet = new RemoveBlockPacket(new Vector3i[] { blockPos });
-            foreach(ServerSession session in world.game.Server.ConnectedClients)
+            foreach(ServerSession session in Game.Server.ConnectedClients)
             {
                 if(session.IsBlockPositionInViewRange(blockPos))
                 {

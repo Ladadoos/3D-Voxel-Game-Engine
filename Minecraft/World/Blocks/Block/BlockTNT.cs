@@ -20,18 +20,15 @@ namespace Minecraft
         public override void OnTick(BlockState blockstate, World world, Vector3i blockPos, float deltaTime)
         {
             if(!(world is WorldServer))
-            {
                 return;
-            }
 
             BlockStateTNT blockTnt = (BlockStateTNT)blockstate;
-            if (!blockTnt.triggered)
-            {
+            if (blockTnt.Trigger == ExplosionTrigger.None)
                 return;
-            }
-            blockTnt.elapsedSecondsSinceTrigger += deltaTime;
-            if ((blockTnt.elapsedSecondsSinceTrigger > 2 && !blockTnt.triggeredByTnt)
-                || (blockTnt.elapsedSecondsSinceTrigger > 0.2F && blockTnt.triggeredByTnt))
+
+            blockTnt.ElapsedSecondsSinceTrigger += deltaTime;
+            if ((blockTnt.ElapsedSecondsSinceTrigger > 2 && blockTnt.Trigger == ExplosionTrigger.PlayerInteraction)
+                || (blockTnt.ElapsedSecondsSinceTrigger > 0.2F && blockTnt.Trigger == ExplosionTrigger.Explosive))
             {
                 Explode(blockTnt, world);
             }
@@ -40,8 +37,8 @@ namespace Minecraft
         public override void OnInteract(BlockState blockstate, Vector3i blockPos, World world)
         {
             BlockStateTNT blockTnt = (BlockStateTNT)blockstate;
-            blockTnt.triggered = true;
-            blockTnt.blockPos = blockPos;
+            blockTnt.Trigger = ExplosionTrigger.PlayerInteraction;
+            blockTnt.BlockPosition = blockPos;
         }
 
         private void Explode(BlockStateTNT blockstate, World world)
@@ -61,17 +58,17 @@ namespace Minecraft
                             continue;
                         }
 
-                        Vector3i target = blockstate.blockPos + new Vector3i(x, y, z);
+                        Vector3i target = blockstate.BlockPosition + new Vector3i(x, y, z);
                         BlockState state = world.GetBlockAt(target);
                         if(state.GetBlock() == Blocks.Air)
                         {
                             continue;
                         }
 
-                        if (state is BlockStateTNT && blockstate.blockPos != target)
+                        if (state is BlockStateTNT && blockstate.BlockPosition != target)
                         {
                             BlockStateTNT tntBlock = (BlockStateTNT)state;
-                            tntBlock.blockPos = target;
+                            tntBlock.BlockPosition = target;
                             explosives.Add(tntBlock);
                         } else
                         {
@@ -85,9 +82,16 @@ namespace Minecraft
 
             foreach (BlockStateTNT state in explosives)
             {
-                state.triggeredByTnt = true;
-                state.GetBlock().OnInteract(state, state.blockPos, world);
+                state.GetBlock().OnInteract(state, state.BlockPosition, world);
+                state.Trigger = ExplosionTrigger.Explosive;
             }
         }
+    }
+
+    enum ExplosionTrigger : byte
+    {
+        None,
+        PlayerInteraction,
+        Explosive
     }
 }

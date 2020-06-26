@@ -35,7 +35,7 @@ namespace Minecraft
             Vector3i chunkLocalPos = new Vector3i(game.ClientPlayer.Position).ToChunkLocal();
             Vector2 chunkPos = World.GetChunkPosition(playerX, playerZ);
             Vector3i playerGridPos = new Vector3i(game.ClientPlayer.Position);
-            game.World.loadedChunks.TryGetValue(chunkPos, out Chunk currentChunk);
+            game.World.LoadedChunks.TryGetValue(chunkPos, out Chunk currentChunk);
 
             StringBuilder sb = new StringBuilder();
 
@@ -68,7 +68,7 @@ namespace Minecraft
                 Vector3i intersectedBlockPos = game.ClientPlayer.mouseOverObject.IntersectedBlockPos;
                 Vector2 mouseOverChunkPos = World.GetChunkPosition(intersectedBlockPos.X, intersectedBlockPos.Z);
 
-                if(game.World.loadedChunks.TryGetValue(mouseOverChunkPos, out Chunk cursorChunk))
+                if(game.World.LoadedChunks.TryGetValue(mouseOverChunkPos, out Chunk cursorChunk))
                 {
                     Vector3i mouseBlockLocalPos = intersectedBlockPos.ToChunkLocal();
 

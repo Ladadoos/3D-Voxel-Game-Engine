@@ -27,7 +27,7 @@ namespace Minecraft
         /// <summary>
         /// All chunk positions that are currently loaded for the player.
         /// </summary>
-        public HashSet<Vector2> CurrentlyLoadedChunks { get; private set; } = new HashSet<Vector2>();
+        private HashSet<Vector2> currentlyLoadedChunks = new HashSet<Vector2>();
 
         /// <summary>
         /// Chunk data that has been received and is ready to be sent to the player.
@@ -69,14 +69,14 @@ namespace Minecraft
             remainingChunkRequests = GetChunkLoadQueue(world, playerGridPos);
 
             //Unload all chunks that are outside of our view distance
-            UnloadChunks(world, CurrentlyLoadedChunks.Where(c => !session.IsChunkVisible(c)).ToList());
+            UnloadChunks(world, currentlyLoadedChunks.Where(c => !session.IsChunkVisible(c)).ToList());
         }
 
         private void UnloadChunks(World world, List<Vector2> chunkPositions)
         {
             foreach(Vector2 chunkPos in chunkPositions)
             {
-                if(world.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+                if(world.LoadedChunks.TryGetValue(chunkPos, out Chunk chunk))
                 {
                     world.RemovePlayerPresenceOfChunk(chunk);
                 } else
@@ -84,7 +84,7 @@ namespace Minecraft
                     throw new ArgumentException("Asked to unload chunk that was not loaded on the server!");
                 }
 
-                if(!CurrentlyLoadedChunks.Remove(chunkPos))
+                if(!currentlyLoadedChunks.Remove(chunkPos))
                     throw new ArgumentException("Trying to unload a player chunk that is not loaded!");
             }
             session.WritePacket(new ChunkUnloadPacket(chunkPositions));
@@ -97,7 +97,7 @@ namespace Minecraft
         private void LoadChunk(World world, Vector2 chunkPos)
         {
             //If the seen chunk is not loaded, request generation of said chunk
-            if(!world.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            if(!world.LoadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 GenerateChunkRequestOutgoing request = new GenerateChunkRequestOutgoing
                 {
@@ -128,9 +128,9 @@ namespace Minecraft
         private void AddPresenceToChunkInWorld(World world, Chunk chunk)
         {
             world.AddPlayerPresenceToChunk(chunk);
-            if(world.game.Server.IsOpenToPublic)
+            if(world.Game.Server.IsOpenToPublic)
             {
-                CurrentlyLoadedChunks.Add(new Vector2(chunk.GridX, chunk.GridZ));
+                currentlyLoadedChunks.Add(new Vector2(chunk.GridX, chunk.GridZ));
                 session.WritePacket(new ChunkDataPacket(chunk));
             }
         }
@@ -158,7 +158,7 @@ namespace Minecraft
                     Vector2 chunkPos = playerGridPosition + new Vector2(x, z);
 
                     //Don't load chunks that are already loaded
-                    if(!CurrentlyLoadedChunks.Contains(chunkPos))
+                    if(!currentlyLoadedChunks.Contains(chunkPos))
                     {
                         var request = new GenerateChunkRequestOutgoing() { world = world, gridPosition = chunkPos };
                         bool enqueueChunk = false;

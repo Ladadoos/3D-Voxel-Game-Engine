@@ -64,7 +64,7 @@ namespace Minecraft
             Vector2 chunkPosition = World.GetChunkPosition(Position.X, Position.Z);
             if (previousChunkPos != chunkPosition)
             {
-                if(world.loadedChunks.TryGetValue(chunkPosition, out Chunk newChunk))
+                if(world.LoadedChunks.TryGetValue(chunkPosition, out Chunk newChunk))
                     Chunk = newChunk;
 
                 OnChunkChangedHandler?.Invoke(world, chunkPosition);

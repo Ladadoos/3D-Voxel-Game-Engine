@@ -33,7 +33,7 @@ namespace Minecraft
 
             Vector2 chunkPos = World.GetChunkPosition(game.ClientPlayer.Position.X, game.ClientPlayer.Position.Z);
 
-            if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+            if(game.World.LoadedChunks.TryGetValue(chunkPos, out Chunk chunk))
             {
                 for(uint x = 0; x < 16; x++)
                 {

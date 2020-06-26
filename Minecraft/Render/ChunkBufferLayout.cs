@@ -1,15 +1,15 @@
 ﻿namespace Minecraft
 {
-    class ChunkBufferLayout
+    struct ChunkBufferLayout
     {
-        public float[] vertexPositions;
-        public int positionsPointer;
-        public float[] vertexUVs;
-        public int uvsPointer;
-        public uint[] vertexLights;
-        public int lightsPointer;
-        public float[] vertexNormals;
-        public int normalsPointer;
-        public int indicesCount;
+        public float[] VertexPositions;
+        public int PositionsPointer;
+        public float[] VertexUVs;
+        public int UVsPointer;
+        public uint[] VertexLights;
+        public int LightsPointer;
+        public float[] VertexNormals;
+        public int NormalsPointer;
+        public int IndicesCount;
     }
 }

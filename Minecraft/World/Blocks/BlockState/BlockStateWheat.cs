@@ -4,8 +4,8 @@ namespace Minecraft
 {
     class BlockStateWheat : BlockState
     {
-        public ushort maturity = 0;
-        public float elapsedTimeSinceLastGrowth = 0;
+        public ushort Maturity { get; set; } = 0;
+        public float ElapsedTimeSinceLastGrowth { get; set; } = 0;
 
         public override Block GetBlock()
         {
@@ -15,16 +15,16 @@ namespace Minecraft
         public override void ToStream(BufferedDataStream bufferedStream)
         {
             base.ToStream(bufferedStream);
-            bufferedStream.WriteUInt16(maturity);
-            bufferedStream.WriteFloat(elapsedTimeSinceLastGrowth);
+            bufferedStream.WriteUInt16(Maturity);
+            bufferedStream.WriteFloat(ElapsedTimeSinceLastGrowth);
         }
 
         public override int PayloadSize() => sizeof(ushort) + sizeof(float);
 
         public override void ExtractFromByteStream(byte[] bytes, ref int head)
         {
-            maturity = DataConverter.BytesToUInt16(bytes, ref head);
-            elapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, ref head);
+            Maturity = DataConverter.BytesToUInt16(bytes, ref head);
+            ElapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, ref head);
         }
     }
 }

@@ -7,14 +7,10 @@ namespace Minecraft
     {
         private Texture texture;
         public Texture Texture {
-            get {
-                return texture;
-            }
+            get { return texture; }
             set {
                 if(texture?.ID == value.ID)
-                {
                     return;
-                }
 
                 texture = value;
                 ParentCanvas.AddComponentToClean(this);

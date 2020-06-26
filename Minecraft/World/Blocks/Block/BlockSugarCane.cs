@@ -30,10 +30,10 @@
             }
 
             BlockStateSugarCane caneState = (BlockStateSugarCane)blockState;
-            caneState.elapsedTimeSinceLastGrowth += deltaTime;
-            if(caneState.elapsedTimeSinceLastGrowth >= secondsToGrow)
+            caneState.ElapsedTimeSinceLastGrowth += deltaTime;
+            if(caneState.ElapsedTimeSinceLastGrowth >= secondsToGrow)
             {
-                caneState.elapsedTimeSinceLastGrowth = 0;
+                caneState.ElapsedTimeSinceLastGrowth = 0;
 
                 if(world.GetBlockAt(blockPos.Up()).GetBlock() == Blocks.Air)
                 {

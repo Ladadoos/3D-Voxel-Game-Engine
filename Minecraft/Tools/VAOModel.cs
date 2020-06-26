@@ -26,13 +26,13 @@ namespace Minecraft
 
         public VAOModel(ChunkBufferLayout chunkLayout)
         {
-            IndicesCount = chunkLayout.indicesCount;
+            IndicesCount = chunkLayout.IndicesCount;
             CreateVAO();
             BindVAO();
-            CreateVBO(3, chunkLayout.vertexPositions, chunkLayout.positionsPointer);
-            CreateVBO(3, chunkLayout.vertexNormals, chunkLayout.normalsPointer);
-            CreateVBO(2, chunkLayout.vertexUVs, chunkLayout.uvsPointer);
-            CreateVBO(1, chunkLayout.vertexLights, chunkLayout.lightsPointer);
+            CreateVBO(3, chunkLayout.VertexPositions, chunkLayout.PositionsPointer);
+            CreateVBO(3, chunkLayout.VertexNormals, chunkLayout.NormalsPointer);
+            CreateVBO(2, chunkLayout.VertexUVs, chunkLayout.UVsPointer);
+            CreateVBO(1, chunkLayout.VertexLights, chunkLayout.LightsPointer);
             UnbindVAO();
         }
 

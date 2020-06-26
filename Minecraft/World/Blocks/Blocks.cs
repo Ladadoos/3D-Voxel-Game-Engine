@@ -4,14 +4,6 @@ namespace Minecraft
 {
     class Blocks
     {
-        public static BlockState GetState(Block block)
-        {
-            if(block.HasCustomState)
-                return block.GetNewDefaultState();
-            int arrayId = block.ID - 1;
-            return defaultStates[arrayId];
-        }
-
         public static readonly Block Air = new BlockAir(1);
         public static readonly Block Dirt = new BlockDirt(2);
         public static readonly Block Stone = new BlockStone(3);
@@ -28,6 +20,14 @@ namespace Minecraft
         public static readonly Block OakLog = new BlockOakLog(14);
         public static readonly Block OakLeaves = new BlockOakLeaves(15);
         public static readonly Block Gravel = new BlockGravel(16);
+
+        public static BlockState GetState(Block block)
+        {
+            if(block.HasCustomState)
+                return block.GetNewDefaultState();
+            int arrayId = block.ID - 1;
+            return defaultStates[arrayId];
+        }
 
         public static int Count { get { return registeredBlocks.Length; } }
         private static Block[] registeredBlocks;

@@ -7,7 +7,7 @@ namespace Minecraft
 {
     abstract class World
     {
-        public readonly Game game;
+        public Game Game { get; private set; }
 
         private const float secondsPerTick = 0.05F;
         private float elapsedMillisecondsSinceLastTick;
@@ -17,10 +17,13 @@ namespace Minecraft
         private readonly Queue<Tuple<Vector3i, BlockState>> toAddBlocks = new Queue<Tuple<Vector3i, BlockState>>();
         private readonly Queue<Entity> toRemoveEntities = new Queue<Entity>();
 
-        public Dictionary<int, Entity> loadedEntities { get; private set; } = new Dictionary<int, Entity>();
-        public Dictionary<Vector2, Chunk> loadedChunks { get; private set; } = new Dictionary<Vector2, Chunk>();
+        private Dictionary<Vector2, int> chunkPlayerPopulation = new Dictionary<Vector2, int>();
 
-        public Dictionary<Vector2, int> chunkPlayerPopulation { get; private set; } = new Dictionary<Vector2, int>();
+        public ReadOnlyDictionary<int, Entity> LoadedEntities { get; private set; }
+        private Dictionary<int, Entity> loadedEntities = new Dictionary<int, Entity>();
+
+        public ReadOnlyDictionary<Vector2, Chunk> LoadedChunks { get; private set; }
+        private Dictionary<Vector2, Chunk> loadedChunks = new Dictionary<Vector2, Chunk>();
 
         public ObjectPool<Chunk> ChunkPool { get; private set; } = new ObjectPool<Chunk>(128);
 
@@ -44,7 +47,11 @@ namespace Minecraft
 
         protected World(Game game)
         {
-            this.game = game;
+            Game = game;
+
+            LoadedEntities = new ReadOnlyDictionary<int, Entity>(loadedEntities);
+            LoadedChunks = new ReadOnlyDictionary<Vector2, Chunk>(loadedChunks);
+
             Environment = new Environment(2400);
             Environment.CurrentTime = 1200;
             Environment.AmbientColor = new Vector3(0.075F, 0.075F, 0.095F);
@@ -76,7 +83,7 @@ namespace Minecraft
             if(chunkPlayerPopulation.TryGetValue(chunkPos, out int population))
             {
                 int newPopulation = population + 1;
-                if((this is WorldServer && newPopulation > 2) && !game.Server.IsOpenToPublic)
+                if((this is WorldServer && newPopulation > 2) && !Game.Server.IsOpenToPublic)
                     throw new ArgumentException("Private world server population should never exceed " + newPopulation);
 
                 if((this is WorldClient && newPopulation > 1))

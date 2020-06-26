@@ -17,7 +17,7 @@ namespace Minecraft
             wasReferenceFixable = true;
             if(position.X < 0 && position.Z < 0)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNegZNeg))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNegZNeg))
                 {
                     chunk = cXNegZNeg;
                     position.X = 15;
@@ -28,7 +28,7 @@ namespace Minecraft
                 }
             } else if(position.X < 0 && position.Z > 15)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cXNegZPos))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cXNegZPos))
                 {
                     chunk = cXNegZPos;
                     position.X = 15;
@@ -39,7 +39,7 @@ namespace Minecraft
                 }
             } else if(position.X > 15 && position.Z > 15)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPosZPos))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPosZPos))
                 {
                     chunk = cXPosZPos;
                     position.X = 0;
@@ -50,7 +50,7 @@ namespace Minecraft
                 }
             } else if(position.X > 15 && position.Z < 0)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cXPosZNeg))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cXPosZNeg))
                 {
                     chunk = cXPosZNeg;
                     position.X = 0;
@@ -61,7 +61,7 @@ namespace Minecraft
                 }
             } else if(position.X < 0)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
                 {
                     chunk = cXNeg;
                     position.X = 15;
@@ -71,7 +71,7 @@ namespace Minecraft
                 }
             } else if(position.X > 15)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
                 {
                     chunk = cXPos;
                     position.X = 0;
@@ -81,7 +81,7 @@ namespace Minecraft
                 }
             } else if(position.Z < 0)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
                 {
                     chunk = cZNeg;
                     position.Z = 15;
@@ -91,7 +91,7 @@ namespace Minecraft
                 }
             } else if(position.Z > 15)
             {
-                if(world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
+                if(world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
                 {
                     chunk = cZPos;
                     position.Z = 0;

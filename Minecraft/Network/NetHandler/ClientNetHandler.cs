@@ -40,7 +40,7 @@ namespace Minecraft
         {
             foreach(Vector2 chunkGridPosition in unloadChunkPacket.ChunkGridPositions)
             {
-                if (game.World.loadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
+                if (game.World.LoadedChunks.TryGetValue(chunkGridPosition, out Chunk chunk))
                 {
                     if(!game.World.RemovePlayerPresenceOfChunk(chunk))
                         throw new Exception();
@@ -51,7 +51,7 @@ namespace Minecraft
         public void ProcessPlayerDataPacket(PlayerDataPacket playerDataPacket)
         {
             Logger.Info(playerDataPacket.ToString());
-            if(!game.World.loadedEntities.TryGetValue(playerDataPacket.EntityID, out Entity player))
+            if(!game.World.LoadedEntities.TryGetValue(playerDataPacket.EntityID, out Entity player))
             {
                 Logger.Error("Received positional data for unregistered player " + playerDataPacket.EntityID);
                 return;

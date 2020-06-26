@@ -20,10 +20,10 @@ namespace Minecraft
 
         protected override ChunkBufferLayout GenerateMesh(World world, Chunk chunk)
         {
-            world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg);
-            world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos);
-            world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg);
-            world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos);
+            world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg);
+            world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos);
+            world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg);
+            world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos);
 
             Light[] lightBuffer = new Light[4];
 
@@ -225,15 +225,15 @@ namespace Minecraft
 
             return new ChunkBufferLayout()
             {
-                vertexPositions = vertexPositions,
-                positionsPointer = positionPointer,
-                vertexUVs = vertexUVs,
-                uvsPointer = uvsPointer,
-                vertexLights = vertexLights,
-                lightsPointer = lightsPointer,
-                vertexNormals = vertexNormals,
-                normalsPointer = normalPointer,
-                indicesCount = indicesCount
+                VertexPositions = vertexPositions,
+                PositionsPointer = positionPointer,
+                VertexUVs = vertexUVs,
+                UVsPointer = uvsPointer,
+                VertexLights = vertexLights,
+                LightsPointer = lightsPointer,
+                VertexNormals = vertexNormals,
+                NormalsPointer = normalPointer,
+                IndicesCount = indicesCount
             };                   
         }
 

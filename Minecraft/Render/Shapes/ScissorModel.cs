@@ -79,7 +79,7 @@ namespace Minecraft
         {
             BlockStateWheat wheat = (BlockStateWheat)state;
 
-            switch(wheat.maturity)
+            switch(wheat.Maturity)
             {
                 case 1:
                     return new BlockFace[] {

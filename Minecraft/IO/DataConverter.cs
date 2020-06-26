@@ -47,6 +47,11 @@ namespace Minecraft
             return value;
         }
 
+        public static T BytesToByteStruct<T>(byte[] bytes, ref int head) where T : struct
+        {
+            return (T)(object)bytes[head++];
+        }
+
         public static Vector3i BytesToVector3i(byte[] bytes, ref int head)
         {
             int x = BytesToInt32(bytes, ref head);

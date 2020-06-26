@@ -25,19 +25,19 @@
             }
 
             BlockStateWheat originalWheat = (BlockStateWheat)blockState;
-            if(originalWheat.maturity >= maxMaturity)
+            if(originalWheat.Maturity >= maxMaturity)
             {
                 return;
             }
 
-            originalWheat.elapsedTimeSinceLastGrowth += deltaTime;
-            if(originalWheat.elapsedTimeSinceLastGrowth >= secondsToGrow)
+            originalWheat.ElapsedTimeSinceLastGrowth += deltaTime;
+            if(originalWheat.ElapsedTimeSinceLastGrowth >= secondsToGrow)
             {
-                originalWheat.elapsedTimeSinceLastGrowth = 0;
+                originalWheat.ElapsedTimeSinceLastGrowth = 0;
 
                 world.QueueToRemoveBlockAt(blockPos);
                 BlockStateWheat newWheat = (BlockStateWheat)Blocks.GetState(Blocks.Wheat);
-                newWheat.maturity = (ushort)(originalWheat.maturity + 1);
+                newWheat.Maturity = (ushort)(originalWheat.Maturity + 1);
                 world.QueueToAddBlockAt(blockPos, newWheat);
             }
         }

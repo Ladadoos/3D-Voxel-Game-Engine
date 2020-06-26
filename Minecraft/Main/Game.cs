@@ -120,7 +120,7 @@ namespace Minecraft
         {
             if (RunMode != RunMode.Server)
             {
-                ClientPlayer.camera.SetWindowSize(newWidth, newHeight);
+                ClientPlayer.Camera.SetWindowSize(newWidth, newHeight);
             }
         }
     }

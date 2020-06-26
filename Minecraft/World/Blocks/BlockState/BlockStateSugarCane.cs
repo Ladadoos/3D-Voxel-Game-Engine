@@ -4,7 +4,7 @@ namespace Minecraft
 {
     class BlockStateSugarCane : BlockState
     {
-        public float elapsedTimeSinceLastGrowth;
+        public float ElapsedTimeSinceLastGrowth;
 
         public override Block GetBlock()
         {
@@ -14,14 +14,14 @@ namespace Minecraft
         public override void ToStream(BufferedDataStream bufferedStream)
         {
             base.ToStream(bufferedStream);
-            bufferedStream.WriteFloat(elapsedTimeSinceLastGrowth);
+            bufferedStream.WriteFloat(ElapsedTimeSinceLastGrowth);
         }
 
         public override int PayloadSize() => sizeof(float);
 
         public override void ExtractFromByteStream(byte[] bytes, ref int head)
         {
-            elapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, ref head);
+            ElapsedTimeSinceLastGrowth = DataConverter.BytesToFloat(bytes, ref head);
         }
     }
 }

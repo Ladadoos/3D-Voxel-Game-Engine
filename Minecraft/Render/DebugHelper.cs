@@ -5,10 +5,10 @@ namespace Minecraft
 {
     class DebugHelper
     {
+        public readonly LightDebugRenderer lightDebug;
         private readonly WireframeRenderer wireframeRenderer;
         private readonly Game game;
         private readonly Camera debugCamera;
-        public readonly LightDebugRenderer lightDebug;
         private UICanvasDebug debugCanvas;
 
         private bool renderFromPlayerCamera;
@@ -76,7 +76,7 @@ namespace Minecraft
                     game.MasterRenderer.SetActiveCamera(debugCamera);
                 } else
                 {
-                    game.MasterRenderer.SetActiveCamera(game.ClientPlayer.camera);
+                    game.MasterRenderer.SetActiveCamera(game.ClientPlayer.Camera);
                 }
             } else if(Game.Input.OnKeyPress(OpenTK.Input.Key.F7))
             {
@@ -88,7 +88,7 @@ namespace Minecraft
                     for(int z = 0; z < 16; z++)
                     {
                         Vector2 chunkPos = World.GetChunkPosition(game.ClientPlayer.Position.X, game.ClientPlayer.Position.Z);
-                        if(game.World.loadedChunks.TryGetValue(chunkPos, out Chunk chunk))
+                        if(game.World.LoadedChunks.TryGetValue(chunkPos, out Chunk chunk))
                         {
                             game.Client.WritePacket(new PlaceBlockPacket(Blocks.GetState(Blocks.Tnt),
                              new Vector3i(x + 16 * chunk.GridX, (int)game.ClientPlayer.Position.Y + 4, z + 16 * chunk.GridZ)));
@@ -139,7 +139,7 @@ namespace Minecraft
         {
             if (renderHitboxes)
             {
-                foreach(Entity entity in game.World.loadedEntities.Values)
+                foreach(Entity entity in game.World.LoadedEntities.Values)
                 {
                     AxisAlignedBox aabb = entity.Hitbox;
                     float width = Math.Abs(aabb.Max.X - aabb.Min.X);

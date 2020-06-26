@@ -22,9 +22,9 @@ namespace Minecraft
 
         private readonly Game game;
 
-        public  readonly DebugHelper DebugHelper;
-        public  readonly UICanvasIngame IngameCanvas;
-        public  readonly int DitherTextureId;
+        public  DebugHelper DebugHelper { get; private set; }
+        public  UICanvasIngame IngameCanvas { get; private set; }
+        public  int DitherTextureId { get; private set; }
         private readonly ShaderBasic basicShader;
         private readonly EntityShader entityShader;
         private readonly CameraController cameraController;
@@ -61,7 +61,7 @@ namespace Minecraft
             entityShader = new EntityShader();
             cameraController = new CameraController(game.Window);
 
-            SetActiveCamera(game.ClientPlayer.camera);
+            SetActiveCamera(game.ClientPlayer.Camera);
 
             int textureAtlasId = TextureLoader.LoadTexture("../../Resources/texturePack.png");
             textureAtlas = new TextureAtlas(textureAtlasId, 256, 16);
@@ -136,7 +136,7 @@ namespace Minecraft
             entityShader.Start();
             entityShader.LoadTexture(entityShader.Location_TextureAtlas, 0, textureAtlas.ID);
             entityShader.LoadMatrix(entityShader.Location_ViewMatrix, cameraController.Camera.CurrentViewMatrix);
-            foreach (Entity entity in world.loadedEntities.Values)
+            foreach (Entity entity in world.LoadedEntities.Values)
             {
                 if (entityMeshRegistry.Models.TryGetValue(entity.EntityType, out VAOModel entityMeshModel))
                 {
@@ -162,7 +162,7 @@ namespace Minecraft
         
         public void RenderChunkBorders()
         {
-            foreach (KeyValuePair<Vector2, Chunk> chunkToRender in game.World.loadedChunks)
+            foreach (KeyValuePair<Vector2, Chunk> chunkToRender in game.World.LoadedChunks)
             {
                 Vector3 min = new Vector3(chunkToRender.Key.X * 16, 0, chunkToRender.Key.Y * 16);
                 wireframeRenderer.RenderWireframeAt(1, min, new Vector3(16, 256, 16), new Vector3(0, 0, 1));
@@ -257,16 +257,16 @@ namespace Minecraft
         private void MeshNeighbourChunks(World world, Chunk chunk, bool immediate = false,
             bool cXNegPredicate = true, bool cXPosPredicate = true, bool cZNegPredicate = true, bool cZPosPredicate = true)
         {
-            if (cXNegPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
+            if (cXNegPredicate && world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ), out Chunk cXNeg))
                 MeshChunk(cXNeg, immediate);
                 
-            if (cXPosPredicate &&  world.loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
+            if (cXPosPredicate &&  world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ), out Chunk cXPos))
                 MeshChunk(cXPos, immediate);
                
-            if (cZNegPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
+            if (cZNegPredicate && world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ - 1), out Chunk cZNeg))
                 MeshChunk(cZNeg, immediate);
               
-            if (cZPosPredicate && world.loadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
+            if (cZPosPredicate && world.LoadedChunks.TryGetValue(new Vector2(chunk.GridX, chunk.GridZ + 1), out Chunk cZPos))
                 MeshChunk(cZPos, immediate);            
         }
 

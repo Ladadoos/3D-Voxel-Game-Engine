@@ -40,6 +40,11 @@ namespace Minecraft
             WriteInt32(*(int*)&value);
         }
 
+        public void WriteByte(byte value)
+        {
+            bufferedStream.WriteByte(value);
+        }
+
         public unsafe void WriteBool(bool value)
         {
             bufferedStream.WriteByte(((byte*)&value)[0]);

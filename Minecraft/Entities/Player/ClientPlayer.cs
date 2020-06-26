@@ -8,7 +8,7 @@ namespace Minecraft
     {
         private readonly Game game;
 
-        public Camera camera;
+        public Camera Camera { get; private set; }
         public RayTraceResult mouseOverObject { get; private set; }
 
         private BlockState selectedBlock = Blocks.GetState(Blocks.Tnt);
@@ -19,7 +19,7 @@ namespace Minecraft
         public ClientPlayer(Game game) : base(-1, "", null, new Vector3(-1, -1, -1))
         {
             this.game = game;
-            camera = new Camera(new ProjectionMatrixInfo {
+            Camera = new Camera(new ProjectionMatrixInfo {
                 DistanceNearPlane = 0.1F,
                 DistanceFarPlane = 1000F,
                 FieldOfView = 1.5F,
@@ -35,10 +35,10 @@ namespace Minecraft
         {
             if(isRunning)
             {
-                camera.SetFieldOfView(1.65F);
+                Camera.SetFieldOfView(1.65F);
             } else
             {
-                camera.SetFieldOfViewToDefault();
+                Camera.SetFieldOfViewToDefault();
             }
         }
 
@@ -46,10 +46,10 @@ namespace Minecraft
         {
             if(isCrouching)
             {
-                camera.SetFieldOfView(1.45F);
+                Camera.SetFieldOfView(1.45F);
             } else
             {
-                camera.SetFieldOfViewToDefault();
+                Camera.SetFieldOfViewToDefault();
             }
         }
 
@@ -59,7 +59,7 @@ namespace Minecraft
             cameraPosition.X += Constants.PLAYER_WIDTH / 2.0F;
             cameraPosition.Y += Constants.PLAYER_CAMERA_HEIGHT;
             cameraPosition.Z += Constants.PLAYER_LENGTH / 2.0F;
-            camera.SetPosition(cameraPosition);
+            Camera.SetPosition(cameraPosition);
         }
 
         public override void Update(float deltaTime, World world)
@@ -72,7 +72,7 @@ namespace Minecraft
             }
                 
             ApplyVelocityAndCheckCollision(deltaTime, world);
-            mouseOverObject = new Ray(camera.Position, camera.Forward).TraceWorld(world, MaxBlockReach);
+            mouseOverObject = new Ray(Camera.Position, Camera.Forward).TraceWorld(world, MaxBlockReach);
 
             UpdateCameraPosition();
 
@@ -102,9 +102,9 @@ namespace Minecraft
                 game.Client.WritePacket(new RemoveBlockPacket(mouseOverObject.IntersectedBlockPos));
             }
 
-            realForward = camera.Forward;
-            moveForward = new Vector3((float)Math.Sin(camera.Pitch), 0, (float)Math.Cos(camera.Pitch));
-            right = camera.Right;
+            realForward = Camera.Forward;
+            moveForward = new Vector3((float)Math.Sin(Camera.Pitch), 0, (float)Math.Cos(Camera.Pitch));
+            right = Camera.Right;
 
             elapsedMsSinceLastPosUpdate += deltaTime;
             if(elapsedMsSinceLastPosUpdate > secondsPerPosUpdate)

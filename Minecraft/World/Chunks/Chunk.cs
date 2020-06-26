@@ -5,9 +5,9 @@ namespace Minecraft
 {
     class Chunk
     {
-        public Dictionary<Vector3i, BlockState> TickableBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
-        public Dictionary<Vector3i, BlockState> LightSourceBlocks { get; set; } = new Dictionary<Vector3i, BlockState>();
-        public Section[] Sections { get; set; } = new Section[Constants.NUM_SECTIONS_IN_CHUNKS];
+        public Dictionary<Vector3i, BlockState> TickableBlocks { get; private set; } = new Dictionary<Vector3i, BlockState>();
+        public Dictionary<Vector3i, BlockState> LightSourceBlocks { get; private set; } = new Dictionary<Vector3i, BlockState>();
+        public Section[] Sections { get; private set; } = new Section[Constants.NUM_SECTIONS_IN_CHUNKS];
         public int GridX { get; private set; }
         public int GridZ { get; private set; }
         public LightMap LightMap { get; private set; } = new LightMap();
