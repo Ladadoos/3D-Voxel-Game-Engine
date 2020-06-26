@@ -1,6 +1,6 @@
 ## 3D Voxel Game
 
-![](Images/demo3.gif)
+![](Images/banner.png)
 
 A 3D voxel game (very much inspired by Minecraft) using OpenGL, C# and GLSL. 
 The focus of this project is to figure out and solve the different challenges that come with making a voxel engine/game like Minecraft: how to represent the world and the different blocks, how to generate the world, how to interact with it, how to update the world (after an interaction), how (smooth) lighting works etc.
@@ -30,4 +30,4 @@ Features that could be added/looked at:
 
 ![](Images/demo1.gif)
 ![](Images/demo2.gif)
-![](Images/demo4.gif)
+![](Images/demo3.gif)
