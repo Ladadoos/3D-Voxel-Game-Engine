@@ -128,9 +128,12 @@ namespace Minecraft
 
             }
 
-            vertexNormals[normalPointer++] = face.Normal.X;
-            vertexNormals[normalPointer++] = face.Normal.Y;
-            vertexNormals[normalPointer++] = face.Normal.Z;
+            for(int i = 0; i < 6; i++)
+            {
+                vertexNormals[normalPointer++] = face.Normal.X;
+                vertexNormals[normalPointer++] = face.Normal.Y;
+                vertexNormals[normalPointer++] = face.Normal.Z;
+            }
         }
 
         protected void AddFacesToMeshDualSided(BlockFace[] toAddFaces, Vector3i blockPos, Light[] lights, bool flip)

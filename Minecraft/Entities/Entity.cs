@@ -12,6 +12,7 @@ namespace Minecraft
         public Vector3 Velocity;
         public Vector3 Acceleration;
         public AxisAlignedBox Hitbox { get; protected set; }
+        public Chunk Chunk { get; private set; }
 
         protected float width, height, length;
 
@@ -63,6 +64,9 @@ namespace Minecraft
             Vector2 chunkPosition = World.GetChunkPosition(Position.X, Position.Z);
             if (previousChunkPos != chunkPosition)
             {
+                if(world.loadedChunks.TryGetValue(chunkPosition, out Chunk newChunk))
+                    Chunk = newChunk;
+
                 OnChunkChangedHandler?.Invoke(world, chunkPosition);
             }
             previousChunkPos = chunkPosition;

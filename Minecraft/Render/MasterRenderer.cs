@@ -247,6 +247,11 @@ namespace Minecraft
 
             MeshChunk(chunk);
             MeshNeighbourChunks(world, chunk);
+
+            foreach(Chunk neighChunk in world.GetCardinalChunks(chunk))
+                foreach(KeyValuePair<Vector3i, BlockState> kp in neighChunk.LightSourceBlocks)
+                    foreach(Chunk editedLightMapChunk in FloodFillLight.RepairLightGridBlockAdded(world, neighChunk, kp.Key, kp.Value))
+                        MeshChunk(editedLightMapChunk);
         }
 
         private void MeshNeighbourChunks(World world, Chunk chunk, bool immediate = false,

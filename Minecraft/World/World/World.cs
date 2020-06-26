@@ -317,5 +317,24 @@ namespace Minecraft
 
             return chunk.GetBlockAt(blockPos.ToChunkLocal());
         }
+
+        public List<Chunk> GetCardinalChunks(Chunk chunk)
+        {
+            List<Chunk> chunks = new List<Chunk>();
+
+            if(loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ - 1), out Chunk cXNegZNeg))
+                chunks.Add(cXNegZNeg);
+
+            if(loadedChunks.TryGetValue(new Vector2(chunk.GridX - 1, chunk.GridZ + 1), out Chunk cXNegZPos))
+                chunks.Add(cXNegZPos);
+
+            if(loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ + 1), out Chunk cXPosZPos))
+                chunks.Add(cXPosZPos);
+
+            if(loadedChunks.TryGetValue(new Vector2(chunk.GridX + 1, chunk.GridZ - 1), out Chunk cXPosZNeg))
+                chunks.Add(cXPosZNeg);
+
+            return chunks;
+        }
     }
 }
