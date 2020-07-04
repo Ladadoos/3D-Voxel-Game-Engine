@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Minecraft
 {
-    class EntityIdTracker
+    class IdTracker
     {
-        private readonly HashSet<int> entityIdsTaken = new HashSet<int>();
+        private readonly HashSet<int> idsTaken = new HashSet<int>();
         private readonly Random random = new Random();
 
         public int GenerateId()
@@ -13,9 +13,9 @@ namespace Minecraft
             while (true)
             {
                 int rand = 1 + random.Next(int.MaxValue - 1);
-                if (!entityIdsTaken.Contains(rand))
+                if (!idsTaken.Contains(rand))
                 {
-                    entityIdsTaken.Add(rand);
+                    idsTaken.Add(rand);
                     return rand;
                 }
             }
@@ -23,7 +23,7 @@ namespace Minecraft
 
         public void ReleaseId(int entityId)
         {
-            entityIdsTaken.Remove(entityId);
+            idsTaken.Remove(entityId);
         }
     }
 }

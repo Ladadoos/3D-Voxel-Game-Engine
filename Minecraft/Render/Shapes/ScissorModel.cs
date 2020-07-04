@@ -2,6 +2,9 @@
 
 namespace Minecraft
 {
+    /// <summary>
+    /// A model that consists of two quads vertically intersecting each other at a 45degree angle.
+    /// </summary>
     abstract class ScissorModel : BlockModel
     {
         protected Vector3[] bladeOneFace = new Vector3[] { new Vector3(1, 0, 1), new Vector3(0, 0, 0), new Vector3(0, 1, 0), new Vector3(1, 1, 1) };

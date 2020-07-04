@@ -1,5 +1,9 @@
 ﻿namespace Minecraft
 {
+    /// <summary>
+    /// Captures the output of tessellating a chunk in order to be forwarded
+    /// to VBO/VAOs to be rendered.
+    /// </summary>
     struct ChunkBufferLayout
     {
         public float[] VertexPositions;

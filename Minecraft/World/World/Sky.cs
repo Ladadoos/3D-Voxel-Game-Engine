@@ -2,10 +2,14 @@
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Responsible for storing and keeping track of the colors the different parts 
+    /// of the sky should currently have.
+    /// </summary>
     class Sky
     {
         /*
-         * The color of different parts of the sky, the soon and moon and other elements can be changed 
+         * The colors of the different parts of the sky, the sun and moon and other elements can be changed 
          * by altering the color for the given hour. The sky will interpolate between the previous color
          * and the next color linearly for smooth transitions between the different colors.
          */

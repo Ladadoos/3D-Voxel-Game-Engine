@@ -5,6 +5,10 @@ using OpenTK;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Stores the loaded entities and chunks and serves as an interface to interact with the blocky world.
+    /// Also responsible for sending tick updates.
+    /// </summary>
     abstract class World
     {
         public Game Game { get; private set; }

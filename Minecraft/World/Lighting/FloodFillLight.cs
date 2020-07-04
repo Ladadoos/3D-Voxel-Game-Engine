@@ -6,7 +6,7 @@ namespace Minecraft
 {
     static class FloodFillLight
     {
-        //TODO Alrerady generated chunks that are on the border of just having light go through them.
+        //TODO Already generated chunks that are on the border of just having light go through them do not update.
         //Reproduce: Place a light such that it ends inside its own chunk border. The chunk neighbouring it will
         //also be lit but won't get unlit if the light is removed since lightmap of the neighbour chunk
         //is not updated.

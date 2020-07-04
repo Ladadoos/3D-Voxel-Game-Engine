@@ -2,6 +2,9 @@
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Renders the selection on the block the player is currently hovering on.
+    /// </summary>
     class PlayerHoverBlockRenderer
     {
         private readonly WireframeRenderer wireframeRenderer;

@@ -3,6 +3,9 @@ using System;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Representation of a view frustum used for culling objects.
+    /// </summary>
     class ViewFrustum
     {
         //Implementation based on: https://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html

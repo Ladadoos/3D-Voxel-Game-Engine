@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// The representation of the world used on the server.
+    /// </summary>
     class WorldServer : World
     {
         /// <summary>
@@ -11,7 +14,7 @@ namespace Minecraft
         /// </summary>
         private const int spawnAreaRadius = 3;
 
-        private EntityIdTracker entityIdTracker = new EntityIdTracker();
+        private IdTracker entityIdTracker = new IdTracker();
         private WorldGenerator worldGenerator;
 
         public WorldServer(Game game) : base(game)

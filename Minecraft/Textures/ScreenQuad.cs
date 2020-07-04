@@ -3,6 +3,9 @@ using System;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// The screen filling used to render a texture with post-processing effects.
+    /// </summary>
     class ScreenQuad
     {
         private readonly ScreenFBO fbo;

@@ -3,6 +3,10 @@ using System;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Responsible for updating the different elements that form the environment of the world.
+    /// Also keeps track of the time.
+    /// </summary>
     class Environment
     {
         /// <summary>

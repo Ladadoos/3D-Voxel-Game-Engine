@@ -1,5 +1,8 @@
 ﻿namespace Minecraft
 {
+    /// <summary>
+    /// The representation of the world used on the client.
+    /// </summary>
     class WorldClient : World
     {
         public WorldClient(Game game) : base(game)

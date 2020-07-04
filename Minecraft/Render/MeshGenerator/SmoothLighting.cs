@@ -2,6 +2,9 @@
 
 namespace Minecraft
 {
+    /// <summary>
+    /// Calculates the correct vertex light and ambient occlusion values to be baked into the chunks mesh.
+    /// </summary>
     class SmoothLighting
     {
         private Corner[] cornerTop = new Corner[] { Corner.BottomLeft, Corner.BottomRight, Corner.TopRight, Corner.TopLeft };
@@ -24,6 +27,10 @@ namespace Minecraft
 
         private (Chunk, Vector3i)[] blockBuffer = new (Chunk, Vector3i)[4];
         private Light[] lighBuffer = new Light[4];
+        /// <summary>
+        /// Calculate the four light values at a position facing a direction by 
+        /// taking the average of the surrounding block light values
+        /// </summary>
         public Light[] GetLightsAt(World world, Chunk chunk, int localX, int worldY, int localZ, Direction dir)
         {
             Vector3i anchor = new Vector3i(localX, worldY, localZ) + DirectionUtil.ToUnit(dir);

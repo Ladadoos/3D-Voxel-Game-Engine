@@ -10,8 +10,8 @@ namespace Minecraft
         public bool IsEmpty { get; private set; }
         public int GridX { get; private set; }
         public int GridZ { get; private set; }
-        public int numberOfOpaqueBlocks;
-        public int numberOfBlocks;
+        private int numberOfOpaqueBlocks;
+        private int numberOfBlocks;
 
         private ushort[] blocks = new ushort[16 * 16 * 16];
         private Dictionary<int, BlockState> customStates = new Dictionary<int, BlockState>();

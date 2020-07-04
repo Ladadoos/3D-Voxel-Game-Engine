@@ -3,6 +3,10 @@ using System;
 
 namespace Minecraft
 {
+    /// <summary>
+    /// The framebuffer object used to render a scene to, in order to apply
+    /// post-processing effects on it afterwards.
+    /// </summary>
     class ScreenFBO
     {
         public int ColorTextureID { get; private set; }

@@ -6,6 +6,10 @@ namespace Minecraft
 {
     class CharacterBuilder
     {
+        /// <summary>
+        /// Reads the font from a font file and converts it in order to be able to properly
+        /// render text on the screen.
+        /// </summary>
         public Dictionary<int, Character> BuildFont(Texture fontTexture, string fontFilePath)
         {
             Dictionary<int, Character> fontChars = new Dictionary<int, Character>();
