@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Minecraft
+﻿namespace Minecraft
 {
     class BlockStateWheat : BlockState
     {
